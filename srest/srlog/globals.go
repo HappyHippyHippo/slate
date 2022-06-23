@@ -27,6 +27,7 @@ const (
 	// for a 204(NoContent) status code.
 	ContainerNoContentID = ContainerID + ".no_content"
 )
+
 const (
 	// EnvID defines the slate.srest.log package base environment variable name.
 	EnvID = srest.EnvID + "_LOG"

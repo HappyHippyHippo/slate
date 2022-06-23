@@ -3,6 +3,7 @@ package srlog
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/happyhippyhippo/slate/slog"
+	"github.com/happyhippyhippo/slate/srest"
 	"time"
 )
 
@@ -12,7 +13,7 @@ func NewMiddleware(
 	logger *slog.Logger,
 	requestReader RequestReader,
 	responseReader ResponseReader,
-) (func(gin.HandlerFunc) gin.HandlerFunc, error) {
+) (srest.Middleware, error) {
 	if logger == nil {
 		return nil, errNilPointer("logger")
 	}

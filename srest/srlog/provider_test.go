@@ -3,10 +3,10 @@ package srlog
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/serror"
 	"github.com/happyhippyhippo/slate/slog"
+	"github.com/happyhippyhippo/slate/srest"
 	"testing"
 )
 
@@ -70,7 +70,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch middleware.(type) {
-			case func(gin.HandlerFunc) gin.HandlerFunc:
+			case srest.Middleware:
 			default:
 				t.Error("didn't returned a valid middleware function")
 			}
@@ -94,7 +94,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch middleware.(type) {
-			case func(gin.HandlerFunc) gin.HandlerFunc:
+			case srest.Middleware:
 			default:
 				t.Error("didn't returned a valid middleware function")
 			}
@@ -118,7 +118,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch middleware.(type) {
-			case func(gin.HandlerFunc) gin.HandlerFunc:
+			case srest.Middleware:
 			default:
 				t.Error("didn't returned a valid middleware function")
 			}
@@ -142,7 +142,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch middleware.(type) {
-			case func(gin.HandlerFunc) gin.HandlerFunc:
+			case srest.Middleware:
 			default:
 				t.Error("didn't returned a valid middleware function")
 			}
@@ -181,7 +181,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch middleware.(type) {
-			case func(gin.HandlerFunc) gin.HandlerFunc:
+			case srest.Middleware:
 			default:
 				t.Error("didn't returned a valid middleware function")
 			}
@@ -205,7 +205,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch middleware.(type) {
-			case func(gin.HandlerFunc) gin.HandlerFunc:
+			case srest.Middleware:
 			default:
 				t.Error("didn't returned a valid middleware function")
 			}
@@ -229,7 +229,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch middleware.(type) {
-			case func(gin.HandlerFunc) gin.HandlerFunc:
+			case srest.Middleware:
 			default:
 				t.Error("didn't returned a valid middleware function")
 			}
@@ -253,7 +253,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch middleware.(type) {
-			case func(gin.HandlerFunc) gin.HandlerFunc:
+			case srest.Middleware:
 			default:
 				t.Error("didn't returned a valid middleware function")
 			}
@@ -292,7 +292,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch middleware.(type) {
-			case func(gin.HandlerFunc) gin.HandlerFunc:
+			case srest.Middleware:
 			default:
 				t.Error("didn't returned a valid middleware function")
 			}
@@ -316,7 +316,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch middleware.(type) {
-			case func(gin.HandlerFunc) gin.HandlerFunc:
+			case srest.Middleware:
 			default:
 				t.Error("didn't returned a valid middleware function")
 			}
@@ -340,7 +340,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch middleware.(type) {
-			case func(gin.HandlerFunc) gin.HandlerFunc:
+			case srest.Middleware:
 			default:
 				t.Error("didn't returned a valid middleware function")
 			}
@@ -364,7 +364,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch middleware.(type) {
-			case func(gin.HandlerFunc) gin.HandlerFunc:
+			case srest.Middleware:
 			default:
 				t.Error("didn't returned a valid middleware function")
 			}
