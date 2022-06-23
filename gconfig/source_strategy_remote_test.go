@@ -1,0 +1,408 @@
+package gconfig
+
+import (
+	"errors"
+	"github.com/golang/mock/gomock"
+	"github.com/happyhippyhippo/slate/gerror"
+	"io"
+	"net/http"
+	"reflect"
+	"strings"
+	"testing"
+)
+
+func Test_NewSourceStrategyRemote(t *testing.T) {
+	t.Run("nil decoder factory", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		strategy, err := NewSourceStrategyRemote(nil)
+		switch {
+		case strategy != nil:
+			t.Error("returned a valid reference")
+		case err == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(err, gerror.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, gerror.ErrNilPointer)
+		}
+	})
+
+	t.Run("new remote source factory strategy", func(t *testing.T) {
+		factory := &(DecoderFactory{})
+
+		strategy, err := NewSourceStrategyRemote(factory)
+		switch {
+		case err != nil:
+			t.Errorf("returned the (%v) error", err)
+		case strategy == nil:
+			t.Error("didn't returned a valid reference")
+		case strategy.(*sourceStrategyRemote).decoderFactory != factory:
+			t.Error("didn't stored the decoder factory reference")
+		default:
+			client := strategy.(*sourceStrategyRemote).clientFactory()
+			switch client.(type) {
+			case *http.Client:
+			default:
+				t.Error("didn't stored a valid http client factory")
+			}
+		}
+	})
+}
+
+func Test_SourceStrategyRemote_Accept(t *testing.T) {
+	t.Run("accept only file type", func(t *testing.T) {
+		scenarios := []struct {
+			sourceType string
+			exp        bool
+		}{
+			{ // _test remote type
+				sourceType: SourceTypeRemote,
+				exp:        true,
+			},
+			{ // _test non-remote type
+				sourceType: SourceTypeUnknown,
+				exp:        false,
+			},
+		}
+
+		for _, scenario := range scenarios {
+			test := func() {
+				strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+				if check := strategy.Accept(scenario.sourceType); check != scenario.exp {
+					t.Errorf("for the type (%s), returned (%v)", scenario.sourceType, check)
+				}
+			}
+			test()
+		}
+	})
+}
+
+func Test_SourceStrategyRemote_AcceptFromConfig(t *testing.T) {
+	t.Run("don't accept on invalid config pointer", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		if strategy.AcceptFromConfig(nil) {
+			t.Error("returned true")
+		}
+	})
+
+	t.Run("don't accept if type is missing", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		if strategy.AcceptFromConfig(&Partial{}) {
+			t.Error("returned true")
+		}
+	})
+
+	t.Run("don't accept if type is not a string", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		if strategy.AcceptFromConfig(&Partial{"type": 123}) {
+			t.Error("returned true")
+		}
+	})
+
+	t.Run("don't accept if invalid type", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		if strategy.AcceptFromConfig(&Partial{"type": SourceTypeUnknown}) {
+			t.Error("returned true")
+		}
+	})
+
+	t.Run("accept config", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		if !strategy.AcceptFromConfig(&Partial{"type": SourceTypeRemote}) {
+			t.Error("returned false")
+		}
+	})
+}
+
+func Test_SourceStrategyRemote_Create(t *testing.T) {
+	t.Run("missing uri", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		src, err := strategy.Create()
+		switch {
+		case src != nil:
+			t.Error("returned a valid reference")
+		case err == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(err, gerror.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, gerror.ErrNilPointer)
+		}
+	})
+
+	t.Run("missing format", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		src, err := strategy.Create("uri")
+		switch {
+		case src != nil:
+			t.Error("returned a valid reference")
+		case err == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(err, gerror.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, gerror.ErrNilPointer)
+		}
+	})
+
+	t.Run("missing path", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		src, err := strategy.Create("uri", "format")
+		switch {
+		case src != nil:
+			t.Error("returned a valid reference")
+		case err == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(err, gerror.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, gerror.ErrNilPointer)
+		}
+	})
+
+	t.Run("non-string uri", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		src, err := strategy.Create(123, "format", "path")
+		switch {
+		case src != nil:
+			t.Error("returned a valid reference")
+		case err == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(err, gerror.ErrConversion):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, gerror.ErrConversion)
+		}
+	})
+
+	t.Run("non-string format", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		src, err := strategy.Create("uri", 123, "path")
+		switch {
+		case src != nil:
+			t.Error("returned a valid reference")
+		case err == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(err, gerror.ErrConversion):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, gerror.ErrConversion)
+		}
+	})
+
+	t.Run("non-string path", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		src, err := strategy.Create("uri", "format", 123)
+		switch {
+		case src != nil:
+			t.Error("returned a valid reference")
+		case err == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(err, gerror.ErrConversion):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, gerror.ErrConversion)
+		}
+	})
+
+	t.Run("create the remote source", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		uri := "uri"
+		format := "yaml"
+		path := "path"
+		field := "field"
+		value := "value"
+		expected := Partial{field: value}
+		factory := &(DecoderFactory{})
+		_ = factory.Register(&DecoderStrategyYAML{})
+		strategy, _ := NewSourceStrategyRemote(factory)
+		response := http.Response{}
+		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
+		client := NewMockHTTPClient(ctrl)
+		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
+		strategy.(*sourceStrategyRemote).clientFactory = func() HTTPClient {
+			return client
+		}
+
+		src, err := strategy.Create(uri, format, path)
+		switch {
+		case err != nil:
+			t.Errorf("returned the (%v) error", err)
+		case src == nil:
+			t.Error("didn't returned a valid reference")
+		default:
+			switch s := src.(type) {
+			case *sourceRemote:
+				if !reflect.DeepEqual(s.partial, expected) {
+					t.Error("didn't loaded the content correctly")
+				}
+			default:
+				t.Error("didn't returned a new remote source")
+			}
+		}
+	})
+}
+
+func Test_SourceStrategyRemote_CreateFromConfig(t *testing.T) {
+	t.Run("error on nil config pointer", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		src, err := strategy.CreateFromConfig(nil)
+		switch {
+		case src != nil:
+			t.Error("returned a valid reference")
+		case err == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(err, gerror.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, gerror.ErrNilPointer)
+		}
+	})
+
+	t.Run("missing uri", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		src, err := strategy.CreateFromConfig(&Partial{"format": "format", "configPath": "path"})
+		switch {
+		case src != nil:
+			t.Error("returned a valid reference")
+		case err == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(err, gerror.ErrConfigPathNotFound):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, gerror.ErrConfigPathNotFound)
+		}
+	})
+
+	t.Run("missing path", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		src, err := strategy.CreateFromConfig(&Partial{"uri": "path", "format": "format"})
+		switch {
+		case src != nil:
+			t.Error("returned a valid reference")
+		case err == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(err, gerror.ErrConfigPathNotFound):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, gerror.ErrConfigPathNotFound)
+		}
+	})
+
+	t.Run("non-string uri", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		src, err := strategy.CreateFromConfig(&Partial{"uri": 123, "format": "format", "configPath": "path"})
+		switch {
+		case src != nil:
+			t.Error("returned a valid reference")
+		case err == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(err, gerror.ErrConversion):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, gerror.ErrConversion)
+		}
+	})
+
+	t.Run("non-string format", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		src, err := strategy.CreateFromConfig(&Partial{"uri": "uri", "format": 123, "configPath": "path"})
+		switch {
+		case src != nil:
+			t.Error("returned a valid reference")
+		case err == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(err, gerror.ErrConversion):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, gerror.ErrConversion)
+		}
+	})
+
+	t.Run("non-string path", func(t *testing.T) {
+		strategy, _ := NewSourceStrategyRemote(&(DecoderFactory{}))
+
+		src, err := strategy.CreateFromConfig(&Partial{"uri": "uri", "format": "format", "configPath": 123})
+		switch {
+		case src != nil:
+			t.Error("returned a valid reference")
+		case err == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(err, gerror.ErrConversion):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, gerror.ErrConversion)
+		}
+	})
+
+	t.Run("create the remote source", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		uri := "uri"
+		format := DecoderFormatJSON
+		path := "path"
+		field := "field"
+		value := "value"
+		expected := Partial{field: value}
+		factory := &(DecoderFactory{})
+		_ = factory.Register(&DecoderStrategyJSON{})
+		strategy, _ := NewSourceStrategyRemote(factory)
+		response := http.Response{}
+		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
+		client := NewMockHTTPClient(ctrl)
+		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
+		strategy.(*sourceStrategyRemote).clientFactory = func() HTTPClient {
+			return client
+		}
+
+		src, err := strategy.CreateFromConfig(&Partial{"uri": uri, "format": format, "configPath": path})
+		switch {
+		case err != nil:
+			t.Errorf("returned the (%v) error", err)
+		case src == nil:
+			t.Error("didn't returned a valid reference")
+		default:
+			switch s := src.(type) {
+			case *sourceRemote:
+				if !reflect.DeepEqual(s.partial, expected) {
+					t.Error("didn't loaded the content correctly")
+				}
+			default:
+				t.Error("didn't returned a new remote source")
+			}
+		}
+	})
+
+	t.Run("create the remote source defaulting format if not present in config", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		uri := "uri"
+		path := "path"
+		field := "field"
+		value := "value"
+		expected := Partial{field: value}
+		factory := &(DecoderFactory{})
+		_ = factory.Register(&DecoderStrategyJSON{})
+		strategy, _ := NewSourceStrategyRemote(factory)
+		response := http.Response{}
+		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
+		client := NewMockHTTPClient(ctrl)
+		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
+		strategy.(*sourceStrategyRemote).clientFactory = func() HTTPClient {
+			return client
+		}
+
+		src, err := strategy.CreateFromConfig(&Partial{"uri": uri, "configPath": path})
+		switch {
+		case err != nil:
+			t.Errorf("returned the (%v) error", err)
+		case src == nil:
+			t.Error("didn't returned a valid reference")
+		default:
+			switch s := src.(type) {
+			case *sourceRemote:
+				if !reflect.DeepEqual(s.partial, expected) {
+					t.Error("didn't loaded the content correctly")
+				}
+			default:
+				t.Error("didn't returned a new remote source")
+			}
+		}
+	})
+}
