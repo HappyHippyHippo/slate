@@ -2,17 +2,17 @@ package slate
 
 import (
 	"fmt"
-	"github.com/happyhippyhippo/slate/gerror"
+	"github.com/happyhippyhippo/slate/serror"
 )
 
 func errNilPointer(arg string) error {
-	return fmt.Errorf("%w : %v", gerror.ErrNilPointer, arg)
+	return fmt.Errorf("%w : %v", serror.ErrNilPointer, arg)
 }
 
 func errConversion(val interface{}, t string) error {
-	return fmt.Errorf("%w : %v to %v", gerror.ErrConversion, val, t)
+	return fmt.Errorf("%w : %v to %v", serror.ErrConversion, val, t)
 }
 
 func errServiceNotFound(arg string) error {
-	return fmt.Errorf("%w : %v", gerror.ErrServiceNotFound, arg)
+	return fmt.Errorf("%w : %v", serror.ErrServiceNotFound, arg)
 }
