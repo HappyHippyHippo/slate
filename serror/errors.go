@@ -44,7 +44,7 @@ var (
 	ErrInvalidLogFormat = fmt.Errorf("invalid output format")
 
 	// ErrInvalidLogLevel defines an error that signal an invalid
-	//log level.
+	// log level.
 	ErrInvalidLogLevel = fmt.Errorf("invalid logger level")
 
 	// ErrDuplicateLogStream defines an error that signal that the
