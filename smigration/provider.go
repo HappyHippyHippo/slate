@@ -43,7 +43,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 			return nil, err
 		}
 
-		return NewMigrator(dao)
+		return newMigrator(dao)
 	})
 
 	return nil

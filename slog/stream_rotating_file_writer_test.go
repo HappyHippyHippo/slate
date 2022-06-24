@@ -13,7 +13,7 @@ import (
 
 func Test_NewStreamFileRotateWriter(t *testing.T) {
 	t.Run("nil file system adapter", func(t *testing.T) {
-		writer, err := NewStreamRotatingFileWriter(nil, "path")
+		writer, err := newStreamRotatingFileWriter(nil, "path")
 		switch {
 		case writer != nil:
 			t.Error("returned a valid reference")
@@ -34,7 +34,7 @@ func Test_NewStreamFileRotateWriter(t *testing.T) {
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 
-		writer, err := NewStreamRotatingFileWriter(fileSystem, path)
+		writer, err := newStreamRotatingFileWriter(fileSystem, path)
 		switch {
 		case writer != nil:
 			t.Error("returned a valid reference")
@@ -55,7 +55,7 @@ func Test_NewStreamFileRotateWriter(t *testing.T) {
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 
-		if writer, err := NewStreamRotatingFileWriter(fileSystem, path); err != nil {
+		if writer, err := newStreamRotatingFileWriter(fileSystem, path); err != nil {
 			t.Errorf("returned the unexpected error : %v", err)
 		} else if writer == nil {
 			t.Error("didn't returned the expected writer reference")
@@ -76,7 +76,7 @@ func Test_RotateFileWriter_Write(t *testing.T) {
 		file.EXPECT().Write(output).Return(0, expected).Times(1)
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		writer, _ := NewStreamRotatingFileWriter(fileSystem, path)
+		writer, _ := newStreamRotatingFileWriter(fileSystem, path)
 
 		if _, err := writer.Write(output); err == nil {
 			t.Error("didn't returned the expected error")
@@ -97,7 +97,7 @@ func Test_RotateFileWriter_Write(t *testing.T) {
 		file.EXPECT().Write(output).Return(count, nil).Times(1)
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		writer, _ := NewStreamRotatingFileWriter(fileSystem, path)
+		writer, _ := newStreamRotatingFileWriter(fileSystem, path)
 
 		if written, err := writer.Write(output); err != nil {
 			t.Errorf("returned the unexpected error : %v", err)
@@ -118,7 +118,7 @@ func Test_RotateFileWriter_Write(t *testing.T) {
 		file.EXPECT().Close().Return(expected)
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		writer, _ := NewStreamRotatingFileWriter(fileSystem, path)
+		writer, _ := newStreamRotatingFileWriter(fileSystem, path)
 
 		writer.(*streamRotatingFileWriter).day++
 
@@ -144,7 +144,7 @@ func Test_RotateFileWriter_Write(t *testing.T) {
 			fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil),
 			fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(nil, expected),
 		)
-		writer, _ := NewStreamRotatingFileWriter(fileSystem, path)
+		writer, _ := newStreamRotatingFileWriter(fileSystem, path)
 
 		writer.(*streamRotatingFileWriter).day++
 
@@ -172,7 +172,7 @@ func Test_RotateFileWriter_Write(t *testing.T) {
 			fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file1, nil),
 			fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file2, nil),
 		)
-		writer, _ := NewStreamRotatingFileWriter(fileSystem, path)
+		writer, _ := newStreamRotatingFileWriter(fileSystem, path)
 
 		writer.(*streamRotatingFileWriter).day++
 
@@ -196,7 +196,7 @@ func Test_RotateFileWriter_Close(t *testing.T) {
 		file.EXPECT().Close().Return(expected)
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		writer, _ := NewStreamRotatingFileWriter(fileSystem, path)
+		writer, _ := newStreamRotatingFileWriter(fileSystem, path)
 
 		if err := writer.(io.Closer).Close(); err == nil {
 			t.Error("didn't returned the expected error")

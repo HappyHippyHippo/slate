@@ -13,10 +13,7 @@ type sourceObservableRest struct {
 
 var _ SourceObservable = &sourceObservableRest{}
 
-// NewSourceObservableRest instantiate a new source that treats a
-// rest connection as the origin of the configuration content. This source will be
-// periodically checked for changes and loaded if so.
-func NewSourceObservableRest(client HTTPClient, uri, format string, factory *DecoderFactory, timestampPath, configPath string) (SourceObservable, error) {
+func newSourceObservableRest(client HTTPClient, uri, format string, factory *DecoderFactory, timestampPath, configPath string) (SourceObservable, error) {
 	if client == nil {
 		return nil, errNilPointer("client")
 	}

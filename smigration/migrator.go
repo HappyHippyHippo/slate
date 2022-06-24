@@ -2,27 +2,34 @@ package smigration
 
 import "sort"
 
-// Migrator defines the structure of an application persistence layer
-// migration manager.
-type Migrator struct {
+// Migrator defines an object that handles the
+// persistence layer migrations.
+type Migrator interface {
+	AddMigration(migration Migration) error
+	Current() (uint64, error)
+	Migrate() error
+	Up() error
+	Down() error
+}
+
+type migrator struct {
 	dao        *Dao
 	migrations []Migration
 }
 
-// NewMigrator instantiates a new migration manager instance.
-func NewMigrator(dao *Dao) (*Migrator, error) {
+func newMigrator(dao *Dao) (Migrator, error) {
 	if dao == nil {
 		return nil, errNilPointer("dao")
 	}
 
-	return &Migrator{
+	return &migrator{
 		dao:        dao,
 		migrations: []Migration{},
 	}, nil
 }
 
 // AddMigration registers a migration into the migration manager.
-func (m *Migrator) AddMigration(migration Migration) error {
+func (m *migrator) AddMigration(migration Migration) error {
 	if migration == nil {
 		return errNilPointer("migration")
 	}
@@ -37,7 +44,7 @@ func (m *Migrator) AddMigration(migration Migration) error {
 }
 
 // Current returns the version of the last executed migration.
-func (m Migrator) Current() (uint64, error) {
+func (m migrator) Current() (uint64, error) {
 	current, err := m.dao.Last()
 	if err != nil {
 		return 0, err
@@ -47,7 +54,7 @@ func (m Migrator) Current() (uint64, error) {
 }
 
 // Migrate execute all migrations that are yet to be executed.
-func (m Migrator) Migrate() error {
+func (m migrator) Migrate() error {
 	if len(m.migrations) == 0 {
 		return nil
 	}
@@ -74,7 +81,7 @@ func (m Migrator) Migrate() error {
 }
 
 // Up will try to execute the next migration in queue to be executed.
-func (m Migrator) Up() error {
+func (m migrator) Up() error {
 	if len(m.migrations) == 0 {
 		return nil
 	}
@@ -99,7 +106,7 @@ func (m Migrator) Up() error {
 }
 
 // Down will try to revert the last migration executed.
-func (m Migrator) Down() error {
+func (m migrator) Down() error {
 	if len(m.migrations) == 0 {
 		return nil
 	}

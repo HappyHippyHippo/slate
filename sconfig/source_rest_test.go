@@ -16,7 +16,7 @@ func Test_NewSourceRest(t *testing.T) {
 	t.Run("nil client", func(t *testing.T) {
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceRest(nil, "uri", DecoderFormatUnknown, factory, "path")
+		src, err := newSourceRest(nil, "uri", DecoderFormatUnknown, factory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -33,7 +33,7 @@ func Test_NewSourceRest(t *testing.T) {
 
 		client := NewMockHTTPClient(ctrl)
 
-		src, err := NewSourceRest(client, "uri", DecoderFormatUnknown, nil, "path")
+		src, err := newSourceRest(client, "uri", DecoderFormatUnknown, nil, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -52,7 +52,7 @@ func Test_NewSourceRest(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceRest(client, "\n", DecoderFormatUnknown, factory, "path")
+		src, err := newSourceRest(client, "\n", DecoderFormatUnknown, factory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -72,7 +72,7 @@ func Test_NewSourceRest(t *testing.T) {
 		client.EXPECT().Do(gomock.Any()).Return(nil, expected).Times(1)
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceRest(client, "uri", DecoderFormatUnknown, factory, "path")
+		src, err := newSourceRest(client, "uri", DecoderFormatUnknown, factory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -93,7 +93,7 @@ func Test_NewSourceRest(t *testing.T) {
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceRest(client, "uri", DecoderFormatUnknown, factory, "path")
+		src, err := newSourceRest(client, "uri", DecoderFormatUnknown, factory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -116,7 +116,7 @@ func Test_NewSourceRest(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
+		src, err := newSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -138,7 +138,7 @@ func Test_NewSourceRest(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
+		src, err := newSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -160,7 +160,7 @@ func Test_NewSourceRest(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path.node")
+		src, err := newSourceRest(client, "uri", DecoderFormatYAML, factory, "path.node")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -182,7 +182,7 @@ func Test_NewSourceRest(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
+		src, err := newSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -205,7 +205,7 @@ func Test_NewSourceRest(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
+		src, err := newSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
 		switch {
 		case err != nil:
 			t.Errorf("returned the unexpected error : %v", err)
@@ -235,7 +235,7 @@ func Test_NewSourceRest(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "node..inner_node")
+		src, err := newSourceRest(client, "uri", DecoderFormatYAML, factory, "node..inner_node")
 		switch {
 		case err != nil:
 			t.Errorf("returned the unexpected error : %v", err)

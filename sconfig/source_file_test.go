@@ -13,7 +13,7 @@ import (
 
 func Test_NewSourceFile(t *testing.T) {
 	t.Run("nil file system adapter", func(t *testing.T) {
-		src, err := NewSourceFile("path", DecoderFormatYAML, nil, &DecoderFactory{})
+		src, err := newSourceFile("path", DecoderFormatYAML, nil, &DecoderFactory{})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -28,7 +28,7 @@ func Test_NewSourceFile(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		src, err := NewSourceFile("path", DecoderFormatYAML, NewMockFs(ctrl), nil)
+		src, err := newSourceFile("path", DecoderFormatYAML, NewMockFs(ctrl), nil)
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -48,7 +48,7 @@ func Test_NewSourceFile(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 
-		src, err := NewSourceFile(path, DecoderFormatYAML, fs, &DecoderFactory{})
+		src, err := newSourceFile(path, DecoderFormatYAML, fs, &DecoderFactory{})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -69,7 +69,7 @@ func Test_NewSourceFile(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 
-		src, err := NewSourceFile(path, DecoderFormatUnknown, fs, &DecoderFactory{})
+		src, err := newSourceFile(path, DecoderFormatUnknown, fs, &DecoderFactory{})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -97,7 +97,7 @@ func Test_NewSourceFile(t *testing.T) {
 		factory := DecoderFactory{}
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceFile(path, DecoderFormatYAML, fs, &factory)
+		src, err := newSourceFile(path, DecoderFormatYAML, fs, &factory)
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -124,7 +124,7 @@ func Test_NewSourceFile(t *testing.T) {
 		factory := DecoderFactory{}
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceFile(path, DecoderFormatYAML, fs, &factory)
+		src, err := newSourceFile(path, DecoderFormatYAML, fs, &factory)
 		switch {
 		case src == nil:
 			t.Error("didn't returned a valid reference")
@@ -170,7 +170,7 @@ func Test_NewSourceFile(t *testing.T) {
 		factory := DecoderFactory{}
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceFile(path, DecoderFormatYAML, fs, &factory)
+		src, err := newSourceFile(path, DecoderFormatYAML, fs, &factory)
 		switch {
 		case src == nil:
 			t.Error("didn't returned a valid reference")

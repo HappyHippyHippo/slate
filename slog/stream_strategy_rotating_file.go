@@ -11,10 +11,7 @@ type streamStrategyRotatingFile struct {
 
 var _ StreamStrategy = &streamStrategyRotatingFile{}
 
-// NewStreamStrategyRotatingFile instantiate a new file stream factory
-// strategy that will enable the stream factory to instantiate a new file
-// stream.
-func NewStreamStrategyRotatingFile(fs afero.Fs, factory *FormatterFactory) (StreamStrategy, error) {
+func newStreamStrategyRotatingFile(fs afero.Fs, factory *FormatterFactory) (StreamStrategy, error) {
 	if fs == nil {
 		return nil, errNilPointer("fs")
 	}
@@ -67,10 +64,10 @@ func (s streamStrategyRotatingFile) Create(args ...interface{}) (Stream, error) 
 		return nil, errConversion(args[3], "log.Level")
 	} else if formatter, err := s.factory.Create(format); err != nil {
 		return nil, err
-	} else if file, err := NewStreamRotatingFileWriter(s.fs, path); err != nil {
+	} else if file, err := newStreamRotatingFileWriter(s.fs, path); err != nil {
 		return nil, err
 	} else {
-		return NewStreamFile(file, formatter, channels, level)
+		return newStreamFile(file, formatter, channels, level)
 	}
 }
 

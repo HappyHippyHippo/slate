@@ -19,15 +19,15 @@ func GetDao(c slate.ServiceContainer) (*Dao, error) {
 
 // GetMigrator will try to retrieve a new migrator instance
 // from the application service container.
-func GetMigrator(c slate.ServiceContainer) (*Migrator, error) {
+func GetMigrator(c slate.ServiceContainer) (Migrator, error) {
 	instance, err := c.Get(ContainerID)
 	if err != nil {
 		return nil, err
 	}
 
-	i, ok := instance.(*Migrator)
+	i, ok := instance.(Migrator)
 	if !ok {
-		return nil, errConversion(instance, "*Migrator")
+		return nil, errConversion(instance, "Migrator")
 	}
 	return i, nil
 }

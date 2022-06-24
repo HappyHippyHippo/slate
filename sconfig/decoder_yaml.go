@@ -16,9 +16,7 @@ type decoderYAML struct {
 
 var _ Decoder = &decoderYAML{}
 
-// NewDecoderYAML instantiate a new yaml configuration decoder object
-// used to parse a yaml configuration source into a config Partial.
-func NewDecoderYAML(reader io.Reader) (Decoder, error) {
+func newDecoderYAML(reader io.Reader) (Decoder, error) {
 	if reader == nil {
 		return nil, errNilPointer("reader")
 	}

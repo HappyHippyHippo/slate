@@ -12,7 +12,7 @@ import (
 
 func Test_NewDecoderJSON(t *testing.T) {
 	t.Run("nil reader", func(t *testing.T) {
-		decoder, err := NewDecoderJSON(nil)
+		decoder, err := newDecoderJSON(nil)
 		switch {
 		case decoder != nil:
 			t.Error("returned a valid reference")
@@ -30,7 +30,7 @@ func Test_NewDecoderJSON(t *testing.T) {
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
 
-		if decoder, err := NewDecoderJSON(reader); decoder == nil {
+		if decoder, err := newDecoderJSON(reader); decoder == nil {
 			t.Errorf("didn't returned a valid reference")
 		} else {
 			defer func() { _ = decoder.Close() }()
@@ -51,7 +51,7 @@ func Test_DecoderJSON_Close(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Return(expected).Times(1)
-		decoder, _ := NewDecoderJSON(reader)
+		decoder, _ := newDecoderJSON(reader)
 
 		if err := decoder.Close(); err == nil {
 			t.Errorf("didn't returned the expected error")
@@ -66,7 +66,7 @@ func Test_DecoderJSON_Close(t *testing.T) {
 
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		decoder, _ := NewDecoderJSON(reader)
+		decoder, _ := newDecoderJSON(reader)
 
 		_ = decoder.Close()
 		_ = decoder.Close()
@@ -81,7 +81,7 @@ func Test_DecoderJSON_Decode(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		decoder, _ := NewDecoderJSON(reader)
+		decoder, _ := newDecoderJSON(reader)
 		defer func() { _ = decoder.Close() }()
 		json := NewMockJsoner(ctrl)
 		json.EXPECT().Decode(&map[string]interface{}{}).DoAndReturn(func(p *map[string]interface{}) error {
@@ -107,7 +107,7 @@ func Test_DecoderJSON_Decode(t *testing.T) {
 		data := Partial{"node": "data"}
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		decoder, _ := NewDecoderJSON(reader)
+		decoder, _ := newDecoderJSON(reader)
 		defer func() { _ = decoder.Close() }()
 		json := NewMockJsoner(ctrl)
 		json.EXPECT().Decode(&map[string]interface{}{}).DoAndReturn(func(p *map[string]interface{}) error {
@@ -131,7 +131,7 @@ func Test_DecoderJSON_Decode(t *testing.T) {
 		json := `{"node": {"subnode": "data"}}`
 		expected := Partial{"node": Partial{"subnode": "data"}}
 		reader := strings.NewReader(json)
-		decoder, _ := NewDecoderJSON(reader)
+		decoder, _ := newDecoderJSON(reader)
 		defer func() { _ = decoder.Close() }()
 
 		check, err := decoder.Decode()

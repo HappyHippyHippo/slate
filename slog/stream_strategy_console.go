@@ -9,10 +9,7 @@ type streamStrategyConsole struct {
 
 var _ StreamStrategy = &streamStrategyConsole{}
 
-// NewStreamStrategyConsole instantiate a new console stream factory
-// strategy that will enable the stream factory to instantiate a new console
-// stream.
-func NewStreamStrategyConsole(factory *FormatterFactory) (StreamStrategy, error) {
+func newStreamStrategyConsole(factory *FormatterFactory) (StreamStrategy, error) {
 	if factory == nil {
 		return nil, errNilPointer("factory")
 	}
@@ -58,7 +55,7 @@ func (s streamStrategyConsole) Create(args ...interface{}) (Stream, error) {
 	} else if formatter, err := s.factory.Create(format); err != nil {
 		return nil, err
 	} else {
-		return NewStreamConsole(formatter, channels, level)
+		return newStreamConsole(formatter, channels, level)
 	}
 }
 

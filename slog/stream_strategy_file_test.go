@@ -12,7 +12,7 @@ import (
 
 func Test_NewStreamStrategyFile(t *testing.T) {
 	t.Run("nil file system adapter", func(t *testing.T) {
-		strategy, err := NewStreamStrategyFile(nil, &FormatterFactory{})
+		strategy, err := newStreamStrategyFile(nil, &FormatterFactory{})
 		switch {
 		case strategy != nil:
 			t.Error("returned a valid reference")
@@ -27,7 +27,7 @@ func Test_NewStreamStrategyFile(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, err := NewStreamStrategyFile(NewMockFs(ctrl), nil)
+		strategy, err := newStreamStrategyFile(NewMockFs(ctrl), nil)
 		switch {
 		case strategy != nil:
 			t.Error("returned a valid reference")
@@ -42,7 +42,7 @@ func Test_NewStreamStrategyFile(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		if strategy, err := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{}); strategy == nil {
+		if strategy, err := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{}); strategy == nil {
 			t.Errorf("didn't returned a valid reference")
 		} else if err != nil {
 			t.Errorf("returned the (%v) error", err)
@@ -54,7 +54,7 @@ func Test_StreamStrategyFile_Accept(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
+	strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
 
 	t.Run("accept only file type", func(t *testing.T) {
 		scenarios := []struct {
@@ -83,7 +83,7 @@ func Test_StreamStrategyFile_AcceptFromConfig(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
+	strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
 
 	t.Run("don't accept if config is a nil pointer", func(t *testing.T) {
 		if strategy.AcceptFromConfig(nil) {
@@ -133,7 +133,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
+		strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
 
 		stream, err := strategy.Create(1, 2, 3)
 		switch {
@@ -150,7 +150,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
+		strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
 
 		stream, err := strategy.Create(123, FormatJSON, []string{}, DEBUG)
 		switch {
@@ -167,7 +167,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
+		strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
 
 		stream, err := strategy.Create("path", 123, []string{}, DEBUG)
 		switch {
@@ -184,7 +184,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
+		strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
 
 		stream, err := strategy.Create("path", FormatJSON, "string", DEBUG)
 		switch {
@@ -201,7 +201,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
+		strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
 
 		stream, err := strategy.Create("path", FormatJSON, []string{}, "string")
 		switch {
@@ -218,7 +218,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
+		strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
 
 		stream, err := strategy.Create("path", FormatJSON, []string{}, DEBUG)
 		switch {
@@ -240,7 +240,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 		fileSystem.EXPECT().OpenFile("path", os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 		factory := &FormatterFactory{}
 		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := NewStreamStrategyFile(fileSystem, factory)
+		strategy, _ := newStreamStrategyFile(fileSystem, factory)
 
 		stream, err := strategy.Create("path", FormatJSON, []string{}, DEBUG)
 		switch {
@@ -263,7 +263,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 		fileSystem.EXPECT().OpenFile("path", os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := &FormatterFactory{}
 		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := NewStreamStrategyFile(fileSystem, factory)
+		strategy, _ := newStreamStrategyFile(fileSystem, factory)
 
 		stream, err := strategy.Create("path", FormatJSON, []string{}, DEBUG)
 		switch {
@@ -286,7 +286,7 @@ func Test_StreamStrategyFile_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
+		strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
 
 		src, err := strategy.CreateFromConfig(nil)
 		switch {
@@ -307,7 +307,7 @@ func Test_StreamStrategyFile_CreateFromConfig(t *testing.T) {
 		config := NewMockConfig(ctrl)
 		config.EXPECT().String("path").Return("", expected).Times(1)
 
-		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
+		strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -331,7 +331,7 @@ func Test_StreamStrategyFile_CreateFromConfig(t *testing.T) {
 			config.EXPECT().String("format").Return("", expected),
 		)
 
-		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
+		strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -358,7 +358,7 @@ func Test_StreamStrategyFile_CreateFromConfig(t *testing.T) {
 
 		factory := &FormatterFactory{}
 		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), factory)
+		strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), factory)
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -384,7 +384,7 @@ func Test_StreamStrategyFile_CreateFromConfig(t *testing.T) {
 
 		factory := &FormatterFactory{}
 		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), factory)
+		strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), factory)
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -410,7 +410,7 @@ func Test_StreamStrategyFile_CreateFromConfig(t *testing.T) {
 		)
 		config.EXPECT().List("channels").Return([]interface{}{"channel1"}, nil)
 
-		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
+		strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -435,7 +435,7 @@ func Test_StreamStrategyFile_CreateFromConfig(t *testing.T) {
 		)
 		config.EXPECT().List("channels").Return([]interface{}{"channel1"}, nil)
 
-		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
+		strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -460,7 +460,7 @@ func Test_StreamStrategyFile_CreateFromConfig(t *testing.T) {
 		)
 		config.EXPECT().List("channels").Return([]interface{}{"channel1"}, nil)
 
-		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
+		strategy, _ := newStreamStrategyFile(NewMockFs(ctrl), &FormatterFactory{})
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -491,7 +491,7 @@ func Test_StreamStrategyFile_CreateFromConfig(t *testing.T) {
 		fileSystem.EXPECT().OpenFile("path", os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 		factory := &FormatterFactory{}
 		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := NewStreamStrategyFile(fileSystem, factory)
+		strategy, _ := newStreamStrategyFile(fileSystem, factory)
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -523,7 +523,7 @@ func Test_StreamStrategyFile_CreateFromConfig(t *testing.T) {
 		fileSystem.EXPECT().OpenFile("path", os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := &FormatterFactory{}
 		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := NewStreamStrategyFile(fileSystem, factory)
+		strategy, _ := newStreamStrategyFile(fileSystem, factory)
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {

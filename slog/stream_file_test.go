@@ -19,7 +19,7 @@ func Test_NewStreamFile(t *testing.T) {
 	level := WARNING
 
 	t.Run("nil writer", func(t *testing.T) {
-		stream, err := NewStreamFile(nil, formatter, channels, level)
+		stream, err := newStreamFile(nil, formatter, channels, level)
 		switch {
 		case stream != nil:
 			_ = stream.(io.Closer).Close()
@@ -32,7 +32,7 @@ func Test_NewStreamFile(t *testing.T) {
 	})
 
 	t.Run("nil formatter", func(t *testing.T) {
-		stream, err := NewStreamFile(writer, nil, channels, level)
+		stream, err := newStreamFile(writer, nil, channels, level)
 		switch {
 		case stream != nil:
 			_ = stream.(io.Closer).Close()
@@ -45,7 +45,7 @@ func Test_NewStreamFile(t *testing.T) {
 	})
 
 	t.Run("new file stream", func(t *testing.T) {
-		stream, err := NewStreamFile(writer, formatter, []string{}, WARNING)
+		stream, err := newStreamFile(writer, formatter, []string{}, WARNING)
 		switch {
 		case stream == nil:
 			t.Error("didn't returned a valid reference")
@@ -65,7 +65,7 @@ func Test_StreamFile_Close(t *testing.T) {
 
 		writer := NewMockWriter(ctrl)
 		writer.EXPECT().Close().Times(1)
-		stream, _ := NewStreamFile(writer, NewMockFormatter(ctrl), []string{}, WARNING)
+		stream, _ := newStreamFile(writer, NewMockFormatter(ctrl), []string{}, WARNING)
 
 		_ = stream.(io.Closer).Close()
 		_ = stream.(io.Closer).Close()
@@ -165,7 +165,7 @@ func Test_StreamFile_Signal(t *testing.T) {
 				writer.EXPECT().Write([]byte(scenario.expected + "\n")).Times(scenario.callTimes)
 				formatter := NewMockFormatter(ctrl)
 				formatter.EXPECT().Format(scenario.call.level, scenario.call.message, scenario.call.fields).Return(scenario.expected).Times(scenario.callTimes)
-				stream, _ := NewStreamFile(writer, formatter, scenario.state.channels, scenario.state.level)
+				stream, _ := newStreamFile(writer, formatter, scenario.state.channels, scenario.state.level)
 
 				defer func() { _ = stream.(io.Closer).Close(); ctrl.Finish() }()
 
@@ -244,7 +244,7 @@ func Test_StreamFile_Broadcast(t *testing.T) {
 				writer.EXPECT().Write([]byte(scenario.expected + "\n")).Times(scenario.callTimes)
 				formatter := NewMockFormatter(ctrl)
 				formatter.EXPECT().Format(scenario.call.level, scenario.call.message, scenario.call.fields).Return(scenario.expected).Times(scenario.callTimes)
-				stream, _ := NewStreamFile(writer, formatter, scenario.state.channels, scenario.state.level)
+				stream, _ := newStreamFile(writer, formatter, scenario.state.channels, scenario.state.level)
 
 				defer func() { _ = stream.(io.Closer).Close(); ctrl.Finish() }()
 

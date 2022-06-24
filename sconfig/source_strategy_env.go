@@ -1,8 +1,5 @@
 package sconfig
 
-// sourceStrategyEnv defines an environment config source
-// instantiation strategy to be used by the config sources factory
-// instance.
 type sourceStrategyEnv struct{}
 
 var _ SourceStrategy = &sourceStrategyEnv{}
@@ -35,7 +32,7 @@ func (s sourceStrategyEnv) Create(args ...interface{}) (Source, error) {
 	}
 
 	if mappings, ok := args[0].(map[string]string); ok {
-		return NewSourceEnv(mappings)
+		return newSourceEnv(mappings)
 	}
 
 	return nil, errConversion(args[0], "map[string]string")

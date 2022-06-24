@@ -6,7 +6,6 @@ import (
 	"sort"
 )
 
-// streamFile defines a file output logger stream.
 type streamFile struct {
 	stream
 	writer io.Writer
@@ -14,9 +13,7 @@ type streamFile struct {
 
 var _ Stream = &streamConsole{}
 
-// NewStreamFile instantiate a new file stream object that will write logging
-// content into a file.
-func NewStreamFile(writer io.Writer, formatter Formatter, channels []string, level Level) (Stream, error) {
+func newStreamFile(writer io.Writer, formatter Formatter, channels []string, level Level) (Stream, error) {
 	if formatter == nil {
 		return nil, errNilPointer("formatter")
 	}

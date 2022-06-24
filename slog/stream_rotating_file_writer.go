@@ -22,10 +22,7 @@ type streamRotatingFileWriter struct {
 
 var _ io.Writer = &streamRotatingFileWriter{}
 
-// NewStreamRotatingFileWriter instantiates an io.Writer implementing structure that
-// output to a file taking into account the file timestamp, so it can perform
-// the rotation to a new file on day change.
-func NewStreamRotatingFileWriter(fs afero.Fs, file string) (io.Writer, error) {
+func newStreamRotatingFileWriter(fs afero.Fs, file string) (io.Writer, error) {
 	if fs == nil {
 		return nil, errNilPointer("fs")
 	}

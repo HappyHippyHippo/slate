@@ -13,10 +13,7 @@ type sourceObservableFile struct {
 
 var _ SourceObservable = &sourceObservableFile{}
 
-// NewSourceObservableFile instantiate a new source that treats a file
-// as the origin of the configuration content. This file source will be
-// periodically checked for changes and loaded if so.
-func NewSourceObservableFile(path, format string, fs afero.Fs, factory *DecoderFactory) (SourceObservable, error) {
+func newSourceObservableFile(path, format string, fs afero.Fs, factory *DecoderFactory) (SourceObservable, error) {
 	if fs == nil {
 		return nil, errNilPointer("fs")
 	}

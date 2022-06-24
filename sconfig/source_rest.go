@@ -24,9 +24,7 @@ type sourceRest struct {
 
 var _ Source = &sourceRest{}
 
-// NewSourceRest instantiate a new source that treats a
-//// rest connection as the origin of the configuration content.
-func NewSourceRest(client HTTPClient, uri, format string, factory *DecoderFactory, configPath string) (Source, error) {
+func newSourceRest(client HTTPClient, uri, format string, factory *DecoderFactory, configPath string) (Source, error) {
 	if client == nil {
 		return nil, errNilPointer("client")
 	}

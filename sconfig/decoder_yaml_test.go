@@ -12,7 +12,7 @@ import (
 
 func Test_NewDecoderYAML(t *testing.T) {
 	t.Run("nil reader", func(t *testing.T) {
-		decoder, err := NewDecoderYAML(nil)
+		decoder, err := newDecoderYAML(nil)
 		switch {
 		case decoder != nil:
 			t.Error("returned a valid reference")
@@ -30,7 +30,7 @@ func Test_NewDecoderYAML(t *testing.T) {
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
 
-		if decoder, err := NewDecoderYAML(reader); decoder == nil {
+		if decoder, err := newDecoderYAML(reader); decoder == nil {
 			t.Errorf("didn't returned a valid reference")
 		} else {
 			defer func() { _ = decoder.Close() }()
@@ -51,7 +51,7 @@ func Test_DecoderYAML_Close(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Return(expected).Times(1)
-		decoder, _ := NewDecoderYAML(reader)
+		decoder, _ := newDecoderYAML(reader)
 
 		if err := decoder.Close(); err == nil {
 			t.Errorf("didn't returned the expected error")
@@ -66,7 +66,7 @@ func Test_DecoderYAML_Close(t *testing.T) {
 
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		decoder, _ := NewDecoderYAML(reader)
+		decoder, _ := newDecoderYAML(reader)
 
 		_ = decoder.Close()
 		_ = decoder.Close()
@@ -81,7 +81,7 @@ func Test_DecoderYAML_Decode(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		decoder, _ := NewDecoderYAML(reader)
+		decoder, _ := newDecoderYAML(reader)
 		defer func() { _ = decoder.Close() }()
 		yaml := NewMockYamler(ctrl)
 		yaml.EXPECT().Decode(&Partial{}).DoAndReturn(func(p *Partial) error {
@@ -107,7 +107,7 @@ func Test_DecoderYAML_Decode(t *testing.T) {
 		data := Partial{"node": "data"}
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		decoder, _ := NewDecoderYAML(reader)
+		decoder, _ := newDecoderYAML(reader)
 		defer func() { _ = decoder.Close() }()
 		yaml := NewMockYamler(ctrl)
 		yaml.EXPECT().Decode(&Partial{}).DoAndReturn(func(p *Partial) error {
@@ -131,7 +131,7 @@ func Test_DecoderYAML_Decode(t *testing.T) {
 		yaml := "node:\n  subnode: data"
 		expected := Partial{"node": Partial{"subnode": "data"}}
 		reader := strings.NewReader(yaml)
-		decoder, _ := NewDecoderYAML(reader)
+		decoder, _ := newDecoderYAML(reader)
 		defer func() { _ = decoder.Close() }()
 
 		check, err := decoder.Decode()

@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-// dialectStrategySqlite  is a SQLite dialect interface generator.
 type dialectStrategySqlite struct{}
 
 var _ DialectStrategy = &dialectStrategySqlite{}

@@ -38,7 +38,7 @@ func Test_FormatterStrategyJSON_Create(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch formatter.(type) {
-			case *FormatterJSON:
+			case *formatterJSON:
 			default:
 				t.Errorf("didn't returned a new json formatter")
 			}

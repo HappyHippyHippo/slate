@@ -6,14 +6,13 @@ import (
 	"time"
 )
 
-// FormatterJSON defines a JSON based logger formatter.
-type FormatterJSON struct{}
+type formatterJSON struct{}
 
-var _ Formatter = &FormatterJSON{}
+var _ Formatter = &formatterJSON{}
 
 // Format will create the output JSON string message formatted with the content
 // of the passed level, message and context
-func (f FormatterJSON) Format(level Level, message string, ctx map[string]interface{}) string {
+func (f formatterJSON) Format(level Level, message string, ctx map[string]interface{}) string {
 	if ctx == nil {
 		ctx = map[string]interface{}{}
 	}

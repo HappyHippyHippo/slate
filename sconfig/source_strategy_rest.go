@@ -4,8 +4,6 @@ import (
 	"net/http"
 )
 
-// sourceStrategyRest defines a rest config source instantiation
-// strategy to be used by the config sources factory instance.
 type sourceStrategyRest struct {
 	clientFactory  func() HTTPClient
 	decoderFactory *DecoderFactory
@@ -13,10 +11,7 @@ type sourceStrategyRest struct {
 
 var _ SourceStrategy = &sourceStrategyRest{}
 
-// NewSourceStrategyRest instantiate a new rest source factory
-// strategy that will enable the source factory to instantiate a new
-// rest configuration source.
-func NewSourceStrategyRest(decoderFactory *DecoderFactory) (SourceStrategy, error) {
+func newSourceStrategyRest(decoderFactory *DecoderFactory) (SourceStrategy, error) {
 	if decoderFactory == nil {
 		return nil, errNilPointer("DecoderFactory")
 	}
@@ -61,7 +56,7 @@ func (s sourceStrategyRest) Create(args ...interface{}) (Source, error) {
 	} else if configPath, ok := args[2].(string); !ok {
 		return nil, errConversion(args[2], "string")
 	} else {
-		return NewSourceRest(s.clientFactory(), uri, format, s.decoderFactory, configPath)
+		return newSourceRest(s.clientFactory(), uri, format, s.decoderFactory, configPath)
 	}
 }
 

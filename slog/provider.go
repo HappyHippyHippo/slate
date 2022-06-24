@@ -32,7 +32,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		if err != nil {
 			return nil, err
 		}
-		return NewStreamStrategyConsole(factory)
+		return newStreamStrategyConsole(factory)
 	}, ContainerStreamStrategyTag)
 
 	_ = c.Service(ContainerStreamStrategyFileID, func() (interface{}, error) {
@@ -41,7 +41,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		} else if formatterFactory, err := GetFormatterFactory(c); err != nil {
 			return nil, err
 		} else {
-			return NewStreamStrategyFile(filesystem, formatterFactory)
+			return newStreamStrategyFile(filesystem, formatterFactory)
 		}
 	}, ContainerStreamStrategyTag)
 
@@ -51,7 +51,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		} else if formatterFactory, err := GetFormatterFactory(c); err != nil {
 			return nil, err
 		} else {
-			return NewStreamStrategyRotatingFile(filesystem, formatterFactory)
+			return newStreamStrategyRotatingFile(filesystem, formatterFactory)
 		}
 	}, ContainerStreamStrategyTag)
 

@@ -172,7 +172,7 @@ func Test_Loader_Load(t *testing.T) {
 		formatterFactory := &FormatterFactory{}
 		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
-		strategy, _ := NewStreamStrategyConsole(formatterFactory)
+		strategy, _ := newStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)
 		loader, _ := NewLoader(cfg, NewLogger(), streamFactory)
 
@@ -196,7 +196,7 @@ func Test_Loader_Load(t *testing.T) {
 		formatterFactory := &FormatterFactory{}
 		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
-		strategy, _ := NewStreamStrategyConsole(formatterFactory)
+		strategy, _ := newStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)
 		loader, _ := NewLoader(cfg, NewLogger(), streamFactory)
 
@@ -218,7 +218,7 @@ func Test_Loader_Load(t *testing.T) {
 		formatterFactory := &FormatterFactory{}
 		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
-		strategy, _ := NewStreamStrategyConsole(formatterFactory)
+		strategy, _ := newStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)
 		logger := NewLogger()
 		loader, _ := NewLoader(cfg, logger, streamFactory)
@@ -244,7 +244,7 @@ func Test_Loader_Load(t *testing.T) {
 		formatterFactory := &FormatterFactory{}
 		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
-		strategy, _ := NewStreamStrategyConsole(formatterFactory)
+		strategy, _ := newStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)
 		logger := NewLogger()
 		loader, _ := NewLoader(cfg, logger, streamFactory)
@@ -271,7 +271,7 @@ func Test_Loader_Load(t *testing.T) {
 		formatterFactory := &FormatterFactory{}
 		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
-		strategy, _ := NewStreamStrategyConsole(formatterFactory)
+		strategy, _ := newStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)
 		logger := NewLogger()
 		loader, _ := NewLoader(cfg, logger, streamFactory)

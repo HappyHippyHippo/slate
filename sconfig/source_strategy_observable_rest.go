@@ -4,19 +4,13 @@ import (
 	"net/http"
 )
 
-// sourceStrategyObservableRest defines am observable rest config
-// source instantiation strategy to be used by the config sources factory
-// instance.
 type sourceStrategyObservableRest struct {
 	sourceStrategyRest
 }
 
 var _ SourceStrategy = &sourceStrategyObservableRest{}
 
-// NewSourceStrategyObservableRest instantiate a new observable rest
-// source factory strategy that will enable the source factory to instantiate
-// a new rest configuration source.
-func NewSourceStrategyObservableRest(decoderFactory *DecoderFactory) (SourceStrategy, error) {
+func newSourceStrategyObservableRest(decoderFactory *DecoderFactory) (SourceStrategy, error) {
 	if decoderFactory == nil {
 		return nil, errNilPointer("DecoderFactory")
 	}
@@ -65,7 +59,7 @@ func (s sourceStrategyObservableRest) Create(args ...interface{}) (Source, error
 	} else if configPath, ok := args[3].(string); !ok {
 		return nil, errConversion(args[3], "string")
 	} else {
-		return NewSourceObservableRest(s.clientFactory(), uri, format, s.decoderFactory, timestampPath, configPath)
+		return newSourceObservableRest(s.clientFactory(), uri, format, s.decoderFactory, timestampPath, configPath)
 	}
 }
 

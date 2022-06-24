@@ -16,7 +16,7 @@ func Test_NewSourceStrategyRest(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, err := NewSourceStrategyRest(nil)
+		strategy, err := newSourceStrategyRest(nil)
 		switch {
 		case strategy != nil:
 			t.Error("returned a valid reference")
@@ -30,7 +30,7 @@ func Test_NewSourceStrategyRest(t *testing.T) {
 	t.Run("new rest source factory strategy", func(t *testing.T) {
 		factory := &(DecoderFactory{})
 
-		strategy, err := NewSourceStrategyRest(factory)
+		strategy, err := newSourceStrategyRest(factory)
 		switch {
 		case err != nil:
 			t.Errorf("returned the (%v) error", err)
@@ -67,7 +67,7 @@ func Test_SourceStrategyRest_Accept(t *testing.T) {
 
 		for _, scenario := range scenarios {
 			test := func() {
-				strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+				strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 				if check := strategy.Accept(scenario.sourceType); check != scenario.exp {
 					t.Errorf("for the type (%s), returned (%v)", scenario.sourceType, check)
 				}
@@ -79,7 +79,7 @@ func Test_SourceStrategyRest_Accept(t *testing.T) {
 
 func Test_SourceStrategyRest_AcceptFromConfig(t *testing.T) {
 	t.Run("don't accept on invalid config pointer", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		if strategy.AcceptFromConfig(nil) {
 			t.Error("returned true")
@@ -87,7 +87,7 @@ func Test_SourceStrategyRest_AcceptFromConfig(t *testing.T) {
 	})
 
 	t.Run("don't accept if type is missing", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		if strategy.AcceptFromConfig(&Partial{}) {
 			t.Error("returned true")
@@ -95,7 +95,7 @@ func Test_SourceStrategyRest_AcceptFromConfig(t *testing.T) {
 	})
 
 	t.Run("don't accept if type is not a string", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		if strategy.AcceptFromConfig(&Partial{"type": 123}) {
 			t.Error("returned true")
@@ -103,7 +103,7 @@ func Test_SourceStrategyRest_AcceptFromConfig(t *testing.T) {
 	})
 
 	t.Run("don't accept if invalid type", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		if strategy.AcceptFromConfig(&Partial{"type": SourceTypeUnknown}) {
 			t.Error("returned true")
@@ -111,7 +111,7 @@ func Test_SourceStrategyRest_AcceptFromConfig(t *testing.T) {
 	})
 
 	t.Run("accept config", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		if !strategy.AcceptFromConfig(&Partial{"type": SourceTypeRest}) {
 			t.Error("returned false")
@@ -121,7 +121,7 @@ func Test_SourceStrategyRest_AcceptFromConfig(t *testing.T) {
 
 func Test_SourceStrategyRest_Create(t *testing.T) {
 	t.Run("missing uri", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		src, err := strategy.Create()
 		switch {
@@ -135,7 +135,7 @@ func Test_SourceStrategyRest_Create(t *testing.T) {
 	})
 
 	t.Run("missing format", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		src, err := strategy.Create("uri")
 		switch {
@@ -149,7 +149,7 @@ func Test_SourceStrategyRest_Create(t *testing.T) {
 	})
 
 	t.Run("missing path", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		src, err := strategy.Create("uri", "format")
 		switch {
@@ -163,7 +163,7 @@ func Test_SourceStrategyRest_Create(t *testing.T) {
 	})
 
 	t.Run("non-string uri", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		src, err := strategy.Create(123, "format", "path")
 		switch {
@@ -177,7 +177,7 @@ func Test_SourceStrategyRest_Create(t *testing.T) {
 	})
 
 	t.Run("non-string format", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		src, err := strategy.Create("uri", 123, "path")
 		switch {
@@ -191,7 +191,7 @@ func Test_SourceStrategyRest_Create(t *testing.T) {
 	})
 
 	t.Run("non-string path", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		src, err := strategy.Create("uri", "format", 123)
 		switch {
@@ -216,7 +216,7 @@ func Test_SourceStrategyRest_Create(t *testing.T) {
 		expected := Partial{field: value}
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
-		strategy, _ := NewSourceStrategyRest(factory)
+		strategy, _ := newSourceStrategyRest(factory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
 		client := NewMockHTTPClient(ctrl)
@@ -246,7 +246,7 @@ func Test_SourceStrategyRest_Create(t *testing.T) {
 
 func Test_SourceStrategyRest_CreateFromConfig(t *testing.T) {
 	t.Run("error on nil config pointer", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		src, err := strategy.CreateFromConfig(nil)
 		switch {
@@ -260,7 +260,7 @@ func Test_SourceStrategyRest_CreateFromConfig(t *testing.T) {
 	})
 
 	t.Run("missing uri", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		src, err := strategy.CreateFromConfig(&Partial{"format": "format", "configPath": "path"})
 		switch {
@@ -274,7 +274,7 @@ func Test_SourceStrategyRest_CreateFromConfig(t *testing.T) {
 	})
 
 	t.Run("missing path", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		src, err := strategy.CreateFromConfig(&Partial{"uri": "path", "format": "format"})
 		switch {
@@ -288,7 +288,7 @@ func Test_SourceStrategyRest_CreateFromConfig(t *testing.T) {
 	})
 
 	t.Run("non-string uri", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		src, err := strategy.CreateFromConfig(&Partial{"uri": 123, "format": "format", "configPath": "path"})
 		switch {
@@ -302,7 +302,7 @@ func Test_SourceStrategyRest_CreateFromConfig(t *testing.T) {
 	})
 
 	t.Run("non-string format", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		src, err := strategy.CreateFromConfig(&Partial{"uri": "uri", "format": 123, "configPath": "path"})
 		switch {
@@ -316,7 +316,7 @@ func Test_SourceStrategyRest_CreateFromConfig(t *testing.T) {
 	})
 
 	t.Run("non-string path", func(t *testing.T) {
-		strategy, _ := NewSourceStrategyRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyRest(&(DecoderFactory{}))
 
 		src, err := strategy.CreateFromConfig(&Partial{"uri": "uri", "format": "format", "configPath": 123})
 		switch {
@@ -341,7 +341,7 @@ func Test_SourceStrategyRest_CreateFromConfig(t *testing.T) {
 		expected := Partial{field: value}
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyJSON{})
-		strategy, _ := NewSourceStrategyRest(factory)
+		strategy, _ := newSourceStrategyRest(factory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
 		client := NewMockHTTPClient(ctrl)
@@ -379,7 +379,7 @@ func Test_SourceStrategyRest_CreateFromConfig(t *testing.T) {
 		expected := Partial{field: value}
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyJSON{})
-		strategy, _ := NewSourceStrategyRest(factory)
+		strategy, _ := newSourceStrategyRest(factory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
 		client := NewMockHTTPClient(ctrl)

@@ -70,7 +70,7 @@ func Test_FormatterJSON_Format(t *testing.T) {
 		}
 
 		for _, scenario := range scenarios {
-			check := FormatterJSON{}.Format(scenario.level, scenario.message, scenario.fields)
+			check := formatterJSON{}.Format(scenario.level, scenario.message, scenario.fields)
 			match, _ := regexp.Match(scenario.expected, []byte(check))
 			if !match {
 				t.Errorf("didn't validated (%s) output", check)

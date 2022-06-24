@@ -276,7 +276,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a reference to the migrator")
 		default:
 			switch sut.(type) {
-			case *Migrator:
+			case *migrator:
 			default:
 				t.Error("didn't returned a migrator reference")
 			}

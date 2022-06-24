@@ -4,8 +4,6 @@ import (
 	"io"
 )
 
-// decoderStrategyYAML defines a strategy used to instantiate
-// a YAML config logStream decoder.
 type decoderStrategyYAML struct{}
 
 var _ DecoderStrategy = &decoderStrategyYAML{}
@@ -23,5 +21,5 @@ func (decoderStrategyYAML) Create(args ...interface{}) (Decoder, error) {
 	if !ok {
 		return nil, errConversion(args[0], "io.Reader")
 	}
-	return NewDecoderYAML(reader)
+	return newDecoderYAML(reader)
 }

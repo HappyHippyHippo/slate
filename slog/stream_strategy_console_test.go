@@ -10,7 +10,7 @@ import (
 
 func Test_NewStreamStrategyConsole(t *testing.T) {
 	t.Run("nil formatter factory", func(t *testing.T) {
-		strategy, err := NewStreamStrategyConsole(nil)
+		strategy, err := newStreamStrategyConsole(nil)
 		switch {
 		case strategy != nil:
 			t.Error("returned a valid reference")
@@ -22,7 +22,7 @@ func Test_NewStreamStrategyConsole(t *testing.T) {
 	})
 
 	t.Run("new console stream factory strategy", func(t *testing.T) {
-		if strategy, err := NewStreamStrategyConsole(&FormatterFactory{}); strategy == nil {
+		if strategy, err := newStreamStrategyConsole(&FormatterFactory{}); strategy == nil {
 			t.Errorf("didn't returned a valid reference")
 		} else if err != nil {
 			t.Errorf("returned the (%v) error", err)
@@ -31,7 +31,7 @@ func Test_NewStreamStrategyConsole(t *testing.T) {
 }
 
 func Test_StreamStrategyConsole_Accept(t *testing.T) {
-	strategy, _ := NewStreamStrategyConsole(&FormatterFactory{})
+	strategy, _ := newStreamStrategyConsole(&FormatterFactory{})
 
 	t.Run("accept only console type", func(t *testing.T) {
 		scenarios := []struct {
@@ -57,7 +57,7 @@ func Test_StreamStrategyConsole_Accept(t *testing.T) {
 }
 
 func Test_StreamStrategyConsole_AcceptFromConfig(t *testing.T) {
-	strategy, _ := NewStreamStrategyConsole(&FormatterFactory{})
+	strategy, _ := newStreamStrategyConsole(&FormatterFactory{})
 
 	t.Run("don't accept if config is a nil pointer", func(t *testing.T) {
 		if strategy.AcceptFromConfig(nil) {
@@ -104,7 +104,7 @@ func Test_StreamStrategyConsole_AcceptFromConfig(t *testing.T) {
 
 func Test_StreamStrategyConsole_Create(t *testing.T) {
 	t.Run("non enough arguments", func(t *testing.T) {
-		strategy, _ := NewStreamStrategyConsole(&FormatterFactory{})
+		strategy, _ := newStreamStrategyConsole(&FormatterFactory{})
 
 		stream, err := strategy.Create(1, 2)
 		switch {
@@ -118,7 +118,7 @@ func Test_StreamStrategyConsole_Create(t *testing.T) {
 	})
 
 	t.Run("non-string format", func(t *testing.T) {
-		strategy, _ := NewStreamStrategyConsole(&FormatterFactory{})
+		strategy, _ := newStreamStrategyConsole(&FormatterFactory{})
 
 		stream, err := strategy.Create(123, []string{}, DEBUG)
 		switch {
@@ -132,7 +132,7 @@ func Test_StreamStrategyConsole_Create(t *testing.T) {
 	})
 
 	t.Run("non-string list channels", func(t *testing.T) {
-		strategy, _ := NewStreamStrategyConsole(&FormatterFactory{})
+		strategy, _ := newStreamStrategyConsole(&FormatterFactory{})
 
 		stream, err := strategy.Create(FormatJSON, "string", DEBUG)
 		switch {
@@ -146,7 +146,7 @@ func Test_StreamStrategyConsole_Create(t *testing.T) {
 	})
 
 	t.Run("non-loglevel level", func(t *testing.T) {
-		strategy, _ := NewStreamStrategyConsole(&FormatterFactory{})
+		strategy, _ := newStreamStrategyConsole(&FormatterFactory{})
 
 		stream, err := strategy.Create(FormatJSON, []string{}, "string")
 		switch {
@@ -160,7 +160,7 @@ func Test_StreamStrategyConsole_Create(t *testing.T) {
 	})
 
 	t.Run("error on creating the formatter", func(t *testing.T) {
-		strategy, _ := NewStreamStrategyConsole(&FormatterFactory{})
+		strategy, _ := newStreamStrategyConsole(&FormatterFactory{})
 
 		stream, err := strategy.Create(FormatJSON, []string{}, DEBUG)
 		switch {
@@ -176,7 +176,7 @@ func Test_StreamStrategyConsole_Create(t *testing.T) {
 	t.Run("create the console stream", func(t *testing.T) {
 		factory := &FormatterFactory{}
 		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := NewStreamStrategyConsole(factory)
+		strategy, _ := newStreamStrategyConsole(factory)
 
 		stream, err := strategy.Create(FormatJSON, []string{}, DEBUG)
 		switch {
@@ -196,7 +196,7 @@ func Test_StreamStrategyConsole_Create(t *testing.T) {
 
 func Test_StreamStrategyConsole_CreateFromConfig(t *testing.T) {
 	t.Run("error on nil config pointer", func(t *testing.T) {
-		strategy, _ := NewStreamStrategyConsole(&FormatterFactory{})
+		strategy, _ := newStreamStrategyConsole(&FormatterFactory{})
 
 		src, err := strategy.CreateFromConfig(nil)
 		switch {
@@ -217,7 +217,7 @@ func Test_StreamStrategyConsole_CreateFromConfig(t *testing.T) {
 		config := NewMockConfig(ctrl)
 		config.EXPECT().String("format").Return("", expected).Times(1)
 
-		strategy, _ := NewStreamStrategyConsole(&FormatterFactory{})
+		strategy, _ := newStreamStrategyConsole(&FormatterFactory{})
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -241,7 +241,7 @@ func Test_StreamStrategyConsole_CreateFromConfig(t *testing.T) {
 
 		factory := &FormatterFactory{}
 		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := NewStreamStrategyConsole(factory)
+		strategy, _ := newStreamStrategyConsole(factory)
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -264,7 +264,7 @@ func Test_StreamStrategyConsole_CreateFromConfig(t *testing.T) {
 
 		factory := &FormatterFactory{}
 		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := NewStreamStrategyConsole(factory)
+		strategy, _ := newStreamStrategyConsole(factory)
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -289,7 +289,7 @@ func Test_StreamStrategyConsole_CreateFromConfig(t *testing.T) {
 		)
 		config.EXPECT().List("channels").Return([]interface{}{"channel1"}, nil)
 
-		strategy, _ := NewStreamStrategyConsole(&FormatterFactory{})
+		strategy, _ := newStreamStrategyConsole(&FormatterFactory{})
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -313,7 +313,7 @@ func Test_StreamStrategyConsole_CreateFromConfig(t *testing.T) {
 		)
 		config.EXPECT().List("channels").Return([]interface{}{"channel1"}, nil)
 
-		strategy, _ := NewStreamStrategyConsole(&FormatterFactory{})
+		strategy, _ := newStreamStrategyConsole(&FormatterFactory{})
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -339,7 +339,7 @@ func Test_StreamStrategyConsole_CreateFromConfig(t *testing.T) {
 
 		factory := &FormatterFactory{}
 		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := NewStreamStrategyConsole(factory)
+		strategy, _ := newStreamStrategyConsole(factory)
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {

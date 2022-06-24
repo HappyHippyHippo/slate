@@ -16,9 +16,7 @@ type sourceFile struct {
 
 var _ Source = &sourceFile{}
 
-// NewSourceFile instantiate a new source that treats a file as
-// the origin of the configuration content.
-func NewSourceFile(path, format string, fs afero.Fs, factory *DecoderFactory) (Source, error) {
+func newSourceFile(path, format string, fs afero.Fs, factory *DecoderFactory) (Source, error) {
 	if fs == nil {
 		return nil, errNilPointer("fs")
 	}

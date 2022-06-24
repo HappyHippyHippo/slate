@@ -4,8 +4,6 @@ import (
 	"github.com/spf13/afero"
 )
 
-// sourceStrategyFile defines a config file source instantiation
-// strategy to be used by the config sources factory instance.
 type sourceStrategyFile struct {
 	fs      afero.Fs
 	factory *DecoderFactory
@@ -13,10 +11,7 @@ type sourceStrategyFile struct {
 
 var _ SourceStrategy = &sourceStrategyFile{}
 
-// NewSourceStrategyFile instantiate a new file source factory
-// strategy that will enable the source factory to instantiate a new
-// file configuration source.
-func NewSourceStrategyFile(fs afero.Fs, factory *DecoderFactory) (SourceStrategy, error) {
+func newSourceStrategyFile(fs afero.Fs, factory *DecoderFactory) (SourceStrategy, error) {
 	if fs == nil {
 		return nil, errNilPointer("fs")
 	}
@@ -62,7 +57,7 @@ func (s sourceStrategyFile) Create(args ...interface{}) (Source, error) {
 	} else if format, ok := args[1].(string); !ok {
 		return nil, errConversion(args[1], "string")
 	} else {
-		return NewSourceFile(path, format, s.fs, s.factory)
+		return newSourceFile(path, format, s.fs, s.factory)
 	}
 }
 

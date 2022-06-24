@@ -14,10 +14,7 @@ type streamStrategyFile struct {
 
 var _ StreamStrategy = &streamStrategyFile{}
 
-// NewStreamStrategyFile instantiate a new file stream factory
-// strategy that will enable the stream factory to instantiate a new file
-// stream.
-func NewStreamStrategyFile(fs afero.Fs, factory *FormatterFactory) (StreamStrategy, error) {
+func newStreamStrategyFile(fs afero.Fs, factory *FormatterFactory) (StreamStrategy, error) {
 	if fs == nil {
 		return nil, errNilPointer("fs")
 	}
@@ -71,7 +68,7 @@ func (s streamStrategyFile) Create(args ...interface{}) (Stream, error) {
 	} else if file, err := s.fs.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644); err != nil {
 		return nil, err
 	} else {
-		return NewStreamFile(file, formatter, channels, level)
+		return newStreamFile(file, formatter, channels, level)
 	}
 }
 

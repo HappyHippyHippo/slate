@@ -17,9 +17,7 @@ type sourceDir struct {
 
 var _ Source = &sourceDir{}
 
-// NewSourceDir instantiate a new source that loads several
-// config files from a system file system directory.
-func NewSourceDir(path, format string, recursive bool, fs afero.Fs, factory *DecoderFactory) (Source, error) {
+func newSourceDir(path, format string, recursive bool, fs afero.Fs, factory *DecoderFactory) (Source, error) {
 	if fs == nil {
 		return nil, errNilPointer("fs")
 	}

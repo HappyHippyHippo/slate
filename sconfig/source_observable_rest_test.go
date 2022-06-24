@@ -16,7 +16,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 	t.Run("nil client", func(t *testing.T) {
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceObservableRest(nil, "uri", "format", factory, "timestampPath", "configPath")
+		src, err := newSourceObservableRest(nil, "uri", "format", factory, "timestampPath", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -33,7 +33,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 
 		client := NewMockHTTPClient(ctrl)
 
-		src, err := NewSourceObservableRest(client, "uri", "format", nil, "timestampPath", "configPath")
+		src, err := newSourceObservableRest(client, "uri", "format", nil, "timestampPath", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -52,7 +52,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceObservableRest(client, "\n", "format", factory, "timestampPath", "configPath")
+		src, err := newSourceObservableRest(client, "\n", "format", factory, "timestampPath", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -72,7 +72,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		client.EXPECT().Do(gomock.Any()).Return(nil, expected).Times(1)
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceObservableRest(client, "uri", "format", factory, "timestampPath", "configPath")
+		src, err := newSourceObservableRest(client, "uri", "format", factory, "timestampPath", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -93,7 +93,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceObservableRest(client, "uri", "format", factory, "timestampPath", "configPath")
+		src, err := newSourceObservableRest(client, "uri", "format", factory, "timestampPath", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -116,7 +116,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestampPath", "configPath")
+		src, err := newSourceObservableRest(client, "uri", "yaml", factory, "timestampPath", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -138,7 +138,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestampPath", "configPath")
+		src, err := newSourceObservableRest(client, "uri", "yaml", factory, "timestampPath", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -160,7 +160,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "configPath")
+		src, err := newSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -183,7 +183,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "configPath")
+		src, err := newSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -205,7 +205,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "configPath")
+		src, err := newSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -227,7 +227,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "path.node")
+		src, err := newSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "path.node")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -249,7 +249,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "path")
+		src, err := newSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -272,7 +272,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "path")
+		src, err := newSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "path")
 		switch {
 		case err != nil:
 			t.Errorf("returned the unexpected error : %v", err)
@@ -302,7 +302,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "node..inner_node")
+		src, err := newSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "node..inner_node")
 		switch {
 		case err != nil:
 			t.Errorf("returned the unexpected error : %v", err)
@@ -339,7 +339,7 @@ func Test_SourceRestObservable_Reload(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, _ := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "node")
+		src, _ := newSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "node")
 
 		loaded, err := src.Reload()
 		switch {
@@ -376,7 +376,7 @@ func Test_SourceRestObservable_Reload(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		src, _ := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "node")
+		src, _ := newSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "node")
 
 		loaded, err := src.Reload()
 		switch {

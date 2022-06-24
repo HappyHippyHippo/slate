@@ -4,8 +4,6 @@ import (
 	"io"
 )
 
-// decoderStrategyJSON defines a strategy used to instantiate
-// a JSON config logStream decoder.
 type decoderStrategyJSON struct{}
 
 var _ DecoderStrategy = &decoderStrategyJSON{}
@@ -23,5 +21,5 @@ func (decoderStrategyJSON) Create(args ...interface{}) (Decoder, error) {
 	if !ok {
 		return nil, errConversion(args[0], "io.Reader")
 	}
-	return NewDecoderJSON(reader)
+	return newDecoderJSON(reader)
 }

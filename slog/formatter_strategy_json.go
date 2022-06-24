@@ -1,8 +1,5 @@
 package slog
 
-// formatterStrategyJSON defines the logger formatter instantiation
-// strategy to be registered in the factory so a Json based logger formatter
-// could be instantiated.
 type formatterStrategyJSON struct{}
 
 var _ FormatterStrategy = &formatterStrategyJSON{}
@@ -15,5 +12,5 @@ func (formatterStrategyJSON) Accept(format string) bool {
 
 // Create will instantiate the desired formatter instance.
 func (formatterStrategyJSON) Create(_ ...interface{}) (Formatter, error) {
-	return &FormatterJSON{}, nil
+	return &formatterJSON{}, nil
 }

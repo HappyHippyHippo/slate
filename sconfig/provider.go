@@ -37,7 +37,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		} else if decoderFactory, err := GetDecoderFactory(c); err != nil {
 			return nil, err
 		} else {
-			return NewSourceStrategyFile(filesystem, decoderFactory)
+			return newSourceStrategyFile(filesystem, decoderFactory)
 		}
 	}, ContainerSourceStrategyTag)
 
@@ -47,7 +47,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		} else if decoderFactory, err := GetDecoderFactory(c); err != nil {
 			return nil, err
 		} else {
-			return NewSourceStrategyObservableFile(filesystem, decoderFactory)
+			return newSourceStrategyObservableFile(filesystem, decoderFactory)
 		}
 	}, ContainerSourceStrategyTag)
 
@@ -57,7 +57,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		} else if decoderFactory, err := GetDecoderFactory(c); err != nil {
 			return nil, err
 		} else {
-			return NewSourceStrategyDir(filesystem, decoderFactory)
+			return newSourceStrategyDir(filesystem, decoderFactory)
 		}
 	}, ContainerSourceStrategyTag)
 
@@ -66,7 +66,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		if err != nil {
 			return nil, err
 		}
-		return NewSourceStrategyRest(decoderFactory)
+		return newSourceStrategyRest(decoderFactory)
 	}, ContainerSourceStrategyTag)
 
 	_ = c.Service(ContainerSourceStrategyRestObservableID, func() (interface{}, error) {
@@ -74,7 +74,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		if err != nil {
 			return nil, err
 		}
-		return NewSourceStrategyObservableRest(decoderFactory)
+		return newSourceStrategyObservableRest(decoderFactory)
 	}, ContainerSourceStrategyTag)
 
 	_ = c.Service(ContainerSourceStrategyEnvID, func() (interface{}, error) {

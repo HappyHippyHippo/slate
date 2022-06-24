@@ -61,7 +61,7 @@ func Test_FormatterFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		formatter := &FormatterJSON{}
+		formatter := &formatterJSON{}
 		strategy := NewMockFormatterStrategy(ctrl)
 		strategy.EXPECT().Accept(format).Return(true).Times(1)
 		strategy.EXPECT().Create().Return(formatter, nil).Times(1)

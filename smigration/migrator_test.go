@@ -16,7 +16,7 @@ import (
 
 func Test_NewMigrator(t *testing.T) {
 	t.Run("nil dao", func(t *testing.T) {
-		check, err := NewMigrator(nil)
+		check, err := newMigrator(nil)
 		switch {
 		case check != nil:
 			t.Error("returned a valid reference")
@@ -33,13 +33,13 @@ func Test_NewMigrator(t *testing.T) {
 
 		dao := &Dao{}
 
-		check, err := NewMigrator(dao)
+		check, err := newMigrator(dao)
 		switch {
 		case err != nil:
 			t.Errorf("returned the unexpected error (%v)", err)
 		case check == nil:
 			t.Error("didn't return the expected migrator instance")
-		case !reflect.DeepEqual(check.dao, dao):
+		case !reflect.DeepEqual(check.(*migrator).dao, dao):
 			t.Error("didn't stored the given dao")
 		}
 	})
@@ -47,7 +47,7 @@ func Test_NewMigrator(t *testing.T) {
 
 func Test_Migrator_AddMigration(t *testing.T) {
 	t.Run("error adding nil migration", func(t *testing.T) {
-		sut, _ := NewMigrator(&Dao{})
+		sut, _ := newMigrator(&Dao{})
 
 		if err := sut.AddMigration(nil); err == nil {
 			t.Error("didn't returned the expected error")
@@ -61,11 +61,11 @@ func Test_Migrator_AddMigration(t *testing.T) {
 		defer ctrl.Finish()
 
 		migration := NewMockMigration(ctrl)
-		sut, _ := NewMigrator(&Dao{})
+		sut, _ := newMigrator(&Dao{})
 
 		if err := sut.AddMigration(migration); err != nil {
 			t.Errorf("returned the unexpected (%v) error", err)
-		} else if !reflect.DeepEqual(sut.migrations, []Migration{migration}) {
+		} else if !reflect.DeepEqual(sut.(*migrator).migrations, []Migration{migration}) {
 			t.Error("didn't stored the registering migration")
 		}
 	})
@@ -89,7 +89,7 @@ func Test_Migrator_Current(t *testing.T) {
 		gdb, err := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
 		dao := &Dao{db: gdb}
 
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 
 		if _, err := sut.Current(); err == nil {
 			t.Error("didn't returned the expected error")
@@ -108,7 +108,7 @@ func Test_Migrator_Current(t *testing.T) {
 		_ = db.Create(&Record{Version: version})
 		dao := &Dao{db}
 
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 
 		if current, err := sut.Current(); err != nil {
 			t.Errorf("returned the unexpected (%v) error", err)
@@ -124,7 +124,7 @@ func Test_Migrator_Migrate(t *testing.T) {
 		defer ctrl.Finish()
 
 		dao := &Dao{}
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 
 		if err := sut.Migrate(); err != nil {
 			t.Errorf("returned the unexpected (%v) error", err)
@@ -150,7 +150,7 @@ func Test_Migrator_Migrate(t *testing.T) {
 
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(uint64(1)).Times(0)
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration)
 
 		if err := sut.Migrate(); err == nil {
@@ -171,7 +171,7 @@ func Test_Migrator_Migrate(t *testing.T) {
 
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(uint64(1)).Times(1)
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration)
 
 		if err := sut.Migrate(); err != nil {
@@ -191,7 +191,7 @@ func Test_Migrator_Migrate(t *testing.T) {
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(uint64(1)).Times(1)
 		migration.EXPECT().Up().Return(expected).Times(1)
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration)
 
 		if check := sut.Migrate(); check == nil {
@@ -226,7 +226,7 @@ func Test_Migrator_Migrate(t *testing.T) {
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(uint64(2)).Times(1)
 		migration.EXPECT().Up().Return(nil).Times(1)
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration)
 
 		if check := sut.Migrate(); check == nil {
@@ -253,7 +253,7 @@ func Test_Migrator_Migrate(t *testing.T) {
 		migration3 := NewMockMigration(ctrl)
 		migration3.EXPECT().Version().Return(uint64(3)).AnyTimes()
 		migration3.EXPECT().Up().Return(nil).Times(1)
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration3)
 		_ = sut.AddMigration(migration1)
 		_ = sut.AddMigration(migration2)
@@ -272,7 +272,7 @@ func Test_Migrator_Up(t *testing.T) {
 		defer ctrl.Finish()
 
 		dao := &Dao{}
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 
 		if err := sut.Up(); err != nil {
 			t.Errorf("returned the unexpected (%v) error", err)
@@ -298,7 +298,7 @@ func Test_Migrator_Up(t *testing.T) {
 
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(uint64(1)).Times(0)
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration)
 
 		if err := sut.Up(); err == nil {
@@ -319,7 +319,7 @@ func Test_Migrator_Up(t *testing.T) {
 
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(uint64(1)).Times(1)
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration)
 
 		if err := sut.Up(); err != nil {
@@ -339,7 +339,7 @@ func Test_Migrator_Up(t *testing.T) {
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(uint64(1)).Times(1)
 		migration.EXPECT().Up().Return(expected).Times(1)
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration)
 
 		if check := sut.Up(); check == nil {
@@ -374,7 +374,7 @@ func Test_Migrator_Up(t *testing.T) {
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(uint64(2)).Times(1)
 		migration.EXPECT().Up().Return(nil).Times(1)
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration)
 
 		if check := sut.Up(); check == nil {
@@ -400,7 +400,7 @@ func Test_Migrator_Up(t *testing.T) {
 		migration2.EXPECT().Up().Return(nil).Times(1)
 		migration3 := NewMockMigration(ctrl)
 		migration3.EXPECT().Version().Return(uint64(3)).AnyTimes()
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration3)
 		_ = sut.AddMigration(migration1)
 		_ = sut.AddMigration(migration2)
@@ -419,7 +419,7 @@ func Test_Migrator_Down(t *testing.T) {
 		defer ctrl.Finish()
 
 		dao := &Dao{}
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 
 		if err := sut.Down(); err != nil {
 			t.Errorf("returned the unexpected (%v) error", err)
@@ -445,7 +445,7 @@ func Test_Migrator_Down(t *testing.T) {
 
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(uint64(1)).Times(0)
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration)
 
 		if err := sut.Down(); err == nil {
@@ -470,7 +470,7 @@ func Test_Migrator_Down(t *testing.T) {
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(version).Times(1)
 		migration.EXPECT().Down().Return(expected).Times(1)
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration)
 
 		if check := sut.Down(); check == nil {
@@ -508,7 +508,7 @@ func Test_Migrator_Down(t *testing.T) {
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(version).Times(1)
 		migration.EXPECT().Down().Return(nil).Times(1)
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration)
 
 		if check := sut.Down(); check == nil {
@@ -530,7 +530,7 @@ func Test_Migrator_Down(t *testing.T) {
 
 		migration1 := NewMockMigration(ctrl)
 		migration1.EXPECT().Version().Return(uint64(1)).AnyTimes()
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration1)
 
 		if err := sut.Down(); err != nil {
@@ -557,7 +557,7 @@ func Test_Migrator_Down(t *testing.T) {
 		migration2.EXPECT().Down().Return(nil).Times(1)
 		migration3 := NewMockMigration(ctrl)
 		migration3.EXPECT().Version().Return(uint64(3)).AnyTimes()
-		sut, _ := NewMigrator(dao)
+		sut, _ := newMigrator(dao)
 		_ = sut.AddMigration(migration3)
 		_ = sut.AddMigration(migration1)
 		_ = sut.AddMigration(migration2)

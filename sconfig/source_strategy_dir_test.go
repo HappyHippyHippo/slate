@@ -12,7 +12,7 @@ import (
 
 func Test_NewSourceStrategyDir(t *testing.T) {
 	t.Run("nil file system adapter", func(t *testing.T) {
-		strategy, err := NewSourceStrategyDir(nil, &(DecoderFactory{}))
+		strategy, err := newSourceStrategyDir(nil, &(DecoderFactory{}))
 		switch {
 		case strategy != nil:
 			t.Error("returned a valid reference")
@@ -27,7 +27,7 @@ func Test_NewSourceStrategyDir(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, err := NewSourceStrategyDir(NewMockFs(ctrl), nil)
+		strategy, err := newSourceStrategyDir(NewMockFs(ctrl), nil)
 		switch {
 		case strategy != nil:
 			t.Error("returned a valid reference")
@@ -45,7 +45,7 @@ func Test_NewSourceStrategyDir(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		factory := &(DecoderFactory{})
 
-		strategy, err := NewSourceStrategyDir(fs, factory)
+		strategy, err := newSourceStrategyDir(fs, factory)
 		switch {
 		case err != nil:
 			t.Errorf("returned the (%v) error", err)
@@ -79,7 +79,7 @@ func Test_SourceStrategyDir_Accept(t *testing.T) {
 			test := func() {
 				ctrl := gomock.NewController(t)
 				defer func() { ctrl.Finish() }()
-				strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+				strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 				if check := strategy.Accept(scenario.sourceType); check != scenario.exp {
 					t.Errorf("for the type (%s), returned (%v)", scenario.sourceType, check)
 				}
@@ -94,7 +94,7 @@ func Test_SourceStrategyDir_AcceptFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 
 		if strategy.AcceptFromConfig(nil) {
 			t.Error("returned true")
@@ -105,7 +105,7 @@ func Test_SourceStrategyDir_AcceptFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 
 		if strategy.AcceptFromConfig(&Partial{}) {
 			t.Error("returned true")
@@ -116,7 +116,7 @@ func Test_SourceStrategyDir_AcceptFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 
 		if strategy.AcceptFromConfig(&Partial{"type": 123}) {
 			t.Error("returned true")
@@ -127,7 +127,7 @@ func Test_SourceStrategyDir_AcceptFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 
 		if strategy.AcceptFromConfig(&Partial{"type": SourceTypeUnknown}) {
 			t.Error("returned true")
@@ -138,7 +138,7 @@ func Test_SourceStrategyDir_AcceptFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 
 		if !strategy.AcceptFromConfig(&Partial{"type": SourceTypeDirectory}) {
 			t.Error("returned false")
@@ -193,7 +193,7 @@ func Test_SourceStrategyDir_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 
 		src, err := strategy.Create(123, "format", true)
 		switch {
@@ -210,7 +210,7 @@ func Test_SourceStrategyDir_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 
 		src, err := strategy.Create("path", 123, true)
 		switch {
@@ -227,7 +227,7 @@ func Test_SourceStrategyDir_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 
 		src, err := strategy.Create("path", "format", "true")
 		switch {
@@ -265,7 +265,7 @@ func Test_SourceStrategyDir_Create(t *testing.T) {
 		factory := DecoderFactory{}
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		strategy, _ := NewSourceStrategyDir(fs, &factory)
+		strategy, _ := newSourceStrategyDir(fs, &factory)
 
 		src, err := strategy.Create(path, DecoderFormatYAML, true)
 		switch {
@@ -291,7 +291,7 @@ func Test_SourceStrategyDir_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 
 		src, err := strategy.CreateFromConfig(nil)
 		switch {
@@ -308,7 +308,7 @@ func Test_SourceStrategyDir_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 
 		src, err := strategy.CreateFromConfig(&Partial{"format": "format", "recursive": true})
 		switch {
@@ -325,7 +325,7 @@ func Test_SourceStrategyDir_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 
 		src, err := strategy.CreateFromConfig(&Partial{"path": 123, "format": "format", "recursive": true})
 		switch {
@@ -342,7 +342,7 @@ func Test_SourceStrategyDir_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 
 		src, err := strategy.CreateFromConfig(&Partial{"path": "path", "format": 123, "recursive": true})
 		switch {
@@ -359,7 +359,7 @@ func Test_SourceStrategyDir_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 
 		src, err := strategy.CreateFromConfig(&Partial{"path": "path", "format": 123, "recursive": "true"})
 		switch {
@@ -376,7 +376,7 @@ func Test_SourceStrategyDir_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := NewSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyDir(NewMockFs(ctrl), &(DecoderFactory{}))
 
 		src, err := strategy.CreateFromConfig(&Partial{"path": "path", "format": "format", "recursive": "true"})
 		switch {
@@ -414,7 +414,7 @@ func Test_SourceStrategyDir_CreateFromConfig(t *testing.T) {
 		factory := DecoderFactory{}
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		strategy, _ := NewSourceStrategyDir(fs, &factory)
+		strategy, _ := newSourceStrategyDir(fs, &factory)
 
 		src, err := strategy.CreateFromConfig(&Partial{"path": path, "format": DecoderFormatYAML, "recursive": true})
 		switch {
@@ -459,7 +459,7 @@ func Test_SourceStrategyDir_CreateFromConfig(t *testing.T) {
 		factory := DecoderFactory{}
 		_ = factory.Register(&decoderStrategyYAML{})
 
-		strategy, _ := NewSourceStrategyDir(fs, &factory)
+		strategy, _ := newSourceStrategyDir(fs, &factory)
 
 		src, err := strategy.CreateFromConfig(&Partial{"path": path, "recursive": true})
 		switch {

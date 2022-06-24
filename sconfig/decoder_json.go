@@ -16,9 +16,7 @@ type decoderJSON struct {
 
 var _ Decoder = &decoderJSON{}
 
-// NewDecoderJSON instantiate a new yaml configuration decoder object
-// used to parse a yaml configuration source into a config Partial.
-func NewDecoderJSON(reader io.Reader) (Decoder, error) {
+func newDecoderJSON(reader io.Reader) (Decoder, error) {
 	if reader == nil {
 		return nil, errNilPointer("reader")
 	}

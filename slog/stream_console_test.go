@@ -17,7 +17,7 @@ func Test_NewStreamConsole(t *testing.T) {
 	level := WARNING
 
 	t.Run("nil formatter", func(t *testing.T) {
-		stream, err := NewStreamConsole(nil, channels, level)
+		stream, err := newStreamConsole(nil, channels, level)
 		switch {
 		case stream != nil:
 			t.Error("returned a valid reference")
@@ -29,7 +29,7 @@ func Test_NewStreamConsole(t *testing.T) {
 	})
 
 	t.Run("new console stream", func(t *testing.T) {
-		stream, err := NewStreamConsole(formatter, []string{}, WARNING)
+		stream, err := newStreamConsole(formatter, []string{}, WARNING)
 		switch {
 		case stream == nil:
 			t.Error("didn't returned a valid reference")
@@ -134,7 +134,7 @@ func Test_StreamConsole_Signal(t *testing.T) {
 				writer.EXPECT().Write([]byte(scenario.expected + "\n")).Times(scenario.callTimes)
 				formatter := NewMockFormatter(ctrl)
 				formatter.EXPECT().Format(scenario.call.level, scenario.call.message, scenario.call.fields).Return(scenario.expected).Times(scenario.callTimes)
-				stream, _ := NewStreamConsole(formatter, scenario.state.channels, scenario.state.level)
+				stream, _ := newStreamConsole(formatter, scenario.state.channels, scenario.state.level)
 				stream.(*streamConsole).writer = writer
 
 				if err := stream.Signal(scenario.call.channel, scenario.call.level, scenario.call.message, scenario.call.fields); err != nil {
@@ -212,7 +212,7 @@ func Test_StreamConsole_Broadcast(t *testing.T) {
 				writer.EXPECT().Write([]byte(scenario.expected + "\n")).Times(scenario.callTimes)
 				formatter := NewMockFormatter(ctrl)
 				formatter.EXPECT().Format(scenario.call.level, scenario.call.message, scenario.call.fields).Return(scenario.expected).Times(scenario.callTimes)
-				stream, _ := NewStreamConsole(formatter, scenario.state.channels, scenario.state.level)
+				stream, _ := newStreamConsole(formatter, scenario.state.channels, scenario.state.level)
 				stream.(*streamConsole).writer = writer
 
 				if err := stream.Broadcast(scenario.call.level, scenario.call.message, scenario.call.fields); err != nil {

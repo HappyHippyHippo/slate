@@ -4,19 +4,13 @@ import (
 	"github.com/spf13/afero"
 )
 
-// sourceStrategyObservableFile defines an observable config file
-// source instantiation strategy to be used by the config sources factory
-// instance.
 type sourceStrategyObservableFile struct {
 	sourceStrategyFile
 }
 
 var _ SourceStrategy = &sourceStrategyObservableFile{}
 
-// NewSourceStrategyObservableFile instantiate a new observable
-// file source factory strategy that will enable the source factory to
-// instantiate a new observable file configuration source.
-func NewSourceStrategyObservableFile(fs afero.Fs, factory *DecoderFactory) (SourceStrategy, error) {
+func newSourceStrategyObservableFile(fs afero.Fs, factory *DecoderFactory) (SourceStrategy, error) {
 	if fs == nil {
 		return nil, errNilPointer("fs")
 	}
@@ -64,7 +58,7 @@ func (s sourceStrategyObservableFile) Create(args ...interface{}) (Source, error
 	} else if format, ok := args[1].(string); !ok {
 		return nil, errConversion(args[1], "string")
 	} else {
-		return NewSourceObservableFile(path, format, s.fs, s.factory)
+		return newSourceObservableFile(path, format, s.fs, s.factory)
 	}
 }
 
