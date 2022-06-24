@@ -170,7 +170,7 @@ func Test_Loader_Load(t *testing.T) {
 		cfg := sconfig.NewConfig(0)
 		_ = cfg.AddSource("id", 0, source)
 		formatterFactory := &FormatterFactory{}
-		_ = formatterFactory.Register(&FormatterStrategyJSON{})
+		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
 		strategy, _ := NewStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)
@@ -194,7 +194,7 @@ func Test_Loader_Load(t *testing.T) {
 		cfg := sconfig.NewConfig(0)
 		_ = cfg.AddSource("id", 0, source)
 		formatterFactory := &FormatterFactory{}
-		_ = formatterFactory.Register(&FormatterStrategyJSON{})
+		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
 		strategy, _ := NewStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)
@@ -216,7 +216,7 @@ func Test_Loader_Load(t *testing.T) {
 		cfg := sconfig.NewConfig(0)
 		_ = cfg.AddSource("id", 0, source)
 		formatterFactory := &FormatterFactory{}
-		_ = formatterFactory.Register(&FormatterStrategyJSON{})
+		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
 		strategy, _ := NewStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)
@@ -242,7 +242,7 @@ func Test_Loader_Load(t *testing.T) {
 		cfg := sconfig.NewConfig(0)
 		_ = cfg.AddSource("id", 0, source)
 		formatterFactory := &FormatterFactory{}
-		_ = formatterFactory.Register(&FormatterStrategyJSON{})
+		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
 		strategy, _ := NewStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)
@@ -269,7 +269,7 @@ func Test_Loader_Load(t *testing.T) {
 		cfg := sconfig.NewConfig(0)
 		_ = cfg.AddSource("id", 0, source)
 		formatterFactory := &FormatterFactory{}
-		_ = formatterFactory.Register(&FormatterStrategyJSON{})
+		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
 		strategy, _ := NewStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)

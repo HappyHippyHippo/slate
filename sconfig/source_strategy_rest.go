@@ -18,7 +18,7 @@ var _ SourceStrategy = &sourceStrategyRest{}
 // rest configuration source.
 func NewSourceStrategyRest(decoderFactory *DecoderFactory) (SourceStrategy, error) {
 	if decoderFactory == nil {
-		return nil, errNilPointer("decoderFactory")
+		return nil, errNilPointer("DecoderFactory")
 	}
 
 	return &sourceStrategyRest{

@@ -92,7 +92,7 @@ func Test_NewSourceDir(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceDir(path, DecoderFormatYAML, true, fs, &factory)
 		switch {
@@ -201,7 +201,7 @@ func Test_NewSourceDir(t *testing.T) {
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
 		fs.EXPECT().OpenFile(path+"/"+fileinfoname, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceDir(path, DecoderFormatYAML, true, fs, &factory)
 		switch {
@@ -236,7 +236,7 @@ func Test_NewSourceDir(t *testing.T) {
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
 		fs.EXPECT().OpenFile(path+"/"+fileinfoname, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceDir(path, DecoderFormatYAML, true, fs, &factory)
 		switch {
@@ -290,7 +290,7 @@ func Test_NewSourceDir(t *testing.T) {
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
 		fs.EXPECT().OpenFile(path+"/"+fileinfoname, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceDir(path, DecoderFormatYAML, false, fs, &factory)
 		switch {
@@ -348,7 +348,7 @@ func Test_NewSourceDir(t *testing.T) {
 			fs.EXPECT().Open(path+"/"+subdirinfoname).Return(nil, expected).Times(1))
 		fs.EXPECT().OpenFile(path+"/"+fileinfoname, os.O_RDONLY, os.FileMode(0o644)).Return(file1, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceDir(path, DecoderFormatYAML, true, fs, &factory)
 		switch {
@@ -404,7 +404,7 @@ func Test_NewSourceDir(t *testing.T) {
 			fs.EXPECT().OpenFile(path+"/"+fileinfoname, os.O_RDONLY, os.FileMode(0o644)).Return(file1, nil).Times(1),
 			fs.EXPECT().OpenFile(path+"/"+subdirinfoname+"/"+subfileinfoname, os.O_RDONLY, os.FileMode(0o644)).Return(file2, nil).Times(1))
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceDir(path, DecoderFormatYAML, true, fs, &factory)
 		switch {

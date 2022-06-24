@@ -61,7 +61,7 @@ func Test_NewConnectionFactory(t *testing.T) {
 		cfg := sconfig.NewConfig(0)
 		_ = cfg.AddSource("id1", 0, source1)
 		dialectFactory := &DialectFactory{}
-		_ = dialectFactory.Register(&DialectStrategySqlite{})
+		_ = dialectFactory.Register(&dialectStrategySqlite{})
 		connFactory, _ := NewConnectionFactory(cfg, dialectFactory)
 
 		_, _ = connFactory.Get(name, &gorm.Config{Logger: gormLogger.Discard})
@@ -105,7 +105,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		cfg := sconfig.NewConfig(0)
 		_ = cfg.AddSource("id1", 0, source1)
 		dialectFactory := &DialectFactory{}
-		_ = dialectFactory.Register(&DialectStrategySqlite{})
+		_ = dialectFactory.Register(&dialectStrategySqlite{})
 		connFactory, _ := NewConnectionFactory(cfg, dialectFactory)
 
 		conn, err := connFactory.Get(name+"salt", &gorm.Config{})
@@ -136,7 +136,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		cfg := sconfig.NewConfig(0)
 		_ = cfg.AddSource("id1", 0, source1)
 		dialectFactory := &DialectFactory{}
-		_ = dialectFactory.Register(&DialectStrategySqlite{})
+		_ = dialectFactory.Register(&dialectStrategySqlite{})
 		connFactory, _ := NewConnectionFactory(cfg, dialectFactory)
 
 		conn, err := connFactory.Get(name, &gorm.Config{})
@@ -167,7 +167,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		cfg := sconfig.NewConfig(0)
 		_ = cfg.AddSource("id1", 0, source1)
 		dialectFactory := &DialectFactory{}
-		_ = dialectFactory.Register(&DialectStrategySqlite{})
+		_ = dialectFactory.Register(&dialectStrategySqlite{})
 		connFactory, _ := NewConnectionFactory(cfg, dialectFactory)
 
 		conn, err := connFactory.Get(name, &gorm.Config{})
@@ -199,7 +199,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		cfg := sconfig.NewConfig(0)
 		_ = cfg.AddSource("id1", 0, source1)
 		dialectFactory := &DialectFactory{}
-		_ = dialectFactory.Register(&DialectStrategySqlite{})
+		_ = dialectFactory.Register(&dialectStrategySqlite{})
 		connFactory, _ := NewConnectionFactory(cfg, dialectFactory)
 
 		conn, err := connFactory.Get(name, &gorm.Config{Logger: gormLogger.Discard})
@@ -230,7 +230,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		cfg := sconfig.NewConfig(0)
 		_ = cfg.AddSource("id1", 0, source1)
 		dialectFactory := &DialectFactory{}
-		_ = dialectFactory.Register(&DialectStrategySqlite{})
+		_ = dialectFactory.Register(&dialectStrategySqlite{})
 		connFactory, _ := NewConnectionFactory(cfg, dialectFactory)
 
 		if check, err := connFactory.Get(name, &gorm.Config{Logger: gormLogger.Discard}); check == nil {
@@ -257,7 +257,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		cfg := sconfig.NewConfig(0)
 		_ = cfg.AddSource("id1", 0, source1)
 		dialectFactory := &DialectFactory{}
-		_ = dialectFactory.Register(&DialectStrategySqlite{})
+		_ = dialectFactory.Register(&dialectStrategySqlite{})
 		connFactory, _ := NewConnectionFactory(cfg, dialectFactory)
 
 		conn, _ := connFactory.Get(name, &gorm.Config{Logger: gormLogger.Discard})

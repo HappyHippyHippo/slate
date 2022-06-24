@@ -237,7 +237,7 @@ func Test_SourceStrategyFileObservable_Create(t *testing.T) {
 		fs.EXPECT().Stat(path).Return(fileInfo, nil).Times(1)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 		strategy, _ := NewSourceStrategyObservableFile(fs, factory)
 
 		src, err := strategy.Create(path, DecoderFormatYAML)
@@ -345,7 +345,7 @@ func Test_SourceStrategyFileObservable_CreateFromConfig(t *testing.T) {
 		fs.EXPECT().Stat(path).Return(fileInfo, nil).Times(1)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 		strategy, _ := NewSourceStrategyObservableFile(fs, factory)
 
 		src, err := strategy.CreateFromConfig(&Partial{"path": path, "format": DecoderFormatYAML})
@@ -383,7 +383,7 @@ func Test_SourceStrategyFileObservable_CreateFromConfig(t *testing.T) {
 		fs.EXPECT().Stat(path).Return(fileInfo, nil).Times(1)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 		strategy, _ := NewSourceStrategyObservableFile(fs, factory)
 
 		src, err := strategy.CreateFromConfig(&Partial{"path": path})

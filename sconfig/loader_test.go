@@ -66,13 +66,13 @@ func Test_Loader_Load(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(LoaderSourcePath, os.O_RDONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 		decoderFactory := &DecoderFactory{}
-		_ = decoderFactory.Register(&DecoderStrategyYAML{})
+		_ = decoderFactory.Register(&decoderStrategyYAML{})
 		sourceFactory := &SourceFactory{}
 		fileStrategy, _ := NewSourceStrategyFile(fs, decoderFactory)
 		_ = sourceFactory.Register(fileStrategy)
 		obsFileStrategy, _ := NewSourceStrategyObservableFile(fs, decoderFactory)
 		_ = sourceFactory.Register(obsFileStrategy)
-		envStrategy := &SourceStrategyEnv{}
+		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
 		cfg := NewConfig(0 * time.Second)
 		load, _ := NewLoader(cfg, sourceFactory)
@@ -98,13 +98,13 @@ func Test_Loader_Load(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(LoaderSourcePath, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoderFactory := &DecoderFactory{}
-		_ = decoderFactory.Register(&DecoderStrategyYAML{})
+		_ = decoderFactory.Register(&decoderStrategyYAML{})
 		sourceFactory := &SourceFactory{}
 		fileStrategy, _ := NewSourceStrategyFile(fs, decoderFactory)
 		_ = sourceFactory.Register(fileStrategy)
 		obsFileStrategy, _ := NewSourceStrategyObservableFile(fs, decoderFactory)
 		_ = sourceFactory.Register(obsFileStrategy)
-		envStrategy := &SourceStrategyEnv{}
+		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
 		src := NewMockSource(ctrl)
 		src.EXPECT().Get("").Return(Partial{}, nil)
@@ -133,13 +133,13 @@ func Test_Loader_Load(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(LoaderSourcePath, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoderFactory := &DecoderFactory{}
-		_ = decoderFactory.Register(&DecoderStrategyYAML{})
+		_ = decoderFactory.Register(&decoderStrategyYAML{})
 		sourceFactory := &SourceFactory{}
 		fileStrategy, _ := NewSourceStrategyFile(fs, decoderFactory)
 		_ = sourceFactory.Register(fileStrategy)
 		obsFileStrategy, _ := NewSourceStrategyObservableFile(fs, decoderFactory)
 		_ = sourceFactory.Register(obsFileStrategy)
-		envStrategy := &SourceStrategyEnv{}
+		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
 		cfg := NewConfig(0 * time.Second)
 		load, _ := NewLoader(cfg, sourceFactory)
@@ -163,13 +163,13 @@ func Test_Loader_Load(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(LoaderSourcePath, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoderFactory := &DecoderFactory{}
-		_ = decoderFactory.Register(&DecoderStrategyYAML{})
+		_ = decoderFactory.Register(&decoderStrategyYAML{})
 		sourceFactory := &SourceFactory{}
 		fileStrategy, _ := NewSourceStrategyFile(fs, decoderFactory)
 		_ = sourceFactory.Register(fileStrategy)
 		obsFileStrategy, _ := NewSourceStrategyObservableFile(fs, decoderFactory)
 		_ = sourceFactory.Register(obsFileStrategy)
-		envStrategy := &SourceStrategyEnv{}
+		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
 		cfg := NewConfig(0 * time.Second)
 		load, _ := NewLoader(cfg, sourceFactory)
@@ -193,13 +193,13 @@ func Test_Loader_Load(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(LoaderSourcePath, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoderFactory := &DecoderFactory{}
-		_ = decoderFactory.Register(&DecoderStrategyYAML{})
+		_ = decoderFactory.Register(&decoderStrategyYAML{})
 		sourceFactory := &SourceFactory{}
 		fileStrategy, _ := NewSourceStrategyFile(fs, decoderFactory)
 		_ = sourceFactory.Register(fileStrategy)
 		obsFileStrategy, _ := NewSourceStrategyObservableFile(fs, decoderFactory)
 		_ = sourceFactory.Register(obsFileStrategy)
-		envStrategy := &SourceStrategyEnv{}
+		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
 		cfg := NewConfig(0 * time.Second)
 		load, _ := NewLoader(cfg, sourceFactory)
@@ -225,13 +225,13 @@ func Test_Loader_Load(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(LoaderSourcePath, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoderFactory := &DecoderFactory{}
-		_ = decoderFactory.Register(&DecoderStrategyYAML{})
+		_ = decoderFactory.Register(&decoderStrategyYAML{})
 		sourceFactory := &SourceFactory{}
 		fileStrategy, _ := NewSourceStrategyFile(fs, decoderFactory)
 		_ = sourceFactory.Register(fileStrategy)
 		obsFileStrategy, _ := NewSourceStrategyObservableFile(fs, decoderFactory)
 		_ = sourceFactory.Register(obsFileStrategy)
-		envStrategy := &SourceStrategyEnv{}
+		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
 		cfg := NewConfig(0 * time.Second)
 		load, _ := NewLoader(cfg, sourceFactory)
@@ -257,13 +257,13 @@ func Test_Loader_Load(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(LoaderSourcePath, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoderFactory := &DecoderFactory{}
-		_ = decoderFactory.Register(&DecoderStrategyYAML{})
+		_ = decoderFactory.Register(&decoderStrategyYAML{})
 		sourceFactory := &SourceFactory{}
 		fileStrategy, _ := NewSourceStrategyFile(fs, decoderFactory)
 		_ = sourceFactory.Register(fileStrategy)
 		obsFileStrategy, _ := NewSourceStrategyObservableFile(fs, decoderFactory)
 		_ = sourceFactory.Register(obsFileStrategy)
-		envStrategy := &SourceStrategyEnv{}
+		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
 		cfg := NewConfig(0 * time.Second)
 		load, _ := NewLoader(cfg, sourceFactory)
@@ -289,13 +289,13 @@ func Test_Loader_Load(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(LoaderSourcePath, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoderFactory := &DecoderFactory{}
-		_ = decoderFactory.Register(&DecoderStrategyYAML{})
+		_ = decoderFactory.Register(&decoderStrategyYAML{})
 		sourceFactory := &SourceFactory{}
 		fileStrategy, _ := NewSourceStrategyFile(fs, decoderFactory)
 		_ = sourceFactory.Register(fileStrategy)
 		obsFileStrategy, _ := NewSourceStrategyObservableFile(fs, decoderFactory)
 		_ = sourceFactory.Register(obsFileStrategy)
-		envStrategy := &SourceStrategyEnv{}
+		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
 		cfg := NewConfig(0 * time.Second)
 		load, _ := NewLoader(cfg, sourceFactory)
@@ -328,13 +328,13 @@ func Test_Loader_Load(t *testing.T) {
 		fs.EXPECT().OpenFile(LoaderSourcePath, os.O_RDONLY, os.FileMode(0o644)).Return(file1, nil).Times(1)
 		fs.EXPECT().OpenFile("path", os.O_RDONLY, os.FileMode(0o644)).Return(file2, nil).Times(1)
 		decoderFactory := &DecoderFactory{}
-		_ = decoderFactory.Register(&DecoderStrategyYAML{})
+		_ = decoderFactory.Register(&decoderStrategyYAML{})
 		sourceFactory := &SourceFactory{}
 		fileStrategy, _ := NewSourceStrategyFile(fs, decoderFactory)
 		_ = sourceFactory.Register(fileStrategy)
 		obsFileStrategy, _ := NewSourceStrategyObservableFile(fs, decoderFactory)
 		_ = sourceFactory.Register(obsFileStrategy)
-		envStrategy := &SourceStrategyEnv{}
+		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
 		src := NewMockSource(ctrl)
 		src.EXPECT().Get("").Return(Partial{}, nil).AnyTimes()
@@ -370,13 +370,13 @@ func Test_Loader_Load(t *testing.T) {
 		fs.EXPECT().OpenFile(LoaderSourcePath, os.O_RDONLY, os.FileMode(0o644)).Return(file1, nil).Times(1)
 		fs.EXPECT().OpenFile("path", os.O_RDONLY, os.FileMode(0o644)).Return(file2, nil).Times(1)
 		decoderFactory := &DecoderFactory{}
-		_ = decoderFactory.Register(&DecoderStrategyYAML{})
+		_ = decoderFactory.Register(&decoderStrategyYAML{})
 		sourceFactory := &SourceFactory{}
 		fileStrategy, _ := NewSourceStrategyFile(fs, decoderFactory)
 		_ = sourceFactory.Register(fileStrategy)
 		obsFileStrategy, _ := NewSourceStrategyObservableFile(fs, decoderFactory)
 		_ = sourceFactory.Register(obsFileStrategy)
-		envStrategy := &SourceStrategyEnv{}
+		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
 		cfg := NewConfig(0 * time.Second)
 		load, _ := NewLoader(cfg, sourceFactory)
@@ -414,13 +414,13 @@ func Test_Loader_Load(t *testing.T) {
 		fs.EXPECT().OpenFile(LoaderSourcePath, os.O_RDONLY, os.FileMode(0o644)).Return(file1, nil).Times(1)
 		fs.EXPECT().OpenFile("path", os.O_RDONLY, os.FileMode(0o644)).Return(file2, nil).Times(1)
 		decoderFactory := &DecoderFactory{}
-		_ = decoderFactory.Register(&DecoderStrategyYAML{})
+		_ = decoderFactory.Register(&decoderStrategyYAML{})
 		sourceFactory := &SourceFactory{}
 		fileStrategy, _ := NewSourceStrategyFile(fs, decoderFactory)
 		_ = sourceFactory.Register(fileStrategy)
 		obsFileStrategy, _ := NewSourceStrategyObservableFile(fs, decoderFactory)
 		_ = sourceFactory.Register(obsFileStrategy)
-		envStrategy := &SourceStrategyEnv{}
+		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
 		cfg := NewConfig(0 * time.Second)
 		load, _ := NewLoader(cfg, sourceFactory)
@@ -453,13 +453,13 @@ func Test_Loader_Load(t *testing.T) {
 		fs.EXPECT().OpenFile(LoaderSourcePath, os.O_RDONLY, os.FileMode(0o644)).Return(file1, nil).Times(1)
 		fs.EXPECT().OpenFile("path", os.O_RDONLY, os.FileMode(0o644)).Return(file2, nil).Times(1)
 		decoderFactory := &DecoderFactory{}
-		_ = decoderFactory.Register(&DecoderStrategyYAML{})
+		_ = decoderFactory.Register(&decoderStrategyYAML{})
 		sourceFactory := &SourceFactory{}
 		fileStrategy, _ := NewSourceStrategyFile(fs, decoderFactory)
 		_ = sourceFactory.Register(fileStrategy)
 		obsFileStrategy, _ := NewSourceStrategyObservableFile(fs, decoderFactory)
 		_ = sourceFactory.Register(obsFileStrategy)
-		envStrategy := &SourceStrategyEnv{}
+		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
 		cfg := NewConfig(0 * time.Second)
 		load, _ := NewLoader(cfg, sourceFactory)

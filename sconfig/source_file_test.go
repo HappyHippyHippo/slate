@@ -95,7 +95,7 @@ func Test_NewSourceFile(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceFile(path, DecoderFormatYAML, fs, &factory)
 		switch {
@@ -122,7 +122,7 @@ func Test_NewSourceFile(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceFile(path, DecoderFormatYAML, fs, &factory)
 		switch {
@@ -168,7 +168,7 @@ func Test_NewSourceFile(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceFile(path, DecoderFormatYAML, fs, &factory)
 		switch {

@@ -215,7 +215,7 @@ func Test_SourceStrategyRest_Create(t *testing.T) {
 		value := "value"
 		expected := Partial{field: value}
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 		strategy, _ := NewSourceStrategyRest(factory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
@@ -340,7 +340,7 @@ func Test_SourceStrategyRest_CreateFromConfig(t *testing.T) {
 		value := "value"
 		expected := Partial{field: value}
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyJSON{})
+		_ = factory.Register(&decoderStrategyJSON{})
 		strategy, _ := NewSourceStrategyRest(factory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
@@ -378,7 +378,7 @@ func Test_SourceStrategyRest_CreateFromConfig(t *testing.T) {
 		value := "value"
 		expected := Partial{field: value}
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyJSON{})
+		_ = factory.Register(&decoderStrategyJSON{})
 		strategy, _ := NewSourceStrategyRest(factory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))

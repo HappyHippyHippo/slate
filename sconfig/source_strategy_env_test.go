@@ -25,7 +25,7 @@ func Test_SourceStrategyEnv_Accept(t *testing.T) {
 		}
 
 		for _, scenario := range scenarios {
-			strategy := &SourceStrategyEnv{}
+			strategy := &sourceStrategyEnv{}
 			if check := strategy.Accept(scenario.sourceType); check != scenario.expected {
 				t.Errorf("for the type (%s), returned (%v)", scenario.sourceType, check)
 			}
@@ -35,25 +35,25 @@ func Test_SourceStrategyEnv_Accept(t *testing.T) {
 
 func Test_SourceStrategyEnv_AcceptFromConfig(t *testing.T) {
 	t.Run("don't accept on invalid config pointer", func(t *testing.T) {
-		if (&SourceStrategyEnv{}).AcceptFromConfig(nil) {
+		if (&sourceStrategyEnv{}).AcceptFromConfig(nil) {
 			t.Error("returned true")
 		}
 	})
 
 	t.Run("don't accept if type is missing", func(t *testing.T) {
-		if (&SourceStrategyEnv{}).AcceptFromConfig(&Partial{}) {
+		if (&sourceStrategyEnv{}).AcceptFromConfig(&Partial{}) {
 			t.Error("returned true")
 		}
 	})
 
 	t.Run("don't accept if type is not a string", func(t *testing.T) {
-		if (&SourceStrategyEnv{}).AcceptFromConfig(&Partial{"type": 123}) {
+		if (&sourceStrategyEnv{}).AcceptFromConfig(&Partial{"type": 123}) {
 			t.Error("returned true")
 		}
 	})
 
 	t.Run("don't accept if type is not env", func(t *testing.T) {
-		if (&SourceStrategyEnv{}).AcceptFromConfig(&Partial{"type": SourceTypeUnknown}) {
+		if (&sourceStrategyEnv{}).AcceptFromConfig(&Partial{"type": SourceTypeUnknown}) {
 			t.Error("returned true")
 		}
 	})
@@ -61,7 +61,7 @@ func Test_SourceStrategyEnv_AcceptFromConfig(t *testing.T) {
 
 func Test_SourceStrategyEnv_Create(t *testing.T) {
 	t.Run("missing mappings", func(t *testing.T) {
-		strategy := &SourceStrategyEnv{}
+		strategy := &sourceStrategyEnv{}
 
 		src, err := strategy.Create()
 		switch {
@@ -75,7 +75,7 @@ func Test_SourceStrategyEnv_Create(t *testing.T) {
 	})
 
 	t.Run("non-map mappings", func(t *testing.T) {
-		strategy := &SourceStrategyEnv{}
+		strategy := &sourceStrategyEnv{}
 
 		src, err := strategy.Create(123)
 		switch {
@@ -96,7 +96,7 @@ func Test_SourceStrategyEnv_Create(t *testing.T) {
 
 		path := "root"
 		expected := Partial{path: value}
-		strategy := &SourceStrategyEnv{}
+		strategy := &sourceStrategyEnv{}
 
 		src, err := strategy.Create(map[string]string{env: path})
 		switch {
@@ -119,7 +119,7 @@ func Test_SourceStrategyEnv_Create(t *testing.T) {
 
 func Test_SourceStrategyEnv_CreateFromConfig(t *testing.T) {
 	t.Run("error on nil config pointer", func(t *testing.T) {
-		src, err := (&SourceStrategyEnv{}).CreateFromConfig(nil)
+		src, err := (&sourceStrategyEnv{}).CreateFromConfig(nil)
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -131,7 +131,7 @@ func Test_SourceStrategyEnv_CreateFromConfig(t *testing.T) {
 	})
 
 	t.Run("non-map mappings", func(t *testing.T) {
-		src, err := (&SourceStrategyEnv{}).CreateFromConfig(&Partial{"mappings": 123})
+		src, err := (&sourceStrategyEnv{}).CreateFromConfig(&Partial{"mappings": 123})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -151,7 +151,7 @@ func Test_SourceStrategyEnv_CreateFromConfig(t *testing.T) {
 		path := "root"
 		expected := Partial{path: value}
 
-		src, err := (&SourceStrategyEnv{}).CreateFromConfig(&Partial{"mappings": Partial{env: path}})
+		src, err := (&sourceStrategyEnv{}).CreateFromConfig(&Partial{"mappings": Partial{env: path}})
 		switch {
 		case err != nil:
 			t.Errorf("returned the (%v) error", err)
@@ -172,7 +172,7 @@ func Test_SourceStrategyEnv_CreateFromConfig(t *testing.T) {
 	t.Run("no mappings on config", func(t *testing.T) {
 		expected := Partial{}
 
-		src, err := (&SourceStrategyEnv{}).CreateFromConfig(&Partial{})
+		src, err := (&sourceStrategyEnv{}).CreateFromConfig(&Partial{})
 		switch {
 		case err != nil:
 			t.Errorf("returned the (%v) error", err)

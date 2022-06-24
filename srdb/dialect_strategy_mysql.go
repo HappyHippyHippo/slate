@@ -8,19 +8,19 @@ import (
 	"strings"
 )
 
-// DialectStrategyMySQL is a MySQL dialect interface generator.
-type DialectStrategyMySQL struct{}
+// dialectStrategyMySQL is a MySQL dialect interface generator.
+type dialectStrategyMySQL struct{}
 
-var _ DialectStrategy = &DialectStrategyMySQL{}
+var _ DialectStrategy = &dialectStrategyMySQL{}
 
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
-func (DialectStrategyMySQL) Accept(dialect string) bool {
+func (dialectStrategyMySQL) Accept(dialect string) bool {
 	return strings.EqualFold(strings.ToLower(dialect), DialectMySQL)
 }
 
 // Get instantiates the requested mysql connection dialect.
-func (DialectStrategyMySQL) Get(config sconfig.Config) (gorm.Dialector, error) {
+func (dialectStrategyMySQL) Get(config sconfig.Config) (gorm.Dialector, error) {
 	if username, err := config.String("username"); err != nil {
 		return nil, err
 	} else if password, err := config.String("password"); err != nil {

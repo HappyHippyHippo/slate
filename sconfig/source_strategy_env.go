@@ -1,22 +1,22 @@
 package sconfig
 
-// SourceStrategyEnv defines an environment config source
+// sourceStrategyEnv defines an environment config source
 // instantiation strategy to be used by the config sources factory
 // instance.
-type SourceStrategyEnv struct{}
+type sourceStrategyEnv struct{}
 
-var _ SourceStrategy = &SourceStrategyEnv{}
+var _ SourceStrategy = &sourceStrategyEnv{}
 
 // Accept will check if the source factory strategy can instantiate a
 // new source of the requested type.
-func (SourceStrategyEnv) Accept(stype string) bool {
+func (sourceStrategyEnv) Accept(stype string) bool {
 	return stype == SourceTypeEnv
 }
 
 // AcceptFromConfig will check if the source factory strategy can instantiate
 // a source where the data to check comes from a configuration Partial
 // instance.
-func (s SourceStrategyEnv) AcceptFromConfig(cfg Config) bool {
+func (s sourceStrategyEnv) AcceptFromConfig(cfg Config) bool {
 	if cfg == nil {
 		return false
 	}
@@ -29,7 +29,7 @@ func (s SourceStrategyEnv) AcceptFromConfig(cfg Config) bool {
 }
 
 // Create will instantiate the desired environment source instance.
-func (s SourceStrategyEnv) Create(args ...interface{}) (Source, error) {
+func (s sourceStrategyEnv) Create(args ...interface{}) (Source, error) {
 	if len(args) < 1 {
 		return nil, errNilPointer("args[0]")
 	}
@@ -43,7 +43,7 @@ func (s SourceStrategyEnv) Create(args ...interface{}) (Source, error) {
 
 // CreateFromConfig will instantiate the desired environment source instance
 // where the initialization data comes from a configuration Partial instance.
-func (s SourceStrategyEnv) CreateFromConfig(cfg Config) (Source, error) {
+func (s sourceStrategyEnv) CreateFromConfig(cfg Config) (Source, error) {
 	if cfg == nil {
 		return nil, errNilPointer("cfg")
 	}

@@ -257,7 +257,7 @@ func Test_Provider_Register(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&Provider{}).Register(container)
 		dialectFactory := &DialectFactory{}
-		_ = dialectFactory.Register(&DialectStrategySqlite{})
+		_ = dialectFactory.Register(&dialectStrategySqlite{})
 		_ = container.Service(ContainerDialectFactoryID, func() (interface{}, error) {
 			return dialectFactory, nil
 		})
@@ -296,7 +296,7 @@ func Test_Provider_Register(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&Provider{}).Register(container)
 		dialectFactory := &DialectFactory{}
-		_ = dialectFactory.Register(&DialectStrategySqlite{})
+		_ = dialectFactory.Register(&dialectStrategySqlite{})
 		_ = container.Service(ContainerDialectFactoryID, func() (interface{}, error) {
 			return dialectFactory, nil
 		})

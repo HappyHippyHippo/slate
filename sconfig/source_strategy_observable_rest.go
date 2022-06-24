@@ -18,7 +18,7 @@ var _ SourceStrategy = &sourceStrategyObservableRest{}
 // a new rest configuration source.
 func NewSourceStrategyObservableRest(decoderFactory *DecoderFactory) (SourceStrategy, error) {
 	if decoderFactory == nil {
-		return nil, errNilPointer("decoderFactory")
+		return nil, errNilPointer("DecoderFactory")
 	}
 
 	return &sourceStrategyObservableRest{

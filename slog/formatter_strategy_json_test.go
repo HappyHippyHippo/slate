@@ -21,7 +21,7 @@ func Test_FormatterStrategyJSON_Accept(t *testing.T) {
 		}
 
 		for _, scenario := range scenarios {
-			if check := (&FormatterStrategyJSON{}).Accept(scenario.format); check != scenario.expected {
+			if check := (&formatterStrategyJSON{}).Accept(scenario.format); check != scenario.expected {
 				t.Errorf("returned (%v) for the (%s) format", check, scenario.format)
 			}
 		}
@@ -30,7 +30,7 @@ func Test_FormatterStrategyJSON_Accept(t *testing.T) {
 
 func Test_FormatterStrategyJSON_Create(t *testing.T) {
 	t.Run("create json formatter", func(t *testing.T) {
-		formatter, err := (&FormatterStrategyJSON{}).Create()
+		formatter, err := (&formatterStrategyJSON{}).Create()
 		switch {
 		case err != nil:
 			t.Errorf("returned the (%v) error", err)

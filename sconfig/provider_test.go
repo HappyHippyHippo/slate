@@ -71,7 +71,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch strategy.(type) {
-			case *DecoderStrategyYAML:
+			case *decoderStrategyYAML:
 			default:
 				t.Error("didn't returned a yaml decoder factory strategy reference")
 			}
@@ -90,7 +90,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch strategy.(type) {
-			case *DecoderStrategyJSON:
+			case *decoderStrategyJSON:
 			default:
 				t.Error("didn't returned a json decoder factory strategy reference")
 			}

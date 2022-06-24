@@ -11,13 +11,13 @@ import (
 
 func Test_DialectStrategySqlite_Accept(t *testing.T) {
 	t.Run("refuse if the dialect name is not mysql", func(t *testing.T) {
-		if (&DialectStrategySqlite{}).Accept("mysql") == true {
+		if (&dialectStrategySqlite{}).Accept("mysql") == true {
 			t.Error("returned true")
 		}
 	})
 
 	t.Run("accept if the dialect name is mysql", func(t *testing.T) {
-		if (&DialectStrategySqlite{}).Accept("sQlItE") == false {
+		if (&dialectStrategySqlite{}).Accept("sQlItE") == false {
 			t.Error("returned false")
 		}
 	})
@@ -30,7 +30,7 @@ func Test_DialectStrategySqlite_Get(t *testing.T) {
 			"host":    123,
 		}
 
-		dialect, err := (&DialectStrategySqlite{}).Get(cfg)
+		dialect, err := (&dialectStrategySqlite{}).Get(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -48,7 +48,7 @@ func Test_DialectStrategySqlite_Get(t *testing.T) {
 			"params":  123,
 		}
 
-		dialect, err := (&DialectStrategySqlite{}).Get(cfg)
+		dialect, err := (&dialectStrategySqlite{}).Get(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -66,7 +66,7 @@ func Test_DialectStrategySqlite_Get(t *testing.T) {
 			"host":    "file.db",
 		}
 
-		dialect, err := (&DialectStrategySqlite{}).Get(cfg)
+		dialect, err := (&dialectStrategySqlite{}).Get(cfg)
 		switch {
 		case err != nil:
 			t.Errorf("return the unexpected error : (%v)", err)
@@ -95,7 +95,7 @@ func Test_DialectStrategySqlite_Get(t *testing.T) {
 			},
 		}
 
-		dialect, err := (&DialectStrategySqlite{}).Get(cfg)
+		dialect, err := (&dialectStrategySqlite{}).Get(cfg)
 		switch {
 		case err != nil:
 			t.Errorf("return the unexpected error : (%v)", err)

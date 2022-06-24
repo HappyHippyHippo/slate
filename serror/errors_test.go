@@ -137,11 +137,3 @@ func Test_ErrUnknownDatabaseDialect(t *testing.T) {
 		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
 	}
 }
-
-func Test_ErrTranslatorNotFound(t *testing.T) {
-	expected := "translator not found"
-
-	if chk := ErrTranslatorNotFound.Error(); chk != expected {
-		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
-	}
-}

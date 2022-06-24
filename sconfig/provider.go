@@ -20,11 +20,11 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 	}
 
 	_ = c.Service(ContainerDecoderStrategyYAMLID, func() (interface{}, error) {
-		return &DecoderStrategyYAML{}, nil
+		return &decoderStrategyYAML{}, nil
 	}, ContainerDecoderStrategyTag)
 
 	_ = c.Service(ContainerDecoderStrategyJSONID, func() (interface{}, error) {
-		return &DecoderStrategyJSON{}, nil
+		return &decoderStrategyJSON{}, nil
 	}, ContainerDecoderStrategyTag)
 
 	_ = c.Service(ContainerDecoderFactoryID, func() (interface{}, error) {
@@ -78,7 +78,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 	}, ContainerSourceStrategyTag)
 
 	_ = c.Service(ContainerSourceStrategyEnvID, func() (interface{}, error) {
-		return &SourceStrategyEnv{}, nil
+		return &sourceStrategyEnv{}, nil
 	}, ContainerSourceStrategyTag)
 
 	_ = c.Service(ContainerSourceFactoryID, func() (interface{}, error) {

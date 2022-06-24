@@ -263,7 +263,7 @@ func Test_SourceStrategyDir_Create(t *testing.T) {
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
 		fs.EXPECT().OpenFile(path+"/"+fileinfoname, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		strategy, _ := NewSourceStrategyDir(fs, &factory)
 
@@ -412,7 +412,7 @@ func Test_SourceStrategyDir_CreateFromConfig(t *testing.T) {
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
 		fs.EXPECT().OpenFile(path+"/"+fileinfoname, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		strategy, _ := NewSourceStrategyDir(fs, &factory)
 
@@ -457,7 +457,7 @@ func Test_SourceStrategyDir_CreateFromConfig(t *testing.T) {
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
 		fs.EXPECT().OpenFile(path+"/"+fileinfoname, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		strategy, _ := NewSourceStrategyDir(fs, &factory)
 

@@ -175,7 +175,7 @@ func Test_StreamStrategyConsole_Create(t *testing.T) {
 
 	t.Run("create the console stream", func(t *testing.T) {
 		factory := &FormatterFactory{}
-		_ = factory.Register(&FormatterStrategyJSON{})
+		_ = factory.Register(&formatterStrategyJSON{})
 		strategy, _ := NewStreamStrategyConsole(factory)
 
 		stream, err := strategy.Create(FormatJSON, []string{}, DEBUG)
@@ -240,7 +240,7 @@ func Test_StreamStrategyConsole_CreateFromConfig(t *testing.T) {
 		config.EXPECT().List("channels").Return(nil, expected)
 
 		factory := &FormatterFactory{}
-		_ = factory.Register(&FormatterStrategyJSON{})
+		_ = factory.Register(&formatterStrategyJSON{})
 		strategy, _ := NewStreamStrategyConsole(factory)
 
 		stream, err := strategy.CreateFromConfig(config)
@@ -263,7 +263,7 @@ func Test_StreamStrategyConsole_CreateFromConfig(t *testing.T) {
 		config.EXPECT().List("channels").Return([]interface{}{123}, nil)
 
 		factory := &FormatterFactory{}
-		_ = factory.Register(&FormatterStrategyJSON{})
+		_ = factory.Register(&formatterStrategyJSON{})
 		strategy, _ := NewStreamStrategyConsole(factory)
 
 		stream, err := strategy.CreateFromConfig(config)
@@ -338,7 +338,7 @@ func Test_StreamStrategyConsole_CreateFromConfig(t *testing.T) {
 		config.EXPECT().List("channels").Return([]interface{}{"channel1"}, nil)
 
 		factory := &FormatterFactory{}
-		_ = factory.Register(&FormatterStrategyJSON{})
+		_ = factory.Register(&formatterStrategyJSON{})
 		strategy, _ := NewStreamStrategyConsole(factory)
 
 		stream, err := strategy.CreateFromConfig(config)

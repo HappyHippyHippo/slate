@@ -114,7 +114,7 @@ func Test_NewSourceRest(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
 		switch {
@@ -136,7 +136,7 @@ func Test_NewSourceRest(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
 		switch {
@@ -158,7 +158,7 @@ func Test_NewSourceRest(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path.node")
 		switch {
@@ -180,7 +180,7 @@ func Test_NewSourceRest(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
 		switch {
@@ -203,7 +203,7 @@ func Test_NewSourceRest(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
 		switch {
@@ -233,7 +233,7 @@ func Test_NewSourceRest(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "node..inner_node")
 		switch {

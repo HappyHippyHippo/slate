@@ -68,8 +68,4 @@ var (
 	// ErrUnknownDatabaseDialect defines an error that signal that the
 	// requested database connection configured dialect is unknown.
 	ErrUnknownDatabaseDialect = fmt.Errorf("unknown database dialect")
-
-	// ErrTranslatorNotFound defines an error that signal that the
-	// requested translator was not found.
-	ErrTranslatorNotFound = fmt.Errorf("translator not found")
 )

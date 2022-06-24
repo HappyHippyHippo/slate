@@ -25,7 +25,7 @@ func Test_DecoderStrategyJSON_Accept(t *testing.T) {
 
 		for _, scenario := range scenarios {
 			test := func() {
-				if check := (DecoderStrategyJSON{}).Accept(scenario.format); check != scenario.expected {
+				if check := (decoderStrategyJSON{}).Accept(scenario.format); check != scenario.expected {
 					t.Errorf("returned (%v) when checking (%v) format", check, scenario.format)
 				}
 			}
@@ -36,7 +36,7 @@ func Test_DecoderStrategyJSON_Accept(t *testing.T) {
 
 func Test_DecoderStrategyJSON_Create(t *testing.T) {
 	t.Run("invalid reader instance", func(t *testing.T) {
-		if decoder, err := (DecoderStrategyJSON{}).Create("string"); decoder != nil {
+		if decoder, err := (decoderStrategyJSON{}).Create("string"); decoder != nil {
 			t.Error("returned an unexpected valid decoder instance")
 		} else if !errors.Is(err, serror.ErrConversion) {
 			t.Errorf("returned the (%v) error when expecting : %v", err, serror.ErrConversion)
@@ -47,7 +47,7 @@ func Test_DecoderStrategyJSON_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		decoder, err := (DecoderStrategyJSON{}).Create(NewMockReader(ctrl))
+		decoder, err := (decoderStrategyJSON{}).Create(NewMockReader(ctrl))
 		switch {
 		case err != nil:
 			t.Errorf("returned the (%v) error", err)

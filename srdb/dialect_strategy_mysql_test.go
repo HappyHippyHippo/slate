@@ -11,13 +11,13 @@ import (
 
 func Test_DialectStrategyMySql_Accept(t *testing.T) {
 	t.Run("refuse if the dialect name is not mysql", func(t *testing.T) {
-		if (&DialectStrategyMySQL{}).Accept("sqlite") == true {
+		if (&dialectStrategyMySQL{}).Accept("sqlite") == true {
 			t.Error("returned true")
 		}
 	})
 
 	t.Run("accept if the dialect name is mysql", func(t *testing.T) {
-		if (&DialectStrategyMySQL{}).Accept("mYsQl") == false {
+		if (&dialectStrategyMySQL{}).Accept("mYsQl") == false {
 			t.Error("returned false")
 		}
 	})
@@ -30,7 +30,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 			"username": 123,
 		}
 
-		dialect, err := (&DialectStrategyMySQL{}).Get(cfg)
+		dialect, err := (&dialectStrategyMySQL{}).Get(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -48,7 +48,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 			"password": 123,
 		}
 
-		dialect, err := (&DialectStrategyMySQL{}).Get(cfg)
+		dialect, err := (&dialectStrategyMySQL{}).Get(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -67,7 +67,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 			"protocol": 123,
 		}
 
-		dialect, err := (&DialectStrategyMySQL{}).Get(cfg)
+		dialect, err := (&dialectStrategyMySQL{}).Get(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -87,7 +87,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 			"host":     123,
 		}
 
-		dialect, err := (&DialectStrategyMySQL{}).Get(cfg)
+		dialect, err := (&dialectStrategyMySQL{}).Get(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -108,7 +108,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 			"port":     "integer",
 		}
 
-		dialect, err := (&DialectStrategyMySQL{}).Get(cfg)
+		dialect, err := (&dialectStrategyMySQL{}).Get(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -130,7 +130,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 			"schema":   123,
 		}
 
-		dialect, err := (&DialectStrategyMySQL{}).Get(cfg)
+		dialect, err := (&dialectStrategyMySQL{}).Get(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -153,7 +153,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 			"params":   123,
 		}
 
-		dialect, err := (&DialectStrategyMySQL{}).Get(cfg)
+		dialect, err := (&dialectStrategyMySQL{}).Get(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -176,7 +176,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 			"schema":   "rdb",
 		}
 
-		dialect, err := (&DialectStrategyMySQL{}).Get(cfg)
+		dialect, err := (&dialectStrategyMySQL{}).Get(cfg)
 		switch {
 		case err != nil:
 			t.Errorf("return the unexpected error : (%v)", err)
@@ -199,7 +199,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 			"schema":   "rdb",
 		}
 
-		dialect, err := (&DialectStrategyMySQL{}).Get(cfg)
+		dialect, err := (&dialectStrategyMySQL{}).Get(cfg)
 		switch {
 		case err != nil:
 			t.Errorf("return the unexpected error : (%v)", err)
@@ -231,7 +231,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 			},
 		}
 
-		dialect, err := (&DialectStrategyMySQL{}).Get(cfg)
+		dialect, err := (&dialectStrategyMySQL{}).Get(cfg)
 		switch {
 		case err != nil:
 			t.Errorf("return the unexpected error : (%v)", err)

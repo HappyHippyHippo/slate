@@ -20,7 +20,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 	}
 
 	_ = c.Service(ContainerFormatterStrategyJSONID, func() (interface{}, error) {
-		return &FormatterStrategyJSON{}, nil
+		return &formatterStrategyJSON{}, nil
 	}, ContainerFormatterStrategyTag)
 
 	_ = c.Service(ContainerFormatterFactoryID, func() (interface{}, error) {

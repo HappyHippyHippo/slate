@@ -239,7 +239,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile("path", os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 		factory := &FormatterFactory{}
-		_ = factory.Register(&FormatterStrategyJSON{})
+		_ = factory.Register(&formatterStrategyJSON{})
 		strategy, _ := NewStreamStrategyFile(fileSystem, factory)
 
 		stream, err := strategy.Create("path", FormatJSON, []string{}, DEBUG)
@@ -262,7 +262,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile("path", os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := &FormatterFactory{}
-		_ = factory.Register(&FormatterStrategyJSON{})
+		_ = factory.Register(&formatterStrategyJSON{})
 		strategy, _ := NewStreamStrategyFile(fileSystem, factory)
 
 		stream, err := strategy.Create("path", FormatJSON, []string{}, DEBUG)
@@ -357,7 +357,7 @@ func Test_StreamStrategyFile_CreateFromConfig(t *testing.T) {
 		config.EXPECT().List("channels").Return(nil, expected)
 
 		factory := &FormatterFactory{}
-		_ = factory.Register(&FormatterStrategyJSON{})
+		_ = factory.Register(&formatterStrategyJSON{})
 		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), factory)
 
 		stream, err := strategy.CreateFromConfig(config)
@@ -383,7 +383,7 @@ func Test_StreamStrategyFile_CreateFromConfig(t *testing.T) {
 		config.EXPECT().List("channels").Return([]interface{}{123}, nil)
 
 		factory := &FormatterFactory{}
-		_ = factory.Register(&FormatterStrategyJSON{})
+		_ = factory.Register(&formatterStrategyJSON{})
 		strategy, _ := NewStreamStrategyFile(NewMockFs(ctrl), factory)
 
 		stream, err := strategy.CreateFromConfig(config)
@@ -490,7 +490,7 @@ func Test_StreamStrategyFile_CreateFromConfig(t *testing.T) {
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile("path", os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 		factory := &FormatterFactory{}
-		_ = factory.Register(&FormatterStrategyJSON{})
+		_ = factory.Register(&formatterStrategyJSON{})
 		strategy, _ := NewStreamStrategyFile(fileSystem, factory)
 
 		stream, err := strategy.CreateFromConfig(config)
@@ -522,7 +522,7 @@ func Test_StreamStrategyFile_CreateFromConfig(t *testing.T) {
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile("path", os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := &FormatterFactory{}
-		_ = factory.Register(&FormatterStrategyJSON{})
+		_ = factory.Register(&formatterStrategyJSON{})
 		strategy, _ := NewStreamStrategyFile(fileSystem, factory)
 
 		stream, err := strategy.CreateFromConfig(config)

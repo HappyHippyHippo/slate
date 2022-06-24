@@ -26,11 +26,11 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 	})
 
 	_ = c.Service(ContainerDialectStrategyMySQLID, func() (interface{}, error) {
-		return &DialectStrategyMySQL{}, nil
+		return &dialectStrategyMySQL{}, nil
 	}, ContainerDialectStrategyTag)
 
 	_ = c.Service(ContainerDialectStrategySqliteID, func() (interface{}, error) {
-		return &DialectStrategySqlite{}, nil
+		return &dialectStrategySqlite{}, nil
 	}, ContainerDialectStrategyTag)
 
 	_ = c.Service(ContainerDialectFactoryID, func() (interface{}, error) {

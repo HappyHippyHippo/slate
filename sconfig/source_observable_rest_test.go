@@ -114,7 +114,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestampPath", "configPath")
 		switch {
@@ -136,7 +136,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestampPath", "configPath")
 		switch {
@@ -158,7 +158,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "configPath")
 		switch {
@@ -181,7 +181,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "configPath")
 		switch {
@@ -203,7 +203,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "configPath")
 		switch {
@@ -225,7 +225,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "path.node")
 		switch {
@@ -247,7 +247,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "path")
 		switch {
@@ -270,7 +270,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "path")
 		switch {
@@ -300,7 +300,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "node..inner_node")
 		switch {
@@ -337,7 +337,7 @@ func Test_SourceRestObservable_Reload(t *testing.T) {
 			client.EXPECT().Do(gomock.Any()).Return(&response2, nil),
 		)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, _ := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "node")
 
@@ -374,7 +374,7 @@ func Test_SourceRestObservable_Reload(t *testing.T) {
 			client.EXPECT().Do(gomock.Any()).Return(&response2, nil),
 		)
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, _ := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "node")
 

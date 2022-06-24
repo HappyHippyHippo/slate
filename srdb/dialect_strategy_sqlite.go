@@ -8,19 +8,19 @@ import (
 	"strings"
 )
 
-// DialectStrategySqlite  is a SQLite dialect interface generator.
-type DialectStrategySqlite struct{}
+// dialectStrategySqlite  is a SQLite dialect interface generator.
+type dialectStrategySqlite struct{}
 
-var _ DialectStrategy = &DialectStrategySqlite{}
+var _ DialectStrategy = &dialectStrategySqlite{}
 
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
-func (DialectStrategySqlite) Accept(name string) bool {
+func (dialectStrategySqlite) Accept(name string) bool {
 	return strings.EqualFold(strings.ToLower(name), DialectSqlite)
 }
 
 // Get instantiates the requested mysql connection dialect.
-func (DialectStrategySqlite) Get(cfg sconfig.Config) (gorm.Dialector, error) {
+func (dialectStrategySqlite) Get(cfg sconfig.Config) (gorm.Dialector, error) {
 	if dsn, err := cfg.String("host"); err != nil {
 		return nil, err
 	} else if params, err := cfg.Partial("params", nil); err != nil {

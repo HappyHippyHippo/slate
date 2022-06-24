@@ -127,7 +127,7 @@ func Test_NewSourceObservableFile(t *testing.T) {
 		fs.EXPECT().Stat(path).Return(fileInfo, nil).Times(1)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
 		switch {
@@ -160,7 +160,7 @@ func Test_NewSourceObservableFile(t *testing.T) {
 		fs.EXPECT().Stat(path).Return(fileInfo, nil).Times(1)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
 		switch {
@@ -211,7 +211,7 @@ func Test_NewSourceObservableFile(t *testing.T) {
 		fs.EXPECT().Stat(path).Return(fileI, nil).Times(1)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 
 		src, err := NewSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
 		switch {
@@ -256,7 +256,7 @@ func Test_SourceObservableFile_Reload(t *testing.T) {
 		)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 		src, _ := NewSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
 
 		reloaded, err := src.Reload()
@@ -299,7 +299,7 @@ func Test_SourceObservableFile_Reload(t *testing.T) {
 			fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(nil, expected),
 		)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 		src, _ := NewSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
 
 		reloaded, err := src.Reload()
@@ -332,7 +332,7 @@ func Test_SourceObservableFile_Reload(t *testing.T) {
 		fs.EXPECT().Stat(path).Return(fileInfo, nil).Times(2)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 		src, _ := NewSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
 
 		if reloaded, err := src.Reload(); reloaded {
@@ -375,7 +375,7 @@ func Test_SourceObservableFile_Reload(t *testing.T) {
 			fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file2, nil),
 		)
 		factory := DecoderFactory{}
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 		src, _ := NewSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
 
 		reloaded, err := src.Reload()

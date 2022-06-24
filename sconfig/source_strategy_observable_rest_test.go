@@ -244,7 +244,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 		value := "value"
 		expected := Partial{field: value}
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyYAML{})
+		_ = factory.Register(&decoderStrategyYAML{})
 		strategy, _ := NewSourceStrategyObservableRest(factory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"config_path": {"field": "value"}, "timestamp_path": "2000-01-01T00:00:00.000Z"}`))
@@ -398,7 +398,7 @@ func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 		value := "value"
 		expected := Partial{field: value}
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyJSON{})
+		_ = factory.Register(&decoderStrategyJSON{})
 		strategy, _ := NewSourceStrategyObservableRest(factory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}, "timestamp": "2021-12-15T21:07:48.239Z"}`))
@@ -435,7 +435,7 @@ func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 		value := "value"
 		expected := Partial{field: value}
 		factory := &(DecoderFactory{})
-		_ = factory.Register(&DecoderStrategyJSON{})
+		_ = factory.Register(&decoderStrategyJSON{})
 		strategy, _ := NewSourceStrategyObservableRest(factory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}, "timestamp": "2021-12-15T21:07:48.239Z"}`))
