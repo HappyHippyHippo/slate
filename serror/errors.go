@@ -59,4 +59,7 @@ var (
 
 	// ErrUnknownDatabaseDialect @todo doc
 	ErrUnknownDatabaseDialect = fmt.Errorf("unknown database dialect")
+
+	// ErrTranslatorNotFound @todo doc
+	ErrTranslatorNotFound = fmt.Errorf("translator not found")
 )
