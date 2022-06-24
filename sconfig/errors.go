@@ -25,8 +25,8 @@ func errConfigPathNotFound(path string) error {
 	return fmt.Errorf("%w : %v", serror.ErrConfigPathNotFound, path)
 }
 
-func errConfigRemotePathNotFound(path string) error {
-	return fmt.Errorf("%w : %v", serror.ErrConfigRemotePathNotFound, path)
+func errConfigRestPathNotFound(path string) error {
+	return fmt.Errorf("%w : %v", serror.ErrConfigRestPathNotFound, path)
 }
 
 func errInvalidConfigDecoderFormat(format string) error {

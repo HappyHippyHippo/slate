@@ -2,7 +2,8 @@ package slog
 
 import "github.com/happyhippyhippo/slate/sconfig"
 
-// StreamFactory @todo doc
+// StreamFactory is a logging stream generator based on a
+// registered list of stream generation strategies.
 type StreamFactory []StreamStrategy
 
 // Register will register a new stream factory strategy to be used

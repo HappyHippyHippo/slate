@@ -12,11 +12,11 @@ import (
 	"testing"
 )
 
-func Test_NewSourceRemoteObservable(t *testing.T) {
+func Test_NewSourceRestObservable(t *testing.T) {
 	t.Run("nil client", func(t *testing.T) {
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceObservableRemote(nil, "uri", "format", factory, "timestampPath", "configPath")
+		src, err := NewSourceObservableRest(nil, "uri", "format", factory, "timestampPath", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -33,7 +33,7 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 
 		client := NewMockHTTPClient(ctrl)
 
-		src, err := NewSourceObservableRemote(client, "uri", "format", nil, "timestampPath", "configPath")
+		src, err := NewSourceObservableRest(client, "uri", "format", nil, "timestampPath", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -52,7 +52,7 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceObservableRemote(client, "\n", "format", factory, "timestampPath", "configPath")
+		src, err := NewSourceObservableRest(client, "\n", "format", factory, "timestampPath", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -72,7 +72,7 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 		client.EXPECT().Do(gomock.Any()).Return(nil, expected).Times(1)
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceObservableRemote(client, "uri", "format", factory, "timestampPath", "configPath")
+		src, err := NewSourceObservableRest(client, "uri", "format", factory, "timestampPath", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -93,7 +93,7 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceObservableRemote(client, "uri", "format", factory, "timestampPath", "configPath")
+		src, err := NewSourceObservableRest(client, "uri", "format", factory, "timestampPath", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -116,7 +116,7 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceObservableRemote(client, "uri", "yaml", factory, "timestampPath", "configPath")
+		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestampPath", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -138,14 +138,14 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceObservableRemote(client, "uri", "yaml", factory, "timestampPath", "configPath")
+		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestampPath", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case err == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(err, serror.ErrConfigRemotePathNotFound):
-			t.Errorf("returned the (%v) error when expecting (%v)", err, serror.ErrConfigRemotePathNotFound)
+		case !errors.Is(err, serror.ErrConfigRestPathNotFound):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, serror.ErrConfigRestPathNotFound)
 		}
 	})
 
@@ -160,7 +160,7 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceObservableRemote(client, "uri", "yaml", factory, "timestamp", "configPath")
+		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -183,7 +183,7 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceObservableRemote(client, "uri", "yaml", factory, "timestamp", "configPath")
+		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -205,14 +205,14 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceObservableRemote(client, "uri", "yaml", factory, "timestamp", "configPath")
+		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "configPath")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case err == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(err, serror.ErrConfigRemotePathNotFound):
-			t.Errorf("returned the (%v) error when expecting (%v)", err, serror.ErrConfigRemotePathNotFound)
+		case !errors.Is(err, serror.ErrConfigRestPathNotFound):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, serror.ErrConfigRestPathNotFound)
 		}
 	})
 
@@ -227,14 +227,14 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceObservableRemote(client, "uri", "yaml", factory, "timestamp", "path.node")
+		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "path.node")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case err == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(err, serror.ErrConfigRemotePathNotFound):
-			t.Errorf("returned the (%v) error when expecting (%v)", err, serror.ErrConfigRemotePathNotFound)
+		case !errors.Is(err, serror.ErrConfigRestPathNotFound):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, serror.ErrConfigRestPathNotFound)
 		}
 	})
 
@@ -249,7 +249,7 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceObservableRemote(client, "uri", "yaml", factory, "timestamp", "path")
+		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -272,7 +272,7 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceObservableRemote(client, "uri", "yaml", factory, "timestamp", "path")
+		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "path")
 		switch {
 		case err != nil:
 			t.Errorf("returned the unexpected error : %v", err)
@@ -280,12 +280,12 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch s := src.(type) {
-			case *sourceObservableRemote:
+			case *sourceObservableRest:
 				if !reflect.DeepEqual(s.partial, expected) {
 					t.Error("didn't correctly stored the decoded Partial")
 				}
 			default:
-				t.Error("didn't returned a new remote src")
+				t.Error("didn't returned a new rest src")
 			}
 		}
 	})
@@ -302,7 +302,7 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceObservableRemote(client, "uri", "yaml", factory, "timestamp", "node..inner_node")
+		src, err := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "node..inner_node")
 		switch {
 		case err != nil:
 			t.Errorf("returned the unexpected error : %v", err)
@@ -310,18 +310,18 @@ func Test_NewSourceRemoteObservable(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch s := src.(type) {
-			case *sourceObservableRemote:
+			case *sourceObservableRest:
 				if !reflect.DeepEqual(s.partial, expected) {
 					t.Error("didn't correctly stored the decoded Partial")
 				}
 			default:
-				t.Error("didn't returned a new remote src")
+				t.Error("didn't returned a new rest src")
 			}
 		}
 	})
 }
 
-func Test_SourceRemoteObservable_Reload(t *testing.T) {
+func Test_SourceRestObservable_Reload(t *testing.T) {
 	t.Run("dont reload on same timestamp", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -339,7 +339,7 @@ func Test_SourceRemoteObservable_Reload(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, _ := NewSourceObservableRemote(client, "uri", "yaml", factory, "timestamp", "node")
+		src, _ := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "node")
 
 		loaded, err := src.Reload()
 		switch {
@@ -349,12 +349,12 @@ func Test_SourceRemoteObservable_Reload(t *testing.T) {
 			t.Errorf("returned the eunexpected error : %v", err)
 		default:
 			switch s := src.(type) {
-			case *sourceObservableRemote:
+			case *sourceObservableRest:
 				if !reflect.DeepEqual(s.partial, expected) {
 					t.Error("didn't correctly stored the decoded Partial")
 				}
 			default:
-				t.Error("didn't returned a new remote src")
+				t.Error("didn't returned a new rest src")
 			}
 		}
 	})
@@ -376,7 +376,7 @@ func Test_SourceRemoteObservable_Reload(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, _ := NewSourceObservableRemote(client, "uri", "yaml", factory, "timestamp", "node")
+		src, _ := NewSourceObservableRest(client, "uri", "yaml", factory, "timestamp", "node")
 
 		loaded, err := src.Reload()
 		switch {
@@ -386,12 +386,12 @@ func Test_SourceRemoteObservable_Reload(t *testing.T) {
 			t.Errorf("returned the eunexpected error : %v", err)
 		default:
 			switch s := src.(type) {
-			case *sourceObservableRemote:
+			case *sourceObservableRest:
 				if !reflect.DeepEqual(s.partial, expected) {
 					t.Error("didn't correctly stored the decoded Partial")
 				}
 			default:
-				t.Error("didn't returned a new remote src")
+				t.Error("didn't returned a new rest src")
 			}
 		}
 	})

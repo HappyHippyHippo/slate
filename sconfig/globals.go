@@ -36,13 +36,13 @@ const (
 	// simple dir config source type.
 	SourceTypeDirectory = "dir"
 
-	// SourceTypeRemote defines the value to be used to declare a
-	// remote config source type.
-	SourceTypeRemote = "remote"
+	// SourceTypeRest defines the value to be used to declare a
+	// rest config source type.
+	SourceTypeRest = "rest"
 
-	// SourceTypeObservableRemote defines the value to be used to
-	// declare an observable remote config source type.
-	SourceTypeObservableRemote = "observable-remote"
+	// SourceTypeObservableRest defines the value to be used to
+	// declare an observable rest config source type.
+	SourceTypeObservableRest = "observable-rest"
 
 	// SourceTypeEnv defines the value to be used to declare an
 	// environment config source type.
@@ -85,22 +85,22 @@ const (
 	// ContainerSourceStrategyFileObservableID defines the id to be used
 	// as the container registration id of a config observable file source
 	// factory strategy instance.
-	ContainerSourceStrategyFileObservableID = ContainerID + ".source.strategy.file_observable"
+	ContainerSourceStrategyFileObservableID = ContainerID + ".source.strategy.observable_file"
 
 	// ContainerSourceStrategyDirID defines the id to be used as the
 	// container registration id of a config dir source factory strategy
 	// instance.
 	ContainerSourceStrategyDirID = ContainerID + ".source.strategy.dir"
 
-	// ContainerSourceStrategyRemoteID defines the id to be used as the
-	// container registration id of a config remote source factory strategy
+	// ContainerSourceStrategyRestID defines the id to be used as the
+	// container registration id of a config rest source factory strategy
 	// instance.
-	ContainerSourceStrategyRemoteID = ContainerID + ".source.strategy.remote"
+	ContainerSourceStrategyRestID = ContainerID + ".source.strategy.rest"
 
-	// ContainerSourceStrategyRemoteObservableID defines the id to be used
-	// as the container registration id of a config observable remote source
+	// ContainerSourceStrategyRestObservableID defines the id to be used
+	// as the container registration id of a config observable rest source
 	// factory strategy instance.
-	ContainerSourceStrategyRemoteObservableID = ContainerID + ".source.strategy.remote_observable"
+	ContainerSourceStrategyRestObservableID = ContainerID + ".source.strategy.observable_rest"
 
 	// ContainerSourceStrategyEnvID defines the id to be used as
 	// the container registration id of a config environment source
@@ -126,9 +126,9 @@ var (
 	// if the format is not present in the config.
 	DefaultFileFormat = senv.String(EnvID+"_DEFAULT_FILE_FORMAT", DecoderFormatYAML)
 
-	// DefaultRemoteFormat defines the remote base config source default format
+	// DefaultRestFormat defines the rest base config source default format
 	// if the format is not present in the config.
-	DefaultRemoteFormat = senv.String(EnvID+"_DEFAULT_REMOTE_FORMAT", DecoderFormatJSON)
+	DefaultRestFormat = senv.String(EnvID+"_DEFAULT_REST_FORMAT", DecoderFormatJSON)
 
 	// PathSeparator defines the element(s) that will be used to split
 	// a config path string into path elements.

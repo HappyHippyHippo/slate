@@ -7,7 +7,9 @@ import (
 	gormLogger "gorm.io/gorm/logger"
 )
 
-// Provider @todo doc
+// Provider defines the slate.rdb module service provider to be used on
+// the application initialization to register the relational
+// database services.
 type Provider struct{}
 
 var _ slate.ServiceProvider = &Provider{}

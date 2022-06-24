@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// DialectStrategySqlite @todo doc
+// DialectStrategySqlite  is a SQLite dialect interface generator.
 type DialectStrategySqlite struct{}
 
 var _ DialectStrategy = &DialectStrategySqlite{}

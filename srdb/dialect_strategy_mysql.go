@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// DialectStrategyMySQL @todo doc
+// DialectStrategyMySQL is a MySQL dialect interface generator.
 type DialectStrategyMySQL struct{}
 
 var _ DialectStrategy = &DialectStrategyMySQL{}

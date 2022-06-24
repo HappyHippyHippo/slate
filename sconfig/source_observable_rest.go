@@ -5,18 +5,18 @@ import (
 	"time"
 )
 
-type sourceObservableRemote struct {
-	sourceRemote
+type sourceObservableRest struct {
+	sourceRest
 	timestampPath string
 	timestamp     time.Time
 }
 
-var _ SourceObservable = &sourceObservableRemote{}
+var _ SourceObservable = &sourceObservableRest{}
 
-// NewSourceObservableRemote instantiate a new source that treats a
-// remote as the origin of the configuration content. This source will be
+// NewSourceObservableRest instantiate a new source that treats a
+// rest connection as the origin of the configuration content. This source will be
 // periodically checked for changes and loaded if so.
-func NewSourceObservableRemote(client HTTPClient, uri, format string, factory *DecoderFactory, timestampPath, configPath string) (SourceObservable, error) {
+func NewSourceObservableRest(client HTTPClient, uri, format string, factory *DecoderFactory, timestampPath, configPath string) (SourceObservable, error) {
 	if client == nil {
 		return nil, errNilPointer("client")
 	}
@@ -24,8 +24,8 @@ func NewSourceObservableRemote(client HTTPClient, uri, format string, factory *D
 		return nil, errNilPointer("factory")
 	}
 
-	s := &sourceObservableRemote{
-		sourceRemote: sourceRemote{
+	s := &sourceObservableRest{
+		sourceRest: sourceRest{
 			source: source{
 				mutex:   &sync.Mutex{},
 				partial: Partial{},
@@ -48,7 +48,7 @@ func NewSourceObservableRemote(client HTTPClient, uri, format string, factory *D
 
 // Reload will check if the source has been updated, and, if so, reload the
 // source configuration Partial content.
-func (s *sourceObservableRemote) Reload() (bool, error) {
+func (s *sourceObservableRest) Reload() (bool, error) {
 	r, err := s.request()
 	if err != nil {
 		return false, err
@@ -76,12 +76,12 @@ func (s *sourceObservableRemote) Reload() (bool, error) {
 	return false, nil
 }
 
-func (s *sourceObservableRemote) searchTimestamp(body Config) (time.Time, error) {
+func (s *sourceObservableRest) searchTimestamp(body Config) (time.Time, error) {
 	var err error
 
 	var ts interface{}
 	if ts, err = body.(*Partial).path(s.timestampPath); err != nil {
-		return time.Now(), errConfigRemotePathNotFound(s.timestampPath)
+		return time.Now(), errConfigRestPathNotFound(s.timestampPath)
 	}
 
 	switch ts.(type) {

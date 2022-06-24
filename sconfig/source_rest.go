@@ -8,12 +8,12 @@ import (
 )
 
 // HTTPClient defines the interface of an instance capable to perform the
-// remote config obtain action
+// rest config obtain action
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-type sourceRemote struct {
+type sourceRest struct {
 	source
 	client     HTTPClient
 	uri        string
@@ -22,10 +22,11 @@ type sourceRemote struct {
 	configPath string
 }
 
-var _ Source = &sourceRemote{}
+var _ Source = &sourceRest{}
 
-// NewSourceRemote @todo doc
-func NewSourceRemote(client HTTPClient, uri, format string, factory *DecoderFactory, configPath string) (Source, error) {
+// NewSourceRest instantiate a new source that treats a
+//// rest connection as the origin of the configuration content.
+func NewSourceRest(client HTTPClient, uri, format string, factory *DecoderFactory, configPath string) (Source, error) {
 	if client == nil {
 		return nil, errNilPointer("client")
 	}
@@ -33,7 +34,7 @@ func NewSourceRemote(client HTTPClient, uri, format string, factory *DecoderFact
 		return nil, errNilPointer("factory")
 	}
 
-	s := &sourceRemote{
+	s := &sourceRest{
 		source: source{
 			mutex:   &sync.Mutex{},
 			partial: Partial{},
@@ -52,7 +53,7 @@ func NewSourceRemote(client HTTPClient, uri, format string, factory *DecoderFact
 	return s, nil
 }
 
-func (s *sourceRemote) load() error {
+func (s *sourceRest) load() error {
 	r, err := s.request()
 	if err != nil {
 		return err
@@ -70,7 +71,7 @@ func (s *sourceRemote) load() error {
 	return nil
 }
 
-func (s *sourceRemote) request() (Config, error) {
+func (s *sourceRest) request() (Config, error) {
 	var err error
 
 	var req *http.Request
@@ -94,12 +95,12 @@ func (s *sourceRemote) request() (Config, error) {
 	return d.Decode()
 }
 
-func (s *sourceRemote) searchConfig(body Config) (Config, error) {
+func (s *sourceRest) searchConfig(body Config) (Config, error) {
 	var err error
 
 	var cfg interface{}
 	if cfg, err = body.(*Partial).path(s.configPath); err != nil {
-		return nil, errConfigRemotePathNotFound(s.configPath)
+		return nil, errConfigRestPathNotFound(s.configPath)
 	}
 
 	if p, ok := cfg.(Partial); ok {

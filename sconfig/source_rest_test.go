@@ -12,11 +12,11 @@ import (
 	"testing"
 )
 
-func Test_NewSourceRemote(t *testing.T) {
+func Test_NewSourceRest(t *testing.T) {
 	t.Run("nil client", func(t *testing.T) {
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceRemote(nil, "uri", DecoderFormatUnknown, factory, "path")
+		src, err := NewSourceRest(nil, "uri", DecoderFormatUnknown, factory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -33,7 +33,7 @@ func Test_NewSourceRemote(t *testing.T) {
 
 		client := NewMockHTTPClient(ctrl)
 
-		src, err := NewSourceRemote(client, "uri", DecoderFormatUnknown, nil, "path")
+		src, err := NewSourceRest(client, "uri", DecoderFormatUnknown, nil, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -52,7 +52,7 @@ func Test_NewSourceRemote(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceRemote(client, "\n", DecoderFormatUnknown, factory, "path")
+		src, err := NewSourceRest(client, "\n", DecoderFormatUnknown, factory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -72,7 +72,7 @@ func Test_NewSourceRemote(t *testing.T) {
 		client.EXPECT().Do(gomock.Any()).Return(nil, expected).Times(1)
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceRemote(client, "uri", DecoderFormatUnknown, factory, "path")
+		src, err := NewSourceRest(client, "uri", DecoderFormatUnknown, factory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -93,7 +93,7 @@ func Test_NewSourceRemote(t *testing.T) {
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		factory := &(DecoderFactory{})
 
-		src, err := NewSourceRemote(client, "uri", DecoderFormatUnknown, factory, "path")
+		src, err := NewSourceRest(client, "uri", DecoderFormatUnknown, factory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -116,7 +116,7 @@ func Test_NewSourceRemote(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceRemote(client, "uri", DecoderFormatYAML, factory, "path")
+		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -138,14 +138,14 @@ func Test_NewSourceRemote(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceRemote(client, "uri", DecoderFormatYAML, factory, "path")
+		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case err == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(err, serror.ErrConfigRemotePathNotFound):
-			t.Errorf("returned the (%v) error when expecting (%v)", err, serror.ErrConfigRemotePathNotFound)
+		case !errors.Is(err, serror.ErrConfigRestPathNotFound):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, serror.ErrConfigRestPathNotFound)
 		}
 	})
 
@@ -160,14 +160,14 @@ func Test_NewSourceRemote(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceRemote(client, "uri", DecoderFormatYAML, factory, "path.node")
+		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path.node")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case err == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(err, serror.ErrConfigRemotePathNotFound):
-			t.Errorf("returned the (%v) error when expecting (%v)", err, serror.ErrConfigRemotePathNotFound)
+		case !errors.Is(err, serror.ErrConfigRestPathNotFound):
+			t.Errorf("returned the (%v) error when expecting (%v)", err, serror.ErrConfigRestPathNotFound)
 		}
 	})
 
@@ -182,7 +182,7 @@ func Test_NewSourceRemote(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceRemote(client, "uri", DecoderFormatYAML, factory, "path")
+		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -205,7 +205,7 @@ func Test_NewSourceRemote(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceRemote(client, "uri", DecoderFormatYAML, factory, "path")
+		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
 		switch {
 		case err != nil:
 			t.Errorf("returned the unexpected error : %v", err)
@@ -213,12 +213,12 @@ func Test_NewSourceRemote(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch s := src.(type) {
-			case *sourceRemote:
+			case *sourceRest:
 				if !reflect.DeepEqual(s.partial, expected) {
 					t.Error("didn't correctly stored the decoded Partial")
 				}
 			default:
-				t.Error("didn't returned a new remote src")
+				t.Error("didn't returned a new rest src")
 			}
 		}
 	})
@@ -235,7 +235,7 @@ func Test_NewSourceRemote(t *testing.T) {
 		factory := &(DecoderFactory{})
 		_ = factory.Register(&DecoderStrategyYAML{})
 
-		src, err := NewSourceRemote(client, "uri", DecoderFormatYAML, factory, "node..inner_node")
+		src, err := NewSourceRest(client, "uri", DecoderFormatYAML, factory, "node..inner_node")
 		switch {
 		case err != nil:
 			t.Errorf("returned the unexpected error : %v", err)
@@ -243,12 +243,12 @@ func Test_NewSourceRemote(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch s := src.(type) {
-			case *sourceRemote:
+			case *sourceRest:
 				if !reflect.DeepEqual(s.partial, expected) {
 					t.Error("didn't correctly stored the decoded Partial")
 				}
 			default:
-				t.Error("didn't returned a new remote src")
+				t.Error("didn't returned a new rest src")
 			}
 		}
 	})

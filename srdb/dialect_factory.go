@@ -6,7 +6,9 @@ import (
 	"strings"
 )
 
-// DialectFactory @todo doc
+// DialectFactory defines an object that will generate a database
+// dialect interface based on a registered list of dialect
+// generation strategies.
 type DialectFactory []DialectStrategy
 
 // Register will register a new dialect factory strategy to be used

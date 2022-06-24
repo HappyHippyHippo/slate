@@ -72,13 +72,13 @@ func Test_ErrConfigPathNotFound(t *testing.T) {
 	})
 }
 
-func Test_ErrConfigRemotePathNotFound(t *testing.T) {
+func Test_ErrConfigRestPathNotFound(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := "dummy argument"
-		expected := "remote path not found : dummy argument"
+		expected := "rest path not found : dummy argument"
 
-		if err := errConfigRemotePathNotFound(arg); !errors.Is(err, serror.ErrConfigRemotePathNotFound) {
-			t.Errorf("error not a instance of ErrRemoteConfigPathNotFound")
+		if err := errConfigRestPathNotFound(arg); !errors.Is(err, serror.ErrConfigRestPathNotFound) {
+			t.Errorf("error not a instance of ErrRestConfigPathNotFound")
 		} else if err.Error() != expected {
 			t.Errorf("error message (%v) not same as expected (%v)", err, expected)
 		}

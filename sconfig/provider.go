@@ -61,20 +61,20 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		}
 	}, ContainerSourceStrategyTag)
 
-	_ = c.Service(ContainerSourceStrategyRemoteID, func() (interface{}, error) {
+	_ = c.Service(ContainerSourceStrategyRestID, func() (interface{}, error) {
 		decoderFactory, err := GetDecoderFactory(c)
 		if err != nil {
 			return nil, err
 		}
-		return NewSourceStrategyRemote(decoderFactory)
+		return NewSourceStrategyRest(decoderFactory)
 	}, ContainerSourceStrategyTag)
 
-	_ = c.Service(ContainerSourceStrategyRemoteObservableID, func() (interface{}, error) {
+	_ = c.Service(ContainerSourceStrategyRestObservableID, func() (interface{}, error) {
 		decoderFactory, err := GetDecoderFactory(c)
 		if err != nil {
 			return nil, err
 		}
-		return NewSourceStrategyObservableRemote(decoderFactory)
+		return NewSourceStrategyObservableRest(decoderFactory)
 	}, ContainerSourceStrategyTag)
 
 	_ = c.Service(ContainerSourceStrategyEnvID, func() (interface{}, error) {

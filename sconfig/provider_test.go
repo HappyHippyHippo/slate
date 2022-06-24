@@ -44,10 +44,10 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("didn't registered the config observable file source strategy : %v", p)
 		case !container.Has(ContainerSourceStrategyDirID):
 			t.Errorf("didn't registered the config dir source strategy : %v", p)
-		case !container.Has(ContainerSourceStrategyRemoteID):
-			t.Errorf("didn't registered the config remote source strategy : %v", p)
-		case !container.Has(ContainerSourceStrategyRemoteObservableID):
-			t.Errorf("didn't registered the config observable remote source strategy : %v", p)
+		case !container.Has(ContainerSourceStrategyRestID):
+			t.Errorf("didn't registered the config rest source strategy : %v", p)
+		case !container.Has(ContainerSourceStrategyRestObservableID):
+			t.Errorf("didn't registered the config observable rest source strategy : %v", p)
 		case !container.Has(ContainerSourceStrategyEnvID):
 			t.Errorf("didn't registered the config environment source strategy : %v", p)
 		case !container.Has(ContainerSourceFactoryID):
@@ -338,7 +338,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving decoder factory on retrieving the source factory strategy remote", func(t *testing.T) {
+	t.Run("error retrieving decoder factory on retrieving the source factory strategy rest", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.ServiceContainer{}
 		_ = (&(sfs.Provider{})).Register(container)
@@ -347,14 +347,14 @@ func Test_Provider_Register(t *testing.T) {
 			return nil, expected
 		})
 
-		if _, err := container.Get(ContainerSourceStrategyRemoteID); err == nil {
+		if _, err := container.Get(ContainerSourceStrategyRestID); err == nil {
 			t.Error("didn't returned the expected error")
 		} else if err.Error() != expected.Error() {
 			t.Errorf("returned the (%v) error when expecting (%v)", err, expected)
 		}
 	})
 
-	t.Run("invalid decoder factory on retrieving the source factory strategy remote", func(t *testing.T) {
+	t.Run("invalid decoder factory on retrieving the source factory strategy rest", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&(sfs.Provider{})).Register(container)
 		_ = (&Provider{}).Register(container)
@@ -362,19 +362,19 @@ func Test_Provider_Register(t *testing.T) {
 			return "string", nil
 		})
 
-		if _, err := container.Get(ContainerSourceStrategyRemoteID); err == nil {
+		if _, err := container.Get(ContainerSourceStrategyRestID); err == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(err, serror.ErrConversion) {
 			t.Errorf("returned the (%v) error when expecting (%v)", err, serror.ErrConversion)
 		}
 	})
 
-	t.Run("retrieving the source factory strategy remote", func(t *testing.T) {
+	t.Run("retrieving the source factory strategy rest", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&(sfs.Provider{})).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		strategy, err := container.Get(ContainerSourceStrategyRemoteID)
+		strategy, err := container.Get(ContainerSourceStrategyRestID)
 		switch {
 		case err != nil:
 			t.Errorf("returned the unexpected error (%v)", err)
@@ -383,7 +383,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving decoder factory on retrieving the source factory strategy observable remote", func(t *testing.T) {
+	t.Run("error retrieving decoder factory on retrieving the source factory strategy observable rest", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.ServiceContainer{}
 		_ = (&(sfs.Provider{})).Register(container)
@@ -392,14 +392,14 @@ func Test_Provider_Register(t *testing.T) {
 			return nil, expected
 		})
 
-		if _, err := container.Get(ContainerSourceStrategyRemoteObservableID); err == nil {
+		if _, err := container.Get(ContainerSourceStrategyRestObservableID); err == nil {
 			t.Error("didn't returned the expected error")
 		} else if err.Error() != expected.Error() {
 			t.Errorf("returned the (%v) error when expecting (%v)", err, expected)
 		}
 	})
 
-	t.Run("invalid decoder factory on retrieving the source factory strategy observable remote", func(t *testing.T) {
+	t.Run("invalid decoder factory on retrieving the source factory strategy observable rest", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&(sfs.Provider{})).Register(container)
 		_ = (&Provider{}).Register(container)
@@ -407,18 +407,18 @@ func Test_Provider_Register(t *testing.T) {
 			return "string", nil
 		})
 
-		if _, err := container.Get(ContainerSourceStrategyRemoteObservableID); err == nil {
+		if _, err := container.Get(ContainerSourceStrategyRestObservableID); err == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(err, serror.ErrConversion) {
 			t.Errorf("returned the (%v) error when expecting (%v)", err, serror.ErrConversion)
 		}
 	})
 
-	t.Run("retrieving the source factory strategy observable remote", func(t *testing.T) {
+	t.Run("retrieving the source factory strategy observable rest", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&Provider{}).Register(container)
 
-		strategy, err := container.Get(ContainerSourceStrategyRemoteObservableID)
+		strategy, err := container.Get(ContainerSourceStrategyRestObservableID)
 		switch {
 		case err != nil:
 			t.Errorf("returned the unexpected error (%v)", err)

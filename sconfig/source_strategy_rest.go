@@ -4,24 +4,24 @@ import (
 	"net/http"
 )
 
-// sourceStrategyRemote defines a remote config source instantiation
+// sourceStrategyRest defines a rest config source instantiation
 // strategy to be used by the config sources factory instance.
-type sourceStrategyRemote struct {
+type sourceStrategyRest struct {
 	clientFactory  func() HTTPClient
 	decoderFactory *DecoderFactory
 }
 
-var _ SourceStrategy = &sourceStrategyRemote{}
+var _ SourceStrategy = &sourceStrategyRest{}
 
-// NewSourceStrategyRemote instantiate a new remote source factory
+// NewSourceStrategyRest instantiate a new rest source factory
 // strategy that will enable the source factory to instantiate a new
-// remote configuration source.
-func NewSourceStrategyRemote(decoderFactory *DecoderFactory) (SourceStrategy, error) {
+// rest configuration source.
+func NewSourceStrategyRest(decoderFactory *DecoderFactory) (SourceStrategy, error) {
 	if decoderFactory == nil {
 		return nil, errNilPointer("decoderFactory")
 	}
 
-	return &sourceStrategyRemote{
+	return &sourceStrategyRest{
 		clientFactory:  func() HTTPClient { return &http.Client{} },
 		decoderFactory: decoderFactory,
 	}, nil
@@ -29,14 +29,14 @@ func NewSourceStrategyRemote(decoderFactory *DecoderFactory) (SourceStrategy, er
 
 // Accept will check if the source factory strategy can instantiate a
 // new source of the requested type.
-func (sourceStrategyRemote) Accept(stype string) bool {
-	return stype == SourceTypeRemote
+func (sourceStrategyRest) Accept(stype string) bool {
+	return stype == SourceTypeRest
 }
 
 // AcceptFromConfig will check if the source factory strategy can instantiate
 // a source where the data to check comes from a configuration Partial
 // instance.
-func (s sourceStrategyRemote) AcceptFromConfig(cfg Config) bool {
+func (s sourceStrategyRest) AcceptFromConfig(cfg Config) bool {
 	if cfg == nil {
 		return false
 	}
@@ -48,8 +48,8 @@ func (s sourceStrategyRemote) AcceptFromConfig(cfg Config) bool {
 	return false
 }
 
-// Create will instantiate the desired remote source instance.
-func (s sourceStrategyRemote) Create(args ...interface{}) (Source, error) {
+// Create will instantiate the desired rest source instance.
+func (s sourceStrategyRest) Create(args ...interface{}) (Source, error) {
 	if len(args) < 3 {
 		return nil, errNilPointer("args")
 	}
@@ -61,20 +61,20 @@ func (s sourceStrategyRemote) Create(args ...interface{}) (Source, error) {
 	} else if configPath, ok := args[2].(string); !ok {
 		return nil, errConversion(args[2], "string")
 	} else {
-		return NewSourceRemote(s.clientFactory(), uri, format, s.decoderFactory, configPath)
+		return NewSourceRest(s.clientFactory(), uri, format, s.decoderFactory, configPath)
 	}
 }
 
-// CreateFromConfig will instantiate the desired remote source instance where
+// CreateFromConfig will instantiate the desired rest source instance where
 // the initialization data comes from a configuration Partial instance.
-func (s sourceStrategyRemote) CreateFromConfig(cfg Config) (Source, error) {
+func (s sourceStrategyRest) CreateFromConfig(cfg Config) (Source, error) {
 	if cfg == nil {
 		return nil, errNilPointer("cfg")
 	}
 
 	if uri, err := cfg.String("uri"); err != nil {
 		return nil, err
-	} else if format, err := cfg.String("format", DefaultRemoteFormat); err != nil {
+	} else if format, err := cfg.String("format", DefaultRestFormat); err != nil {
 		return nil, err
 	} else if configPath, err := cfg.String("configPath"); err != nil {
 		return nil, err

@@ -50,10 +50,10 @@ func Test_ErrConfigPathNotFound(t *testing.T) {
 	}
 }
 
-func Test_ErrConfigRemotePathNotFound(t *testing.T) {
-	expected := "remote path not found"
+func Test_ErrConfigRestPathNotFound(t *testing.T) {
+	expected := "rest path not found"
 
-	if chk := ErrConfigRemotePathNotFound.Error(); chk != expected {
+	if chk := ErrConfigRestPathNotFound.Error(); chk != expected {
 		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
 	}
 }

@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// ConnectionFactory @todo doc
+// ConnectionFactory is a database connection generator.
 type ConnectionFactory struct {
 	config         sconfig.Manager
 	dialectFactory *DialectFactory

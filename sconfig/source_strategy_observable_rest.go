@@ -4,25 +4,25 @@ import (
 	"net/http"
 )
 
-// sourceStrategyObservableRemote defines am observable remote config
+// sourceStrategyObservableRest defines am observable rest config
 // source instantiation strategy to be used by the config sources factory
 // instance.
-type sourceStrategyObservableRemote struct {
-	sourceStrategyRemote
+type sourceStrategyObservableRest struct {
+	sourceStrategyRest
 }
 
-var _ SourceStrategy = &sourceStrategyObservableRemote{}
+var _ SourceStrategy = &sourceStrategyObservableRest{}
 
-// NewSourceStrategyObservableRemote instantiate a new observable remote
+// NewSourceStrategyObservableRest instantiate a new observable rest
 // source factory strategy that will enable the source factory to instantiate
-// a new remote configuration source.
-func NewSourceStrategyObservableRemote(decoderFactory *DecoderFactory) (SourceStrategy, error) {
+// a new rest configuration source.
+func NewSourceStrategyObservableRest(decoderFactory *DecoderFactory) (SourceStrategy, error) {
 	if decoderFactory == nil {
 		return nil, errNilPointer("decoderFactory")
 	}
 
-	return &sourceStrategyObservableRemote{
-		sourceStrategyRemote: sourceStrategyRemote{
+	return &sourceStrategyObservableRest{
+		sourceStrategyRest: sourceStrategyRest{
 			clientFactory:  func() HTTPClient { return &http.Client{} },
 			decoderFactory: decoderFactory,
 		},
@@ -31,14 +31,14 @@ func NewSourceStrategyObservableRemote(decoderFactory *DecoderFactory) (SourceSt
 
 // Accept will check if the source factory strategy can instantiate a
 // new source of the requested type.
-func (sourceStrategyObservableRemote) Accept(stype string) bool {
-	return stype == SourceTypeObservableRemote
+func (sourceStrategyObservableRest) Accept(stype string) bool {
+	return stype == SourceTypeObservableRest
 }
 
 // AcceptFromConfig will check if the source factory strategy can instantiate
 // a source where the data to check comes from a configuration Partial
 // instance.
-func (s sourceStrategyObservableRemote) AcceptFromConfig(cfg Config) bool {
+func (s sourceStrategyObservableRest) AcceptFromConfig(cfg Config) bool {
 	if cfg == nil {
 		return false
 	}
@@ -50,8 +50,8 @@ func (s sourceStrategyObservableRemote) AcceptFromConfig(cfg Config) bool {
 	return false
 }
 
-// Create will instantiate the desired observable remote source instance.
-func (s sourceStrategyObservableRemote) Create(args ...interface{}) (Source, error) {
+// Create will instantiate the desired observable rest source instance.
+func (s sourceStrategyObservableRest) Create(args ...interface{}) (Source, error) {
 	if len(args) < 4 {
 		return nil, errNilPointer("args")
 	}
@@ -65,20 +65,20 @@ func (s sourceStrategyObservableRemote) Create(args ...interface{}) (Source, err
 	} else if configPath, ok := args[3].(string); !ok {
 		return nil, errConversion(args[3], "string")
 	} else {
-		return NewSourceObservableRemote(s.clientFactory(), uri, format, s.decoderFactory, timestampPath, configPath)
+		return NewSourceObservableRest(s.clientFactory(), uri, format, s.decoderFactory, timestampPath, configPath)
 	}
 }
 
-// CreateFromConfig will instantiate the desired remote source instance where
+// CreateFromConfig will instantiate the desired rest source instance where
 // the initialization data comes from a configuration Partial instance.
-func (s sourceStrategyObservableRemote) CreateFromConfig(cfg Config) (Source, error) {
+func (s sourceStrategyObservableRest) CreateFromConfig(cfg Config) (Source, error) {
 	if cfg == nil {
 		return nil, errNilPointer("cfg")
 	}
 
 	if uri, err := cfg.String("uri"); err != nil {
 		return nil, err
-	} else if format, err := cfg.String("format", DefaultRemoteFormat); err != nil {
+	} else if format, err := cfg.String("format", DefaultRestFormat); err != nil {
 		return nil, err
 	} else if timestampPath, err := cfg.String("timestampPath"); err != nil {
 		return nil, err
