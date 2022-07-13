@@ -47,6 +47,10 @@ const (
 	// SourceTypeEnv defines the value to be used to declare an
 	// environment config source type.
 	SourceTypeEnv = "env"
+
+	// SourceTypeContainer defines the value to be used to declare an
+	// container loading configs source type.
+	SourceTypeContainer = "container"
 )
 
 const (
@@ -107,9 +111,18 @@ const (
 	// factory strategy instance.
 	ContainerSourceStrategyEnvID = ContainerID + ".source.strategy.env"
 
+	// ContainerSourceStrategyContainerID defines the id to be used as
+	// the container registration id of a container loading config source
+	// factory strategy instance.
+	ContainerSourceStrategyContainerID = ContainerID + ".source.strategy.container"
+
 	// ContainerSourceFactoryID defines the id to be used as the
 	// container registration id config source factory instance.
 	ContainerSourceFactoryID = ContainerID + ".source.factory"
+
+	// ContainerSourceContainerPartialTag defines the tag to be assigned
+	// to all container defined config partials.
+	ContainerSourceContainerPartialTag = ContainerID + ".source.container.tag"
 
 	// ContainerLoaderID defines the id to be used as the container
 	// registration id of a config loader instance.

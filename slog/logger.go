@@ -5,17 +5,32 @@ import (
 	"sync"
 )
 
+// ILogger defines the interface of a logger instance.
+type ILogger interface {
+	io.Closer
+
+	Signal(channel string, level Level, msg string, ctx map[string]interface{}) error
+	Broadcast(level Level, msg string, ctx map[string]interface{}) error
+	HasStream(id string) bool
+	ListStreams() []string
+	AddStream(id string, stream IStream) error
+	RemoveStream(id string)
+	RemoveAllStreams()
+	Stream(id string) IStream
+}
+
 // Logger defines a logging proxy for all the registered logging streams.
 type Logger struct {
 	mutex   sync.Locker
-	streams map[string]Stream
+	streams map[string]IStream
 }
 
-// NewLogger create a new logger instance.
-func NewLogger() *Logger {
+var _ ILogger = &Logger{}
+
+func newLogger() ILogger {
 	return &Logger{
 		mutex:   &sync.Mutex{},
-		streams: map[string]Stream{},
+		streams: map[string]IStream{},
 	}
 }
 
@@ -74,7 +89,7 @@ func (l Logger) ListStreams() []string {
 }
 
 // AddStream registers a new stream into the logger instance.
-func (l *Logger) AddStream(id string, stream Stream) error {
+func (l *Logger) AddStream(id string, stream IStream) error {
 	if stream == nil {
 		return errNilPointer("stream")
 	}
@@ -118,7 +133,7 @@ func (l *Logger) RemoveAllStreams() {
 
 // Stream retrieve a stream from the logger that is registered with the
 // requested id.
-func (l Logger) Stream(id string) Stream {
+func (l Logger) Stream(id string) IStream {
 	l.mutex.Lock()
 	defer func() { l.mutex.Unlock() }()
 

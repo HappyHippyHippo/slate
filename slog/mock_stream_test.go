@@ -12,7 +12,7 @@ type MockStreamer struct {
 	recorder *MockStreamerRecorder
 }
 
-var _ Stream = &MockStreamer{}
+var _ IStream = &MockStreamer{}
 
 // MockStreamerRecorder is the mock recorder for MockStreamer
 type MockStreamerRecorder struct {

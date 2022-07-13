@@ -18,13 +18,13 @@ type sourceRest struct {
 	client     HTTPClient
 	uri        string
 	format     string
-	factory    *DecoderFactory
+	factory    IDecoderFactory
 	configPath string
 }
 
-var _ Source = &sourceRest{}
+var _ ISource = &sourceRest{}
 
-func newSourceRest(client HTTPClient, uri, format string, factory *DecoderFactory, configPath string) (Source, error) {
+func newSourceRest(client HTTPClient, uri, format string, factory IDecoderFactory, configPath string) (ISource, error) {
 	if client == nil {
 		return nil, errNilPointer("client")
 	}
@@ -69,7 +69,7 @@ func (s *sourceRest) load() error {
 	return nil
 }
 
-func (s *sourceRest) request() (Config, error) {
+func (s *sourceRest) request() (IConfig, error) {
 	var err error
 
 	var req *http.Request
@@ -93,7 +93,7 @@ func (s *sourceRest) request() (Config, error) {
 	return d.Decode()
 }
 
-func (s *sourceRest) searchConfig(body Config) (Config, error) {
+func (s *sourceRest) searchConfig(body IConfig) (IConfig, error) {
 	var err error
 
 	var cfg interface{}

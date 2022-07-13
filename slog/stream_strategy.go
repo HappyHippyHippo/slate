@@ -5,19 +5,19 @@ import (
 	"strings"
 )
 
-// StreamStrategy interface defines the methods of the stream
+// IStreamStrategy interface defines the methods of the stream
 // factory strategy that can validate creation requests and instantiation
 // of particular type of stream.
-type StreamStrategy interface {
+type IStreamStrategy interface {
 	Accept(sourceType string) bool
-	AcceptFromConfig(cfg sconfig.Config) bool
-	Create(args ...interface{}) (Stream, error)
-	CreateFromConfig(cfg sconfig.Config) (Stream, error)
+	AcceptFromConfig(cfg sconfig.IConfig) bool
+	Create(args ...interface{}) (IStream, error)
+	CreateFromConfig(cfg sconfig.IConfig) (IStream, error)
 }
 
 type streamStrategy struct{}
 
-func (streamStrategy) level(cfg sconfig.Config) (Level, error) {
+func (streamStrategy) level(cfg sconfig.IConfig) (Level, error) {
 	level, err := cfg.String("level")
 	if err != nil {
 		return FATAL, err
@@ -30,7 +30,7 @@ func (streamStrategy) level(cfg sconfig.Config) (Level, error) {
 	return LevelMap[level], nil
 }
 
-func (streamStrategy) channels(cfg sconfig.Config) ([]string, error) {
+func (streamStrategy) channels(cfg sconfig.IConfig) ([]string, error) {
 	entries, err := cfg.List("channels")
 	if err != nil {
 		return nil, err

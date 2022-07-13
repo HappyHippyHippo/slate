@@ -4,8 +4,8 @@ import (
 	"sort"
 )
 
-// Stream interface defines the interaction methods with a logging stream.
-type Stream interface {
+// IStream interface defines the interaction methods with a logging stream.
+type IStream interface {
 	Level() Level
 
 	Signal(channel string, level Level, message string, ctx map[string]interface{}) error
@@ -19,7 +19,7 @@ type Stream interface {
 
 // stream defines the base interaction with a logger stream instance.
 type stream struct {
-	formatter Formatter
+	formatter IFormatter
 	channels  []string
 	level     Level
 }

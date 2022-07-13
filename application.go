@@ -1,25 +1,33 @@
 package slate
 
+// IApplication defines the interface of a slate application instance.
+type IApplication interface {
+	Add(provider IServiceProvider) error
+	Boot() error
+}
+
 // Application defines the structure that controls the application
 // container and container initialization.
 type Application struct {
 	Container ServiceContainer
-	providers []ServiceProvider
+	providers []IServiceProvider
 	isBoot    bool
 }
+
+var _ IApplication = &Application{}
 
 // NewApplication used to instantiate a new application.
 func NewApplication() *Application {
 	return &Application{
 		Container: ServiceContainer{},
-		providers: []ServiceProvider{},
+		providers: []IServiceProvider{},
 		isBoot:    false,
 	}
 }
 
 // Add will register a new provider into the application used
 // on the application boot.
-func (a *Application) Add(provider ServiceProvider) error {
+func (a *Application) Add(provider IServiceProvider) error {
 	if provider == nil {
 		return errNilPointer("provider")
 	}

@@ -6,12 +6,12 @@ import (
 
 type sourceStrategyRest struct {
 	clientFactory  func() HTTPClient
-	decoderFactory *DecoderFactory
+	decoderFactory IDecoderFactory
 }
 
-var _ SourceStrategy = &sourceStrategyRest{}
+var _ ISourceStrategy = &sourceStrategyRest{}
 
-func newSourceStrategyRest(decoderFactory *DecoderFactory) (SourceStrategy, error) {
+func newSourceStrategyRest(decoderFactory IDecoderFactory) (ISourceStrategy, error) {
 	if decoderFactory == nil {
 		return nil, errNilPointer("DecoderFactory")
 	}
@@ -24,27 +24,27 @@ func newSourceStrategyRest(decoderFactory *DecoderFactory) (SourceStrategy, erro
 
 // Accept will check if the source factory strategy can instantiate a
 // new source of the requested type.
-func (sourceStrategyRest) Accept(stype string) bool {
-	return stype == SourceTypeRest
+func (sourceStrategyRest) Accept(sourceType string) bool {
+	return sourceType == SourceTypeRest
 }
 
 // AcceptFromConfig will check if the source factory strategy can instantiate
 // a source where the data to check comes from a configuration Partial
 // instance.
-func (s sourceStrategyRest) AcceptFromConfig(cfg Config) bool {
+func (s sourceStrategyRest) AcceptFromConfig(cfg IConfig) bool {
 	if cfg == nil {
 		return false
 	}
 
-	if stype, err := cfg.String("type"); err == nil {
-		return s.Accept(stype)
+	if sourceType, err := cfg.String("type"); err == nil {
+		return s.Accept(sourceType)
 	}
 
 	return false
 }
 
 // Create will instantiate the desired rest source instance.
-func (s sourceStrategyRest) Create(args ...interface{}) (Source, error) {
+func (s sourceStrategyRest) Create(args ...interface{}) (ISource, error) {
 	if len(args) < 3 {
 		return nil, errNilPointer("args")
 	}
@@ -62,7 +62,7 @@ func (s sourceStrategyRest) Create(args ...interface{}) (Source, error) {
 
 // CreateFromConfig will instantiate the desired rest source instance where
 // the initialization data comes from a configuration Partial instance.
-func (s sourceStrategyRest) CreateFromConfig(cfg Config) (Source, error) {
+func (s sourceStrategyRest) CreateFromConfig(cfg IConfig) (ISource, error) {
 	if cfg == nil {
 		return nil, errNilPointer("cfg")
 	}

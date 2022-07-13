@@ -12,7 +12,7 @@ type MockSourceStrategy struct {
 	recorder *MockSourceStrategyRecorder
 }
 
-var _ SourceStrategy = &MockSourceStrategy{}
+var _ ISourceStrategy = &MockSourceStrategy{}
 
 // MockSourceStrategyRecorder is the mock recorder for MockSourceStrategy
 type MockSourceStrategyRecorder struct {
@@ -47,7 +47,7 @@ func (mr *MockSourceStrategyRecorder) Accept(sourceType interface{}, args ...int
 }
 
 // AcceptFromConfig mocks base method
-func (m *MockSourceStrategy) AcceptFromConfig(cfg Config) bool {
+func (m *MockSourceStrategy) AcceptFromConfig(cfg IConfig) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AcceptFromConfig", cfg)
 	ret0, _ := ret[0].(bool)
@@ -61,14 +61,14 @@ func (mr *MockSourceStrategyRecorder) AcceptFromConfig(cfg interface{}) *gomock.
 }
 
 // Create mocks base method
-func (m *MockSourceStrategy) Create(args ...interface{}) (Source, error) {
+func (m *MockSourceStrategy) Create(args ...interface{}) (ISource, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range args {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Create", varargs...)
-	ret0, _ := ret[0].(Source)
+	ret0, _ := ret[0].(ISource)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -80,10 +80,10 @@ func (mr *MockSourceStrategyRecorder) Create(args ...interface{}) *gomock.Call {
 }
 
 // CreateFromConfig mocks base method
-func (m *MockSourceStrategy) CreateFromConfig(cfg Config) (Source, error) {
+func (m *MockSourceStrategy) CreateFromConfig(cfg IConfig) (ISource, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateFromConfig", cfg)
-	ret0, _ := ret[0].(Source)
+	ret0, _ := ret[0].(ISource)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

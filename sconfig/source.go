@@ -2,28 +2,27 @@ package sconfig
 
 import "sync"
 
-// Source defines the base interface of a config source.
-type Source interface {
+// ISource defines the base interface of a config source.
+type ISource interface {
 	Has(path string) bool
 	Get(path string, def ...interface{}) (interface{}, error)
 }
 
-// SourceObservable interface extends the Source interface with methods
+// ISourceObservable interface extends the ISource interface with methods
 // specific to sources that will be checked for updates in a regular
 // periodicity defined in the config object where the source will be
 // registered.
-type SourceObservable interface {
-	Source
+type ISourceObservable interface {
+	ISource
 	Reload() (bool, error)
 }
 
-// source defines a base code of a config source instance.
 type source struct {
 	mutex   sync.Locker
 	partial Partial
 }
 
-var _ Source = &source{}
+var _ ISource = &source{}
 
 // Has will check if the requested path is present in the source
 // configuration content.

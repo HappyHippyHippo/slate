@@ -12,7 +12,7 @@ type MockFormatter struct {
 	recorder *MockFormatterRecorder
 }
 
-var _ Formatter = &MockFormatter{}
+var _ IFormatter = &MockFormatter{}
 
 // MockFormatterRecorder is the mock recorder for MockFormatter
 type MockFormatterRecorder struct {

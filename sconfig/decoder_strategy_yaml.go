@@ -6,7 +6,7 @@ import (
 
 type decoderStrategyYAML struct{}
 
-var _ DecoderStrategy = &decoderStrategyYAML{}
+var _ IDecoderStrategy = &decoderStrategyYAML{}
 
 // Accept will check if the decoder factory strategy can instantiate a
 // decoder giving the format and the creation request parameters.
@@ -16,7 +16,7 @@ func (decoderStrategyYAML) Accept(format string) bool {
 
 // Create will instantiate the desired decoder instance with the given reader
 // instance as source of the content to decode.
-func (decoderStrategyYAML) Create(args ...interface{}) (Decoder, error) {
+func (decoderStrategyYAML) Create(args ...interface{}) (IDecoder, error) {
 	reader, ok := args[0].(io.Reader)
 	if !ok {
 		return nil, errConversion(args[0], "io.Reader")

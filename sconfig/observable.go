@@ -2,9 +2,9 @@ package sconfig
 
 import "io"
 
-// Observable defined an interface to an instance that can
+// IObservable defined an interface to an instance that can
 // observe configuration changes
-type Observable interface {
+type IObservable interface {
 	io.Closer
 
 	HasObserver(path string) bool

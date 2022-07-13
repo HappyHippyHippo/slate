@@ -5,7 +5,7 @@ import "strings"
 // Partial defines a section of a configuration information
 type Partial map[interface{}]interface{}
 
-var _ Config = &Partial{}
+var _ IConfig = &Partial{}
 
 // Clone will instantiate an identical instance of the original Partial
 func (p Partial) Clone() Partial {

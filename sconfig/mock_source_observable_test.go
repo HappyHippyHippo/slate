@@ -12,7 +12,7 @@ type MockSourceObservable struct {
 	recorder *MockSourceObservableRecorder
 }
 
-var _ SourceObservable = &MockSourceObservable{}
+var _ ISourceObservable = &MockSourceObservable{}
 
 // MockSourceObservableRecorder is the mock recorder for MockSourceObservable
 type MockSourceObservableRecorder struct {

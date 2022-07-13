@@ -6,15 +6,21 @@ import (
 	"gorm.io/gorm"
 )
 
+// IConnectionFactory defines the interface of a connection factory instance.
+type IConnectionFactory interface {
+	Get(name string, gcfg *gorm.Config) (*gorm.DB, error)
+}
+
 // ConnectionFactory is a database connection generator.
 type ConnectionFactory struct {
-	config         sconfig.Manager
-	dialectFactory *DialectFactory
+	config         sconfig.IManager
+	dialectFactory IDialectFactory
 	instances      map[string]*gorm.DB
 }
 
-// NewConnectionFactory instantiates a new connection factory instance.
-func NewConnectionFactory(config sconfig.Manager, dialectFactory *DialectFactory) (*ConnectionFactory, error) {
+var _ IConnectionFactory = &ConnectionFactory{}
+
+func newConnectionFactory(config sconfig.IManager, dialectFactory IDialectFactory) (IConnectionFactory, error) {
 	if config == nil {
 		return nil, errNilPointer("config")
 	}

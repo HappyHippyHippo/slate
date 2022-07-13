@@ -9,9 +9,9 @@ type streamStrategyRotatingFile struct {
 	streamStrategyFile
 }
 
-var _ StreamStrategy = &streamStrategyRotatingFile{}
+var _ IStreamStrategy = &streamStrategyRotatingFile{}
 
-func newStreamStrategyRotatingFile(fs afero.Fs, factory *FormatterFactory) (StreamStrategy, error) {
+func newStreamStrategyRotatingFile(fs afero.Fs, factory IFormatterFactory) (IStreamStrategy, error) {
 	if fs == nil {
 		return nil, errNilPointer("fs")
 	}
@@ -29,27 +29,27 @@ func newStreamStrategyRotatingFile(fs afero.Fs, factory *FormatterFactory) (Stre
 
 // Accept will check if the file stream factory strategy can instantiate a
 // stream of the requested type and with the calling parameters.
-func (streamStrategyRotatingFile) Accept(stype string) bool {
-	return stype == StreamRotatingFile
+func (streamStrategyRotatingFile) Accept(streamType string) bool {
+	return streamType == StreamRotatingFile
 }
 
 // AcceptFromConfig will check if the stream factory strategy can instantiate
 // a stream where the data to check comes from a configuration partial
 // instance.
-func (s streamStrategyRotatingFile) AcceptFromConfig(cfg sconfig.Config) bool {
+func (s streamStrategyRotatingFile) AcceptFromConfig(cfg sconfig.IConfig) bool {
 	if cfg == nil {
 		return false
 	}
 
-	if stype, err := cfg.String("type"); err == nil {
-		return s.Accept(stype)
+	if streamType, err := cfg.String("type"); err == nil {
+		return s.Accept(streamType)
 	}
 
 	return false
 }
 
 // Create will instantiate the desired stream instance.
-func (s streamStrategyRotatingFile) Create(args ...interface{}) (Stream, error) {
+func (s streamStrategyRotatingFile) Create(args ...interface{}) (IStream, error) {
 	if len(args) < 4 {
 		return nil, errNilPointer("args")
 	}
@@ -73,7 +73,7 @@ func (s streamStrategyRotatingFile) Create(args ...interface{}) (Stream, error) 
 
 // CreateFromConfig will instantiate the desired stream instance where
 // the initialization data comes from a configuration instance.
-func (s streamStrategyRotatingFile) CreateFromConfig(cfg sconfig.Config) (Stream, error) {
+func (s streamStrategyRotatingFile) CreateFromConfig(cfg sconfig.IConfig) (IStream, error) {
 	if cfg == nil {
 		return nil, errNilPointer("cfg")
 	}

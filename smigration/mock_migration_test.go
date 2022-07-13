@@ -6,13 +6,13 @@ import (
 	"github.com/golang/mock/gomock"
 )
 
-// MockMigration is a mock of Migration interface.
+// MockMigration is a mock of IMigration interface.
 type MockMigration struct {
 	ctrl     *gomock.Controller
 	recorder *MockMigrationRecorder
 }
 
-var _ Migration = &MockMigration{}
+var _ IMigration = &MockMigration{}
 
 // MockMigrationRecorder is the mock recorder for MockMigration.
 type MockMigrationRecorder struct {

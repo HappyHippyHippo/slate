@@ -9,17 +9,10 @@ import (
 	"time"
 )
 
-// Manager defined an interface to a instance that manages configuration
-type Manager interface {
-	Config
-	Sourced
-	Observable
-}
-
 type sourceRef struct {
 	id       string
 	priority int
-	source   Source
+	source   ISource
 }
 
 type sourceRefSorter []sourceRef
@@ -46,25 +39,36 @@ type observerRef struct {
 	callback Observer
 }
 
-// config defines the instance of a configuration managing structure.
+// IManager defined an interface to a instance that manages configuration
+type IManager interface {
+	IConfig
+	IObservable
+
+	HasSource(id string) bool
+	AddSource(id string, priority int, src ISource) error
+	RemoveSource(id string) error
+	RemoveAllSources() error
+	Source(id string) (ISource, error)
+	SourcePriority(id string, priority int) error
+}
+
 type manager struct {
 	mutex     sync.Locker
 	sources   []sourceRef
 	observers []observerRef
 	partial   *Partial
-	loader    strigger.Trigger
+	loader    strigger.ITrigger
 }
 
-var _ Config = &manager{}
-var _ Sourced = &manager{}
-var _ Observable = &manager{}
-var _ Manager = &manager{}
+var _ IConfig = &manager{}
+var _ IObservable = &manager{}
+var _ IManager = &manager{}
 
-// NewConfig instantiate a new configuration object.
+// NewManager instantiate a new configuration object.
 // This object will manage a series of sources, alongside of the ability of
 // registration of configuration path/values observer callbacks that will be
 // called whenever the value has changed.
-func NewConfig(period time.Duration) Manager {
+func NewManager(period time.Duration) IManager {
 	c := &manager{
 		mutex:     &sync.Mutex{},
 		sources:   []sourceRef{},
@@ -188,7 +192,7 @@ func (c *manager) HasSource(id string) bool {
 }
 
 // AddSource register a new source with a specific id with a given priority.
-func (c *manager) AddSource(id string, priority int, src Source) error {
+func (c *manager) AddSource(id string, priority int, src ISource) error {
 	if src == nil {
 		return errNilPointer("src")
 	}
@@ -249,8 +253,8 @@ func (c *manager) RemoveAllSources() error {
 	return nil
 }
 
-// Source retrieve a previously registered source with a requested id.
-func (c *manager) Source(id string) (Source, error) {
+// ISource retrieve a previously registered source with a requested id.
+func (c *manager) Source(id string) (ISource, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -338,7 +342,7 @@ func (c *manager) RemoveObserver(path string) {
 func (c *manager) reload() error {
 	reloaded := false
 	for _, ref := range c.sources {
-		if s, ok := ref.source.(SourceObservable); ok {
+		if s, ok := ref.source.(ISourceObservable); ok {
 			updated, _ := s.Reload()
 			reloaded = reloaded || updated
 		}

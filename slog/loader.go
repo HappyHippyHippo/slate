@@ -2,16 +2,22 @@ package slog
 
 import "github.com/happyhippyhippo/slate/sconfig"
 
+// ILoader defines the interface of a log loader instance.
+type ILoader interface {
+	Load() error
+}
+
 // Loader defines the logger instantiation and initialization of a new
 // logger proxy.
 type Loader struct {
-	config  sconfig.Manager
-	logger  *Logger
-	factory *StreamFactory
+	config  sconfig.IManager
+	logger  ILogger
+	factory IStreamFactory
 }
 
-// NewLoader create a new logging configuration loader instance.
-func NewLoader(config sconfig.Manager, logger *Logger, factory *StreamFactory) (*Loader, error) {
+var _ ILoader = &Loader{}
+
+func newLoader(config sconfig.IManager, logger ILogger, factory IStreamFactory) (ILoader, error) {
 	if config == nil {
 		return nil, errNilPointer("config")
 	}

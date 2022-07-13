@@ -13,7 +13,7 @@ import (
 
 func Test_NewConnectionFactory(t *testing.T) {
 	t.Run("missing configuration", func(t *testing.T) {
-		factory, err := NewConnectionFactory(nil, &DialectFactory{})
+		factory, err := newConnectionFactory(nil, &DialectFactory{})
 		switch {
 		case factory != nil:
 			t.Error("return an unexpected valid connection factory instance")
@@ -25,7 +25,7 @@ func Test_NewConnectionFactory(t *testing.T) {
 	})
 
 	t.Run("missing dialect factory", func(t *testing.T) {
-		factory, err := NewConnectionFactory(sconfig.NewConfig(0), nil)
+		factory, err := newConnectionFactory(sconfig.NewManager(0), nil)
 		switch {
 		case factory != nil:
 			t.Error("return an unexpected valid connection factory instance")
@@ -37,7 +37,7 @@ func Test_NewConnectionFactory(t *testing.T) {
 	})
 
 	t.Run("valid creation", func(t *testing.T) {
-		if factory, err := NewConnectionFactory(sconfig.NewConfig(0), &DialectFactory{}); factory == nil {
+		if factory, err := newConnectionFactory(sconfig.NewManager(0), &DialectFactory{}); factory == nil {
 			t.Error("didn't returned the expected valid connection factory instance")
 		} else if err != nil {
 			t.Errorf("return the unexpected error : %v", err)
@@ -58,15 +58,15 @@ func Test_NewConnectionFactory(t *testing.T) {
 		}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id1", 0, source1)
 		dialectFactory := &DialectFactory{}
 		_ = dialectFactory.Register(&dialectStrategySqlite{})
-		connFactory, _ := NewConnectionFactory(cfg, dialectFactory)
+		connFactory, _ := newConnectionFactory(cfg, dialectFactory)
 
 		_, _ = connFactory.Get(name, &gorm.Config{Logger: gormLogger.Discard})
 
-		if len(connFactory.instances) != 1 {
+		if len(connFactory.(*ConnectionFactory).instances) != 1 {
 			t.Error("didn't store the requested connection instance")
 		}
 
@@ -81,7 +81,7 @@ func Test_NewConnectionFactory(t *testing.T) {
 		source2.EXPECT().Get("").Return(partial2, nil).MinTimes(1)
 		_ = cfg.AddSource("id2", 10, source2)
 
-		if len(connFactory.instances) != 0 {
+		if len(connFactory.(*ConnectionFactory).instances) != 0 {
 			t.Error("didn't removed the stored connection instances")
 		}
 	})
@@ -102,11 +102,11 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id1", 0, source1)
 		dialectFactory := &DialectFactory{}
 		_ = dialectFactory.Register(&dialectStrategySqlite{})
-		connFactory, _ := NewConnectionFactory(cfg, dialectFactory)
+		connFactory, _ := newConnectionFactory(cfg, dialectFactory)
 
 		conn, err := connFactory.Get(name+"salt", &gorm.Config{})
 		switch {
@@ -133,11 +133,11 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id1", 0, source1)
 		dialectFactory := &DialectFactory{}
 		_ = dialectFactory.Register(&dialectStrategySqlite{})
-		connFactory, _ := NewConnectionFactory(cfg, dialectFactory)
+		connFactory, _ := newConnectionFactory(cfg, dialectFactory)
 
 		conn, err := connFactory.Get(name, &gorm.Config{})
 		switch {
@@ -164,11 +164,11 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id1", 0, source1)
 		dialectFactory := &DialectFactory{}
 		_ = dialectFactory.Register(&dialectStrategySqlite{})
-		connFactory, _ := NewConnectionFactory(cfg, dialectFactory)
+		connFactory, _ := newConnectionFactory(cfg, dialectFactory)
 
 		conn, err := connFactory.Get(name, &gorm.Config{})
 		switch {
@@ -196,11 +196,11 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id1", 0, source1)
 		dialectFactory := &DialectFactory{}
 		_ = dialectFactory.Register(&dialectStrategySqlite{})
-		connFactory, _ := NewConnectionFactory(cfg, dialectFactory)
+		connFactory, _ := newConnectionFactory(cfg, dialectFactory)
 
 		conn, err := connFactory.Get(name, &gorm.Config{Logger: gormLogger.Discard})
 		switch {
@@ -227,11 +227,11 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id1", 0, source1)
 		dialectFactory := &DialectFactory{}
 		_ = dialectFactory.Register(&dialectStrategySqlite{})
-		connFactory, _ := NewConnectionFactory(cfg, dialectFactory)
+		connFactory, _ := newConnectionFactory(cfg, dialectFactory)
 
 		if check, err := connFactory.Get(name, &gorm.Config{Logger: gormLogger.Discard}); check == nil {
 			t.Error("didn't return the expected connection instance")
@@ -254,11 +254,11 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id1", 0, source1)
 		dialectFactory := &DialectFactory{}
 		_ = dialectFactory.Register(&dialectStrategySqlite{})
-		connFactory, _ := NewConnectionFactory(cfg, dialectFactory)
+		connFactory, _ := newConnectionFactory(cfg, dialectFactory)
 
 		conn, _ := connFactory.Get(name, &gorm.Config{Logger: gormLogger.Discard})
 		check, err := connFactory.Get(name, &gorm.Config{Logger: gormLogger.Discard})

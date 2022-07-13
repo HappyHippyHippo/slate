@@ -14,9 +14,9 @@ type decoderYAML struct {
 	decoder yamler
 }
 
-var _ Decoder = &decoderYAML{}
+var _ IDecoder = &decoderYAML{}
 
-func newDecoderYAML(reader io.Reader) (Decoder, error) {
+func newDecoderYAML(reader io.Reader) (IDecoder, error) {
 	if reader == nil {
 		return nil, errNilPointer("reader")
 	}
@@ -42,7 +42,7 @@ func (d *decoderYAML) Close() error {
 
 // Decode parse the associated configuration source reader content
 // into a configuration Partial.
-func (d decoderYAML) Decode() (Config, error) {
+func (d decoderYAML) Decode() (IConfig, error) {
 	data := Partial{}
 	if err := d.decoder.Decode(&data); err != nil {
 		return nil, err

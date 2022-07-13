@@ -10,7 +10,7 @@ import (
 
 type dialectStrategyMySQL struct{}
 
-var _ DialectStrategy = &dialectStrategyMySQL{}
+var _ IDialectStrategy = &dialectStrategyMySQL{}
 
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
@@ -19,7 +19,7 @@ func (dialectStrategyMySQL) Accept(dialect string) bool {
 }
 
 // Get instantiates the requested mysql connection dialect.
-func (dialectStrategyMySQL) Get(config sconfig.Config) (gorm.Dialector, error) {
+func (dialectStrategyMySQL) Get(config sconfig.IConfig) (gorm.Dialector, error) {
 	if username, err := config.String("username"); err != nil {
 		return nil, err
 	} else if password, err := config.String("password"); err != nil {

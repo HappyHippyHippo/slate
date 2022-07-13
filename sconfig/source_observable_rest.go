@@ -11,9 +11,9 @@ type sourceObservableRest struct {
 	timestamp     time.Time
 }
 
-var _ SourceObservable = &sourceObservableRest{}
+var _ ISourceObservable = &sourceObservableRest{}
 
-func newSourceObservableRest(client HTTPClient, uri, format string, factory *DecoderFactory, timestampPath, configPath string) (SourceObservable, error) {
+func newSourceObservableRest(client HTTPClient, uri, format string, factory IDecoderFactory, timestampPath, configPath string) (ISourceObservable, error) {
 	if client == nil {
 		return nil, errNilPointer("client")
 	}
@@ -57,7 +57,7 @@ func (s *sourceObservableRest) Reload() (bool, error) {
 	}
 
 	if s.timestamp.Equal(time.Unix(0, 0)) || s.timestamp.Before(t) {
-		var p Config
+		var p IConfig
 		if p, err = s.searchConfig(r); err != nil {
 			return false, err
 		}
@@ -73,7 +73,7 @@ func (s *sourceObservableRest) Reload() (bool, error) {
 	return false, nil
 }
 
-func (s *sourceObservableRest) searchTimestamp(body Config) (time.Time, error) {
+func (s *sourceObservableRest) searchTimestamp(body IConfig) (time.Time, error) {
 	var err error
 
 	var ts interface{}

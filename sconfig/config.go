@@ -1,8 +1,8 @@
 package sconfig
 
-// Config defined an interface to an instance that holds
+// IConfig defined an interface to an instance that holds
 // configuration values
-type Config interface {
+type IConfig interface {
 	Has(path string) bool
 	Get(path string, def ...interface{}) (interface{}, error)
 	Bool(path string, def ...bool) (bool, error)

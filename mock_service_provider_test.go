@@ -12,7 +12,7 @@ type MockServiceProvider struct {
 	recorder *MockserviceProviderRecorder
 }
 
-var _ ServiceProvider = &MockServiceProvider{}
+var _ IServiceProvider = &MockServiceProvider{}
 
 // MockserviceProviderRecorder is the mock recorder for MockServiceProvider
 type MockserviceProviderRecorder struct {

@@ -13,7 +13,7 @@ type MockConfigSource struct {
 	recorder *MockConfigSourceRecorder
 }
 
-var _ sconfig.Source = &MockConfigSource{}
+var _ sconfig.ISource = &MockConfigSource{}
 
 // MockConfigSourceRecorder is the mock recorder for MockConfigSource
 type MockConfigSourceRecorder struct {

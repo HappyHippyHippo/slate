@@ -11,9 +11,9 @@ type sourceEnv struct {
 	mappings map[string]string
 }
 
-var _ Source = &sourceEnv{}
+var _ ISource = &sourceEnv{}
 
-func newSourceEnv(mappings map[string]string) (Source, error) {
+func newSourceEnv(mappings map[string]string) (ISource, error) {
 	s := &sourceEnv{
 		source: source{
 			mutex:   &sync.Mutex{},
@@ -39,7 +39,7 @@ func (s *sourceEnv) load() error {
 					}
 
 					switch step[section].(type) {
-					case Config:
+					case IConfig:
 					default:
 						step[section] = Partial{}
 					}

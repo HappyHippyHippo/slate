@@ -9,7 +9,7 @@ import (
 // the application initialization to register the migrations service.
 type Provider struct{}
 
-var _ slate.ServiceProvider = &Provider{}
+var _ slate.IServiceProvider = &Provider{}
 
 // Register will register the migration package instances in the
 // application container
@@ -34,7 +34,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 			return nil, err
 		}
 
-		return NewDao(conn)
+		return newDao(conn)
 	})
 
 	_ = c.Service(ContainerID, func() (interface{}, error) {
@@ -77,4 +77,53 @@ func (p Provider) Boot(c slate.ServiceContainer) error {
 	}
 
 	return migrator.Migrate()
+}
+
+// GetDao will try to retrieve a new migration DAO instances
+// from the application service container.
+func GetDao(c slate.ServiceContainer) (IDao, error) {
+	instance, err := c.Get(ContainerDaoID)
+	if err != nil {
+		return nil, err
+	}
+
+	i, ok := instance.(IDao)
+	if !ok {
+		return nil, errConversion(instance, "IDao")
+	}
+	return i, nil
+}
+
+// GetMigrator will try to retrieve a new migrator instance
+// from the application service container.
+func GetMigrator(c slate.ServiceContainer) (IMigrator, error) {
+	instance, err := c.Get(ContainerID)
+	if err != nil {
+		return nil, err
+	}
+
+	i, ok := instance.(IMigrator)
+	if !ok {
+		return nil, errConversion(instance, "IMigrator")
+	}
+	return i, nil
+}
+
+// GetMigrations will try to retrieve the registered the list of
+// migration instances from the application service container.
+func GetMigrations(c slate.ServiceContainer) ([]IMigration, error) {
+	tags, err := c.Tagged(ContainerMigrationTag)
+	if err != nil {
+		return nil, err
+	}
+
+	var list []IMigration
+	for _, service := range tags {
+		s, ok := service.(IMigration)
+		if !ok {
+			return nil, errConversion(service, "IMigration")
+		}
+		list = append(list, s)
+	}
+	return list, nil
 }

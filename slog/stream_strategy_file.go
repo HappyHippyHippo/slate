@@ -9,12 +9,12 @@ import (
 type streamStrategyFile struct {
 	streamStrategy
 	fs      afero.Fs
-	factory *FormatterFactory
+	factory IFormatterFactory
 }
 
-var _ StreamStrategy = &streamStrategyFile{}
+var _ IStreamStrategy = &streamStrategyFile{}
 
-func newStreamStrategyFile(fs afero.Fs, factory *FormatterFactory) (StreamStrategy, error) {
+func newStreamStrategyFile(fs afero.Fs, factory IFormatterFactory) (IStreamStrategy, error) {
 	if fs == nil {
 		return nil, errNilPointer("fs")
 	}
@@ -30,27 +30,27 @@ func newStreamStrategyFile(fs afero.Fs, factory *FormatterFactory) (StreamStrate
 
 // Accept will check if the file stream factory strategy can instantiate a
 // stream of the requested type and with the calling parameters.
-func (streamStrategyFile) Accept(stype string) bool {
-	return stype == StreamFile
+func (streamStrategyFile) Accept(streamType string) bool {
+	return streamType == StreamFile
 }
 
 // AcceptFromConfig will check if the stream factory strategy can instantiate
 // a stream where the data to check comes from a configuration partial
 // instance.
-func (s streamStrategyFile) AcceptFromConfig(cfg sconfig.Config) bool {
+func (s streamStrategyFile) AcceptFromConfig(cfg sconfig.IConfig) bool {
 	if cfg == nil {
 		return false
 	}
 
-	if stype, err := cfg.String("type"); err == nil {
-		return s.Accept(stype)
+	if streamType, err := cfg.String("type"); err == nil {
+		return s.Accept(streamType)
 	}
 
 	return false
 }
 
 // Create will instantiate the desired stream instance.
-func (s streamStrategyFile) Create(args ...interface{}) (Stream, error) {
+func (s streamStrategyFile) Create(args ...interface{}) (IStream, error) {
 	if len(args) < 4 {
 		return nil, errNilPointer("args")
 	}
@@ -74,7 +74,7 @@ func (s streamStrategyFile) Create(args ...interface{}) (Stream, error) {
 
 // CreateFromConfig will instantiate the desired stream instance where
 // the initialization data comes from a configuration instance.
-func (s streamStrategyFile) CreateFromConfig(cfg sconfig.Config) (Stream, error) {
+func (s streamStrategyFile) CreateFromConfig(cfg sconfig.IConfig) (IStream, error) {
 	if cfg == nil {
 		return nil, errNilPointer("cfg")
 	}

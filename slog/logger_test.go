@@ -12,7 +12,7 @@ import (
 
 func Test_NewLogger(t *testing.T) {
 	t.Run("new logger", func(t *testing.T) {
-		if logger := NewLogger(); logger == nil {
+		if logger := newLogger(); logger == nil {
 			t.Error("didn't returned a valid reference")
 		}
 	})
@@ -29,7 +29,7 @@ func Test_Logger_Close(t *testing.T) {
 		stream1.EXPECT().Close().Times(1)
 		stream2 := NewMockStream(ctrl)
 		stream2.EXPECT().Close().Times(1)
-		logger := NewLogger()
+		logger := newLogger()
 		_ = logger.AddStream(id1, stream1)
 		_ = logger.AddStream(id2, stream2)
 		_ = logger.Close()
@@ -60,7 +60,7 @@ func Test_Logger_Signal(t *testing.T) {
 		stream2 := NewMockStream(ctrl)
 		stream2.EXPECT().Signal(channel, level, message, fields).Return(nil).Times(1)
 		stream2.EXPECT().Close().Return(nil).Times(1)
-		logger := NewLogger()
+		logger := newLogger()
 		defer func() { _ = logger.Close() }()
 		_ = logger.AddStream(id1, stream1)
 		_ = logger.AddStream(id2, stream2)
@@ -87,7 +87,7 @@ func Test_Logger_Signal(t *testing.T) {
 		stream2 := NewMockStream(ctrl)
 		stream2.EXPECT().Signal(channel, level, message, fields).Return(nil).AnyTimes()
 		stream2.EXPECT().Close().Return(nil).Times(1)
-		logger := NewLogger()
+		logger := newLogger()
 		defer func() { _ = logger.Close() }()
 		_ = logger.AddStream(id1, stream1)
 		_ = logger.AddStream(id2, stream2)
@@ -116,7 +116,7 @@ func Test_Logger_Broadcast(t *testing.T) {
 		stream2 := NewMockStream(ctrl)
 		stream2.EXPECT().Broadcast(level, message, fields).Return(nil).Times(1)
 		stream2.EXPECT().Close().Return(nil).Times(1)
-		logger := NewLogger()
+		logger := newLogger()
 		defer func() { _ = logger.Close() }()
 		_ = logger.AddStream(id1, stream1)
 		_ = logger.AddStream(id2, stream2)
@@ -142,7 +142,7 @@ func Test_Logger_Broadcast(t *testing.T) {
 		stream2 := NewMockStream(ctrl)
 		stream2.EXPECT().Broadcast(level, message, fields).Return(nil).AnyTimes()
 		stream2.EXPECT().Close().Return(nil).Times(1)
-		logger := NewLogger()
+		logger := newLogger()
 		defer func() { _ = logger.Close() }()
 		_ = logger.AddStream(id1, stream1)
 		_ = logger.AddStream(id2, stream2)
@@ -167,7 +167,7 @@ func Test_Logger_HasStream(t *testing.T) {
 		stream1.EXPECT().Close().Return(nil).Times(1)
 		stream2 := NewMockStream(ctrl)
 		stream2.EXPECT().Close().Return(nil).Times(1)
-		logger := NewLogger()
+		logger := newLogger()
 		defer func() { _ = logger.Close() }()
 		_ = logger.AddStream(id1, stream1)
 		_ = logger.AddStream(id2, stream2)
@@ -199,7 +199,7 @@ func Test_Logger_ListStreams(t *testing.T) {
 		stream2.EXPECT().Close().Return(nil).Times(1)
 		stream3 := NewMockStream(ctrl)
 		stream3.EXPECT().Close().Return(nil).Times(1)
-		logger := NewLogger()
+		logger := newLogger()
 		defer func() { _ = logger.Close() }()
 		_ = logger.AddStream(id1, stream1)
 		_ = logger.AddStream(id2, stream2)
@@ -230,7 +230,7 @@ func Test_Logger_ListStreams(t *testing.T) {
 
 func Test_Logger_AddStream(t *testing.T) {
 	t.Run("error if nil stream", func(t *testing.T) {
-		logger := NewLogger()
+		logger := newLogger()
 		defer func() { _ = logger.Close() }()
 
 		if err := logger.AddStream("id", nil); err == nil {
@@ -248,7 +248,7 @@ func Test_Logger_AddStream(t *testing.T) {
 		stream1 := NewMockStream(ctrl)
 		stream1.EXPECT().Close().Return(nil).Times(1)
 		stream2 := NewMockStream(ctrl)
-		logger := NewLogger()
+		logger := newLogger()
 		defer func() { _ = logger.Close() }()
 		_ = logger.AddStream(id, stream1)
 
@@ -266,7 +266,7 @@ func Test_Logger_AddStream(t *testing.T) {
 		id := "stream"
 		stream := NewMockStream(ctrl)
 		stream.EXPECT().Close().Return(nil).Times(1)
-		logger := NewLogger()
+		logger := newLogger()
 		defer func() { _ = logger.Close() }()
 
 		if err := logger.AddStream(id, stream); err != nil {
@@ -285,7 +285,7 @@ func Test_Logger_RemoveStream(t *testing.T) {
 		id := "stream"
 		stream := NewMockStream(ctrl)
 		stream.EXPECT().Close().Return(nil).Times(1)
-		logger := NewLogger()
+		logger := newLogger()
 		defer func() { _ = logger.Close() }()
 		_ = logger.AddStream(id, stream)
 		logger.RemoveStream(id)
@@ -310,7 +310,7 @@ func Test_Logger_RemoveAllStreams(t *testing.T) {
 		stream2.EXPECT().Close().Return(nil).Times(1)
 		stream3 := NewMockStream(ctrl)
 		stream3.EXPECT().Close().Return(nil).Times(1)
-		logger := NewLogger()
+		logger := newLogger()
 		defer func() { _ = logger.Close() }()
 		_ = logger.AddStream(id1, stream1)
 		_ = logger.AddStream(id2, stream2)
@@ -325,7 +325,7 @@ func Test_Logger_RemoveAllStreams(t *testing.T) {
 
 func Test_Logger_Stream(t *testing.T) {
 	t.Run("nil on a non-existing stream", func(t *testing.T) {
-		logger := NewLogger()
+		logger := newLogger()
 		defer func() { _ = logger.Close() }()
 
 		if result := logger.Stream("invalid id"); result != nil {
@@ -340,7 +340,7 @@ func Test_Logger_Stream(t *testing.T) {
 		id := "stream"
 		stream := NewMockStream(ctrl)
 		stream.EXPECT().Close().Return(nil).Times(1)
-		logger := NewLogger()
+		logger := newLogger()
 		defer func() { _ = logger.Close() }()
 		_ = logger.AddStream(id, stream)
 

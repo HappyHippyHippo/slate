@@ -11,9 +11,9 @@ type sourceObservableFile struct {
 	timestamp time.Time
 }
 
-var _ SourceObservable = &sourceObservableFile{}
+var _ ISourceObservable = &sourceObservableFile{}
 
-func newSourceObservableFile(path, format string, fs afero.Fs, factory *DecoderFactory) (SourceObservable, error) {
+func newSourceObservableFile(path, format string, fs afero.Fs, factory IDecoderFactory) (ISourceObservable, error) {
 	if fs == nil {
 		return nil, errNilPointer("fs")
 	}

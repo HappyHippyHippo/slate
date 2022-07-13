@@ -19,9 +19,25 @@ func (e serviceContainerEntry) hasTag(tag string) bool {
 	return found
 }
 
+// IServiceContainer defines the interface of a slate
+// application service container instance.
+type IServiceContainer interface {
+	io.Closer
+
+	Has(id string) bool
+	Remove(id string) error
+	Clear() error
+	Service(id string, factory ServiceFactory, tags ...string) error
+	Factory(id string, factory ServiceFactory, tags ...string) error
+	Get(id string) (any, error)
+	Tagged(tag string) ([]any, error)
+}
+
 // ServiceContainer defines the structure that hold the application service
 // factories and initialized services.
 type ServiceContainer map[string]serviceContainerEntry
+
+var _ IServiceContainer = &ServiceContainer{}
 
 // Close clean up the container from all the stored objects.
 // If the object has been already instantiated and implements the Closable

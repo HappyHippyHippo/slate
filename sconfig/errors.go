@@ -33,10 +33,10 @@ func errInvalidConfigDecoderFormat(format string) error {
 	return fmt.Errorf("%w : %v", serror.ErrInvalidConfigDecoderFormat, format)
 }
 
-func errInvalidConfigSourceType(stype string) error {
-	return fmt.Errorf("%w : %v", serror.ErrInvalidConfigSourceType, stype)
+func errInvalidConfigSourceType(sourceType string) error {
+	return fmt.Errorf("%w : %v", serror.ErrInvalidConfigSourceType, sourceType)
 }
 
-func errInvalidConfigSourcePartial(cfg Config) error {
+func errInvalidConfigSourcePartial(cfg IConfig) error {
 	return fmt.Errorf("%w : %v", serror.ErrInvalidConfigSourcePartial, cfg)
 }

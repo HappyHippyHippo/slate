@@ -8,9 +8,9 @@ import (
 // Callback used as a trigger execution process.
 type Callback func() error
 
-// Trigger defines the interface of a trigger used to execute a function call
+// ITrigger defines the interface of a trigger used to execute a function call
 // on determine time intervals.
-type Trigger interface {
+type ITrigger interface {
 	io.Closer
 	Delay() time.Duration
 }

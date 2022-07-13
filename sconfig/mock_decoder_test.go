@@ -6,13 +6,13 @@ import (
 	"github.com/golang/mock/gomock"
 )
 
-// MockDecoder is a mock of Decoder interface
+// MockDecoder is a mock of IDecoder interface
 type MockDecoder struct {
 	ctrl     *gomock.Controller
 	recorder *MockDecoderRecorder
 }
 
-var _ Decoder = &MockDecoder{}
+var _ IDecoder = &MockDecoder{}
 
 // MockDecoderRecorder is the mock recorder for MockDecoder
 type MockDecoderRecorder struct {
@@ -46,10 +46,10 @@ func (mr *MockDecoderRecorder) Close() *gomock.Call {
 }
 
 // Decode mocks base method
-func (m *MockDecoder) Decode() (Config, error) {
+func (m *MockDecoder) Decode() (IConfig, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Decode")
-	ret0, _ := ret[0].(Config)
+	ret0, _ := ret[0].(IConfig)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

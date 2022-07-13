@@ -10,7 +10,7 @@ import (
 // the application initialization to register the logging service.
 type Provider struct{}
 
-var _ slate.ServiceProvider = &Provider{}
+var _ slate.IServiceProvider = &Provider{}
 
 // Register will register the logger package instances in the
 // application container.
@@ -60,7 +60,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 	})
 
 	_ = c.Service(ContainerID, func() (interface{}, error) {
-		return NewLogger(), nil
+		return newLogger(), nil
 	})
 
 	_ = c.Service(ContainerLoaderID, func() (interface{}, error) {
@@ -71,7 +71,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		} else if streamFactory, err := GetStreamFactory(c); err != nil {
 			return nil, err
 		} else {
-			return NewLoader(config, logger, streamFactory)
+			return newLoader(config, logger, streamFactory)
 		}
 	})
 
@@ -114,4 +114,102 @@ func (p Provider) Boot(c slate.ServiceContainer) error {
 		return err
 	}
 	return loader.Load()
+}
+
+// GetFormatterFactory will try to retrieve the registered formatter
+// factory instance from the application service container.
+func GetFormatterFactory(c slate.ServiceContainer) (IFormatterFactory, error) {
+	instance, err := c.Get(ContainerFormatterFactoryID)
+	if err != nil {
+		return nil, err
+	}
+
+	i, ok := instance.(IFormatterFactory)
+	if !ok {
+		return nil, errConversion(instance, "IFormatterFactory")
+	}
+	return i, nil
+}
+
+// GetFormatterStrategies will try to retrieve the registered the list of
+// formatter strategies instances from the application service container.
+func GetFormatterStrategies(c slate.ServiceContainer) ([]IFormatterStrategy, error) {
+	tags, err := c.Tagged(ContainerFormatterStrategyTag)
+	if err != nil {
+		return nil, err
+	}
+
+	var list []IFormatterStrategy
+	for _, service := range tags {
+		s, ok := service.(IFormatterStrategy)
+		if !ok {
+			return nil, errConversion(service, "IFormatterStrategy")
+		}
+		list = append(list, s)
+	}
+	return list, nil
+}
+
+// GetStreamFactory will try to retrieve the registered stream
+// factory instance from the application service container.
+func GetStreamFactory(c slate.ServiceContainer) (IStreamFactory, error) {
+	instance, err := c.Get(ContainerStreamFactoryID)
+	if err != nil {
+		return nil, err
+	}
+
+	i, ok := instance.(IStreamFactory)
+	if !ok {
+		return nil, errConversion(instance, "IStreamFactory")
+	}
+	return i, nil
+}
+
+// GetStreamStrategies will try to retrieve the registered the list of
+// stream strategies instances from the application service container.
+func GetStreamStrategies(c slate.ServiceContainer) ([]IStreamStrategy, error) {
+	tags, err := c.Tagged(ContainerStreamStrategyTag)
+	if err != nil {
+		return nil, err
+	}
+
+	var list []IStreamStrategy
+	for _, service := range tags {
+		s, ok := service.(IStreamStrategy)
+		if !ok {
+			return nil, errConversion(service, "IStreamStrategy")
+		}
+		list = append(list, s)
+	}
+	return list, nil
+}
+
+// GetLogger will try to retrieve the registered logger manager
+// instance from the application service container.
+func GetLogger(c slate.ServiceContainer) (ILogger, error) {
+	instance, err := c.Get(ContainerID)
+	if err != nil {
+		return nil, err
+	}
+
+	i, ok := instance.(ILogger)
+	if !ok {
+		return nil, errConversion(instance, "ILogger")
+	}
+	return i, nil
+}
+
+// GetLoader will try to retrieve the registered loader
+// instance from the application service container.
+func GetLoader(c slate.ServiceContainer) (ILoader, error) {
+	instance, err := c.Get(ContainerLoaderID)
+	if err != nil {
+		return nil, err
+	}
+
+	i, ok := instance.(ILoader)
+	if !ok {
+		return nil, errConversion(instance, "ILoader")
+	}
+	return i, nil
 }

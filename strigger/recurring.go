@@ -11,11 +11,11 @@ type recurring struct {
 	doneChannel chan struct{}
 }
 
-var _ Trigger = &recurring{}
+var _ ITrigger = &recurring{}
 
 // NewRecurring instantiate a new trigger that will execute a
 // callback method recurrently with a defined periodicity.
-func NewRecurring(delay time.Duration, callback Callback) (Trigger, error) {
+func NewRecurring(delay time.Duration, callback Callback) (ITrigger, error) {
 	if callback == nil {
 		return nil, errNilPointer("callback")
 	}

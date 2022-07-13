@@ -1,7 +1,7 @@
 package smigration
 
-// Migration defines an interface that all migrations must obey.
-type Migration interface {
+// IMigration defines an interface that all migrations must obey.
+type IMigration interface {
 	Version() uint64
 	Up() error
 	Down() error

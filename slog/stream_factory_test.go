@@ -96,7 +96,7 @@ func Test_StreamFactory_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		strategy := NewMockStreamStrategy(ctrl)
 		strategy.EXPECT().AcceptFromConfig(cfg).Return(false).Times(1)
 		factory := &StreamFactory{}
@@ -117,7 +117,7 @@ func Test_StreamFactory_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		stream := NewMockStream(ctrl)
 		strategy := NewMockStreamStrategy(ctrl)
 		strategy.EXPECT().AcceptFromConfig(cfg).Return(true).Times(1)

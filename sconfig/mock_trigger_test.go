@@ -8,13 +8,13 @@ import (
 	"github.com/happyhippyhippo/slate/strigger"
 )
 
-// MockTrigger is a mock of Trigger interface.
+// MockTrigger is a mock of ITrigger interface.
 type MockTrigger struct {
 	ctrl     *gomock.Controller
 	recorder *MockTriggerRecorder
 }
 
-var _ strigger.Trigger = &MockTrigger{}
+var _ strigger.ITrigger = &MockTrigger{}
 
 // MockTriggerRecorder is the mock recorder for MockTrigger.
 type MockTriggerRecorder struct {

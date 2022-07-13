@@ -65,7 +65,7 @@ func Test_Migrator_AddMigration(t *testing.T) {
 
 		if err := sut.AddMigration(migration); err != nil {
 			t.Errorf("returned the unexpected (%v) error", err)
-		} else if !reflect.DeepEqual(sut.(*migrator).migrations, []Migration{migration}) {
+		} else if !reflect.DeepEqual(sut.(*migrator).migrations, []IMigration{migration}) {
 			t.Error("didn't stored the registering migration")
 		}
 	})

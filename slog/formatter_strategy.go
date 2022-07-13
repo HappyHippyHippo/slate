@@ -1,9 +1,9 @@
 package slog
 
-// FormatterStrategy interface defines the methods of the formatter
+// IFormatterStrategy interface defines the methods of the formatter
 // factory strategy that can validate creation requests and instantiation
 // of particular decoder.
-type FormatterStrategy interface {
+type IFormatterStrategy interface {
 	Accept(format string) bool
-	Create(args ...interface{}) (Formatter, error)
+	Create(args ...interface{}) (IFormatter, error)
 }

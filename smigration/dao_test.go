@@ -34,7 +34,7 @@ func Test_NewDao(t *testing.T) {
 
 		gdb, err := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
 
-		dao, err := NewDao(gdb)
+		dao, err := newDao(gdb)
 		switch {
 		case dao != nil:
 			t.Error("return an unexpected valid reference to the dao instance")
@@ -57,7 +57,7 @@ func Test_NewDao(t *testing.T) {
 
 		gdb, err := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
 
-		if dao, err := NewDao(gdb); err != nil {
+		if dao, err := newDao(gdb); err != nil {
 			t.Errorf("return the unexpected error : (%v)", err)
 		} else if dao == nil {
 			t.Error("didn't return the expected parser instance")

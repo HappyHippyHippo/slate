@@ -8,13 +8,13 @@ import (
 	"github.com/happyhippyhippo/slate/sconfig"
 )
 
-// MockDialectStrategy is a mock of DialectStrategy interface.
+// MockDialectStrategy is a mock of IDialectStrategy interface.
 type MockDialectStrategy struct {
 	ctrl     *gomock.Controller
 	recorder *MockDialectStrategyRecorder
 }
 
-var _ DialectStrategy = &MockDialectStrategy{}
+var _ IDialectStrategy = &MockDialectStrategy{}
 
 // MockDialectStrategyRecorder is the mock recorder for MockDialectStrategy.
 type MockDialectStrategyRecorder struct {
@@ -48,7 +48,7 @@ func (mr *MockDialectStrategyRecorder) Accept(name interface{}) *gomock.Call {
 }
 
 // Get mocks base method.
-func (m *MockDialectStrategy) Get(cfg sconfig.Config) (gorm.Dialector, error) {
+func (m *MockDialectStrategy) Get(cfg sconfig.IConfig) (gorm.Dialector, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", cfg)
 	ret0, _ := ret[0].(gorm.Dialector)

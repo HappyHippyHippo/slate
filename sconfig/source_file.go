@@ -11,12 +11,12 @@ type sourceFile struct {
 	path    string
 	format  string
 	fs      afero.Fs
-	factory *DecoderFactory
+	factory IDecoderFactory
 }
 
-var _ Source = &sourceFile{}
+var _ ISource = &sourceFile{}
 
-func newSourceFile(path, format string, fs afero.Fs, factory *DecoderFactory) (Source, error) {
+func newSourceFile(path, format string, fs afero.Fs, factory IDecoderFactory) (ISource, error) {
 	if fs == nil {
 		return nil, errNilPointer("fs")
 	}

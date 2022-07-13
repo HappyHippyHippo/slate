@@ -10,7 +10,7 @@ import (
 
 type dialectStrategySqlite struct{}
 
-var _ DialectStrategy = &dialectStrategySqlite{}
+var _ IDialectStrategy = &dialectStrategySqlite{}
 
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
@@ -19,7 +19,7 @@ func (dialectStrategySqlite) Accept(name string) bool {
 }
 
 // Get instantiates the requested mysql connection dialect.
-func (dialectStrategySqlite) Get(cfg sconfig.Config) (gorm.Dialector, error) {
+func (dialectStrategySqlite) Get(cfg sconfig.IConfig) (gorm.Dialector, error) {
 	if dsn, err := cfg.String("host"); err != nil {
 		return nil, err
 	} else if params, err := cfg.Partial("params", nil); err != nil {

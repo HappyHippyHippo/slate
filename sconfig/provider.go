@@ -10,7 +10,7 @@ import (
 // the application initialization to register the config service.
 type Provider struct{}
 
-var _ slate.ServiceProvider = &Provider{}
+var _ slate.IServiceProvider = &Provider{}
 
 // Register will register the configuration section instances in the
 // application container.
@@ -81,12 +81,21 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		return &sourceStrategyEnv{}, nil
 	}, ContainerSourceStrategyTag)
 
+	_ = c.Service(ContainerSourceStrategyContainerID, func() (interface{}, error) {
+		partials, e := GetSourceContainerPartials(c)
+		if e != nil {
+			return nil, e
+		}
+
+		return &sourceStrategyContainer{partials: partials}, nil
+	}, ContainerSourceStrategyTag)
+
 	_ = c.Service(ContainerSourceFactoryID, func() (interface{}, error) {
 		return &SourceFactory{}, nil
 	})
 
 	_ = c.Service(ContainerID, func() (interface{}, error) {
-		return NewConfig(time.Duration(ObserveFrequency) * time.Second), nil
+		return NewManager(time.Duration(ObserveFrequency) * time.Second), nil
 	})
 
 	_ = c.Service(ContainerLoaderID, func() (interface{}, error) {
@@ -95,7 +104,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		} else if sourceFactory, err := GetSourceFactory(c); err != nil {
 			return nil, err
 		} else {
-			return NewLoader(config, sourceFactory)
+			return newLoader(config, sourceFactory)
 		}
 	})
 
@@ -138,4 +147,121 @@ func (p Provider) Boot(c slate.ServiceContainer) error {
 		return err
 	}
 	return loader.Load()
+}
+
+// GetDecoderFactory will try to retrieve the registered decoder
+// factory instance from the application service container.
+func GetDecoderFactory(c slate.ServiceContainer) (IDecoderFactory, error) {
+	instance, err := c.Get(ContainerDecoderFactoryID)
+	if err != nil {
+		return nil, err
+	}
+
+	i, ok := instance.(IDecoderFactory)
+	if !ok {
+		return nil, errConversion(instance, "IDecoderFactory")
+	}
+	return i, nil
+}
+
+// GetDecoderStrategies will try to retrieve the registered the list of decoder
+// strategies instances from the application service container.
+func GetDecoderStrategies(c slate.ServiceContainer) ([]IDecoderStrategy, error) {
+	tags, err := c.Tagged(ContainerDecoderStrategyTag)
+	if err != nil {
+		return nil, err
+	}
+
+	var list []IDecoderStrategy
+	for _, service := range tags {
+		s, ok := service.(IDecoderStrategy)
+		if !ok {
+			return nil, errConversion(service, "IDecoderStrategy")
+		}
+		list = append(list, s)
+	}
+	return list, nil
+}
+
+// GetSourceFactory will try to retrieve the registered source
+// factory instance from the application service container.
+func GetSourceFactory(c slate.ServiceContainer) (ISourceFactory, error) {
+	instance, err := c.Get(ContainerSourceFactoryID)
+	if err != nil {
+		return nil, err
+	}
+
+	i, ok := instance.(ISourceFactory)
+	if !ok {
+		return nil, errConversion(instance, "ISourceFactory")
+	}
+	return i, nil
+}
+
+// GetSourceStrategies will try to retrieve the registered the list of source
+// strategies instances from the application service container.
+func GetSourceStrategies(c slate.ServiceContainer) ([]ISourceStrategy, error) {
+	tags, err := c.Tagged(ContainerSourceStrategyTag)
+	if err != nil {
+		return nil, err
+	}
+
+	var list []ISourceStrategy
+	for _, service := range tags {
+		s, ok := service.(ISourceStrategy)
+		if !ok {
+			return nil, errConversion(service, "ISourceStrategy")
+		}
+		list = append(list, s)
+	}
+	return list, nil
+}
+
+// GetSourceContainerPartials will try to retrieve the registered the list
+// of source partials instances from the application service container.
+func GetSourceContainerPartials(c slate.ServiceContainer) ([]IConfig, error) {
+	tags, err := c.Tagged(ContainerSourceContainerPartialTag)
+	if err != nil {
+		return nil, err
+	}
+
+	var list []IConfig
+	for _, service := range tags {
+		s, ok := service.(IConfig)
+		if !ok {
+			return nil, errConversion(service, "IConfig")
+		}
+		list = append(list, s)
+	}
+	return list, nil
+}
+
+// GetConfig will try to retrieve the registered config
+// instance from the application service container.
+func GetConfig(c slate.ServiceContainer) (IManager, error) {
+	instance, err := c.Get(ContainerID)
+	if err != nil {
+		return nil, err
+	}
+
+	i, ok := instance.(IManager)
+	if !ok {
+		return nil, errConversion(instance, "IManager")
+	}
+	return i, nil
+}
+
+// GetLoader will try to retrieve the registered loader
+// instance from the application service container.
+func GetLoader(c slate.ServiceContainer) (ILoader, error) {
+	instance, err := c.Get(ContainerLoaderID)
+	if err != nil {
+		return nil, err
+	}
+
+	i, ok := instance.(ILoader)
+	if !ok {
+		return nil, errConversion(instance, "ILoader")
+	}
+	return i, nil
 }

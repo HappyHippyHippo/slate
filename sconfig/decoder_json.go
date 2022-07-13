@@ -14,9 +14,9 @@ type decoderJSON struct {
 	decoder jsoner
 }
 
-var _ Decoder = &decoderJSON{}
+var _ IDecoder = &decoderJSON{}
 
-func newDecoderJSON(reader io.Reader) (Decoder, error) {
+func newDecoderJSON(reader io.Reader) (IDecoder, error) {
 	if reader == nil {
 		return nil, errNilPointer("reader")
 	}
@@ -42,7 +42,7 @@ func (d *decoderJSON) Close() error {
 
 // Decode parse the associated configuration source reader content
 // into a configuration Partial.
-func (d decoderJSON) Decode() (Config, error) {
+func (d decoderJSON) Decode() (IConfig, error) {
 	data := map[string]interface{}{}
 	if err := d.decoder.Decode(&data); err != nil {
 		return nil, err

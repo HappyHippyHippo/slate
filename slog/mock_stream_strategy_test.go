@@ -13,7 +13,7 @@ type MockStreamStrategy struct {
 	recorder *MockStreamStrategyRecorder
 }
 
-var _ StreamStrategy = &MockStreamStrategy{}
+var _ IStreamStrategy = &MockStreamStrategy{}
 
 // MockStreamStrategyRecorder is the mock recorder for MockStreamStrategy
 type MockStreamStrategyRecorder struct {
@@ -47,7 +47,7 @@ func (mr *MockStreamStrategyRecorder) Accept(sourceType interface{}) *gomock.Cal
 }
 
 // AcceptFromConfig mocks base method
-func (m *MockStreamStrategy) AcceptFromConfig(cfg sconfig.Config) bool {
+func (m *MockStreamStrategy) AcceptFromConfig(cfg sconfig.IConfig) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AcceptFromConfig", cfg)
 	ret0, _ := ret[0].(bool)
@@ -61,14 +61,14 @@ func (mr *MockStreamStrategyRecorder) AcceptFromConfig(cfg interface{}) *gomock.
 }
 
 // Create mocks base method
-func (m *MockStreamStrategy) Create(args ...interface{}) (Stream, error) {
+func (m *MockStreamStrategy) Create(args ...interface{}) (IStream, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range args {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Create", varargs...)
-	ret0, _ := ret[0].(Stream)
+	ret0, _ := ret[0].(IStream)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -80,10 +80,10 @@ func (mr *MockStreamStrategyRecorder) Create(args ...interface{}) *gomock.Call {
 }
 
 // CreateFromConfig mocks base method
-func (m *MockStreamStrategy) CreateFromConfig(cfg sconfig.Config) (Stream, error) {
+func (m *MockStreamStrategy) CreateFromConfig(cfg sconfig.IConfig) (IStream, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateFromConfig", cfg)
-	ret0, _ := ret[0].(Stream)
+	ret0, _ := ret[0].(IStream)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

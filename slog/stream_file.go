@@ -11,9 +11,9 @@ type streamFile struct {
 	writer io.Writer
 }
 
-var _ Stream = &streamConsole{}
+var _ IStream = &streamConsole{}
 
-func newStreamFile(writer io.Writer, formatter Formatter, channels []string, level Level) (Stream, error) {
+func newStreamFile(writer io.Writer, formatter IFormatter, channels []string, level Level) (IStream, error) {
 	if formatter == nil {
 		return nil, errNilPointer("formatter")
 	}

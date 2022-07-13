@@ -5,9 +5,9 @@ import (
 	"gorm.io/gorm"
 )
 
-// DialectStrategy defines the interface to a gorm rdb
+// IDialectStrategy defines the interface to a gorm rdb
 // dialect instantiation strategy, based on a configuration.
-type DialectStrategy interface {
+type IDialectStrategy interface {
 	Accept(dialect string) bool
-	Get(config sconfig.Config) (gorm.Dialector, error)
+	Get(config sconfig.IConfig) (gorm.Dialector, error)
 }

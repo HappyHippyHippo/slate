@@ -6,13 +6,13 @@ import (
 	"github.com/golang/mock/gomock"
 )
 
-// MockSource is a mock of Source interface
+// MockSource is a mock of ISource interface
 type MockSource struct {
 	ctrl     *gomock.Controller
 	recorder *MockSourceRecorder
 }
 
-var _ Source = &MockSource{}
+var _ ISource = &MockSource{}
 
 // MockSourceRecorder is the mock recorder for MockSource
 type MockSourceRecorder struct {

@@ -8,7 +8,7 @@ import (
 
 type formatterJSON struct{}
 
-var _ Formatter = &formatterJSON{}
+var _ IFormatter = &formatterJSON{}
 
 // Format will create the output JSON string message formatted with the content
 // of the passed level, message and context

@@ -6,13 +6,13 @@ import (
 	"github.com/golang/mock/gomock"
 )
 
-// MockDecoderStrategy is a mock of DecoderStrategy interface
+// MockDecoderStrategy is a mock of IDecoderStrategy interface
 type MockDecoderStrategy struct {
 	ctrl     *gomock.Controller
 	recorder *MockDecoderStrategyRecorder
 }
 
-var _ DecoderStrategy = &MockDecoderStrategy{}
+var _ IDecoderStrategy = &MockDecoderStrategy{}
 
 // MockDecoderStrategyRecorder is the mock recorder for MockDecoderStrategy
 type MockDecoderStrategyRecorder struct {
@@ -47,14 +47,14 @@ func (mr *MockDecoderStrategyRecorder) Accept(format interface{}, args ...interf
 }
 
 // Create mocks base method
-func (m *MockDecoderStrategy) Create(args ...interface{}) (Decoder, error) {
+func (m *MockDecoderStrategy) Create(args ...interface{}) (IDecoder, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range args {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Create", varargs...)
-	ret0, _ := ret[0].(Decoder)
+	ret0, _ := ret[0].(IDecoder)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

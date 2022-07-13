@@ -12,7 +12,7 @@ type MockFormatterStrategy struct {
 	recorder *MockFormatterStrategyRecorder
 }
 
-var _ FormatterStrategy = &MockFormatterStrategy{}
+var _ IFormatterStrategy = &MockFormatterStrategy{}
 
 // MockFormatterStrategyRecorder is the mock recorder for MockFormatterStrategy
 type MockFormatterStrategyRecorder struct {
@@ -46,14 +46,14 @@ func (mr *MockFormatterStrategyRecorder) Accept(format interface{}) *gomock.Call
 }
 
 // Create mocks base method
-func (m *MockFormatterStrategy) Create(args ...interface{}) (Formatter, error) {
+func (m *MockFormatterStrategy) Create(args ...interface{}) (IFormatter, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range args {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Create", varargs...)
-	ret0, _ := ret[0].(Formatter)
+	ret0, _ := ret[0].(IFormatter)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

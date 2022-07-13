@@ -12,7 +12,7 @@ import (
 // database services.
 type Provider struct{}
 
-var _ slate.ServiceProvider = &Provider{}
+var _ slate.IServiceProvider = &Provider{}
 
 // Register will register the rdb package instances in the
 // application container
@@ -43,7 +43,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		} else if dialectFactory, err := GetDialectFactory(c); err != nil {
 			return nil, err
 		} else {
-			return NewConnectionFactory(cfg, dialectFactory)
+			return newConnectionFactory(cfg, dialectFactory)
 		}
 	})
 
@@ -77,4 +77,83 @@ func (p Provider) Boot(c slate.ServiceContainer) error {
 	}
 
 	return nil
+}
+
+// GetConfig will try to retrieve a new default gorm config instance
+// from the application service container.
+func GetConfig(c slate.ServiceContainer) (*gorm.Config, error) {
+	instance, err := c.Get(ContainerConfigID)
+	if err != nil {
+		return nil, err
+	}
+
+	i, ok := instance.(*gorm.Config)
+	if !ok {
+		return nil, errConversion(instance, "*gorm.Config")
+	}
+	return i, nil
+}
+
+// GetDialectFactory will try to retrieve the registered dialect
+// factory instance from the application service container.
+func GetDialectFactory(c slate.ServiceContainer) (IDialectFactory, error) {
+	instance, err := c.Get(ContainerDialectFactoryID)
+	if err != nil {
+		return nil, err
+	}
+
+	i, ok := instance.(IDialectFactory)
+	if !ok {
+		return nil, errConversion(instance, "IDialectFactory")
+	}
+	return i, nil
+}
+
+// GetDialectStrategies will try to retrieve the registered the list of
+// dialect strategies instances from the application service container.
+func GetDialectStrategies(c slate.ServiceContainer) ([]IDialectStrategy, error) {
+	tags, err := c.Tagged(ContainerDialectStrategyTag)
+	if err != nil {
+		return nil, err
+	}
+
+	var list []IDialectStrategy
+	for _, service := range tags {
+		s, ok := service.(IDialectStrategy)
+		if !ok {
+			return nil, errConversion(service, "IDialectStrategy")
+		}
+		list = append(list, s)
+	}
+	return list, nil
+}
+
+// GetConnectionFactory will try to retrieve the registered connection
+// factory instance from the application service container.
+func GetConnectionFactory(c slate.ServiceContainer) (IConnectionFactory, error) {
+	instance, err := c.Get(ContainerID)
+	if err != nil {
+		return nil, err
+	}
+
+	i, ok := instance.(IConnectionFactory)
+	if !ok {
+		return nil, errConversion(instance, "IConnectionFactory")
+	}
+	return i, nil
+}
+
+// GetPrimaryConnection will try to retrieve the registered connection
+// factory instance from the application service container.
+func GetPrimaryConnection(c slate.ServiceContainer) (*gorm.DB, error) {
+	instance, err := c.Get(ContainerPrimaryID)
+	if err != nil {
+		return nil, err
+	}
+
+	i, ok := instance.(*gorm.DB)
+	if !ok {
+		return nil, errConversion(instance, "*gorm.DB")
+	}
+	return i, nil
 }

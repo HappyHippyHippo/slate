@@ -26,10 +26,10 @@ func errDuplicateStream(id string) error {
 	return fmt.Errorf("%w : %v", serror.ErrDuplicateLogStream, id)
 }
 
-func errInvalidStreamType(stype string) error {
-	return fmt.Errorf("%w : %v", serror.ErrInvalidLogStreamType, stype)
+func errInvalidStreamType(streamType string) error {
+	return fmt.Errorf("%w : %v", serror.ErrInvalidLogStreamType, streamType)
 }
 
-func errInvalidStreamConfig(cfg sconfig.Config) error {
+func errInvalidStreamConfig(cfg sconfig.IConfig) error {
 	return fmt.Errorf("%w : %v", serror.ErrInvalidLogStreamConfig, cfg)
 }

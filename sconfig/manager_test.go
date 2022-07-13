@@ -12,7 +12,7 @@ import (
 
 func Test_NewConfig(t *testing.T) {
 	t.Run("new config without reload", func(t *testing.T) {
-		cfg := NewConfig(0 * time.Second)
+		cfg := NewManager(0 * time.Second)
 		defer func() { _ = cfg.Close() }()
 
 		switch {
@@ -28,7 +28,7 @@ func Test_NewConfig(t *testing.T) {
 	})
 
 	t.Run("new config with reload", func(t *testing.T) {
-		cfg := NewConfig(10 * time.Second)
+		cfg := NewManager(10 * time.Second)
 		defer func() { _ = cfg.Close() }()
 
 		switch {
@@ -50,7 +50,7 @@ func Test_config_Close(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		src := NewMockSource(ctrl)
 		src.EXPECT().Get("").Return(Partial{}, nil).AnyTimes()
 		src.EXPECT().Close().Return(expected).Times(1)
@@ -67,7 +67,7 @@ func Test_config_Close(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		src := NewMockSource(ctrl)
 		src.EXPECT().Get("").Return(Partial{}, nil).AnyTimes()
 		src.EXPECT().Close().Return(nil).Times(1)
@@ -87,7 +87,7 @@ func Test_config_Close(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		id1 := "src.1"
 		id2 := "src.2"
 		priority1 := 0
@@ -128,7 +128,7 @@ func Test_config_Has(t *testing.T) {
 			test := func() {
 				ctrl := gomock.NewController(t)
 
-				cfg := NewConfig(60 * time.Second)
+				cfg := NewManager(60 * time.Second)
 				src := NewMockSource(ctrl)
 				src.EXPECT().Close().Times(1)
 				src.EXPECT().Get("").Return(scenario.config, nil).Times(1)
@@ -153,7 +153,7 @@ func Test_config_Get(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
 		src.EXPECT().Get("").Return(config, nil).Times(1)
@@ -174,7 +174,7 @@ func Test_config_Get(t *testing.T) {
 
 		data := Partial{"node1": Partial{"node2": 101}}
 		path := "node3"
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -199,7 +199,7 @@ func Test_config_Get(t *testing.T) {
 		data := Partial{"node1": Partial{"node2": 101}}
 		path := "node3"
 		val := 3
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -220,7 +220,7 @@ func Test_config_Bool(t *testing.T) {
 		defer ctrl.Finish()
 
 		path := "node"
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -242,7 +242,7 @@ func Test_config_Int(t *testing.T) {
 
 		value := 123
 		path := "node"
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -264,7 +264,7 @@ func Test_config_Float(t *testing.T) {
 
 		value := 123.4
 		path := "node"
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -286,7 +286,7 @@ func Test_config_String(t *testing.T) {
 
 		value := "value"
 		path := "node"
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -308,7 +308,7 @@ func Test_config_List(t *testing.T) {
 
 		value := []interface{}{1, 2, 3}
 		path := "node"
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -330,7 +330,7 @@ func Test_config_Config(t *testing.T) {
 
 		value := Partial{"field": "value"}
 		path := "node"
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -350,7 +350,7 @@ func Test_config_HasSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -366,7 +366,7 @@ func Test_config_HasSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -381,7 +381,7 @@ func Test_config_HasSource(t *testing.T) {
 
 func Test_config_AddSource(t *testing.T) {
 	t.Run("nil source", func(t *testing.T) {
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 
 		if err := cfg.AddSource("src", 0, nil); err == nil {
@@ -395,7 +395,7 @@ func Test_config_AddSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -412,7 +412,7 @@ func Test_config_AddSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -430,7 +430,7 @@ func Test_config_AddSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Close().Times(1)
@@ -450,7 +450,7 @@ func Test_config_AddSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Close().Times(1)
@@ -470,7 +470,7 @@ func Test_config_AddSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Close().Times(1)
@@ -492,7 +492,7 @@ func Test_config_RemoveSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 
 		if err := cfg.RemoveSource("src"); err != nil {
@@ -505,7 +505,7 @@ func Test_config_RemoveSource(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Return(expected).Times(2)
@@ -523,7 +523,7 @@ func Test_config_RemoveSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Close().Times(1)
@@ -548,7 +548,7 @@ func Test_config_RemoveSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Close().Times(1)
@@ -575,7 +575,7 @@ func Test_config_RemoveAllSources(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 
 		expected := fmt.Errorf("error string")
@@ -603,7 +603,7 @@ func Test_config_RemoveAllSources(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 
 		src1 := NewMockSource(ctrl)
@@ -631,7 +631,7 @@ func Test_config_Source(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 
 		check, err := cfg.Source("invalid id")
@@ -649,7 +649,7 @@ func Test_config_Source(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -670,7 +670,7 @@ func Test_config_Source(t *testing.T) {
 
 func Test_config_SourcePriority(t *testing.T) {
 	t.Run("error if the source was not found", func(t *testing.T) {
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 
 		if err := cfg.SourcePriority("invalid id", 0); err == nil {
@@ -684,7 +684,7 @@ func Test_config_SourcePriority(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Close().Times(1)
@@ -736,7 +736,7 @@ func Test_config_HasObserver(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				defer ctrl.Finish()
 
-				cfg := NewConfig(0 * time.Second)
+				cfg := NewManager(0 * time.Second)
 				defer func() { _ = cfg.Close() }()
 				src := NewMockSource(ctrl)
 				src.EXPECT().Close().Times(1)
@@ -758,7 +758,7 @@ func Test_config_HasObserver(t *testing.T) {
 
 func Test_config_AddObserver(t *testing.T) {
 	t.Run("nil callback", func(t *testing.T) {
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 
 		if err := cfg.AddObserver("path", nil); err == nil {
@@ -769,7 +769,7 @@ func Test_config_AddObserver(t *testing.T) {
 	})
 
 	t.Run("error if path not present", func(t *testing.T) {
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 
 		if err := cfg.AddObserver("path", func(interface{}, interface{}) {}); err == nil {
@@ -783,7 +783,7 @@ func Test_config_AddObserver(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -803,7 +803,7 @@ func Test_config_RemoveObserver(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(60 * time.Second)
+		cfg := NewManager(60 * time.Second)
 		defer func() { _ = cfg.Close() }()
 
 		src := NewMockSource(ctrl)
@@ -827,7 +827,7 @@ func Test_Config(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(2 * time.Millisecond)
+		cfg := NewManager(2 * time.Millisecond)
 		defer func() { _ = cfg.Close() }()
 
 		src := NewMockSourceObservable(ctrl)
@@ -843,7 +843,7 @@ func Test_Config(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewConfig(20 * time.Millisecond)
+		cfg := NewManager(20 * time.Millisecond)
 
 		src := NewMockSourceObservable(ctrl)
 		src.EXPECT().Get("").Return(Partial{"node": "value"}, nil).MinTimes(2)
@@ -862,7 +862,7 @@ func Test_Config(t *testing.T) {
 		defer ctrl.Finish()
 
 		check := false
-		cfg := NewConfig(20 * time.Millisecond)
+		cfg := NewManager(20 * time.Millisecond)
 
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Get("").Return(Partial{"node": "value1"}, nil).AnyTimes()
@@ -895,7 +895,7 @@ func Test_Config(t *testing.T) {
 		defer ctrl.Finish()
 
 		check := false
-		cfg := NewConfig(20 * time.Millisecond)
+		cfg := NewManager(20 * time.Millisecond)
 		initial := []interface{}{Partial{"subnode": "value1"}}
 		expected := []interface{}{Partial{"subnode": "value2"}}
 
@@ -930,7 +930,7 @@ func Test_Config(t *testing.T) {
 		defer ctrl.Finish()
 
 		check := false
-		cfg := NewConfig(20 * time.Millisecond)
+		cfg := NewManager(20 * time.Millisecond)
 		initial := Partial{"subnode": "value1"}
 		expected := Partial{"subnode": "value2"}
 

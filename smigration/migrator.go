@@ -2,10 +2,10 @@ package smigration
 
 import "sort"
 
-// Migrator defines an object that handles the
+// IMigrator defines an object that handles the
 // persistence layer migrations.
-type Migrator interface {
-	AddMigration(migration Migration) error
+type IMigrator interface {
+	AddMigration(migration IMigration) error
 	Current() (uint64, error)
 	Migrate() error
 	Up() error
@@ -13,23 +13,25 @@ type Migrator interface {
 }
 
 type migrator struct {
-	dao        *Dao
-	migrations []Migration
+	dao        IDao
+	migrations []IMigration
 }
 
-func newMigrator(dao *Dao) (Migrator, error) {
+var _ IMigrator = &migrator{}
+
+func newMigrator(dao IDao) (IMigrator, error) {
 	if dao == nil {
 		return nil, errNilPointer("dao")
 	}
 
 	return &migrator{
 		dao:        dao,
-		migrations: []Migration{},
+		migrations: []IMigration{},
 	}, nil
 }
 
 // AddMigration registers a migration into the migration manager.
-func (m *migrator) AddMigration(migration Migration) error {
+func (m *migrator) AddMigration(migration IMigration) error {
 	if migration == nil {
 		return errNilPointer("migration")
 	}

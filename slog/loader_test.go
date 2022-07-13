@@ -10,7 +10,7 @@ import (
 
 func Test_NewLoader(t *testing.T) {
 	t.Run("error when missing the config", func(t *testing.T) {
-		loader, err := NewLoader(nil, NewLogger(), &StreamFactory{})
+		loader, err := newLoader(nil, newLogger(), &StreamFactory{})
 		switch {
 		case loader != nil:
 			t.Errorf("return a valid reference")
@@ -22,7 +22,7 @@ func Test_NewLoader(t *testing.T) {
 	})
 
 	t.Run("error when missing the logger", func(t *testing.T) {
-		loader, err := NewLoader(sconfig.NewConfig(0), nil, &StreamFactory{})
+		loader, err := newLoader(sconfig.NewManager(0), nil, &StreamFactory{})
 		switch {
 		case loader != nil:
 			t.Errorf("return a valid reference")
@@ -34,7 +34,7 @@ func Test_NewLoader(t *testing.T) {
 	})
 
 	t.Run("error when missing the logger stream factory", func(t *testing.T) {
-		loader, err := NewLoader(sconfig.NewConfig(0), NewLogger(), nil)
+		loader, err := newLoader(sconfig.NewManager(0), newLogger(), nil)
 		switch {
 		case loader != nil:
 			t.Errorf("return a valid reference")
@@ -46,7 +46,7 @@ func Test_NewLoader(t *testing.T) {
 	})
 
 	t.Run("create loader", func(t *testing.T) {
-		if loader, err := NewLoader(sconfig.NewConfig(0), NewLogger(), &StreamFactory{}); loader == nil {
+		if loader, err := newLoader(sconfig.NewManager(0), newLogger(), &StreamFactory{}); loader == nil {
 			t.Errorf("didn't returned a valid reference")
 		} else if err != nil {
 			t.Errorf("returned the (%v) error", err)
@@ -56,7 +56,7 @@ func Test_NewLoader(t *testing.T) {
 
 func Test_Loader_Load(t *testing.T) {
 	t.Run("no-op if stream list is empty", func(t *testing.T) {
-		loader, _ := NewLoader(sconfig.NewConfig(0), NewLogger(), &StreamFactory{})
+		loader, _ := newLoader(sconfig.NewManager(0), newLogger(), &StreamFactory{})
 
 		if err := loader.Load(); err != nil {
 			t.Errorf("returned the (%s) error", err)
@@ -70,9 +70,9 @@ func Test_Loader_Load(t *testing.T) {
 		partial := sconfig.Partial{"log": sconfig.Partial{"streams": "string"}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id", 0, source)
-		loader, _ := NewLoader(cfg, NewLogger(), &StreamFactory{})
+		loader, _ := newLoader(cfg, newLogger(), &StreamFactory{})
 
 		if err := loader.Load(); err == nil {
 			t.Errorf("didn't returned the expected error")
@@ -92,9 +92,9 @@ func Test_Loader_Load(t *testing.T) {
 		partial := sconfig.Partial{path: "string"}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id", 0, source)
-		loader, _ := NewLoader(cfg, NewLogger(), &StreamFactory{})
+		loader, _ := newLoader(cfg, newLogger(), &StreamFactory{})
 
 		if err := loader.Load(); err == nil {
 			t.Errorf("didn't returned the expected error")
@@ -110,9 +110,9 @@ func Test_Loader_Load(t *testing.T) {
 		partial := sconfig.Partial{"log": sconfig.Partial{"streams": []interface{}{"string"}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id", 0, source)
-		loader, _ := NewLoader(cfg, NewLogger(), &StreamFactory{})
+		loader, _ := newLoader(cfg, newLogger(), &StreamFactory{})
 
 		if err := loader.Load(); err == nil {
 			t.Errorf("didn't returned the expected error")
@@ -129,9 +129,9 @@ func Test_Loader_Load(t *testing.T) {
 		partial := sconfig.Partial{"log": sconfig.Partial{"streams": []interface{}{scfg}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id", 0, source)
-		loader, _ := NewLoader(cfg, NewLogger(), &StreamFactory{})
+		loader, _ := newLoader(cfg, newLogger(), &StreamFactory{})
 
 		if err := loader.Load(); err == nil {
 			t.Errorf("didn't returned the expected error")
@@ -148,9 +148,9 @@ func Test_Loader_Load(t *testing.T) {
 		partial := sconfig.Partial{"log": sconfig.Partial{"streams": []interface{}{scfg}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id", 0, source)
-		loader, _ := NewLoader(cfg, NewLogger(), &StreamFactory{})
+		loader, _ := newLoader(cfg, newLogger(), &StreamFactory{})
 
 		if err := loader.Load(); err == nil {
 			t.Errorf("didn't returned the expected error")
@@ -167,14 +167,14 @@ func Test_Loader_Load(t *testing.T) {
 		partial := sconfig.Partial{"log": sconfig.Partial{"streams": []interface{}{scfg, scfg}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id", 0, source)
 		formatterFactory := &FormatterFactory{}
 		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
 		strategy, _ := newStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)
-		loader, _ := NewLoader(cfg, NewLogger(), streamFactory)
+		loader, _ := newLoader(cfg, newLogger(), streamFactory)
 
 		if err := loader.Load(); err == nil {
 			t.Errorf("didn't returned the expected error")
@@ -191,14 +191,14 @@ func Test_Loader_Load(t *testing.T) {
 		partial := sconfig.Partial{"log": sconfig.Partial{"streams": []interface{}{scfg}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id", 0, source)
 		formatterFactory := &FormatterFactory{}
 		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
 		strategy, _ := newStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)
-		loader, _ := NewLoader(cfg, NewLogger(), streamFactory)
+		loader, _ := newLoader(cfg, newLogger(), streamFactory)
 
 		if err := loader.Load(); err != nil {
 			t.Errorf("returned the (%v) error", err)
@@ -213,15 +213,15 @@ func Test_Loader_Load(t *testing.T) {
 		partial := sconfig.Partial{"log": sconfig.Partial{"streams": []interface{}{scfg1}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id", 0, source)
 		formatterFactory := &FormatterFactory{}
 		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
 		strategy, _ := newStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)
-		logger := NewLogger()
-		loader, _ := NewLoader(cfg, logger, streamFactory)
+		logger := newLogger()
+		loader, _ := newLoader(cfg, logger, streamFactory)
 
 		_ = loader.Load()
 
@@ -239,15 +239,15 @@ func Test_Loader_Load(t *testing.T) {
 		partial := sconfig.Partial{"log": sconfig.Partial{"streams": []interface{}{scfg1}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id", 0, source)
 		formatterFactory := &FormatterFactory{}
 		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
 		strategy, _ := newStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)
-		logger := NewLogger()
-		loader, _ := NewLoader(cfg, logger, streamFactory)
+		logger := newLogger()
+		loader, _ := newLoader(cfg, logger, streamFactory)
 
 		_ = loader.Load()
 
@@ -266,15 +266,15 @@ func Test_Loader_Load(t *testing.T) {
 		partial := sconfig.Partial{"log": sconfig.Partial{"streams": []interface{}{scfg1}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
-		cfg := sconfig.NewConfig(0)
+		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id", 0, source)
 		formatterFactory := &FormatterFactory{}
 		_ = formatterFactory.Register(&formatterStrategyJSON{})
 		streamFactory := &StreamFactory{}
 		strategy, _ := newStreamStrategyConsole(formatterFactory)
 		_ = streamFactory.Register(strategy)
-		logger := NewLogger()
-		loader, _ := NewLoader(cfg, logger, streamFactory)
+		logger := newLogger()
+		loader, _ := newLoader(cfg, logger, streamFactory)
 
 		_ = loader.Load()
 

@@ -1,9 +1,9 @@
 package sconfig
 
-// DecoderStrategy interface defines the methods of the decoder
+// IDecoderStrategy interface defines the methods of the decoder
 // factory strategy that can validate creation requests and instantiation of a
 // particular decoder.
-type DecoderStrategy interface {
+type IDecoderStrategy interface {
 	Accept(format string) bool
-	Create(args ...interface{}) (Decoder, error)
+	Create(args ...interface{}) (IDecoder, error)
 }

@@ -1,14 +1,18 @@
 package sconfig
 
-// Loader defines the config instantiation and initialization of a new
-// config managing structure.
-type Loader struct {
-	cfg     Manager
-	factory *SourceFactory
+// ILoader defines the interface of a config loader instance.
+type ILoader interface {
+	Load() error
 }
 
-// NewLoader instantiate a new configuration loader.
-func NewLoader(cfg Manager, factory *SourceFactory) (*Loader, error) {
+type loader struct {
+	cfg     IManager
+	factory ISourceFactory
+}
+
+var _ ILoader = &loader{}
+
+func newLoader(cfg IManager, factory ISourceFactory) (ILoader, error) {
 	if cfg == nil {
 		return nil, errNilPointer("cfg")
 	}
@@ -16,7 +20,7 @@ func NewLoader(cfg Manager, factory *SourceFactory) (*Loader, error) {
 		return nil, errNilPointer("factory")
 	}
 
-	return &Loader{
+	return &loader{
 		cfg:     cfg,
 		factory: factory,
 	}, nil
@@ -24,7 +28,7 @@ func NewLoader(cfg Manager, factory *SourceFactory) (*Loader, error) {
 
 // Load loads the configuration from a base config file defined by a
 // path and format.
-func (l Loader) Load() error {
+func (l loader) Load() error {
 	if src, err := l.factory.Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat); err != nil {
 		return err
 	} else if err := l.cfg.AddSource(LoaderSourceID, 0, src); err != nil {
@@ -44,7 +48,7 @@ func (l Loader) Load() error {
 	return nil
 }
 
-func (l Loader) loadSource(cfg Config) error {
+func (l loader) loadSource(cfg IConfig) error {
 	if id, err := cfg.String("id"); err != nil {
 		return err
 	} else if priority, err := cfg.Int("priority", 0); err != nil {

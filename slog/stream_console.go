@@ -12,9 +12,9 @@ type streamConsole struct {
 	writer io.Writer
 }
 
-var _ Stream = &streamConsole{}
+var _ IStream = &streamConsole{}
 
-func newStreamConsole(formatter Formatter, channels []string, level Level) (Stream, error) {
+func newStreamConsole(formatter IFormatter, channels []string, level Level) (IStream, error) {
 	if formatter == nil {
 		return nil, errNilPointer("formatter")
 	}

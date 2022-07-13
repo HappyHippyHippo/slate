@@ -12,11 +12,11 @@ import (
 )
 
 func Test_NewLoader(t *testing.T) {
-	cfg := NewConfig(0 * time.Second)
+	cfg := NewManager(0 * time.Second)
 	factory := &SourceFactory{}
 
 	t.Run("nil cfg", func(t *testing.T) {
-		load, err := NewLoader(nil, factory)
+		load, err := newLoader(nil, factory)
 		switch {
 		case load != nil:
 			t.Error("returned a valid reference")
@@ -28,7 +28,7 @@ func Test_NewLoader(t *testing.T) {
 	})
 
 	t.Run("nil source factory", func(t *testing.T) {
-		load, err := NewLoader(cfg, nil)
+		load, err := newLoader(cfg, nil)
 		switch {
 		case load != nil:
 			t.Error("returned a valid reference")
@@ -40,7 +40,7 @@ func Test_NewLoader(t *testing.T) {
 	})
 
 	t.Run("new loader", func(t *testing.T) {
-		if load, err := NewLoader(cfg, factory); load == nil {
+		if load, err := newLoader(cfg, factory); load == nil {
 			t.Error("didn't returned a valid reference")
 		} else if err != nil {
 			t.Errorf("return the (%v) error", err)
@@ -74,8 +74,8 @@ func Test_Loader_Load(t *testing.T) {
 		_ = sourceFactory.Register(obsFileStrategy)
 		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
-		cfg := NewConfig(0 * time.Second)
-		load, _ := NewLoader(cfg, sourceFactory)
+		cfg := NewManager(0 * time.Second)
+		load, _ := newLoader(cfg, sourceFactory)
 
 		if err := load.Load(); err == nil {
 			t.Error("didn't returned the expected error")
@@ -108,9 +108,9 @@ func Test_Loader_Load(t *testing.T) {
 		_ = sourceFactory.Register(envStrategy)
 		src := NewMockSource(ctrl)
 		src.EXPECT().Get("").Return(Partial{}, nil)
-		cfg := NewConfig(0 * time.Second)
+		cfg := NewManager(0 * time.Second)
 		_ = cfg.AddSource(LoaderSourceID, 0, src)
-		load, _ := NewLoader(cfg, sourceFactory)
+		load, _ := newLoader(cfg, sourceFactory)
 
 		if err := load.Load(); err == nil {
 			t.Error("didn't returned the expected error")
@@ -141,8 +141,8 @@ func Test_Loader_Load(t *testing.T) {
 		_ = sourceFactory.Register(obsFileStrategy)
 		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
-		cfg := NewConfig(0 * time.Second)
-		load, _ := NewLoader(cfg, sourceFactory)
+		cfg := NewManager(0 * time.Second)
+		load, _ := newLoader(cfg, sourceFactory)
 
 		if err := load.Load(); err != nil {
 			t.Errorf("returned the (%v) error", err)
@@ -171,8 +171,8 @@ func Test_Loader_Load(t *testing.T) {
 		_ = sourceFactory.Register(obsFileStrategy)
 		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
-		cfg := NewConfig(0 * time.Second)
-		load, _ := NewLoader(cfg, sourceFactory)
+		cfg := NewManager(0 * time.Second)
+		load, _ := newLoader(cfg, sourceFactory)
 
 		if err := load.Load(); err != nil {
 			t.Errorf("returned the unexpected error : %v", err)
@@ -201,8 +201,8 @@ func Test_Loader_Load(t *testing.T) {
 		_ = sourceFactory.Register(obsFileStrategy)
 		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
-		cfg := NewConfig(0 * time.Second)
-		load, _ := NewLoader(cfg, sourceFactory)
+		cfg := NewManager(0 * time.Second)
+		load, _ := newLoader(cfg, sourceFactory)
 
 		if err := load.Load(); err == nil {
 			t.Error("didn't returned the expected error")
@@ -233,8 +233,8 @@ func Test_Loader_Load(t *testing.T) {
 		_ = sourceFactory.Register(obsFileStrategy)
 		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
-		cfg := NewConfig(0 * time.Second)
-		load, _ := NewLoader(cfg, sourceFactory)
+		cfg := NewManager(0 * time.Second)
+		load, _ := newLoader(cfg, sourceFactory)
 
 		if err := load.Load(); err == nil {
 			t.Error("didn't returned the expected error")
@@ -265,8 +265,8 @@ func Test_Loader_Load(t *testing.T) {
 		_ = sourceFactory.Register(obsFileStrategy)
 		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
-		cfg := NewConfig(0 * time.Second)
-		load, _ := NewLoader(cfg, sourceFactory)
+		cfg := NewManager(0 * time.Second)
+		load, _ := newLoader(cfg, sourceFactory)
 
 		if err := load.Load(); err == nil {
 			t.Error("didn't returned the expected error")
@@ -297,8 +297,8 @@ func Test_Loader_Load(t *testing.T) {
 		_ = sourceFactory.Register(obsFileStrategy)
 		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
-		cfg := NewConfig(0 * time.Second)
-		load, _ := NewLoader(cfg, sourceFactory)
+		cfg := NewManager(0 * time.Second)
+		load, _ := newLoader(cfg, sourceFactory)
 
 		if err := load.Load(); err == nil {
 			t.Error("didn't returned the expected error")
@@ -338,9 +338,9 @@ func Test_Loader_Load(t *testing.T) {
 		_ = sourceFactory.Register(envStrategy)
 		src := NewMockSource(ctrl)
 		src.EXPECT().Get("").Return(Partial{}, nil).AnyTimes()
-		cfg := NewConfig(0 * time.Second)
+		cfg := NewManager(0 * time.Second)
 		_ = cfg.AddSource("id", 0, src)
-		load, _ := NewLoader(cfg, sourceFactory)
+		load, _ := newLoader(cfg, sourceFactory)
 
 		if err := load.Load(); err == nil {
 			t.Error("didn't returned the expected error")
@@ -378,8 +378,8 @@ func Test_Loader_Load(t *testing.T) {
 		_ = sourceFactory.Register(obsFileStrategy)
 		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
-		cfg := NewConfig(0 * time.Second)
-		load, _ := NewLoader(cfg, sourceFactory)
+		cfg := NewManager(0 * time.Second)
+		load, _ := newLoader(cfg, sourceFactory)
 
 		if err := load.Load(); err != nil {
 			t.Errorf("returned the (%v) error", err)
@@ -422,8 +422,8 @@ func Test_Loader_Load(t *testing.T) {
 		_ = sourceFactory.Register(obsFileStrategy)
 		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
-		cfg := NewConfig(0 * time.Second)
-		load, _ := NewLoader(cfg, sourceFactory)
+		cfg := NewManager(0 * time.Second)
+		load, _ := newLoader(cfg, sourceFactory)
 
 		if err := load.Load(); err != nil {
 			t.Errorf("returned the (%v) error", err)
@@ -461,8 +461,8 @@ func Test_Loader_Load(t *testing.T) {
 		_ = sourceFactory.Register(obsFileStrategy)
 		envStrategy := &sourceStrategyEnv{}
 		_ = sourceFactory.Register(envStrategy)
-		cfg := NewConfig(0 * time.Second)
-		load, _ := NewLoader(cfg, sourceFactory)
+		cfg := NewManager(0 * time.Second)
+		load, _ := newLoader(cfg, sourceFactory)
 
 		if err := load.Load(); err != nil {
 			t.Errorf("returned the (%v) error", err)
