@@ -29,14 +29,14 @@ func (sources sourceRefSorter) Less(i, j int) bool {
 	return sources[i].priority < sources[j].priority
 }
 
-// Observer callback function used to be called when an observed
+// IObserver callback function used to be called when an observed
 // configuration path has changed.
-type Observer func(interface{}, interface{})
+type IObserver func(interface{}, interface{})
 
 type observerRef struct {
 	path     string
 	current  interface{}
-	callback Observer
+	callback IObserver
 }
 
 // IManager defined an interface to a instance that manages configuration
@@ -253,7 +253,7 @@ func (c *manager) RemoveAllSources() error {
 	return nil
 }
 
-// ISource retrieve a previously registered source with a requested id.
+// Source retrieve a previously registered source with a requested id.
 func (c *manager) Source(id string) (ISource, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
@@ -305,7 +305,7 @@ func (c *manager) HasObserver(path string) bool {
 }
 
 // AddObserver register a new observer to a configuration path.
-func (c *manager) AddObserver(path string, callback Observer) error {
+func (c *manager) AddObserver(path string, callback IObserver) error {
 	if callback == nil {
 		return errNilPointer("callback")
 	}

@@ -1,6 +1,7 @@
 package sconfig
 
 import (
+	"github.com/spf13/afero"
 	"os"
 	"reflect"
 
@@ -12,6 +13,8 @@ type MockFile struct {
 	ctrl     *gomock.Controller
 	recorder *MockFileRecorder
 }
+
+var _ afero.File = &MockFile{}
 
 // MockFileRecorder is the mock recorder for MockFile
 type MockFileRecorder struct {

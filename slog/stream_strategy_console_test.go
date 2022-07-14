@@ -174,9 +174,9 @@ func Test_StreamStrategyConsole_Create(t *testing.T) {
 	})
 
 	t.Run("create the console stream", func(t *testing.T) {
-		factory := &FormatterFactory{}
-		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := newStreamStrategyConsole(factory)
+		fFactory := &FormatterFactory{}
+		_ = fFactory.Register(&formatterStrategyJSON{})
+		strategy, _ := newStreamStrategyConsole(fFactory)
 
 		stream, err := strategy.Create(FormatJSON, []string{}, DEBUG)
 		switch {
@@ -239,9 +239,9 @@ func Test_StreamStrategyConsole_CreateFromConfig(t *testing.T) {
 		config.EXPECT().String("format").Return(FormatJSON, nil)
 		config.EXPECT().List("channels").Return(nil, expected)
 
-		factory := &FormatterFactory{}
-		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := newStreamStrategyConsole(factory)
+		fFactory := &FormatterFactory{}
+		_ = fFactory.Register(&formatterStrategyJSON{})
+		strategy, _ := newStreamStrategyConsole(fFactory)
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -262,9 +262,9 @@ func Test_StreamStrategyConsole_CreateFromConfig(t *testing.T) {
 		config.EXPECT().String("format").Return(FormatJSON, nil)
 		config.EXPECT().List("channels").Return([]interface{}{123}, nil)
 
-		factory := &FormatterFactory{}
-		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := newStreamStrategyConsole(factory)
+		fFactory := &FormatterFactory{}
+		_ = fFactory.Register(&formatterStrategyJSON{})
+		strategy, _ := newStreamStrategyConsole(fFactory)
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -337,9 +337,9 @@ func Test_StreamStrategyConsole_CreateFromConfig(t *testing.T) {
 		)
 		config.EXPECT().List("channels").Return([]interface{}{"channel1"}, nil)
 
-		factory := &FormatterFactory{}
-		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := newStreamStrategyConsole(factory)
+		fFactory := &FormatterFactory{}
+		_ = fFactory.Register(&formatterStrategyJSON{})
+		strategy, _ := newStreamStrategyConsole(fFactory)
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {

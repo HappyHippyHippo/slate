@@ -31,8 +31,8 @@ func newDecoderJSON(reader io.Reader) (IDecoder, error) {
 func (d *decoderJSON) Close() error {
 	if d.reader != nil {
 		if r, ok := d.reader.(io.Closer); ok {
-			if err := r.Close(); err != nil {
-				return err
+			if e := r.Close(); e != nil {
+				return e
 			}
 		}
 		d.reader = nil
@@ -44,8 +44,8 @@ func (d *decoderJSON) Close() error {
 // into a configuration Partial.
 func (d decoderJSON) Decode() (IConfig, error) {
 	data := map[string]interface{}{}
-	if err := d.decoder.Decode(&data); err != nil {
-		return nil, err
+	if e := d.decoder.Decode(&data); e != nil {
+		return nil, e
 	}
 	p := (Partial{}).convert(data).(Partial)
 

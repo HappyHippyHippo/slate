@@ -15,7 +15,7 @@ var _ ITrigger = &recurring{}
 
 // NewRecurring instantiate a new trigger that will execute a
 // callback method recurrently with a defined periodicity.
-func NewRecurring(delay time.Duration, callback Callback) (ITrigger, error) {
+func NewRecurring(delay time.Duration, callback ICallback) (ITrigger, error) {
 	if callback == nil {
 		return nil, errNilPointer("callback")
 	}

@@ -14,7 +14,7 @@ import (
 
 func Test_NewSourceObservableFile(t *testing.T) {
 	t.Run("nil file system adapter", func(t *testing.T) {
-		src, err := newSourceObservableFile("path", DecoderFormatYAML, nil, &DecoderFactory{})
+		src, err := newSourceObservableFile("path", DecoderFormatYAML, nil, &decoderFactory{})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -25,7 +25,7 @@ func Test_NewSourceObservableFile(t *testing.T) {
 		}
 	})
 
-	t.Run("nil decoder factory", func(t *testing.T) {
+	t.Run("nil decoder dFactory", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -48,9 +48,9 @@ func Test_NewSourceObservableFile(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Stat(path).Return(nil, expected).Times(1)
-		factory := DecoderFactory{}
+		dFactory := decoderFactory{}
 
-		src, err := newSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
+		src, err := newSourceObservableFile(path, DecoderFormatYAML, fs, &dFactory)
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -72,9 +72,9 @@ func Test_NewSourceObservableFile(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Stat(path).Return(fileInfo, nil).Times(1)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
-		factory := DecoderFactory{}
+		dFactory := decoderFactory{}
 
-		src, err := newSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
+		src, err := newSourceObservableFile(path, DecoderFormatYAML, fs, &dFactory)
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -97,9 +97,9 @@ func Test_NewSourceObservableFile(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Stat(path).Return(fileInfo, nil).Times(1)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		factory := DecoderFactory{}
+		dFactory := decoderFactory{}
 
-		src, err := newSourceObservableFile(path, DecoderFormatUnknown, fs, &factory)
+		src, err := newSourceObservableFile(path, DecoderFormatUnknown, fs, &dFactory)
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -126,10 +126,10 @@ func Test_NewSourceObservableFile(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Stat(path).Return(fileInfo, nil).Times(1)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		factory := DecoderFactory{}
-		_ = factory.Register(&decoderStrategyYAML{})
+		dFactory := decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
 
-		src, err := newSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
+		src, err := newSourceObservableFile(path, DecoderFormatYAML, fs, &dFactory)
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -159,10 +159,10 @@ func Test_NewSourceObservableFile(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Stat(path).Return(fileInfo, nil).Times(1)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		factory := DecoderFactory{}
-		_ = factory.Register(&decoderStrategyYAML{})
+		dFactory := decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
 
-		src, err := newSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
+		src, err := newSourceObservableFile(path, DecoderFormatYAML, fs, &dFactory)
 		switch {
 		case src == nil:
 			t.Error("didn't returned a valid reference")
@@ -180,8 +180,8 @@ func Test_NewSourceObservableFile(t *testing.T) {
 					t.Error("didn't stored the file content format")
 				case s.fs != fs:
 					t.Error("didn't stored the file system adapter reference")
-				case s.factory != &factory:
-					t.Error("didn't stored the decoder factory reference")
+				case s.factory != &dFactory:
+					t.Error("didn't stored the decoder dFactory reference")
 				case !reflect.DeepEqual(s.partial, expected):
 					t.Error("didn't loaded the content correctly")
 				}
@@ -210,10 +210,10 @@ func Test_NewSourceObservableFile(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Stat(path).Return(fileI, nil).Times(1)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		factory := DecoderFactory{}
-		_ = factory.Register(&decoderStrategyYAML{})
+		dFactory := decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
 
-		src, err := newSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
+		src, err := newSourceObservableFile(path, DecoderFormatYAML, fs, &dFactory)
 		switch {
 		case src == nil:
 			t.Error("didn't returned a valid reference")
@@ -255,9 +255,9 @@ func Test_SourceObservableFile_Reload(t *testing.T) {
 			fs.EXPECT().Stat(path).Return(nil, expected),
 		)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		factory := DecoderFactory{}
-		_ = factory.Register(&decoderStrategyYAML{})
-		src, _ := newSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
+		dFactory := decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
+		src, _ := newSourceObservableFile(path, DecoderFormatYAML, fs, &dFactory)
 
 		reloaded, err := src.Reload()
 		switch {
@@ -298,9 +298,9 @@ func Test_SourceObservableFile_Reload(t *testing.T) {
 			fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil),
 			fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(nil, expected),
 		)
-		factory := DecoderFactory{}
-		_ = factory.Register(&decoderStrategyYAML{})
-		src, _ := newSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
+		dFactory := decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
+		src, _ := newSourceObservableFile(path, DecoderFormatYAML, fs, &dFactory)
 
 		reloaded, err := src.Reload()
 		switch {
@@ -331,9 +331,9 @@ func Test_SourceObservableFile_Reload(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Stat(path).Return(fileInfo, nil).Times(2)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		factory := DecoderFactory{}
-		_ = factory.Register(&decoderStrategyYAML{})
-		src, _ := newSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
+		dFactory := decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
+		src, _ := newSourceObservableFile(path, DecoderFormatYAML, fs, &dFactory)
 
 		if reloaded, err := src.Reload(); reloaded {
 			t.Error("flagged that was reloaded")
@@ -374,9 +374,9 @@ func Test_SourceObservableFile_Reload(t *testing.T) {
 			fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file1, nil),
 			fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file2, nil),
 		)
-		factory := DecoderFactory{}
-		_ = factory.Register(&decoderStrategyYAML{})
-		src, _ := newSourceObservableFile(path, DecoderFormatYAML, fs, &factory)
+		dFactory := decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
+		src, _ := newSourceObservableFile(path, DecoderFormatYAML, fs, &dFactory)
 
 		reloaded, err := src.Reload()
 		switch {

@@ -23,11 +23,11 @@ func Test_StreamFactory_Register(t *testing.T) {
 		defer ctrl.Finish()
 
 		strategy := NewMockStreamStrategy(ctrl)
-		factory := &StreamFactory{}
+		sFactory := &StreamFactory{}
 
-		if err := factory.Register(strategy); err != nil {
+		if err := sFactory.Register(strategy); err != nil {
 			t.Errorf("returned the (%v) error", err)
-		} else if (*factory)[0] != strategy {
+		} else if (*sFactory)[0] != strategy {
 			t.Error("didn't stored the strategy")
 		}
 	})
@@ -43,10 +43,10 @@ func Test_StreamFactory_Create(t *testing.T) {
 		format := "format"
 		strategy := NewMockStreamStrategy(ctrl)
 		strategy.EXPECT().Accept(streamType).Return(false).Times(1)
-		factory := &StreamFactory{}
-		_ = factory.Register(strategy)
+		sFactory := &StreamFactory{}
+		_ = sFactory.Register(strategy)
 
-		stream, err := factory.Create(streamType, path, format)
+		stream, err := sFactory.Create(streamType, path, format)
 		switch {
 		case stream != nil:
 			t.Error("returned an valid reference")
@@ -68,10 +68,10 @@ func Test_StreamFactory_Create(t *testing.T) {
 		strategy := NewMockStreamStrategy(ctrl)
 		strategy.EXPECT().Accept(sourceType).Return(true).Times(1)
 		strategy.EXPECT().Create(path, format).Return(stream, nil).Times(1)
-		factory := &StreamFactory{}
-		_ = factory.Register(strategy)
+		sFactory := &StreamFactory{}
+		_ = sFactory.Register(strategy)
 
-		if s, err := factory.Create(sourceType, path, format); err != nil {
+		if s, err := sFactory.Create(sourceType, path, format); err != nil {
 			t.Errorf("returned the (%v) error", err)
 		} else if !reflect.DeepEqual(s, stream) {
 			t.Error("didn't returned the created stream")
@@ -99,10 +99,10 @@ func Test_StreamFactory_CreateFromConfig(t *testing.T) {
 		cfg := sconfig.NewManager(0)
 		strategy := NewMockStreamStrategy(ctrl)
 		strategy.EXPECT().AcceptFromConfig(cfg).Return(false).Times(1)
-		factory := &StreamFactory{}
-		_ = factory.Register(strategy)
+		sFactory := &StreamFactory{}
+		_ = sFactory.Register(strategy)
 
-		stream, err := factory.CreateFromConfig(cfg)
+		stream, err := sFactory.CreateFromConfig(cfg)
 		switch {
 		case stream != nil:
 			t.Error("returned a config stream")
@@ -122,10 +122,10 @@ func Test_StreamFactory_CreateFromConfig(t *testing.T) {
 		strategy := NewMockStreamStrategy(ctrl)
 		strategy.EXPECT().AcceptFromConfig(cfg).Return(true).Times(1)
 		strategy.EXPECT().CreateFromConfig(cfg).Return(stream, nil).Times(1)
-		factory := &StreamFactory{}
-		_ = factory.Register(strategy)
+		sFactory := &StreamFactory{}
+		_ = sFactory.Register(strategy)
 
-		if s, err := factory.CreateFromConfig(cfg); err != nil {
+		if s, err := sFactory.CreateFromConfig(cfg); err != nil {
 			t.Errorf("returned the (%v) error", err)
 		} else if !reflect.DeepEqual(s, stream) {
 			t.Error("didn't returned the created stream")

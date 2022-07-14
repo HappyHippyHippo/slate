@@ -12,9 +12,9 @@ import (
 
 func Test_NewDecoderYAML(t *testing.T) {
 	t.Run("nil reader", func(t *testing.T) {
-		decoder, err := newDecoderYAML(nil)
+		sut, err := newDecoderYAML(nil)
 		switch {
-		case decoder != nil:
+		case sut != nil:
 			t.Error("returned a valid reference")
 		case err == nil:
 			t.Error("didn't returned the expected error")
@@ -30,13 +30,13 @@ func Test_NewDecoderYAML(t *testing.T) {
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
 
-		if decoder, err := newDecoderYAML(reader); decoder == nil {
+		if sut, err := newDecoderYAML(reader); sut == nil {
 			t.Errorf("didn't returned a valid reference")
 		} else {
-			defer func() { _ = decoder.Close() }()
+			defer func() { _ = sut.Close() }()
 			if err != nil {
 				t.Errorf("returned the (%v) error", err)
-			} else if decoder.(*decoderYAML).reader != reader {
+			} else if sut.(*decoderYAML).reader != reader {
 				t.Error("didn't store the reader reference")
 			}
 		}
@@ -51,9 +51,9 @@ func Test_DecoderYAML_Close(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Return(expected).Times(1)
-		decoder, _ := newDecoderYAML(reader)
+		sut, _ := newDecoderYAML(reader)
 
-		if err := decoder.Close(); err == nil {
+		if err := sut.Close(); err == nil {
 			t.Errorf("didn't returned the expected error")
 		} else if err.Error() != expected.Error() {
 			t.Errorf("returned the (%v) error when expecting (%v)", err, expected)
@@ -66,10 +66,10 @@ func Test_DecoderYAML_Close(t *testing.T) {
 
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		decoder, _ := newDecoderYAML(reader)
+		sut, _ := newDecoderYAML(reader)
 
-		_ = decoder.Close()
-		_ = decoder.Close()
+		_ = sut.Close()
+		_ = sut.Close()
 	})
 }
 
@@ -81,15 +81,15 @@ func Test_DecoderYAML_Decode(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		decoder, _ := newDecoderYAML(reader)
-		defer func() { _ = decoder.Close() }()
+		sut, _ := newDecoderYAML(reader)
+		defer func() { _ = sut.Close() }()
 		yaml := NewMockYamler(ctrl)
 		yaml.EXPECT().Decode(&Partial{}).DoAndReturn(func(p *Partial) error {
 			return expected
 		}).Times(1)
-		decoder.(*decoderYAML).decoder = yaml
+		sut.(*decoderYAML).decoder = yaml
 
-		check, err := decoder.Decode()
+		check, err := sut.Decode()
 		switch {
 		case check != nil:
 			t.Error("returned an reference")
@@ -107,16 +107,16 @@ func Test_DecoderYAML_Decode(t *testing.T) {
 		data := Partial{"node": "data"}
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		decoder, _ := newDecoderYAML(reader)
-		defer func() { _ = decoder.Close() }()
+		sut, _ := newDecoderYAML(reader)
+		defer func() { _ = sut.Close() }()
 		yaml := NewMockYamler(ctrl)
 		yaml.EXPECT().Decode(&Partial{}).DoAndReturn(func(p *Partial) error {
 			(*p)["node"] = data["node"]
 			return nil
 		}).Times(1)
-		decoder.(*decoderYAML).decoder = yaml
+		sut.(*decoderYAML).decoder = yaml
 
-		check, err := decoder.Decode()
+		check, err := sut.Decode()
 		switch {
 		case check == nil:
 			t.Error("returned a nil data")
@@ -131,10 +131,10 @@ func Test_DecoderYAML_Decode(t *testing.T) {
 		yaml := "node:\n  subnode: data"
 		expected := Partial{"node": Partial{"subnode": "data"}}
 		reader := strings.NewReader(yaml)
-		decoder, _ := newDecoderYAML(reader)
-		defer func() { _ = decoder.Close() }()
+		sut, _ := newDecoderYAML(reader)
+		defer func() { _ = sut.Close() }()
 
-		check, err := decoder.Decode()
+		check, err := sut.Decode()
 		switch {
 		case check == nil:
 			t.Error("returned a nil data")

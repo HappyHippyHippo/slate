@@ -28,7 +28,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 	}, ContainerDecoderStrategyTag)
 
 	_ = c.Service(ContainerDecoderFactoryID, func() (interface{}, error) {
-		return &DecoderFactory{}, nil
+		return &decoderFactory{}, nil
 	})
 
 	_ = c.Service(ContainerSourceStrategyFileID, func() (interface{}, error) {
@@ -62,19 +62,19 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 	}, ContainerSourceStrategyTag)
 
 	_ = c.Service(ContainerSourceStrategyRestID, func() (interface{}, error) {
-		decoderFactory, err := GetDecoderFactory(c)
+		dFactory, err := GetDecoderFactory(c)
 		if err != nil {
 			return nil, err
 		}
-		return newSourceStrategyRest(decoderFactory)
+		return newSourceStrategyRest(dFactory)
 	}, ContainerSourceStrategyTag)
 
 	_ = c.Service(ContainerSourceStrategyRestObservableID, func() (interface{}, error) {
-		decoderFactory, err := GetDecoderFactory(c)
+		dFactory, err := GetDecoderFactory(c)
 		if err != nil {
 			return nil, err
 		}
-		return newSourceStrategyObservableRest(decoderFactory)
+		return newSourceStrategyObservableRest(dFactory)
 	}, ContainerSourceStrategyTag)
 
 	_ = c.Service(ContainerSourceStrategyEnvID, func() (interface{}, error) {
@@ -91,7 +91,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 	}, ContainerSourceStrategyTag)
 
 	_ = c.Service(ContainerSourceFactoryID, func() (interface{}, error) {
-		return &SourceFactory{}, nil
+		return &sourceFactory{}, nil
 	})
 
 	_ = c.Service(ContainerID, func() (interface{}, error) {
@@ -101,10 +101,10 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 	_ = c.Service(ContainerLoaderID, func() (interface{}, error) {
 		if config, err := GetConfig(c); err != nil {
 			return nil, err
-		} else if sourceFactory, err := GetSourceFactory(c); err != nil {
+		} else if sFactory, err := GetSourceFactory(c); err != nil {
 			return nil, err
 		} else {
-			return newLoader(config, sourceFactory)
+			return newLoader(config, sFactory)
 		}
 	})
 
@@ -118,23 +118,23 @@ func (p Provider) Boot(c slate.ServiceContainer) error {
 		return errNilPointer("container")
 	}
 
-	if decoderFactory, err := GetDecoderFactory(c); err != nil {
+	if dFactory, err := GetDecoderFactory(c); err != nil {
 		return err
 	} else if decoderStrategies, err := GetDecoderStrategies(c); err != nil {
 		return err
 	} else {
 		for _, strategy := range decoderStrategies {
-			_ = decoderFactory.Register(strategy)
+			_ = dFactory.Register(strategy)
 		}
 	}
 
-	if sourceFactory, err := GetSourceFactory(c); err != nil {
+	if sFactory, err := GetSourceFactory(c); err != nil {
 		return err
 	} else if sourceStrategies, err := GetSourceStrategies(c); err != nil {
 		return err
 	} else {
 		for _, strategy := range sourceStrategies {
-			_ = sourceFactory.Register(strategy)
+			_ = sFactory.Register(strategy)
 		}
 	}
 
@@ -142,11 +142,11 @@ func (p Provider) Boot(c slate.ServiceContainer) error {
 		return nil
 	}
 
-	loader, err := GetLoader(c)
+	l, err := GetLoader(c)
 	if err != nil {
 		return err
 	}
-	return loader.Load()
+	return l.Load()
 }
 
 // GetDecoderFactory will try to retrieve the registered decoder

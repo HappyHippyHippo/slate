@@ -13,39 +13,39 @@ type IConnectionFactory interface {
 
 // ConnectionFactory is a database connection generator.
 type ConnectionFactory struct {
-	config         sconfig.IManager
-	dialectFactory IDialectFactory
-	instances      map[string]*gorm.DB
+	config    sconfig.IManager
+	dFactory  IDialectFactory
+	instances map[string]*gorm.DB
 }
 
 var _ IConnectionFactory = &ConnectionFactory{}
 
-func newConnectionFactory(config sconfig.IManager, dialectFactory IDialectFactory) (IConnectionFactory, error) {
+func newConnectionFactory(config sconfig.IManager, dFactory IDialectFactory) (IConnectionFactory, error) {
 	if config == nil {
 		return nil, errNilPointer("config")
 	}
-	if dialectFactory == nil {
-		return nil, errNilPointer("factory")
+	if dFactory == nil {
+		return nil, errNilPointer("cFactory")
 	}
 
-	factory := &ConnectionFactory{
-		config:         config,
-		dialectFactory: dialectFactory,
-		instances:      map[string]*gorm.DB{},
+	cFactory := &ConnectionFactory{
+		config:    config,
+		dFactory:  dFactory,
+		instances: map[string]*gorm.DB{},
 	}
 
 	if ObserveConfig {
 		_ = config.AddObserver(ConnectionsConfigPath, func(_ interface{}, _ interface{}) {
-			for _, conn := range factory.instances {
+			for _, conn := range cFactory.instances {
 				if db, _ := conn.DB(); db != nil {
 					_ = db.Close()
 				}
 			}
-			factory.instances = map[string]*gorm.DB{}
+			cFactory.instances = map[string]*gorm.DB{}
 		})
 	}
 
-	return factory, nil
+	return cFactory, nil
 }
 
 // Get execute the process of the connection creation based on the
@@ -63,7 +63,7 @@ func (f *ConnectionFactory) Get(name string, gcfg *gorm.Config) (*gorm.DB, error
 
 	if cfg, err := f.config.Partial(name); err != nil {
 		return nil, err
-	} else if dialect, err := f.dialectFactory.Get(&cfg); err != nil {
+	} else if dialect, err := f.dFactory.Get(&cfg); err != nil {
 		return nil, err
 	} else if conn, err := gorm.Open(dialect, gcfg); err != nil {
 		return nil, err

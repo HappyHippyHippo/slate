@@ -31,8 +31,8 @@ func newDecoderYAML(reader io.Reader) (IDecoder, error) {
 func (d *decoderYAML) Close() error {
 	if d.reader != nil {
 		if r, ok := d.reader.(io.Closer); ok {
-			if err := r.Close(); err != nil {
-				return err
+			if e := r.Close(); e != nil {
+				return e
 			}
 		}
 		d.reader = nil
@@ -44,8 +44,8 @@ func (d *decoderYAML) Close() error {
 // into a configuration Partial.
 func (d decoderYAML) Decode() (IConfig, error) {
 	data := Partial{}
-	if err := d.decoder.Decode(&data); err != nil {
-		return nil, err
+	if e := d.decoder.Decode(&data); e != nil {
+		return nil, e
 	}
 	p := (Partial{}).convert(data).(Partial)
 

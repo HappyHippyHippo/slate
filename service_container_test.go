@@ -15,15 +15,15 @@ func Test_ServiceContainer_Close(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
 		entry.EXPECT().Close().Times(0)
-		_ = c.Service(id, func() (interface{}, error) {
+		_ = sut.Service(id, func() (interface{}, error) {
 			return entry, nil
 		})
-		_ = c.Close()
+		_ = sut.Close()
 
-		if c.Has(id) {
+		if sut.Has(id) {
 			t.Error("didn't removed the entry")
 		}
 	})
@@ -34,15 +34,15 @@ func Test_ServiceContainer_Close(t *testing.T) {
 
 		id := "id"
 		expected := fmt.Errorf("error message")
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
 		entry.EXPECT().Close().Return(expected).Times(1)
-		_ = c.Service(id, func() (interface{}, error) {
+		_ = sut.Service(id, func() (interface{}, error) {
 			return entry, nil
 		})
-		_, _ = c.Get(id)
+		_, _ = sut.Get(id)
 
-		if err := c.Close(); err == nil {
+		if err := sut.Close(); err == nil {
 			t.Error("didn't returned the expected error")
 		} else if err.Error() != expected.Error() {
 			t.Errorf("returned the error (%v) when was expecting (%v)", err, expected)
@@ -54,16 +54,16 @@ func Test_ServiceContainer_Close(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
 		entry.EXPECT().Close().Return(nil).Times(1)
-		_ = c.Service(id, func() (interface{}, error) {
+		_ = sut.Service(id, func() (interface{}, error) {
 			return entry, nil
 		})
-		_, _ = c.Get(id)
-		_ = c.Close()
+		_, _ = sut.Get(id)
+		_ = sut.Close()
 
-		if c.Has(id) {
+		if sut.Has(id) {
 			t.Error("didn't removed the entry")
 		}
 	})
@@ -75,13 +75,13 @@ func Test_ServiceContainer_Has(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
-		_ = c.Service(id, func() (interface{}, error) {
+		_ = sut.Service(id, func() (interface{}, error) {
 			return entry, nil
 		})
 
-		if !c.Has(id) {
+		if !sut.Has(id) {
 			t.Error("didn't found the entry")
 		}
 	})
@@ -91,13 +91,13 @@ func Test_ServiceContainer_Has(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
-		_ = c.Service(id, func() (interface{}, error) {
+		_ = sut.Service(id, func() (interface{}, error) {
 			return entry, nil
 		})
 
-		if c.Has(id + "salt") {
+		if sut.Has(id + "salt") {
 			t.Error("unexpectedly found a valid entry")
 		}
 	})
@@ -107,13 +107,13 @@ func Test_ServiceContainer_Has(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
-		_ = c.Factory(id, func() (interface{}, error) {
+		_ = sut.Factory(id, func() (interface{}, error) {
 			return entry, nil
 		})
 
-		if !c.Has(id) {
+		if !sut.Has(id) {
 			t.Error("didn't found the entry")
 		}
 	})
@@ -123,13 +123,13 @@ func Test_ServiceContainer_Has(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
-		_ = c.Factory(id, func() (interface{}, error) {
+		_ = sut.Factory(id, func() (interface{}, error) {
 			return entry, nil
 		})
 
-		if c.Has(id + "salt") {
+		if sut.Has(id + "salt") {
 			t.Error("unexpectedly found a valid entry")
 		}
 	})
@@ -138,22 +138,21 @@ func Test_ServiceContainer_Has(t *testing.T) {
 func Test_ServiceContainer_Remove(t *testing.T) {
 	t.Run("removing a non-registered service/factory should not error", func(t *testing.T) {
 		id := "id"
-		c := ServiceContainer{}
-		if err := c.Remove(id); err != nil {
+		if err := (ServiceContainer{}).Remove(id); err != nil {
 			t.Errorf("returned the unexpected error : %v", err)
 		}
 	})
 
 	t.Run("removing a non-loaded service should not error", func(t *testing.T) {
 		id := "id"
-		c := ServiceContainer{}
-		_ = c.Service(id, func() (interface{}, error) {
+		sut := ServiceContainer{}
+		_ = sut.Service(id, func() (interface{}, error) {
 			return "value", nil
 		})
 
-		if err := c.Remove(id); err != nil {
+		if err := sut.Remove(id); err != nil {
 			t.Errorf("returned the unexpected error : %v", err)
-		} else if c.Has(id) {
+		} else if sut.Has(id) {
 			t.Error("didn't removed the entry")
 		}
 	})
@@ -163,17 +162,17 @@ func Test_ServiceContainer_Remove(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
 		entry.EXPECT().Close().Times(1)
-		_ = c.Service(id, func() (interface{}, error) {
+		_ = sut.Service(id, func() (interface{}, error) {
 			return entry, nil
 		})
-		_, _ = c.Get(id)
+		_, _ = sut.Get(id)
 
-		if err := c.Remove(id); err != nil {
+		if err := sut.Remove(id); err != nil {
 			t.Errorf("returned the unexpected error : %v", err)
-		} else if c.Has(id) {
+		} else if sut.Has(id) {
 			t.Error("didn't removed the entry")
 		}
 	})
@@ -183,16 +182,16 @@ func Test_ServiceContainer_Remove(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
 		entry.EXPECT().Close().Times(0)
-		_ = c.Factory(id, func() (interface{}, error) {
+		_ = sut.Factory(id, func() (interface{}, error) {
 			return entry, nil
 		})
 
-		if err := c.Remove(id); err != nil {
+		if err := sut.Remove(id); err != nil {
 			t.Errorf("returned the unexpected error : %v", err)
-		} else if c.Has(id) {
+		} else if sut.Has(id) {
 			t.Error("didn't removed the entry")
 		}
 	})
@@ -202,18 +201,18 @@ func Test_ServiceContainer_Remove(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
 		entry.EXPECT().Close().Times(0)
-		_ = c.Factory(id, func() (interface{}, error) {
+		_ = sut.Factory(id, func() (interface{}, error) {
 			return entry, nil
 		})
-		_, _ = c.Get(id)
-		_ = c.Remove(id)
+		_, _ = sut.Get(id)
+		_ = sut.Remove(id)
 
-		if err := c.Remove(id); err != nil {
+		if err := sut.Remove(id); err != nil {
 			t.Errorf("returned the unexpected error : %v", err)
-		} else if c.Has(id) {
+		} else if sut.Has(id) {
 			t.Error("didn't removed the entry")
 		}
 	})
@@ -225,16 +224,16 @@ func Test_ServiceContainer_Clear(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
 		entry.EXPECT().Close().Times(0)
-		_ = c.Service(id, func() (interface{}, error) {
+		_ = sut.Service(id, func() (interface{}, error) {
 			return entry, nil
 		})
 
-		if err := c.Clear(); err != nil {
+		if err := sut.Clear(); err != nil {
 			t.Errorf("returned the unexpected error : %v", err)
-		} else if c.Has(id) {
+		} else if sut.Has(id) {
 			t.Error("didn't removed the entry")
 		}
 	})
@@ -245,15 +244,15 @@ func Test_ServiceContainer_Clear(t *testing.T) {
 
 		id := "id"
 		expected := fmt.Errorf("error message")
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
 		entry.EXPECT().Close().Return(expected).Times(1)
-		_ = c.Service(id, func() (interface{}, error) {
+		_ = sut.Service(id, func() (interface{}, error) {
 			return entry, nil
 		})
-		_, _ = c.Get(id)
+		_, _ = sut.Get(id)
 
-		if err := c.Clear(); err == nil {
+		if err := sut.Clear(); err == nil {
 			t.Error("didn't returned the expected error")
 		} else if err.Error() != expected.Error() {
 			t.Errorf("returned the error (%v) when was expecting (%v)", err, expected)
@@ -265,17 +264,17 @@ func Test_ServiceContainer_Clear(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
 		entry.EXPECT().Close().Return(nil).Times(1)
-		_ = c.Service(id, func() (interface{}, error) {
+		_ = sut.Service(id, func() (interface{}, error) {
 			return entry, nil
 		})
-		_, _ = c.Get(id)
+		_, _ = sut.Get(id)
 
-		if err := c.Clear(); err != nil {
+		if err := sut.Clear(); err != nil {
 			t.Errorf("returned the unexpected error : %v", err)
-		} else if c.Has(id) {
+		} else if sut.Has(id) {
 			t.Error("didn't removed the entry")
 		}
 	})
@@ -284,9 +283,8 @@ func Test_ServiceContainer_Clear(t *testing.T) {
 func Test_ServiceContainer_Service(t *testing.T) {
 	t.Run("nil factory", func(t *testing.T) {
 		id := "id"
-		c := ServiceContainer{}
 
-		if err := c.Service(id, nil); err == nil {
+		if err := (ServiceContainer{}).Service(id, nil); err == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(err, serror.ErrNilPointer) {
 			t.Errorf("returned the error (%v) when was expecting (%v)", err, serror.ErrNilPointer)
@@ -298,16 +296,16 @@ func Test_ServiceContainer_Service(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
 
-		if err := c.Service(id, func() (interface{}, error) {
+		if err := sut.Service(id, func() (interface{}, error) {
 			return entry, nil
 		}); err != nil {
 			t.Errorf("returned the (%s) error", err)
-		} else if !c.Has(id) {
+		} else if !sut.Has(id) {
 			t.Error("didn't found the added entry")
-		} else if check, _ := c.Get(id); !reflect.DeepEqual(check, entry) {
+		} else if check, _ := sut.Get(id); !reflect.DeepEqual(check, entry) {
 			t.Error("didn't stored the requested entry")
 		}
 	})
@@ -318,16 +316,16 @@ func Test_ServiceContainer_Service(t *testing.T) {
 
 		id := "id"
 		expected := fmt.Errorf("error message")
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry1 := NewMockCloser(ctrl)
 		entry1.EXPECT().Close().Return(expected).Times(1)
 		entry2 := NewMockCloser(ctrl)
-		_ = c.Service(id, func() (interface{}, error) {
+		_ = sut.Service(id, func() (interface{}, error) {
 			return entry1, nil
 		})
-		_, _ = c.Get(id)
+		_, _ = sut.Get(id)
 
-		if err := c.Service(id, func() (interface{}, error) {
+		if err := sut.Service(id, func() (interface{}, error) {
 			return entry2, nil
 		}); err == nil {
 			t.Error("didn't returned the expected error")
@@ -341,26 +339,26 @@ func Test_ServiceContainer_Service(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry1 := NewMockCloser(ctrl)
 		entry1.EXPECT().Close().Times(1)
 		entry2 := NewMockCloser(ctrl)
 
-		if err := c.Service(id, func() (interface{}, error) {
+		if err := sut.Service(id, func() (interface{}, error) {
 			return entry1, nil
 		}); err != nil {
 			t.Errorf("returned the (%s) error", err)
-		} else if !c.Has(id) {
+		} else if !sut.Has(id) {
 			t.Error("didn't found the added entry")
-		} else if check, _ := c.Get(id); !reflect.DeepEqual(check, entry1) {
+		} else if check, _ := sut.Get(id); !reflect.DeepEqual(check, entry1) {
 			t.Error("didn't stored the requested first entry")
-		} else if err := c.Service(id, func() (interface{}, error) {
+		} else if err := sut.Service(id, func() (interface{}, error) {
 			return entry2, nil
 		}); err != nil {
 			t.Errorf("returned the (%s) error", err)
-		} else if !c.Has(id) {
+		} else if !sut.Has(id) {
 			t.Error("didn't found the added entry")
-		} else if check, _ := c.Get(id); !reflect.DeepEqual(check, entry2) {
+		} else if check, _ := sut.Get(id); !reflect.DeepEqual(check, entry2) {
 			t.Error("didn't stored the requested second entry")
 		}
 	})
@@ -370,25 +368,25 @@ func Test_ServiceContainer_Service(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry1 := NewMockCloser(ctrl)
 		entry2 := NewMockCloser(ctrl)
 
-		if err := c.Factory(id, func() (interface{}, error) {
+		if err := sut.Factory(id, func() (interface{}, error) {
 			return entry1, nil
 		}); err != nil {
 			t.Errorf("returned the (%s) error", err)
-		} else if !c.Has(id) {
+		} else if !sut.Has(id) {
 			t.Error("didn't found the added entry")
-		} else if check, _ := c.Get(id); !reflect.DeepEqual(check, entry1) {
+		} else if check, _ := sut.Get(id); !reflect.DeepEqual(check, entry1) {
 			t.Error("didn't stored the requested first entry")
-		} else if err := c.Service(id, func() (interface{}, error) {
+		} else if err := sut.Service(id, func() (interface{}, error) {
 			return entry2, nil
 		}); err != nil {
 			t.Errorf("returned the (%s) error", err)
-		} else if !c.Has(id) {
+		} else if !sut.Has(id) {
 			t.Error("didn't found the added entry")
-		} else if check, _ := c.Get(id); !reflect.DeepEqual(check, entry2) {
+		} else if check, _ := sut.Get(id); !reflect.DeepEqual(check, entry2) {
 			t.Error("didn't stored the requested second entry")
 		}
 	})
@@ -397,9 +395,8 @@ func Test_ServiceContainer_Service(t *testing.T) {
 func Test_ServiceContainer_Factory(t *testing.T) {
 	t.Run("nil factory", func(t *testing.T) {
 		id := "id"
-		c := ServiceContainer{}
 
-		if err := c.Factory(id, nil); err == nil {
+		if err := (ServiceContainer{}).Factory(id, nil); err == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(err, serror.ErrNilPointer) {
 			t.Errorf("returned the error (%v) when was expecting (%v)", err, serror.ErrNilPointer)
@@ -411,16 +408,16 @@ func Test_ServiceContainer_Factory(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
 
-		if err := c.Factory(id, func() (interface{}, error) {
+		if err := sut.Factory(id, func() (interface{}, error) {
 			return entry, nil
 		}); err != nil {
 			t.Errorf("returned the (%s) error", err)
-		} else if !c.Has(id) {
+		} else if !sut.Has(id) {
 			t.Error("didn't found the added entry")
-		} else if check, _ := c.Get(id); !reflect.DeepEqual(check, entry) {
+		} else if check, _ := sut.Get(id); !reflect.DeepEqual(check, entry) {
 			t.Error("didn't stored the requested entry")
 		}
 	})
@@ -431,16 +428,16 @@ func Test_ServiceContainer_Factory(t *testing.T) {
 
 		id := "id"
 		expected := fmt.Errorf("error message")
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry1 := NewMockCloser(ctrl)
 		entry1.EXPECT().Close().Return(expected).Times(1)
 		entry2 := NewMockCloser(ctrl)
-		_ = c.Service(id, func() (interface{}, error) {
+		_ = sut.Service(id, func() (interface{}, error) {
 			return entry1, nil
 		})
-		_, _ = c.Get(id)
+		_, _ = sut.Get(id)
 
-		if err := c.Factory(id, func() (interface{}, error) {
+		if err := sut.Factory(id, func() (interface{}, error) {
 			return entry2, nil
 		}); err == nil {
 			t.Error("didn't returned the expected error")
@@ -454,25 +451,25 @@ func Test_ServiceContainer_Factory(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry1 := NewMockCloser(ctrl)
 		entry2 := NewMockCloser(ctrl)
 
-		if err := c.Factory(id, func() (interface{}, error) {
+		if err := sut.Factory(id, func() (interface{}, error) {
 			return entry1, nil
 		}); err != nil {
 			t.Errorf("returned the (%s) error", err)
-		} else if !c.Has(id) {
+		} else if !sut.Has(id) {
 			t.Error("didn't found the added entry")
-		} else if check, _ := c.Get(id); !reflect.DeepEqual(check, entry1) {
+		} else if check, _ := sut.Get(id); !reflect.DeepEqual(check, entry1) {
 			t.Error("didn't stored the requested first entry")
-		} else if err := c.Factory(id, func() (interface{}, error) {
+		} else if err := sut.Factory(id, func() (interface{}, error) {
 			return entry1, nil
 		}); err != nil {
 			t.Errorf("returned the (%s) error", err)
-		} else if !c.Has(id) {
+		} else if !sut.Has(id) {
 			t.Error("didn't found the added entry")
-		} else if check, _ := c.Get(id); !reflect.DeepEqual(check, entry2) {
+		} else if check, _ := sut.Get(id); !reflect.DeepEqual(check, entry2) {
 			t.Error("didn't stored the requested second entry")
 		}
 	})
@@ -482,26 +479,26 @@ func Test_ServiceContainer_Factory(t *testing.T) {
 		defer ctrl.Finish()
 
 		id := "id"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry1 := NewMockCloser(ctrl)
 		entry1.EXPECT().Close().Times(1)
 		entry2 := NewMockCloser(ctrl)
 
-		if err := c.Service(id, func() (interface{}, error) {
+		if err := sut.Service(id, func() (interface{}, error) {
 			return entry1, nil
 		}); err != nil {
 			t.Errorf("returned the (%s) error", err)
-		} else if !c.Has(id) {
+		} else if !sut.Has(id) {
 			t.Error("didn't found the added entry")
-		} else if check, _ := c.Get(id); !reflect.DeepEqual(check, entry1) {
+		} else if check, _ := sut.Get(id); !reflect.DeepEqual(check, entry1) {
 			t.Error("didn't stored the requested first entry")
-		} else if err := c.Factory(id, func() (interface{}, error) {
+		} else if err := sut.Factory(id, func() (interface{}, error) {
 			return entry1, nil
 		}); err != nil {
 			t.Errorf("returned the (%s) error", err)
-		} else if !c.Has(id) {
+		} else if !sut.Has(id) {
 			t.Error("didn't found the added entry")
-		} else if check, _ := c.Get(id); !reflect.DeepEqual(check, entry2) {
+		} else if check, _ := sut.Get(id); !reflect.DeepEqual(check, entry2) {
 			t.Error("didn't stored the requested second entry")
 		}
 	})
@@ -510,9 +507,8 @@ func Test_ServiceContainer_Factory(t *testing.T) {
 func Test_ServiceContainer_Get(t *testing.T) {
 	t.Run("retrieving a non-registered service/factory", func(t *testing.T) {
 		id := "invalid_id"
-		c := ServiceContainer{}
 
-		check, err := c.Get(id)
+		check, err := (ServiceContainer{}).Get(id)
 		switch {
 		case check != nil:
 			t.Error("returned an unexpected valid instance reference")
@@ -526,12 +522,12 @@ func Test_ServiceContainer_Get(t *testing.T) {
 	t.Run("error while calling the service", func(t *testing.T) {
 		id := "id"
 		expected := fmt.Errorf("error message")
-		c := ServiceContainer{}
-		_ = c.Service(id, func() (interface{}, error) {
+		sut := ServiceContainer{}
+		_ = sut.Service(id, func() (interface{}, error) {
 			return nil, expected
 		})
 
-		check, err := c.Get(id)
+		check, err := sut.Get(id)
 		switch {
 		case check != nil:
 			t.Error("returned an unexpected valid instance reference")
@@ -548,14 +544,14 @@ func Test_ServiceContainer_Get(t *testing.T) {
 
 		id := "id"
 		count := 0
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
-		_ = c.Service(id, func() (interface{}, error) {
+		_ = sut.Service(id, func() (interface{}, error) {
 			count++
 			return entry, nil
 		})
 
-		if check, err := c.Get(id); err != nil {
+		if check, err := sut.Get(id); err != nil {
 			t.Errorf("returned the unexpected error (%v)", err)
 		} else if check == nil {
 			t.Error("didn't returned a valid reference")
@@ -568,16 +564,16 @@ func Test_ServiceContainer_Get(t *testing.T) {
 
 		id := "id"
 		count := 0
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
-		_ = c.Service(id, func() (interface{}, error) {
+		_ = sut.Service(id, func() (interface{}, error) {
 			count++
 			return entry, nil
 		})
 
 		runs := 2
 		for runs > 0 {
-			check, err := c.Get(id)
+			check, err := sut.Get(id)
 			switch {
 			case err != nil:
 				t.Errorf("returned the unexpected error (%v)", err)
@@ -591,14 +587,14 @@ func Test_ServiceContainer_Get(t *testing.T) {
 	})
 
 	t.Run("error while calling the factory", func(t *testing.T) {
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		id := "id"
 		expected := fmt.Errorf("error message")
-		_ = c.Factory(id, func() (interface{}, error) {
+		_ = sut.Factory(id, func() (interface{}, error) {
 			return nil, expected
 		})
 
-		check, err := c.Get(id)
+		check, err := sut.Get(id)
 		switch {
 		case check != nil:
 			t.Error("returned an unexpected valid instance reference")
@@ -615,14 +611,14 @@ func Test_ServiceContainer_Get(t *testing.T) {
 
 		id := "id"
 		count := 0
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
-		_ = c.Factory(id, func() (interface{}, error) {
+		_ = sut.Factory(id, func() (interface{}, error) {
 			count++
 			return entry, nil
 		})
 
-		if check, err := c.Get(id); err != nil {
+		if check, err := sut.Get(id); err != nil {
 			t.Errorf("returned the unexpected error (%v)", err)
 		} else if check == nil {
 			t.Error("didn't returned a valid reference")
@@ -635,16 +631,16 @@ func Test_ServiceContainer_Get(t *testing.T) {
 
 		id := "id"
 		count := 0
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry := NewMockCloser(ctrl)
-		_ = c.Factory(id, func() (interface{}, error) {
+		_ = sut.Factory(id, func() (interface{}, error) {
 			count++
 			return entry, nil
 		})
 
 		runs := 1
 		for runs < 3 {
-			check, err := c.Get(id)
+			check, err := sut.Get(id)
 			switch {
 			case err != nil:
 				t.Errorf("returned the unexpected error (%v)", err)
@@ -660,13 +656,13 @@ func Test_ServiceContainer_Get(t *testing.T) {
 
 func Test_ServiceContainer_Tagged(t *testing.T) {
 	t.Run("error while instantiating retrieved service", func(t *testing.T) {
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		id := "id"
 		expected := fmt.Errorf("error message")
 		factory := func() (interface{}, error) { return nil, expected }
-		_ = c.Service(id, factory, "tag1")
+		_ = sut.Service(id, factory, "tag1")
 
-		check, err := c.Tagged("tag1")
+		check, err := sut.Tagged("tag1")
 		switch {
 		case check != nil:
 			t.Error("returned an unexpected valid instance reference")
@@ -683,17 +679,17 @@ func Test_ServiceContainer_Tagged(t *testing.T) {
 
 		id1 := "id1"
 		id2 := "id2"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry1 := NewMockCloser(ctrl)
 		entry2 := NewMockCloser(ctrl)
-		_ = c.Service(id1, func() (interface{}, error) {
+		_ = sut.Service(id1, func() (interface{}, error) {
 			return entry1, nil
 		}, "tag1")
-		_ = c.Service(id2, func() (interface{}, error) {
+		_ = sut.Service(id2, func() (interface{}, error) {
 			return entry2, nil
 		}, "tag1", "tag2")
 
-		if list, err := c.Tagged("tag3"); err != nil {
+		if list, err := sut.Tagged("tag3"); err != nil {
 			t.Errorf("returned the unexpected error (%v)", err)
 		} else if len(list) != 0 {
 			t.Errorf("returned the unexpected non-empty (%v) list", list)
@@ -706,17 +702,17 @@ func Test_ServiceContainer_Tagged(t *testing.T) {
 
 		id1 := "id1"
 		id2 := "id2"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry1 := NewMockCloser(ctrl)
 		entry2 := NewMockCloser(ctrl)
-		_ = c.Service(id1, func() (interface{}, error) {
+		_ = sut.Service(id1, func() (interface{}, error) {
 			return entry1, nil
 		}, "tag1")
-		_ = c.Service(id2, func() (interface{}, error) {
+		_ = sut.Service(id2, func() (interface{}, error) {
 			return entry2, nil
 		}, "tag1", "tag2")
 
-		if list, err := c.Tagged("tag2"); err != nil {
+		if list, err := sut.Tagged("tag2"); err != nil {
 			t.Errorf("returned the unexpected error (%v)", err)
 		} else if len(list) != 1 {
 			t.Errorf("returned the unexpected (%v) list", list)
@@ -731,17 +727,17 @@ func Test_ServiceContainer_Tagged(t *testing.T) {
 
 		id1 := "id1"
 		id2 := "id2"
-		c := ServiceContainer{}
+		sut := ServiceContainer{}
 		entry1 := NewMockCloser(ctrl)
 		entry2 := NewMockCloser(ctrl)
-		_ = c.Service(id1, func() (interface{}, error) {
+		_ = sut.Service(id1, func() (interface{}, error) {
 			return entry1, nil
 		}, "tag1")
-		_ = c.Service(id2, func() (interface{}, error) {
+		_ = sut.Service(id2, func() (interface{}, error) {
 			return entry2, nil
 		}, "tag1", "tag2")
 
-		if list, err := c.Tagged("tag1"); err != nil {
+		if list, err := sut.Tagged("tag1"); err != nil {
 			t.Errorf("returned the unexpected error (%v)", err)
 		} else if len(list) != 2 {
 			t.Errorf("returned the unexpected (%v) list", list)

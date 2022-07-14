@@ -12,17 +12,17 @@ type sourceDir struct {
 	format    string
 	recursive bool
 	fs        afero.Fs
-	factory   IDecoderFactory
+	dFactory  IDecoderFactory
 }
 
 var _ ISource = &sourceDir{}
 
-func newSourceDir(path, format string, recursive bool, fs afero.Fs, factory IDecoderFactory) (ISource, error) {
+func newSourceDir(path, format string, recursive bool, fs afero.Fs, dFactory IDecoderFactory) (ISource, error) {
 	if fs == nil {
 		return nil, errNilPointer("fs")
 	}
-	if factory == nil {
-		return nil, errNilPointer("factory")
+	if dFactory == nil {
+		return nil, errNilPointer("dFactory")
 	}
 
 	s := &sourceDir{
@@ -34,7 +34,7 @@ func newSourceDir(path, format string, recursive bool, fs afero.Fs, factory IDec
 		format:    format,
 		recursive: recursive,
 		fs:        fs,
-		factory:   factory,
+		dFactory:  dFactory,
 	}
 
 	if err := s.load(); err != nil {
@@ -98,7 +98,7 @@ func (s *sourceDir) loadFile(path string) (*Partial, error) {
 		return nil, err
 	}
 
-	d, err := s.factory.Create(s.format, f)
+	d, err := s.dFactory.Create(s.format, f)
 	if err != nil {
 		_ = f.Close()
 		return nil, err

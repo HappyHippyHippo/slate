@@ -14,9 +14,9 @@ import (
 
 func Test_NewSourceRest(t *testing.T) {
 	t.Run("nil client", func(t *testing.T) {
-		factory := &(DecoderFactory{})
+		dFactory := &decoderFactory{}
 
-		src, err := newSourceRest(nil, "uri", DecoderFormatUnknown, factory, "path")
+		src, err := newSourceRest(nil, "uri", DecoderFormatUnknown, dFactory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -27,7 +27,7 @@ func Test_NewSourceRest(t *testing.T) {
 		}
 	})
 
-	t.Run("nil decoder factory", func(t *testing.T) {
+	t.Run("nil decoder dFactory", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -50,9 +50,9 @@ func Test_NewSourceRest(t *testing.T) {
 
 		expected := fmt.Errorf(`parse "\n": net/url: invalid control character in URL`)
 		client := NewMockHTTPClient(ctrl)
-		factory := &(DecoderFactory{})
+		dFactory := &decoderFactory{}
 
-		src, err := newSourceRest(client, "\n", DecoderFormatUnknown, factory, "path")
+		src, err := newSourceRest(client, "\n", DecoderFormatUnknown, dFactory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -70,9 +70,9 @@ func Test_NewSourceRest(t *testing.T) {
 		expected := fmt.Errorf(`test exception`)
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(nil, expected).Times(1)
-		factory := &(DecoderFactory{})
+		dFactory := &decoderFactory{}
 
-		src, err := newSourceRest(client, "uri", DecoderFormatUnknown, factory, "path")
+		src, err := newSourceRest(client, "uri", DecoderFormatUnknown, dFactory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -91,9 +91,9 @@ func Test_NewSourceRest(t *testing.T) {
 		response.Body = io.NopCloser(strings.NewReader(`{"path"`))
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		factory := &(DecoderFactory{})
+		dFactory := &decoderFactory{}
 
-		src, err := newSourceRest(client, "uri", DecoderFormatUnknown, factory, "path")
+		src, err := newSourceRest(client, "uri", DecoderFormatUnknown, dFactory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -113,10 +113,10 @@ func Test_NewSourceRest(t *testing.T) {
 		response.Body = io.NopCloser(strings.NewReader(`{"path"`))
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		factory := &(DecoderFactory{})
-		_ = factory.Register(&decoderStrategyYAML{})
+		dFactory := &decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
 
-		src, err := newSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
+		src, err := newSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -135,10 +135,10 @@ func Test_NewSourceRest(t *testing.T) {
 		response.Body = io.NopCloser(strings.NewReader(`{"other_path": 123}`))
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		factory := &(DecoderFactory{})
-		_ = factory.Register(&decoderStrategyYAML{})
+		dFactory := &decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
 
-		src, err := newSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
+		src, err := newSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -157,10 +157,10 @@ func Test_NewSourceRest(t *testing.T) {
 		response.Body = io.NopCloser(strings.NewReader(`{"path": 123}`))
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		factory := &(DecoderFactory{})
-		_ = factory.Register(&decoderStrategyYAML{})
+		dFactory := &decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
 
-		src, err := newSourceRest(client, "uri", DecoderFormatYAML, factory, "path.node")
+		src, err := newSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path.node")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -179,10 +179,10 @@ func Test_NewSourceRest(t *testing.T) {
 		response.Body = io.NopCloser(strings.NewReader(`{"path": 123}`))
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		factory := &(DecoderFactory{})
-		_ = factory.Register(&decoderStrategyYAML{})
+		dFactory := &decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
 
-		src, err := newSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
+		src, err := newSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -202,10 +202,10 @@ func Test_NewSourceRest(t *testing.T) {
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "data"}}`))
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		factory := &(DecoderFactory{})
-		_ = factory.Register(&decoderStrategyYAML{})
+		dFactory := &decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
 
-		src, err := newSourceRest(client, "uri", DecoderFormatYAML, factory, "path")
+		src, err := newSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path")
 		switch {
 		case err != nil:
 			t.Errorf("returned the unexpected error : %v", err)
@@ -232,10 +232,10 @@ func Test_NewSourceRest(t *testing.T) {
 		response.Body = io.NopCloser(strings.NewReader(`{"node": {"inner_node": {"field": "data"}}}`))
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		factory := &(DecoderFactory{})
-		_ = factory.Register(&decoderStrategyYAML{})
+		dFactory := &decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
 
-		src, err := newSourceRest(client, "uri", DecoderFormatYAML, factory, "node..inner_node")
+		src, err := newSourceRest(client, "uri", DecoderFormatYAML, dFactory, "node..inner_node")
 		switch {
 		case err != nil:
 			t.Errorf("returned the unexpected error : %v", err)

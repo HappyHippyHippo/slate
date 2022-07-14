@@ -11,9 +11,9 @@ import (
 
 func Test_DialectFactory_Register(t *testing.T) {
 	t.Run("missing strategy", func(t *testing.T) {
-		factory := &DialectFactory{}
+		dFactory := &DialectFactory{}
 
-		if err := factory.Register(nil); err == nil {
+		if err := dFactory.Register(nil); err == nil {
 			t.Error("didn't return an expected error")
 		} else if !errors.Is(err, serror.ErrNilPointer) {
 			t.Errorf("returned the (%v) error when expected (%v)", err, serror.ErrNilPointer)
@@ -25,11 +25,11 @@ func Test_DialectFactory_Register(t *testing.T) {
 		defer ctrl.Finish()
 
 		strategy := NewMockDialectStrategy(ctrl)
-		factory := &DialectFactory{}
+		dFactory := &DialectFactory{}
 
-		if err := factory.Register(strategy); err != nil {
+		if err := dFactory.Register(strategy); err != nil {
 			t.Errorf("return the unexpected error : %v", err)
-		} else if (*factory)[0] != strategy {
+		} else if (*dFactory)[0] != strategy {
 			t.Error("didn't stored the requested strategy")
 		}
 	})
@@ -37,9 +37,9 @@ func Test_DialectFactory_Register(t *testing.T) {
 
 func Test_DialectFactory_Get(t *testing.T) {
 	t.Run("missing config", func(t *testing.T) {
-		factory := &DialectFactory{}
+		dFactory := &DialectFactory{}
 
-		dialect, err := factory.Get(nil)
+		dialect, err := dFactory.Get(nil)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -52,9 +52,9 @@ func Test_DialectFactory_Get(t *testing.T) {
 
 	t.Run("requested connection config is not a partial", func(t *testing.T) {
 		cfg := &sconfig.Partial{"dialect": 123}
-		factory := &DialectFactory{}
+		dFactory := &DialectFactory{}
 
-		dialect, err := factory.Get(cfg)
+		dialect, err := dFactory.Get(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -72,10 +72,10 @@ func Test_DialectFactory_Get(t *testing.T) {
 		cfg := &sconfig.Partial{"dialect": "unsupported"}
 		strategy := NewMockDialectStrategy(ctrl)
 		strategy.EXPECT().Accept("unsupported").Return(false).Times(1)
-		factory := &DialectFactory{}
-		_ = factory.Register(strategy)
+		dFactory := &DialectFactory{}
+		_ = dFactory.Register(strategy)
 
-		dialect, err := factory.Get(cfg)
+		dialect, err := dFactory.Get(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -95,10 +95,10 @@ func Test_DialectFactory_Get(t *testing.T) {
 		strategy := NewMockDialectStrategy(ctrl)
 		strategy.EXPECT().Accept("unsupported").Return(true).Times(1)
 		strategy.EXPECT().Get(cfg).Return(nil, expected).Times(1)
-		factory := &DialectFactory{}
-		_ = factory.Register(strategy)
+		dFactory := &DialectFactory{}
+		_ = dFactory.Register(strategy)
 
-		if _, err := factory.Get(cfg); err == nil {
+		if _, err := dFactory.Get(cfg); err == nil {
 			t.Error("didn't return an expected error")
 		} else if err.Error() != expected.Error() {
 			t.Errorf("returned the (%v) error when expected (%v)", err, expected)
@@ -114,10 +114,10 @@ func Test_DialectFactory_Get(t *testing.T) {
 		strategy := NewMockDialectStrategy(ctrl)
 		strategy.EXPECT().Accept("unsupported").Return(true).Times(1)
 		strategy.EXPECT().Get(cfg).Return(dialect, nil).Times(1)
-		factory := &DialectFactory{}
-		_ = factory.Register(strategy)
+		dFactory := &DialectFactory{}
+		_ = dFactory.Register(strategy)
 
-		if check, err := factory.Get(cfg); err != nil {
+		if check, err := dFactory.Get(cfg); err != nil {
 			t.Errorf("return the unexpected error (%v)", err)
 		} else if check != dialect {
 			t.Error("didn't returned the strategy provided dialect")

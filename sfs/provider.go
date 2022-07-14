@@ -34,9 +34,9 @@ func (Provider) Boot(c slate.ServiceContainer) error {
 // GetFileSystem wii try to retrieve the registered file
 // system adapter from the application service container.
 func GetFileSystem(c slate.ServiceContainer) (afero.Fs, error) {
-	instance, err := c.Get(ContainerID)
-	if err != nil {
-		return nil, err
+	instance, e := c.Get(ContainerID)
+	if e != nil {
+		return nil, e
 	}
 
 	i, ok := instance.(afero.Fs)

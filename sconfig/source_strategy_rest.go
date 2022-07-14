@@ -5,30 +5,30 @@ import (
 )
 
 type sourceStrategyRest struct {
-	clientFactory  func() HTTPClient
-	decoderFactory IDecoderFactory
+	cFactory func() HTTPClient
+	dFactory IDecoderFactory
 }
 
 var _ ISourceStrategy = &sourceStrategyRest{}
 
-func newSourceStrategyRest(decoderFactory IDecoderFactory) (ISourceStrategy, error) {
-	if decoderFactory == nil {
-		return nil, errNilPointer("DecoderFactory")
+func newSourceStrategyRest(dFactory IDecoderFactory) (ISourceStrategy, error) {
+	if dFactory == nil {
+		return nil, errNilPointer("dFactory")
 	}
 
 	return &sourceStrategyRest{
-		clientFactory:  func() HTTPClient { return &http.Client{} },
-		decoderFactory: decoderFactory,
+		cFactory: func() HTTPClient { return &http.Client{} },
+		dFactory: dFactory,
 	}, nil
 }
 
-// Accept will check if the source factory strategy can instantiate a
+// Accept will check if the source dFactory strategy can instantiate a
 // new source of the requested type.
 func (sourceStrategyRest) Accept(sourceType string) bool {
 	return sourceType == SourceTypeRest
 }
 
-// AcceptFromConfig will check if the source factory strategy can instantiate
+// AcceptFromConfig will check if the source dFactory strategy can instantiate
 // a source where the data to check comes from a configuration Partial
 // instance.
 func (s sourceStrategyRest) AcceptFromConfig(cfg IConfig) bool {
@@ -56,7 +56,7 @@ func (s sourceStrategyRest) Create(args ...interface{}) (ISource, error) {
 	} else if configPath, ok := args[2].(string); !ok {
 		return nil, errConversion(args[2], "string")
 	} else {
-		return newSourceRest(s.clientFactory(), uri, format, s.decoderFactory, configPath)
+		return newSourceRest(s.cFactory(), uri, format, s.dFactory, configPath)
 	}
 }
 

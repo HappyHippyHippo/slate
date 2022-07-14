@@ -5,7 +5,7 @@ import "io"
 type serviceContainerEntry struct {
 	id       string
 	tags     []string
-	factory  ServiceFactory
+	factory  IServiceFactory
 	instance any
 }
 
@@ -27,8 +27,8 @@ type IServiceContainer interface {
 	Has(id string) bool
 	Remove(id string) error
 	Clear() error
-	Service(id string, factory ServiceFactory, tags ...string) error
-	Factory(id string, factory ServiceFactory, tags ...string) error
+	Service(id string, factory IServiceFactory, tags ...string) error
+	Factory(id string, factory IServiceFactory, tags ...string) error
 	Get(id string) (any, error)
 	Tagged(tag string) ([]any, error)
 }
@@ -61,8 +61,8 @@ func (c ServiceContainer) Remove(id string) error {
 	if entry, ok := c[id]; ok {
 		if entry.instance != nil {
 			if instance, ok := entry.instance.(io.Closer); ok {
-				if err := instance.Close(); err != nil {
-					return err
+				if e := instance.Close(); e != nil {
+					return e
 				}
 			}
 		}
@@ -74,8 +74,8 @@ func (c ServiceContainer) Remove(id string) error {
 // Clear will eliminate all the registered object from the container.
 func (c ServiceContainer) Clear() error {
 	for id := range c {
-		if err := c.Remove(id); err != nil {
-			return err
+		if e := c.Remove(id); e != nil {
+			return e
 		}
 	}
 	return nil
@@ -88,24 +88,24 @@ func (c ServiceContainer) Clear() error {
 // If any object was registered previously with the requested id, then the
 // object will be removed by calling the Remove method previously the storing
 // of the new object factory.
-func (c ServiceContainer) Service(id string, factory ServiceFactory, tags ...string) error {
+func (c ServiceContainer) Service(id string, factory IServiceFactory, tags ...string) error {
 	if factory == nil {
 		return errNilPointer("factory")
 	}
 
-	if err := c.Remove(id); err != nil {
-		return err
+	if e := c.Remove(id); e != nil {
+		return e
 	}
 
 	c[id] = serviceContainerEntry{
 		id:   id,
 		tags: tags,
-		factory: func() (instance any, err error) {
+		factory: func() (instance any, e error) {
 			if c[id].instance != nil {
 				return c[id].instance, nil
 			}
-			instance, err = factory()
-			if err == nil {
+			instance, e = factory()
+			if e == nil {
 				c[id] = serviceContainerEntry{
 					id:       id,
 					tags:     c[id].tags,
@@ -113,7 +113,7 @@ func (c ServiceContainer) Service(id string, factory ServiceFactory, tags ...str
 					instance: instance,
 				}
 			}
-			return instance, err
+			return instance, e
 		},
 		instance: nil,
 	}
@@ -126,13 +126,13 @@ func (c ServiceContainer) Service(id string, factory ServiceFactory, tags ...str
 // If any object was registered previously with the requested id, then the
 // object will be removed by calling the Remove method previously the storing
 // of the new object factory.
-func (c ServiceContainer) Factory(id string, factory ServiceFactory, tags ...string) error {
+func (c ServiceContainer) Factory(id string, factory IServiceFactory, tags ...string) error {
 	if factory == nil {
 		return errNilPointer("factory")
 	}
 
-	if err := c.Remove(id); err != nil {
-		return err
+	if e := c.Remove(id); e != nil {
+		return e
 	}
 
 	c[id] = serviceContainerEntry{
@@ -162,9 +162,9 @@ func (c ServiceContainer) Tagged(tag string) ([]any, error) {
 	var result []interface{}
 	for id := range c {
 		if c[id].hasTag(tag) {
-			instance, err := c.Get(id)
-			if err != nil {
-				return nil, err
+			instance, e := c.Get(id)
+			if e != nil {
+				return nil, e
 			}
 			result = append(result, instance)
 		}

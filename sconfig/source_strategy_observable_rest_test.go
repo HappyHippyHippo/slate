@@ -12,7 +12,7 @@ import (
 )
 
 func Test_NewSourceStrategyRestObservable(t *testing.T) {
-	t.Run("nil decoder factory", func(t *testing.T) {
+	t.Run("nil decoder dFactory", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -27,23 +27,23 @@ func Test_NewSourceStrategyRestObservable(t *testing.T) {
 		}
 	})
 
-	t.Run("new observable rest source factory strategy", func(t *testing.T) {
-		factory := &(DecoderFactory{})
+	t.Run("new observable rest source dFactory strategy", func(t *testing.T) {
+		dFactory := &decoderFactory{}
 
-		strategy, err := newSourceStrategyObservableRest(factory)
+		strategy, err := newSourceStrategyObservableRest(dFactory)
 		switch {
 		case err != nil:
 			t.Errorf("returned the (%v) error", err)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
-		case strategy.(*sourceStrategyObservableRest).decoderFactory != factory:
-			t.Error("didn't stored the decoder factory reference")
+		case strategy.(*sourceStrategyObservableRest).dFactory != dFactory:
+			t.Error("didn't stored the decoder dFactory reference")
 		default:
-			client := strategy.(*sourceStrategyObservableRest).clientFactory()
+			client := strategy.(*sourceStrategyObservableRest).cFactory()
 			switch client.(type) {
 			case *http.Client:
 			default:
-				t.Error("didn't stored a valid http client factory")
+				t.Error("didn't stored a valid http client dFactory")
 			}
 		}
 	})
@@ -67,7 +67,7 @@ func Test_SourceStrategyRestObservable_Accept(t *testing.T) {
 
 		for _, scenario := range scenarios {
 			test := func() {
-				strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+				strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 				if check := strategy.Accept(scenario.sourceType); check != scenario.exp {
 					t.Errorf("for the type (%s), returned (%v)", scenario.sourceType, check)
 				}
@@ -79,7 +79,7 @@ func Test_SourceStrategyRestObservable_Accept(t *testing.T) {
 
 func Test_SourceStrategyRestObservable_AcceptFromConfig(t *testing.T) {
 	t.Run("don't accept on invalid config pointer", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		if strategy.AcceptFromConfig(nil) {
 			t.Error("returned true")
@@ -87,7 +87,7 @@ func Test_SourceStrategyRestObservable_AcceptFromConfig(t *testing.T) {
 	})
 
 	t.Run("don't accept if type is missing", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		if strategy.AcceptFromConfig(&Partial{}) {
 			t.Error("returned true")
@@ -95,7 +95,7 @@ func Test_SourceStrategyRestObservable_AcceptFromConfig(t *testing.T) {
 	})
 
 	t.Run("don't accept if type is not a string", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		if strategy.AcceptFromConfig(&Partial{"type": 123}) {
 			t.Error("returned true")
@@ -103,7 +103,7 @@ func Test_SourceStrategyRestObservable_AcceptFromConfig(t *testing.T) {
 	})
 
 	t.Run("don't accept if invalid type", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		if strategy.AcceptFromConfig(&Partial{"type": SourceTypeUnknown}) {
 			t.Error("returned true")
@@ -111,7 +111,7 @@ func Test_SourceStrategyRestObservable_AcceptFromConfig(t *testing.T) {
 	})
 
 	t.Run("accept config", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		if !strategy.AcceptFromConfig(&Partial{"type": SourceTypeObservableRest}) {
 			t.Error("returned false")
@@ -121,7 +121,7 @@ func Test_SourceStrategyRestObservable_AcceptFromConfig(t *testing.T) {
 
 func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 	t.Run("missing uri", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.Create()
 		switch {
@@ -135,7 +135,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 	})
 
 	t.Run("missing format", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.Create("uri")
 		switch {
@@ -149,7 +149,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 	})
 
 	t.Run("missing timestamp path", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.Create("uri", "format")
 		switch {
@@ -163,7 +163,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 	})
 
 	t.Run("missing config path", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.Create("uri", "format", "timestamp path")
 		switch {
@@ -177,7 +177,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 	})
 
 	t.Run("non-string uri", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.Create(123, "format", "config path", "timestamp path")
 		switch {
@@ -191,7 +191,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 	})
 
 	t.Run("non-string format", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.Create("uri", 123, "config path", "timestamp path")
 		switch {
@@ -205,7 +205,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 	})
 
 	t.Run("non-string timestamp path", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.Create("uri", "format", 123, "config path")
 		switch {
@@ -219,7 +219,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 	})
 
 	t.Run("non-string config path", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.Create("uri", "format", "timestamp path", 123)
 		switch {
@@ -243,14 +243,14 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 		field := "field"
 		value := "value"
 		expected := Partial{field: value}
-		factory := &(DecoderFactory{})
-		_ = factory.Register(&decoderStrategyYAML{})
-		strategy, _ := newSourceStrategyObservableRest(factory)
+		dFactory := &decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
+		strategy, _ := newSourceStrategyObservableRest(dFactory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"config_path": {"field": "value"}, "timestamp_path": "2000-01-01T00:00:00.000Z"}`))
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		strategy.(*sourceStrategyObservableRest).clientFactory = func() HTTPClient {
+		strategy.(*sourceStrategyObservableRest).cFactory = func() HTTPClient {
 			return client
 		}
 
@@ -275,7 +275,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 
 func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 	t.Run("error on nil config pointer", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.CreateFromConfig(nil)
 		switch {
@@ -289,7 +289,7 @@ func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 	})
 
 	t.Run("missing uri", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.CreateFromConfig(&Partial{"format": "format", "timestampPath": "path", "configPath": "path"})
 		switch {
@@ -303,7 +303,7 @@ func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 	})
 
 	t.Run("missing timestamp path", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.CreateFromConfig(&Partial{"uri": "uri", "format": "format", "configPath": "path"})
 		switch {
@@ -317,7 +317,7 @@ func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 	})
 
 	t.Run("missing config path", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.CreateFromConfig(&Partial{"uri": "uri", "format": "format", "timestampPath": "path"})
 		switch {
@@ -331,7 +331,7 @@ func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 	})
 
 	t.Run("non-string uri", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.CreateFromConfig(&Partial{"uri": 123, "format": "format", "timestampPath": "path", "configPath": "path"})
 		switch {
@@ -345,7 +345,7 @@ func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 	})
 
 	t.Run("non-string format", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.CreateFromConfig(&Partial{"uri": "uri", "format": 123, "timestampPath": "path", "configPath": "path"})
 		switch {
@@ -359,7 +359,7 @@ func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 	})
 
 	t.Run("non-string timestamp path", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.CreateFromConfig(&Partial{"uri": "uri", "format": "format", "timestampPath": 123, "configPath": "path"})
 		switch {
@@ -373,7 +373,7 @@ func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 	})
 
 	t.Run("non-string config path", func(t *testing.T) {
-		strategy, _ := newSourceStrategyObservableRest(&(DecoderFactory{}))
+		strategy, _ := newSourceStrategyObservableRest(&decoderFactory{})
 
 		src, err := strategy.CreateFromConfig(&Partial{"uri": "uri", "format": "format", "timestampPath": "path", "configPath": 123})
 		switch {
@@ -397,14 +397,14 @@ func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 		field := "field"
 		value := "value"
 		expected := Partial{field: value}
-		factory := &(DecoderFactory{})
-		_ = factory.Register(&decoderStrategyJSON{})
-		strategy, _ := newSourceStrategyObservableRest(factory)
+		dFactory := &decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyJSON{})
+		strategy, _ := newSourceStrategyObservableRest(dFactory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}, "timestamp": "2021-12-15T21:07:48.239Z"}`))
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		strategy.(*sourceStrategyObservableRest).clientFactory = func() HTTPClient { return client }
+		strategy.(*sourceStrategyObservableRest).cFactory = func() HTTPClient { return client }
 
 		src, err := strategy.CreateFromConfig(&Partial{"uri": uri, "format": format, "timestampPath": timestampPath, "configPath": configPath})
 		switch {
@@ -434,14 +434,14 @@ func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 		field := "field"
 		value := "value"
 		expected := Partial{field: value}
-		factory := &(DecoderFactory{})
-		_ = factory.Register(&decoderStrategyJSON{})
-		strategy, _ := newSourceStrategyObservableRest(factory)
+		dFactory := &decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyJSON{})
+		strategy, _ := newSourceStrategyObservableRest(dFactory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}, "timestamp": "2021-12-15T21:07:48.239Z"}`))
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		strategy.(*sourceStrategyObservableRest).clientFactory = func() HTTPClient { return client }
+		strategy.(*sourceStrategyObservableRest).cFactory = func() HTTPClient { return client }
 
 		src, err := strategy.CreateFromConfig(&Partial{"uri": uri, "timestampPath": timestampPath, "configPath": configPath})
 		switch {

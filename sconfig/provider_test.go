@@ -111,7 +111,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch factory.(type) {
-			case *DecoderFactory:
+			case *decoderFactory:
 			default:
 				t.Error("didn't returned a decoder factory reference")
 			}
@@ -189,6 +189,12 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("returned the unexpected error (%v)", err)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
+		default:
+			switch strategy.(type) {
+			case *sourceStrategyFile:
+			default:
+				t.Error("didn't returned a source file strategy reference")
+			}
 		}
 	})
 
@@ -263,6 +269,12 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("returned the unexpected error (%v)", err)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
+		default:
+			switch strategy.(type) {
+			case *sourceStrategyObservableFile:
+			default:
+				t.Error("didn't returned a source observable file strategy reference")
+			}
 		}
 	})
 
@@ -337,6 +349,12 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("returned the unexpected error (%v)", err)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
+		default:
+			switch strategy.(type) {
+			case *sourceStrategyDir:
+			default:
+				t.Error("didn't returned a source dir strategy reference")
+			}
 		}
 	})
 
@@ -382,6 +400,12 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("returned the unexpected error (%v)", err)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
+		default:
+			switch strategy.(type) {
+			case *sourceStrategyRest:
+			default:
+				t.Error("didn't returned a source rest strategy reference")
+			}
 		}
 	})
 
@@ -426,6 +450,12 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("returned the unexpected error (%v)", err)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
+		default:
+			switch strategy.(type) {
+			case *sourceStrategyObservableRest:
+			default:
+				t.Error("didn't returned a source observable rest strategy reference")
+			}
 		}
 	})
 
@@ -439,6 +469,12 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("returned the unexpected error (%v)", err)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
+		default:
+			switch strategy.(type) {
+			case *sourceStrategyEnv:
+			default:
+				t.Error("didn't returned a source environment strategy reference")
+			}
 		}
 	})
 
@@ -467,6 +503,12 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("returned the unexpected error (%v)", err)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
+		default:
+			switch strategy.(type) {
+			case *sourceStrategyContainer:
+			default:
+				t.Error("didn't returned a source container strategy reference")
+			}
 		}
 	})
 
@@ -480,6 +522,12 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("returned the unexpected error (%v)", err)
 		case factory == nil:
 			t.Error("didn't returned a valid reference")
+		default:
+			switch factory.(type) {
+			case *sourceFactory:
+			default:
+				t.Error("didn't returned a source factory reference")
+			}
 		}
 	})
 
@@ -494,6 +542,12 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("returned the unexpected error (%v)", err)
 		case cfg == nil:
 			t.Error("didn't returned a valid reference")
+		default:
+			switch cfg.(type) {
+			case *manager:
+			default:
+				t.Error("didn't returned a config manager reference")
+			}
 		}
 	})
 
@@ -564,12 +618,18 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&(sfs.Provider{})).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		load, err := container.Get(ContainerLoaderID)
+		l, err := container.Get(ContainerLoaderID)
 		switch {
 		case err != nil:
 			t.Errorf("returned the unexpected error (%v)", err)
-		case load == nil:
+		case l == nil:
 			t.Error("didn't returned a valid reference")
+		default:
+			switch l.(type) {
+			case *loader:
+			default:
+				t.Error("didn't returned a config loader reference")
+			}
 		}
 	})
 }

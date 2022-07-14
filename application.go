@@ -32,8 +32,8 @@ func (a *Application) Add(provider IServiceProvider) error {
 		return errNilPointer("provider")
 	}
 
-	if err := provider.Register(a.Container); err != nil {
-		return err
+	if e := provider.Register(a.Container); e != nil {
+		return e
 	}
 	a.providers = append(a.providers, provider)
 
@@ -57,8 +57,8 @@ func (a *Application) Boot() (err error) {
 
 	if !a.isBoot {
 		for _, provider := range a.providers {
-			if err := provider.Boot(a.Container); err != nil {
-				return err
+			if e := provider.Boot(a.Container); e != nil {
+				return e
 			}
 		}
 		a.isBoot = true

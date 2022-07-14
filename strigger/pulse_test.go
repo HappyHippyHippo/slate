@@ -28,11 +28,11 @@ func Test_NewPulse(t *testing.T) {
 func Test_Pulse_Close(t *testing.T) {
 	t.Run("is the same as stopping it", func(t *testing.T) {
 		called := false
-		pulse, _ := NewPulse(20*time.Millisecond, func() error {
+		sut, _ := NewPulse(20*time.Millisecond, func() error {
 			called = true
 			return nil
 		})
-		_ = pulse.Close()
+		_ = sut.Close()
 		time.Sleep(40 * time.Millisecond)
 
 		if called {
@@ -44,12 +44,12 @@ func Test_Pulse_Close(t *testing.T) {
 func Test_Pulse_Delay(t *testing.T) {
 	t.Run("retrieves the trigger delay time", func(t *testing.T) {
 		duration := 20 * time.Millisecond
-		pulse, _ := NewPulse(duration, func() error {
+		sut, _ := NewPulse(duration, func() error {
 			return nil
 		})
-		defer func() { _ = pulse.Close() }()
+		defer func() { _ = sut.Close() }()
 
-		if check := pulse.Delay(); check != duration {
+		if check := sut.Delay(); check != duration {
 			t.Errorf("returned (%v) wait duration", check)
 		}
 	})
@@ -58,11 +58,11 @@ func Test_Pulse_Delay(t *testing.T) {
 func Test_Pulse(t *testing.T) {
 	t.Run("only trigger execution once", func(t *testing.T) {
 		count := 0
-		pulse, _ := NewPulse(20*time.Millisecond, func() error {
+		sut, _ := NewPulse(20*time.Millisecond, func() error {
 			count++
 			return nil
 		})
-		defer func() { _ = pulse.Close() }()
+		defer func() { _ = sut.Close() }()
 		time.Sleep(100 * time.Millisecond)
 
 		if count == 0 {

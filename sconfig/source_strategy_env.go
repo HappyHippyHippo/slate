@@ -4,13 +4,13 @@ type sourceStrategyEnv struct{}
 
 var _ ISourceStrategy = &sourceStrategyEnv{}
 
-// Accept will check if the source factory strategy can instantiate a
+// Accept will check if the source dFactory strategy can instantiate a
 // new source of the requested type.
 func (sourceStrategyEnv) Accept(sourceType string) bool {
 	return sourceType == SourceTypeEnv
 }
 
-// AcceptFromConfig will check if the source factory strategy can instantiate
+// AcceptFromConfig will check if the source dFactory strategy can instantiate
 // a source where the data to check comes from a configuration Partial
 // instance.
 func (s sourceStrategyEnv) AcceptFromConfig(cfg IConfig) bool {

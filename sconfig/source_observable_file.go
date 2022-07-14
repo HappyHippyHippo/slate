@@ -18,7 +18,7 @@ func newSourceObservableFile(path, format string, fs afero.Fs, factory IDecoderF
 		return nil, errNilPointer("fs")
 	}
 	if factory == nil {
-		return nil, errNilPointer("factory")
+		return nil, errNilPointer("dFactory")
 	}
 
 	s := &sourceObservableFile{

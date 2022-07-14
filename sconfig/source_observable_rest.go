@@ -13,12 +13,12 @@ type sourceObservableRest struct {
 
 var _ ISourceObservable = &sourceObservableRest{}
 
-func newSourceObservableRest(client HTTPClient, uri, format string, factory IDecoderFactory, timestampPath, configPath string) (ISourceObservable, error) {
+func newSourceObservableRest(client HTTPClient, uri, format string, dFactory IDecoderFactory, timestampPath, configPath string) (ISourceObservable, error) {
 	if client == nil {
 		return nil, errNilPointer("client")
 	}
-	if factory == nil {
-		return nil, errNilPointer("factory")
+	if dFactory == nil {
+		return nil, errNilPointer("dFactory")
 	}
 
 	s := &sourceObservableRest{
@@ -30,7 +30,7 @@ func newSourceObservableRest(client HTTPClient, uri, format string, factory IDec
 			client:     client,
 			uri:        uri,
 			format:     format,
-			factory:    factory,
+			dFactory:   dFactory,
 			configPath: configPath,
 		},
 		timestampPath: timestampPath,

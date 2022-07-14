@@ -15,7 +15,7 @@ func newSourceStrategyObservableFile(fs afero.Fs, factory IDecoderFactory) (ISou
 		return nil, errNilPointer("fs")
 	}
 	if factory == nil {
-		return nil, errNilPointer("factory")
+		return nil, errNilPointer("dFactory")
 	}
 
 	return &sourceStrategyObservableFile{
@@ -26,13 +26,13 @@ func newSourceStrategyObservableFile(fs afero.Fs, factory IDecoderFactory) (ISou
 	}, nil
 }
 
-// Accept will check if the source factory strategy can instantiate a
+// Accept will check if the source dFactory strategy can instantiate a
 // new source of the requested type.
 func (sourceStrategyObservableFile) Accept(sourceType string) bool {
 	return sourceType == SourceTypeObservableFile
 }
 
-// AcceptFromConfig will check if the source factory strategy can instantiate
+// AcceptFromConfig will check if the source dFactory strategy can instantiate
 // a source where the data to check comes from a configuration Partial
 // instance.
 func (s sourceStrategyObservableFile) AcceptFromConfig(cfg IConfig) bool {

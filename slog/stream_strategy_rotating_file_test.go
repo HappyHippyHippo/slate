@@ -243,9 +243,9 @@ func Test_StreamStrategyFileRotate_Create(t *testing.T) {
 		expectedPath := fmt.Sprintf(path, time.Now().Format("2006-01-02"))
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
-		factory := &FormatterFactory{}
-		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := newStreamStrategyRotatingFile(fileSystem, factory)
+		fFactory := &FormatterFactory{}
+		_ = fFactory.Register(&formatterStrategyJSON{})
+		strategy, _ := newStreamStrategyRotatingFile(fileSystem, fFactory)
 
 		stream, err := strategy.Create(path, FormatJSON, []string{}, DEBUG)
 		switch {
@@ -268,9 +268,9 @@ func Test_StreamStrategyFileRotate_Create(t *testing.T) {
 		file := NewMockFile(ctrl)
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		factory := &FormatterFactory{}
-		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := newStreamStrategyRotatingFile(fileSystem, factory)
+		fFactory := &FormatterFactory{}
+		_ = fFactory.Register(&formatterStrategyJSON{})
+		strategy, _ := newStreamStrategyRotatingFile(fileSystem, fFactory)
 
 		stream, err := strategy.Create(path, FormatJSON, []string{}, DEBUG)
 		switch {
@@ -363,9 +363,9 @@ func Test_StreamStrategyFileRotate_CreateFromConfig(t *testing.T) {
 		)
 		config.EXPECT().List("channels").Return(nil, expected)
 
-		factory := &FormatterFactory{}
-		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := newStreamStrategyRotatingFile(NewMockFs(ctrl), factory)
+		fFactory := &FormatterFactory{}
+		_ = fFactory.Register(&formatterStrategyJSON{})
+		strategy, _ := newStreamStrategyRotatingFile(NewMockFs(ctrl), fFactory)
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -389,9 +389,9 @@ func Test_StreamStrategyFileRotate_CreateFromConfig(t *testing.T) {
 		)
 		config.EXPECT().List("channels").Return([]interface{}{123}, nil)
 
-		factory := &FormatterFactory{}
-		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := newStreamStrategyRotatingFile(NewMockFs(ctrl), factory)
+		fFactory := &FormatterFactory{}
+		_ = fFactory.Register(&formatterStrategyJSON{})
+		strategy, _ := newStreamStrategyRotatingFile(NewMockFs(ctrl), fFactory)
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -499,9 +499,9 @@ func Test_StreamStrategyFileRotate_CreateFromConfig(t *testing.T) {
 
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
-		factory := &FormatterFactory{}
-		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := newStreamStrategyRotatingFile(fileSystem, factory)
+		fFactory := &FormatterFactory{}
+		_ = fFactory.Register(&formatterStrategyJSON{})
+		strategy, _ := newStreamStrategyRotatingFile(fileSystem, fFactory)
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {
@@ -534,9 +534,9 @@ func Test_StreamStrategyFileRotate_CreateFromConfig(t *testing.T) {
 		file.EXPECT().Close().Return(nil).Times(1)
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		factory := &FormatterFactory{}
-		_ = factory.Register(&formatterStrategyJSON{})
-		strategy, _ := newStreamStrategyRotatingFile(fileSystem, factory)
+		fFactory := &FormatterFactory{}
+		_ = fFactory.Register(&formatterStrategyJSON{})
+		strategy, _ := newStreamStrategyRotatingFile(fileSystem, fFactory)
 
 		stream, err := strategy.CreateFromConfig(config)
 		switch {

@@ -8,6 +8,6 @@ type IObservable interface {
 	io.Closer
 
 	HasObserver(path string) bool
-	AddObserver(path string, callback Observer) error
+	AddObserver(path string, callback IObserver) error
 	RemoveObserver(path string)
 }

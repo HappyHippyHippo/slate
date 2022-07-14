@@ -29,11 +29,11 @@ func Test_NewRecurring(t *testing.T) {
 func Test_Recurring_Close(t *testing.T) {
 	t.Run("is the same as stopping it", func(t *testing.T) {
 		called := false
-		recurring, _ := NewRecurring(20*time.Millisecond, func() error {
+		sut, _ := NewRecurring(20*time.Millisecond, func() error {
 			called = true
 			return nil
 		})
-		_ = recurring.Close()
+		_ = sut.Close()
 		time.Sleep(40 * time.Millisecond)
 
 		if called {
@@ -45,12 +45,12 @@ func Test_Recurring_Close(t *testing.T) {
 func Test_Recurring_Delay(t *testing.T) {
 	t.Run("retrieves the trigger interval duration", func(t *testing.T) {
 		duration := 20 * time.Millisecond
-		recurring, _ := NewRecurring(duration, func() error {
+		sut, _ := NewRecurring(duration, func() error {
 			return nil
 		})
-		defer func() { _ = recurring.Close() }()
+		defer func() { _ = sut.Close() }()
 
-		if check := recurring.Delay(); check != duration {
+		if check := sut.Delay(); check != duration {
 			t.Errorf("returned (%v) interval duration", check)
 		}
 	})
@@ -59,11 +59,11 @@ func Test_Recurring_Delay(t *testing.T) {
 func Test_Recurring(t *testing.T) {
 	t.Run("run trigger multiple times", func(t *testing.T) {
 		count := 0
-		recurring, _ := NewRecurring(20*time.Millisecond, func() error {
+		sut, _ := NewRecurring(20*time.Millisecond, func() error {
 			count++
 			return nil
 		})
-		defer func() { _ = recurring.Close() }()
+		defer func() { _ = sut.Close() }()
 		time.Sleep(100 * time.Millisecond)
 
 		if count <= 2 {
@@ -73,11 +73,11 @@ func Test_Recurring(t *testing.T) {
 
 	t.Run("stop the trigger on callback error", func(t *testing.T) {
 		count := 0
-		recurring, _ := NewRecurring(20*time.Millisecond, func() error {
+		sut, _ := NewRecurring(20*time.Millisecond, func() error {
 			count++
 			return fmt.Errorf("__dummy_error__")
 		})
-		defer func() { _ = recurring.Close() }()
+		defer func() { _ = sut.Close() }()
 		time.Sleep(100 * time.Millisecond)
 
 		if count != 1 {

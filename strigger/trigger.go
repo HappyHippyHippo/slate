@@ -5,9 +5,6 @@ import (
 	"time"
 )
 
-// Callback used as a trigger execution process.
-type Callback func() error
-
 // ITrigger defines the interface of a trigger used to execute a function call
 // on determine time intervals.
 type ITrigger interface {
@@ -17,7 +14,7 @@ type ITrigger interface {
 
 type trigger struct {
 	delay    time.Duration
-	callback Callback
+	callback ICallback
 }
 
 // Delay will retrieve the time period associated to the trigger.

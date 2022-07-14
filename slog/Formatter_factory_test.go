@@ -22,11 +22,11 @@ func Test_FormatterFactory_Register(t *testing.T) {
 		defer ctrl.Finish()
 
 		strategy := NewMockFormatterStrategy(ctrl)
-		factory := &FormatterFactory{}
+		fFactory := &FormatterFactory{}
 
-		if err := factory.Register(strategy); err != nil {
+		if err := fFactory.Register(strategy); err != nil {
 			t.Errorf("returned the (%v) error", err)
-		} else if (*factory)[0] != strategy {
+		} else if (*fFactory)[0] != strategy {
 			t.Errorf("didn't stored the s")
 		}
 	})
@@ -41,10 +41,10 @@ func Test_FormatterFactory_Create(t *testing.T) {
 
 		strategy := NewMockFormatterStrategy(ctrl)
 		strategy.EXPECT().Accept(format).Return(false).Times(1)
-		factory := &FormatterFactory{}
-		_ = factory.Register(strategy)
+		fFactory := &FormatterFactory{}
+		_ = fFactory.Register(strategy)
 
-		res, err := factory.Create(format)
+		res, err := fFactory.Create(format)
 		switch {
 		case res != nil:
 			t.Error("returned a valid reference")
@@ -65,10 +65,10 @@ func Test_FormatterFactory_Create(t *testing.T) {
 		strategy := NewMockFormatterStrategy(ctrl)
 		strategy.EXPECT().Accept(format).Return(true).Times(1)
 		strategy.EXPECT().Create().Return(formatter, nil).Times(1)
-		factory := &FormatterFactory{}
-		_ = factory.Register(strategy)
+		fFactory := &FormatterFactory{}
+		_ = fFactory.Register(strategy)
 
-		if res, err := factory.Create(format); err != nil {
+		if res, err := fFactory.Create(format); err != nil {
 			t.Errorf("returned the (%v) error", err)
 		} else if !reflect.DeepEqual(res, formatter) {
 			t.Errorf("didn't returned the formatter")

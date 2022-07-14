@@ -18,18 +18,18 @@ type sourceRest struct {
 	client     HTTPClient
 	uri        string
 	format     string
-	factory    IDecoderFactory
+	dFactory   IDecoderFactory
 	configPath string
 }
 
 var _ ISource = &sourceRest{}
 
-func newSourceRest(client HTTPClient, uri, format string, factory IDecoderFactory, configPath string) (ISource, error) {
+func newSourceRest(client HTTPClient, uri, format string, dFactory IDecoderFactory, configPath string) (ISource, error) {
 	if client == nil {
 		return nil, errNilPointer("client")
 	}
-	if factory == nil {
-		return nil, errNilPointer("factory")
+	if dFactory == nil {
+		return nil, errNilPointer("dFactory")
 	}
 
 	s := &sourceRest{
@@ -40,7 +40,7 @@ func newSourceRest(client HTTPClient, uri, format string, factory IDecoderFactor
 		client:     client,
 		uri:        uri,
 		format:     format,
-		factory:    factory,
+		dFactory:   dFactory,
 		configPath: configPath,
 	}
 
@@ -84,7 +84,7 @@ func (s *sourceRest) request() (IConfig, error) {
 
 	b, _ := io.ReadAll(res.Body)
 
-	d, err := s.factory.Create(s.format, bytes.NewReader(b))
+	d, err := s.dFactory.Create(s.format, bytes.NewReader(b))
 	if err != nil {
 		return nil, err
 	}

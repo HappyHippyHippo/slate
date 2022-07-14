@@ -13,7 +13,7 @@ import (
 
 func Test_NewSourceStrategyFile(t *testing.T) {
 	t.Run("nil file system adapter", func(t *testing.T) {
-		strategy, err := newSourceStrategyFile(nil, &(DecoderFactory{}))
+		strategy, err := newSourceStrategyFile(nil, &decoderFactory{})
 		switch {
 		case strategy != nil:
 			t.Error("returned a valid reference")
@@ -24,7 +24,7 @@ func Test_NewSourceStrategyFile(t *testing.T) {
 		}
 	})
 
-	t.Run("nil decoder factory", func(t *testing.T) {
+	t.Run("nil decoder dFactory", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -39,14 +39,14 @@ func Test_NewSourceStrategyFile(t *testing.T) {
 		}
 	})
 
-	t.Run("new file source factory strategy", func(t *testing.T) {
+	t.Run("new file source dFactory strategy", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		fs := NewMockFs(ctrl)
-		factory := &(DecoderFactory{})
+		dFactory := &decoderFactory{}
 
-		strategy, err := newSourceStrategyFile(fs, factory)
+		strategy, err := newSourceStrategyFile(fs, dFactory)
 		switch {
 		case err != nil:
 			t.Errorf("returned the (%v) error", err)
@@ -54,8 +54,8 @@ func Test_NewSourceStrategyFile(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		case strategy.(*sourceStrategyFile).fs != fs:
 			t.Error("didn't stored the file system adapter reference")
-		case strategy.(*sourceStrategyFile).factory != factory:
-			t.Error("didn't stored the decoder factory reference")
+		case strategy.(*sourceStrategyFile).factory != dFactory:
+			t.Error("didn't stored the decoder dFactory reference")
 		}
 	})
 }
@@ -80,7 +80,7 @@ func Test_SourceStrategyFile_Accept(t *testing.T) {
 			test := func() {
 				ctrl := gomock.NewController(t)
 				defer func() { ctrl.Finish() }()
-				strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &(DecoderFactory{}))
+				strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &decoderFactory{})
 				if check := strategy.Accept(scenario.sourceType); check != scenario.exp {
 					t.Errorf("for the type (%s), returned (%v)", scenario.sourceType, check)
 				}
@@ -95,7 +95,7 @@ func Test_SourceStrategyFile_AcceptFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &decoderFactory{})
 
 		if strategy.AcceptFromConfig(nil) {
 			t.Error("returned true")
@@ -106,7 +106,7 @@ func Test_SourceStrategyFile_AcceptFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &decoderFactory{})
 
 		if strategy.AcceptFromConfig(&Partial{}) {
 			t.Error("returned true")
@@ -117,7 +117,7 @@ func Test_SourceStrategyFile_AcceptFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &decoderFactory{})
 
 		if strategy.AcceptFromConfig(&Partial{"type": 123}) {
 			t.Error("returned true")
@@ -128,7 +128,7 @@ func Test_SourceStrategyFile_AcceptFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &decoderFactory{})
 
 		if strategy.AcceptFromConfig(&Partial{"type": SourceTypeUnknown}) {
 			t.Error("returned true")
@@ -139,7 +139,7 @@ func Test_SourceStrategyFile_AcceptFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &decoderFactory{})
 
 		if !strategy.AcceptFromConfig(&Partial{"type": SourceTypeFile}) {
 			t.Error("returned false")
@@ -180,7 +180,7 @@ func Test_SourceStrategyFile_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &decoderFactory{})
 
 		src, err := strategy.Create(123, "format")
 		switch {
@@ -197,7 +197,7 @@ func Test_SourceStrategyFile_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &decoderFactory{})
 
 		src, err := strategy.Create("path", 123)
 		switch {
@@ -226,9 +226,9 @@ func Test_SourceStrategyFile_Create(t *testing.T) {
 		file.EXPECT().Close().Times(1)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		factory := &(DecoderFactory{})
-		_ = factory.Register(&decoderStrategyYAML{})
-		strategy, _ := newSourceStrategyFile(fs, factory)
+		dFactory := &decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
+		strategy, _ := newSourceStrategyFile(fs, dFactory)
 
 		src, err := strategy.Create(path, DecoderFormatYAML)
 		switch {
@@ -254,7 +254,7 @@ func Test_SourceStrategyFile_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &decoderFactory{})
 
 		src, err := strategy.CreateFromConfig(nil)
 		switch {
@@ -271,7 +271,7 @@ func Test_SourceStrategyFile_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &decoderFactory{})
 
 		src, err := strategy.CreateFromConfig(&Partial{"format": "format"})
 		switch {
@@ -288,7 +288,7 @@ func Test_SourceStrategyFile_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &decoderFactory{})
 
 		src, err := strategy.CreateFromConfig(&Partial{"path": 123, "format": "format"})
 		switch {
@@ -305,7 +305,7 @@ func Test_SourceStrategyFile_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &(DecoderFactory{}))
+		strategy, _ := newSourceStrategyFile(NewMockFs(ctrl), &decoderFactory{})
 
 		src, err := strategy.CreateFromConfig(&Partial{"path": "path", "format": 123})
 		switch {
@@ -334,9 +334,9 @@ func Test_SourceStrategyFile_CreateFromConfig(t *testing.T) {
 		file.EXPECT().Close().Times(1)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		factory := &(DecoderFactory{})
-		_ = factory.Register(&decoderStrategyYAML{})
-		strategy, _ := newSourceStrategyFile(fs, factory)
+		dFactory := &decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
+		strategy, _ := newSourceStrategyFile(fs, dFactory)
 
 		src, err := strategy.CreateFromConfig(&Partial{"path": path, "format": DecoderFormatYAML})
 		switch {
@@ -372,9 +372,9 @@ func Test_SourceStrategyFile_CreateFromConfig(t *testing.T) {
 		file.EXPECT().Close().Times(1)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		factory := &(DecoderFactory{})
-		_ = factory.Register(&decoderStrategyYAML{})
-		strategy, _ := newSourceStrategyFile(fs, factory)
+		dFactory := &decoderFactory{}
+		_ = dFactory.Register(&decoderStrategyYAML{})
+		strategy, _ := newSourceStrategyFile(fs, dFactory)
 
 		src, err := strategy.CreateFromConfig(&Partial{"path": path})
 		switch {

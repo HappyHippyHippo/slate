@@ -6,13 +6,13 @@ type sourceStrategyContainer struct {
 
 var _ ISourceStrategy = &sourceStrategyContainer{}
 
-// Accept will check if the source factory strategy can instantiate a
+// Accept will check if the source dFactory strategy can instantiate a
 // new source of the requested type.
 func (sourceStrategyContainer) Accept(sourceType string) bool {
 	return sourceType == SourceTypeContainer
 }
 
-// AcceptFromConfig will check if the source factory strategy can instantiate
+// AcceptFromConfig will check if the source dFactory strategy can instantiate
 // a source where the data to check comes from a configuration Partial
 // instance.
 func (s sourceStrategyContainer) AcceptFromConfig(cfg IConfig) bool {

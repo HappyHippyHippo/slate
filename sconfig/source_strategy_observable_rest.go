@@ -10,26 +10,26 @@ type sourceStrategyObservableRest struct {
 
 var _ ISourceStrategy = &sourceStrategyObservableRest{}
 
-func newSourceStrategyObservableRest(decoderFactory IDecoderFactory) (ISourceStrategy, error) {
-	if decoderFactory == nil {
-		return nil, errNilPointer("DecoderFactory")
+func newSourceStrategyObservableRest(dFactory IDecoderFactory) (ISourceStrategy, error) {
+	if dFactory == nil {
+		return nil, errNilPointer("dFactory")
 	}
 
 	return &sourceStrategyObservableRest{
 		sourceStrategyRest: sourceStrategyRest{
-			clientFactory:  func() HTTPClient { return &http.Client{} },
-			decoderFactory: decoderFactory,
+			cFactory: func() HTTPClient { return &http.Client{} },
+			dFactory: dFactory,
 		},
 	}, nil
 }
 
-// Accept will check if the source factory strategy can instantiate a
+// Accept will check if the source dFactory strategy can instantiate a
 // new source of the requested type.
 func (sourceStrategyObservableRest) Accept(sourceType string) bool {
 	return sourceType == SourceTypeObservableRest
 }
 
-// AcceptFromConfig will check if the source factory strategy can instantiate
+// AcceptFromConfig will check if the source dFactory strategy can instantiate
 // a source where the data to check comes from a configuration Partial
 // instance.
 func (s sourceStrategyObservableRest) AcceptFromConfig(cfg IConfig) bool {
@@ -59,7 +59,7 @@ func (s sourceStrategyObservableRest) Create(args ...interface{}) (ISource, erro
 	} else if configPath, ok := args[3].(string); !ok {
 		return nil, errConversion(args[3], "string")
 	} else {
-		return newSourceObservableRest(s.clientFactory(), uri, format, s.decoderFactory, timestampPath, configPath)
+		return newSourceObservableRest(s.cFactory(), uri, format, s.dFactory, timestampPath, configPath)
 	}
 }
 
