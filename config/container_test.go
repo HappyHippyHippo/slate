@@ -60,7 +60,7 @@ func Test_GetDecoderStrategies(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		c := slate.ServiceContainer{}
 		_ = c.Service("dummy", func() (any, error) {
-			return nil, e
+			return nil, expected
 		}, ContainerDecoderStrategyTag)
 
 		s, e := GetDecoderStrategies(c)
@@ -156,7 +156,7 @@ func Test_GetSourceStrategies(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		c := slate.ServiceContainer{}
 		_ = c.Service("dummy", func() (any, error) {
-			return nil, e
+			return nil, expected
 		}, ContainerSourceStrategyTag)
 
 		s, e := GetSourceStrategies(c)
@@ -207,7 +207,7 @@ func Test_GetSourceContainerPartials(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		c := slate.ServiceContainer{}
 		_ = c.Service("dummy", func() (any, error) {
-			return nil, e
+			return nil, expected
 		}, ContainerSourceContainerPartialTag)
 
 		s, e := GetSourceContainerPartials(c)
