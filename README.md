@@ -2,9 +2,17 @@
 Opinionated golang application framework
 
 - [x] slate
-  - [x] senv
-  - [x] strigger
-  - [x] sconfig
-  - [x] slog
-  - [x] srdb
-  - [x] smigration
+  - [x] err
+  - [x] env
+  - [x] trigger
+  - [x] fs
+  - [ ] config
+  - [ ] log
+  - [ ] rdb
+  - [ ] migration
+  - [ ] rest
+    - [ ] log
+    - [ ] envelope
+    - [ ] validation
+    - [ ] cache
+    - [ ] health

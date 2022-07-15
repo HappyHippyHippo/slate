@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/serror"
+	"github.com/happyhippyhippo/slate/err"
 	"reflect"
 	"testing"
 )
@@ -42,10 +42,10 @@ func Test_Application_Add(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		if err := NewApplication().Add(nil); err == nil {
+		if e := NewApplication().Add(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(err, serror.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", err, serror.ErrNilPointer)
+		} else if !errors.Is(e, err.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrNilPointer)
 		}
 	})
 
@@ -58,12 +58,12 @@ func Test_Application_Add(t *testing.T) {
 		provider := NewMockServiceProvider(ctrl)
 		provider.EXPECT().Register(sut.Container).Return(expected).Times(1)
 
-		err := sut.Add(provider)
+		e := sut.Add(provider)
 		switch {
-		case err == nil:
+		case e == nil:
 			t.Error("didn't returned the expected error")
-		case err.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", err, expected)
+		case e.Error() != expected.Error():
+			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
 		case len(sut.providers) != 0:
 			t.Error("stored the failing provider")
 		}
@@ -77,8 +77,8 @@ func Test_Application_Add(t *testing.T) {
 		provider := NewMockServiceProvider(ctrl)
 		provider.EXPECT().Register(sut.Container).Return(nil).Times(1)
 
-		if err := sut.Add(provider); err != nil {
-			t.Errorf("returned the (%v) error", err)
+		if e := sut.Add(provider); e != nil {
+			t.Errorf("returned the (%v) error", e)
 		} else if len(sut.providers) != 1 || sut.providers[0] != provider {
 			t.Error("didn't stored the added provider")
 		}
@@ -99,10 +99,10 @@ func Test_Application_Boot(t *testing.T) {
 		}).Times(1)
 		_ = sut.Add(provider)
 
-		if err := sut.Boot(); err == nil {
+		if e := sut.Boot(); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if err.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error", err)
+		} else if e.Error() != expected.Error() {
+			t.Errorf("returned the (%v) error", e)
 		}
 	})
 
@@ -134,10 +134,10 @@ func Test_Application_Boot(t *testing.T) {
 		provider.EXPECT().Boot(sut.Container).Return(fmt.Errorf("%s", expected)).Times(1)
 		_ = sut.Add(provider)
 
-		if err := sut.Boot(); err == nil {
+		if e := sut.Boot(); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if err.Error() != expected {
-			t.Errorf("returned the (%v) error", err)
+		} else if e.Error() != expected {
+			t.Errorf("returned the (%v) error", e)
 		}
 	})
 

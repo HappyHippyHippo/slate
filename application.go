@@ -44,13 +44,13 @@ func (a *Application) Add(provider IServiceProvider) error {
 // The initialization of an application is the calling of the register method
 // on all providers, after the registration of all objects in the container,
 // the boot method of all providers will be executed.
-func (a *Application) Boot() (err error) {
+func (a *Application) Boot() (e error) {
 	defer func() {
 		if r := recover(); r != nil {
 			if tr, ok := r.(error); !ok {
 				panic(r)
 			} else {
-				err = tr
+				e = tr
 			}
 		}
 	}()
