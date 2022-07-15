@@ -20,7 +20,7 @@ func Test_GetDecoderFactory(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrServiceNotFound):
-			t.Error("returned the e is not of the expected a service not found error")
+			t.Error("returned the error is not of the expected a service not found error")
 		}
 	})
 
@@ -37,7 +37,7 @@ func Test_GetDecoderFactory(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the e is not of the expected a conversion error")
+			t.Error("returned the error is not of the expected a conversion error")
 		}
 	})
 
@@ -57,7 +57,7 @@ func Test_GetDecoderFactory(t *testing.T) {
 
 func Test_GetDecoderStrategies(t *testing.T) {
 	t.Run("tagged retrieval error", func(t *testing.T) {
-		e := fmt.Errorf("dummy message")
+		expected := fmt.Errorf("error message")
 		c := slate.ServiceContainer{}
 		_ = c.Service("dummy", func() (any, error) {
 			return nil, e
@@ -69,8 +69,8 @@ func Test_GetDecoderStrategies(t *testing.T) {
 			t.Error("returned an unexpectedly valid instance of a service")
 		case e == nil:
 			t.Error("didn't returned an expected error")
-		case !errors.Is(e, e):
-			t.Error("returned the e is not of the expected error")
+		case !errors.Is(e, expected):
+			t.Error("returned the error is not of the expected error")
 		}
 	})
 
@@ -87,7 +87,7 @@ func Test_GetDecoderStrategies(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the e is not of the expected error")
+			t.Error("returned the error is not of the expected error")
 		}
 	})
 
@@ -116,7 +116,7 @@ func Test_GetSourceFactory(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrServiceNotFound):
-			t.Error("returned the e is not of the expected a service not found error")
+			t.Error("returned the error is not of the expected a service not found error")
 		}
 	})
 
@@ -133,7 +133,7 @@ func Test_GetSourceFactory(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the e is not of the expected a conversion error")
+			t.Error("returned the error is not of the expected a conversion error")
 		}
 	})
 
@@ -153,7 +153,7 @@ func Test_GetSourceFactory(t *testing.T) {
 
 func Test_GetSourceStrategies(t *testing.T) {
 	t.Run("tagged retrieval error", func(t *testing.T) {
-		e := fmt.Errorf("dummy message")
+		expected := fmt.Errorf("error message")
 		c := slate.ServiceContainer{}
 		_ = c.Service("dummy", func() (any, error) {
 			return nil, e
@@ -165,8 +165,8 @@ func Test_GetSourceStrategies(t *testing.T) {
 			t.Error("returned an unexpectedly valid instance of a service")
 		case e == nil:
 			t.Error("didn't returned an expected error")
-		case !errors.Is(e, e):
-			t.Error("returned the e is not of the expected error")
+		case !errors.Is(e, expected):
+			t.Error("returned the error is not of the expected error")
 		}
 	})
 
@@ -183,7 +183,7 @@ func Test_GetSourceStrategies(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the e is not of the expected error")
+			t.Error("returned the error is not of the expected error")
 		}
 	})
 
@@ -204,7 +204,7 @@ func Test_GetSourceStrategies(t *testing.T) {
 
 func Test_GetSourceContainerPartials(t *testing.T) {
 	t.Run("tagged retrieval error", func(t *testing.T) {
-		e := fmt.Errorf("dummy message")
+		expected := fmt.Errorf("error message")
 		c := slate.ServiceContainer{}
 		_ = c.Service("dummy", func() (any, error) {
 			return nil, e
@@ -216,8 +216,8 @@ func Test_GetSourceContainerPartials(t *testing.T) {
 			t.Error("returned an unexpectedly valid instance of a service")
 		case e == nil:
 			t.Error("didn't returned an expected error")
-		case !errors.Is(e, e):
-			t.Error("returned the e is not of the expected error")
+		case !errors.Is(e, expected):
+			t.Error("returned the error is not of the expected error")
 		}
 	})
 
@@ -234,7 +234,7 @@ func Test_GetSourceContainerPartials(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the e is not of the expected error")
+			t.Error("returned the error is not of the expected error")
 		}
 	})
 
@@ -266,7 +266,7 @@ func Test_Get(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrServiceNotFound):
-			t.Error("returned the e is not of the expected a service not found error")
+			t.Error("returned the error is not of the expected a service not found error")
 		}
 	})
 
@@ -283,7 +283,7 @@ func Test_Get(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the e is not of the expected a conversion error")
+			t.Error("returned the error is not of the expected a conversion error")
 		}
 	})
 
@@ -312,7 +312,7 @@ func Test_GetLoader(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrServiceNotFound):
-			t.Error("returned the e is not of the expected a service not found error")
+			t.Error("returned the error is not of the expected a service not found error")
 		}
 	})
 
@@ -329,7 +329,7 @@ func Test_GetLoader(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the e is not of the expected a conversion error")
+			t.Error("returned the error is not of the expected a conversion error")
 		}
 	})
 
