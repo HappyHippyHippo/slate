@@ -120,20 +120,20 @@ func (p Provider) Boot(c slate.ServiceContainer) error {
 
 	if dFactory, e := GetDecoderFactory(c); e != nil {
 		return e
-	} else if decoderStrategies, e := GetDecoderStrategies(c); e != nil {
+	} else if strategies, e := GetDecoderStrategies(c); e != nil {
 		return e
 	} else {
-		for _, strategy := range decoderStrategies {
+		for _, strategy := range strategies {
 			_ = dFactory.Register(strategy)
 		}
 	}
 
 	if sFactory, e := GetSourceFactory(c); e != nil {
 		return e
-	} else if sourceStrategies, e := GetSourceStrategies(c); e != nil {
+	} else if strategies, e := GetSourceStrategies(c); e != nil {
 		return e
 	} else {
-		for _, strategy := range sourceStrategies {
+		for _, strategy := range strategies {
 			_ = sFactory.Register(strategy)
 		}
 	}
