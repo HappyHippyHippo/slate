@@ -13,6 +13,8 @@ type MockStreamFactory struct {
 	recorder *MockStreamFactoryRecorder
 }
 
+var _ IStreamFactory = &MockStreamFactory{}
+
 // MockStreamFactoryRecorder is the mock recorder for MockStreamFactory.
 type MockStreamFactoryRecorder struct {
 	mock *MockStreamFactory

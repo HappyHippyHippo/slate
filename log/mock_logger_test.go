@@ -12,6 +12,8 @@ type MockLogger struct {
 	recorder *MockLoggerRecorder
 }
 
+var _ ILogger = &MockLogger{}
+
 // MockLoggerRecorder is the mock recorder for MockLogger.
 type MockLoggerRecorder struct {
 	mock *MockLogger

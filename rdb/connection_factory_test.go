@@ -1,0 +1,243 @@
+package rdb
+
+import (
+	"fmt"
+	"github.com/golang/mock/gomock"
+	"github.com/happyhippyhippo/slate/config"
+	"github.com/happyhippyhippo/slate/err"
+	"github.com/pkg/errors"
+	"gorm.io/gorm"
+	gormLogger "gorm.io/gorm/logger"
+	"testing"
+)
+
+func Test_NewConnectionFactory(t *testing.T) {
+	t.Run("missing configuration", func(t *testing.T) {
+		sut, e := newConnectionFactory(nil, &DialectFactory{})
+		switch {
+		case sut != nil:
+			t.Error("return an unexpected valid connection factory instance")
+		case e == nil:
+			t.Error("didn't return an expected err")
+		case !errors.Is(e, err.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrNilPointer)
+		}
+	})
+
+	t.Run("missing dialect factory", func(t *testing.T) {
+		sut, e := newConnectionFactory(config.NewManager(0), nil)
+		switch {
+		case sut != nil:
+			t.Error("return an unexpected valid connection factory instance")
+		case e == nil:
+			t.Error("didn't return an expected err")
+		case !errors.Is(e, err.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrNilPointer)
+		}
+	})
+
+	t.Run("valid creation", func(t *testing.T) {
+		if sut, e := newConnectionFactory(config.NewManager(0), &DialectFactory{}); sut == nil {
+			t.Error("didn't returned the expected valid connection factory instance")
+		} else if e != nil {
+			t.Errorf("return the unexpected error : %v", e)
+		}
+	})
+
+	t.Run("cfg change purge all stored connections", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		name := "primary"
+		cfg1 := config.Partial{"dialect": "sqlite", "host": ":memory:"}
+		cfg2 := config.Partial{"dialect": "sqlite", "host": ":memory:"}
+		partial1 := config.Partial{"rdb": config.Partial{"connections": config.Partial{name: cfg1}}}
+		partial2 := config.Partial{"rdb": config.Partial{"connections": config.Partial{name + "salt": cfg2}}}
+		source1 := NewMockConfigSource(ctrl)
+		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
+		source2 := NewMockConfigSource(ctrl)
+		source2.EXPECT().Get("").Return(partial2, nil).MinTimes(1)
+		dFactory := &DialectFactory{}
+		_ = dFactory.Register(&dialectStrategySqlite{})
+		cfg := config.NewManager(0)
+		_ = cfg.AddSource("id1", 0, source1)
+
+		sut, _ := newConnectionFactory(cfg, dFactory)
+
+		_, _ = sut.Get(name, &gorm.Config{Logger: gormLogger.Discard})
+		if len(sut.(*connectionFactory).instances) != 1 {
+			t.Error("didn't store the requested connection instance")
+		}
+
+		_ = cfg.AddSource("id2", 10, source2)
+		if len(sut.(*connectionFactory).instances) != 0 {
+			t.Error("didn't removed the stored connection instances")
+		}
+	})
+}
+
+func Test_ConnectionFactory_Get(t *testing.T) {
+	t.Run("missing requested connection configuration", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		name := "primary"
+		cfg1 := config.Partial{"dialect": "sqlite", "host": ":memory:"}
+		partial1 := config.Partial{"rdb": config.Partial{"connections": config.Partial{name: cfg1}}}
+		source1 := NewMockConfigSource(ctrl)
+		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
+		dFactory := NewMockDialectFactory(ctrl)
+		cfg := config.NewManager(0)
+		_ = cfg.AddSource("id1", 0, source1)
+
+		sut, _ := newConnectionFactory(cfg, dFactory)
+
+		conn, e := sut.Get(name+"salt", &gorm.Config{})
+		switch {
+		case conn != nil:
+			t.Error("return an unexpected valid connection instance")
+		case e == nil:
+			t.Error("didn't return an expected err")
+		case !errors.Is(e, err.ErrDatabaseConfigNotFound):
+			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrDatabaseConfigNotFound)
+		}
+	})
+
+	t.Run("invalid requested connection configuration", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		name := "primary"
+		partial1 := config.Partial{"rdb": config.Partial{"connections": config.Partial{name: "string"}}}
+		source1 := NewMockConfigSource(ctrl)
+		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
+		dFactory := NewMockDialectFactory(ctrl)
+		cfg := config.NewManager(0)
+		_ = cfg.AddSource("id1", 0, source1)
+
+		sut, _ := newConnectionFactory(cfg, dFactory)
+
+		conn, e := sut.Get(name, &gorm.Config{})
+		switch {
+		case conn != nil:
+			t.Error("return an unexpected valid connection instance")
+		case e == nil:
+			t.Error("didn't return an expected err")
+		case !errors.Is(e, err.ErrConversion):
+			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrConversion)
+		}
+	})
+
+	t.Run("error instantiating dialect", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		expected := fmt.Errorf("error message")
+		name := "primary"
+		cfg1 := config.Partial{"dialect": "invalid", "host": ":memory:"}
+		partial1 := config.Partial{"rdb": config.Partial{"connections": config.Partial{name: cfg1}}}
+		source1 := NewMockConfigSource(ctrl)
+		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
+		dFactory := NewMockDialectFactory(ctrl)
+		dFactory.EXPECT().Get(&cfg1).Return(nil, expected).Times(1)
+		cfg := config.NewManager(0)
+		_ = cfg.AddSource("id1", 0, source1)
+
+		sut, _ := newConnectionFactory(cfg, dFactory)
+
+		conn, e := sut.Get(name, &gorm.Config{})
+		switch {
+		case conn != nil:
+			t.Error("return an unexpected valid connection instance")
+		case e == nil:
+			t.Error("didn't return an expected err")
+		case e.Error() != expected.Error():
+			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
+		}
+	})
+
+	t.Run("error instantiating connector", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		expected := fmt.Errorf("error message")
+		name := "primary"
+		cfg1 := config.Partial{"dialect": "invalid", "host": ":memory:"}
+		partial1 := config.Partial{"rdb": config.Partial{"connections": config.Partial{name: cfg1}}}
+		source1 := NewMockConfigSource(ctrl)
+		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
+		dialect := NewMockDialect(ctrl)
+		dialect.EXPECT().Initialize(gomock.Any()).Return(expected).Times(1)
+		dFactory := NewMockDialectFactory(ctrl)
+		dFactory.EXPECT().Get(&cfg1).Return(dialect, nil).Times(1)
+		cfg := config.NewManager(0)
+		_ = cfg.AddSource("id1", 0, source1)
+
+		sut, _ := newConnectionFactory(cfg, dFactory)
+
+		conn, e := sut.Get(name, &gorm.Config{Logger: gormLogger.Discard})
+		switch {
+		case conn != nil:
+			t.Error("return an unexpected valid connection instance")
+		case e == nil:
+			t.Error("didn't return an expected err")
+		case e.Error() != expected.Error():
+			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
+		}
+	})
+
+	t.Run("valid connection", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		name := "primary"
+		cfg1 := config.Partial{"dialect": "invalid", "host": ":memory:"}
+		partial1 := config.Partial{"rdb": config.Partial{"connections": config.Partial{name: cfg1}}}
+		source1 := NewMockConfigSource(ctrl)
+		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
+		dialect := NewMockDialect(ctrl)
+		dialect.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
+		dFactory := NewMockDialectFactory(ctrl)
+		dFactory.EXPECT().Get(&cfg1).Return(dialect, nil).Times(1)
+		cfg := config.NewManager(0)
+		_ = cfg.AddSource("id1", 0, source1)
+
+		sut, _ := newConnectionFactory(cfg, dFactory)
+
+		if check, e := sut.Get(name, &gorm.Config{Logger: gormLogger.Discard}); check == nil {
+			t.Error("didn't return the expected connection instance")
+		} else if e != nil {
+			t.Errorf("return the unexpected error : (%v)", e)
+		}
+	})
+
+	t.Run("multiple requests only instantiate a single connection", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		name := "primary"
+		cfg1 := config.Partial{"dialect": "invalid", "host": ":memory:"}
+		partial1 := config.Partial{"rdb": config.Partial{"connections": config.Partial{name: cfg1}}}
+		source1 := NewMockConfigSource(ctrl)
+		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
+		dialect := NewMockDialect(ctrl)
+		dialect.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
+		dFactory := NewMockDialectFactory(ctrl)
+		dFactory.EXPECT().Get(&cfg1).Return(dialect, nil).Times(1)
+		cfg := config.NewManager(0)
+		_ = cfg.AddSource("id1", 0, source1)
+
+		sut, _ := newConnectionFactory(cfg, dFactory)
+
+		conn, _ := sut.Get(name, &gorm.Config{Logger: gormLogger.Discard})
+		check, e := sut.Get(name, &gorm.Config{Logger: gormLogger.Discard})
+		switch {
+		case check == nil:
+			t.Error("didn't return the expected connection instance")
+		case e != nil:
+			t.Errorf("return the unexpected error : (%v)", e)
+		case check != conn:
+			t.Error("didn't returned the same instance")
+		}
+	})
+}

@@ -12,6 +12,8 @@ type MockFormatterFactory struct {
 	recorder *MockFormatterFactoryRecorder
 }
 
+var _ IFormatterFactory = &MockFormatterFactory{}
+
 // MockFormatterFactoryRecorder is the mock recorder for MockFormatterFactory.
 type MockFormatterFactoryRecorder struct {
 	mock *MockFormatterFactory
