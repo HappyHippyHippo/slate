@@ -12,7 +12,7 @@ import (
 func Test_DialectFactory_Register(t *testing.T) {
 	t.Run("missing strategy", func(t *testing.T) {
 		if e := (&DialectFactory{}).Register(nil); e == nil {
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		} else if !errors.Is(e, err.ErrNilPointer) {
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrNilPointer)
 		}
@@ -42,7 +42,7 @@ func Test_DialectFactory_Get(t *testing.T) {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case !errors.Is(e, err.ErrNilPointer):
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrNilPointer)
 		}
@@ -57,7 +57,7 @@ func Test_DialectFactory_Get(t *testing.T) {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case !errors.Is(e, err.ErrConversion):
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrConversion)
 		}
@@ -79,7 +79,7 @@ func Test_DialectFactory_Get(t *testing.T) {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case !errors.Is(e, err.ErrUnknownDatabaseDialect):
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrUnknownDatabaseDialect)
 		}
@@ -99,7 +99,7 @@ func Test_DialectFactory_Get(t *testing.T) {
 		_ = sut.Register(strategy)
 
 		if _, e := sut.Get(cfg); e == nil {
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		} else if e.Error() != expected.Error() {
 			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
 		}

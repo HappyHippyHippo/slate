@@ -18,7 +18,7 @@ func Test_NewConnectionFactory(t *testing.T) {
 		case sut != nil:
 			t.Error("return an unexpected valid connection factory instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case !errors.Is(e, err.ErrNilPointer):
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrNilPointer)
 		}
@@ -30,7 +30,7 @@ func Test_NewConnectionFactory(t *testing.T) {
 		case sut != nil:
 			t.Error("return an unexpected valid connection factory instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case !errors.Is(e, err.ErrNilPointer):
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrNilPointer)
 		}
@@ -97,7 +97,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		case conn != nil:
 			t.Error("return an unexpected valid connection instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case !errors.Is(e, err.ErrDatabaseConfigNotFound):
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrDatabaseConfigNotFound)
 		}
@@ -122,7 +122,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		case conn != nil:
 			t.Error("return an unexpected valid connection instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case !errors.Is(e, err.ErrConversion):
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrConversion)
 		}
@@ -150,7 +150,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		case conn != nil:
 			t.Error("return an unexpected valid connection instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case e.Error() != expected.Error():
 			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
 		}
@@ -180,7 +180,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		case conn != nil:
 			t.Error("return an unexpected valid connection instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case e.Error() != expected.Error():
 			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
 		}

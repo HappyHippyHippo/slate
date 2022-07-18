@@ -20,9 +20,9 @@ func Test_GetConfig(t *testing.T) {
 		case sut != nil:
 			t.Error("returned an unexpectedly valid instance of a service")
 		case e == nil:
-			t.Error("didn't returned an expected err")
+			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrServiceNotFound):
-			t.Error("returned the error is not of the expected a service not found err")
+			t.Error("returned the error is not of the expected a service not found error")
 		}
 	})
 
@@ -37,9 +37,9 @@ func Test_GetConfig(t *testing.T) {
 		case sut != nil:
 			t.Error("returned an unexpectedly valid instance of a service")
 		case e == nil:
-			t.Error("didn't returned an expected err")
+			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the error is not of the expected a conversion err")
+			t.Error("returned error is not of the expected conversion error")
 		}
 	})
 
@@ -66,9 +66,9 @@ func Test_GetDialectFactory(t *testing.T) {
 		case sut != nil:
 			t.Error("returned an unexpectedly valid instance of a service")
 		case e == nil:
-			t.Error("didn't returned an expected err")
+			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrServiceNotFound):
-			t.Error("returned the error is not of the expected a service not found err")
+			t.Error("returned the error is not of the expected a service not found error")
 		}
 	})
 
@@ -83,9 +83,9 @@ func Test_GetDialectFactory(t *testing.T) {
 		case sut != nil:
 			t.Error("returned an unexpectedly valid instance of a service")
 		case e == nil:
-			t.Error("didn't returned an expected err")
+			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the error is not of the expected a conversion err")
+			t.Error("returned error is not of the expected conversion error")
 		}
 	})
 
@@ -116,9 +116,9 @@ func Test_GetDialectStrategies(t *testing.T) {
 		case sut != nil:
 			t.Error("returned an unexpectedly valid instance of a service")
 		case e == nil:
-			t.Error("didn't returned an expected err")
+			t.Error("didn't returned an expected error")
 		case !errors.Is(e, e):
-			t.Error("returned the error is not of the expected err")
+			t.Error("returned the error is not of the expected error")
 		}
 	})
 
@@ -133,9 +133,9 @@ func Test_GetDialectStrategies(t *testing.T) {
 		case sut != nil:
 			t.Error("returned an unexpectedly valid instance of a service")
 		case e == nil:
-			t.Error("didn't returned an expected err")
+			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the error is not of the expected err")
+			t.Error("returned the error is not of the expected error")
 		}
 	})
 
@@ -162,9 +162,9 @@ func Test_GetConnectionFactory(t *testing.T) {
 		case sut != nil:
 			t.Error("returned an unexpectedly valid instance of a service")
 		case e == nil:
-			t.Error("didn't returned an expected err")
+			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrServiceNotFound):
-			t.Error("returned the error is not of the expected a service not found err")
+			t.Error("returned the error is not of the expected a service not found error")
 		}
 	})
 
@@ -179,9 +179,9 @@ func Test_GetConnectionFactory(t *testing.T) {
 		case sut != nil:
 			t.Error("returned an unexpectedly valid instance of a service")
 		case e == nil:
-			t.Error("didn't returned an expected err")
+			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the error is not of the expected a conversion err")
+			t.Error("returned error is not of the expected conversion error")
 		}
 	})
 
@@ -210,9 +210,9 @@ func Test_GetPrimaryConnection(t *testing.T) {
 		case sut != nil:
 			t.Error("returned an unexpectedly valid instance of a service")
 		case e == nil:
-			t.Error("didn't returned an expected err")
+			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrServiceNotFound):
-			t.Error("returned the error is not of the expected a service not found err")
+			t.Error("returned the error is not of the expected a service not found error")
 		}
 	})
 
@@ -230,9 +230,9 @@ func Test_GetPrimaryConnection(t *testing.T) {
 		case sut != nil:
 			t.Error("returned an unexpectedly valid instance of a service")
 		case e == nil:
-			t.Error("didn't returned an expected err")
+			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the error is not of the expected a conversion err")
+			t.Error("returned error is not of the expected conversion error")
 		}
 	})
 

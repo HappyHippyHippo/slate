@@ -1,14 +1,15 @@
 # slate
-Opinionated golang application framework
+
+#### Opinionated golang application scafolding
 
 - [x] slate
   - [x] err
   - [x] env
   - [x] trigger
   - [x] fs
-  - [ ] config
-  - [ ] log
-  - [ ] rdb
+  - [x] config
+  - [x] log
+  - [x] rdb
   - [ ] migration
   - [ ] rest
     - [ ] log

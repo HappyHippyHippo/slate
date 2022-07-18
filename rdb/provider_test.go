@@ -14,7 +14,7 @@ import (
 func Test_Provider_Register(t *testing.T) {
 	t.Run("nil container", func(t *testing.T) {
 		if e := (&Provider{}).Register(nil); e == nil {
-			t.Error("didn't return the expected err")
+			t.Error("didn't return the expected error")
 		} else if !errors.Is(e, err.ErrNilPointer) {
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrNilPointer)
 		}
@@ -116,7 +116,7 @@ func Test_Provider_Register(t *testing.T) {
 		})
 
 		if _, e := container.Get(ContainerID); e == nil {
-			t.Error("didn't returned the expected err")
+			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
 		}
@@ -130,7 +130,7 @@ func Test_Provider_Register(t *testing.T) {
 		})
 
 		if _, e := container.Get(ContainerID); e == nil {
-			t.Error("didn't returned the expected err")
+			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, err.ErrConversion) {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, err.ErrConversion)
 		}
@@ -146,7 +146,7 @@ func Test_Provider_Register(t *testing.T) {
 		})
 
 		if _, e := container.Get(ContainerID); e == nil {
-			t.Error("didn't returned the expected err")
+			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
 		}
@@ -161,7 +161,7 @@ func Test_Provider_Register(t *testing.T) {
 		})
 
 		if _, e := container.Get(ContainerID); e == nil {
-			t.Error("didn't returned the expected err")
+			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, err.ErrConversion) {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, err.ErrConversion)
 		}
@@ -193,7 +193,7 @@ func Test_Provider_Register(t *testing.T) {
 		})
 
 		if _, e := container.Get(ContainerPrimaryID); e == nil {
-			t.Error("didn't returned the expected err")
+			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
 		}
@@ -207,7 +207,7 @@ func Test_Provider_Register(t *testing.T) {
 		})
 
 		if _, e := container.Get(ContainerPrimaryID); e == nil {
-			t.Error("didn't returned the expected err")
+			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, err.ErrConversion) {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, err.ErrConversion)
 		}
@@ -226,7 +226,7 @@ func Test_Provider_Register(t *testing.T) {
 		})
 
 		if _, e := container.Get(ContainerPrimaryID); e == nil {
-			t.Error("didn't returned the expected err")
+			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
 		}
@@ -244,7 +244,7 @@ func Test_Provider_Register(t *testing.T) {
 		})
 
 		if _, e := container.Get(ContainerPrimaryID); e == nil {
-			t.Error("didn't returned the expected err")
+			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, err.ErrConversion) {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, err.ErrConversion)
 		}
@@ -318,7 +318,7 @@ func Test_Provider_Register(t *testing.T) {
 func Test_Provider_Boot(t *testing.T) {
 	t.Run("nil container", func(t *testing.T) {
 		if e := (&Provider{}).Boot(nil); e == nil {
-			t.Error("didn't returned the expected err")
+			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, err.ErrNilPointer) {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, err.ErrNilPointer)
 		}
@@ -334,7 +334,7 @@ func Test_Provider_Boot(t *testing.T) {
 		})
 
 		if e := provider.Boot(container); e == nil {
-			t.Error("didn't returned the expected err")
+			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
 			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
 		}
@@ -349,7 +349,7 @@ func Test_Provider_Boot(t *testing.T) {
 		})
 
 		if e := provider.Boot(container); e == nil {
-			t.Error("didn't returned the expected err")
+			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, err.ErrConversion) {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, err.ErrConversion)
 		}
@@ -366,7 +366,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}, ContainerDialectStrategyTag)
 
 		if e := sut.Boot(container); e == nil {
-			t.Error("didn't returned the expected err")
+			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
 			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
 		}
@@ -382,7 +382,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}, ContainerDialectStrategyTag)
 
 		if e := sut.Boot(container); e == nil {
-			t.Error("didn't returned the expected err")
+			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, err.ErrConversion) {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, err.ErrConversion)
 		}

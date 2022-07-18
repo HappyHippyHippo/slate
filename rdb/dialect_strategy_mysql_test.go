@@ -35,7 +35,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case !errors.Is(e, err.ErrConversion):
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrConversion)
 		}
@@ -53,7 +53,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case !errors.Is(e, err.ErrConversion):
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrConversion)
 		}
@@ -72,7 +72,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case !errors.Is(e, err.ErrConversion):
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrConversion)
 		}
@@ -92,7 +92,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case !errors.Is(e, err.ErrConversion):
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrConversion)
 		}
@@ -113,7 +113,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case !errors.Is(e, err.ErrConversion):
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrConversion)
 		}
@@ -135,7 +135,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case !errors.Is(e, err.ErrConversion):
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrConversion)
 		}
@@ -158,7 +158,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
-			t.Error("didn't return an expected err")
+			t.Error("didn't return the expected error")
 		case !errors.Is(e, err.ErrConversion):
 			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrConversion)
 		}

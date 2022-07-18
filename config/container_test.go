@@ -37,7 +37,7 @@ func Test_GetDecoderFactory(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the error is not of the expected a conversion error")
+			t.Error("returned error is not of the expected conversion error")
 		}
 	})
 
@@ -133,7 +133,7 @@ func Test_GetSourceFactory(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the error is not of the expected a conversion error")
+			t.Error("returned error is not of the expected conversion error")
 		}
 	})
 
@@ -283,7 +283,7 @@ func Test_Get(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the error is not of the expected a conversion error")
+			t.Error("returned error is not of the expected conversion error")
 		}
 	})
 
@@ -329,7 +329,7 @@ func Test_GetLoader(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned an expected error")
 		case !errors.Is(e, err.ErrConversion):
-			t.Error("returned the error is not of the expected a conversion error")
+			t.Error("returned error is not of the expected conversion error")
 		}
 	})
 
