@@ -44,15 +44,15 @@ func Test_NewConnectionFactory(t *testing.T) {
 		}
 	})
 
-	t.Run("cfg change purge all stored connections", func(t *testing.T) {
+	t.Run("config change purge all stored connections", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		name := "primary"
 		cfg1 := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
 		cfg2 := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
-		partial1 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
-		partial2 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name + "salt": cfg2}}}
+		partial1 := sconfig.Partial{"slate": sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}}
+		partial2 := sconfig.Partial{"slate": sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name + "salt": cfg2}}}}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
 		source2 := NewMockConfigSource(ctrl)
@@ -81,18 +81,14 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		name := "primary"
-		cfg1 := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
-		partial1 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
-		source1 := NewMockConfigSource(ctrl)
-		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
 		dFactory := NewMockDialectFactory(ctrl)
-		cfg := sconfig.NewManager(0)
-		_ = cfg.AddSource("id1", 0, source1)
+		cfg := NewMockConfigManager(ctrl)
+		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(false).Times(1)
 
 		sut, _ := newConnectionFactory(cfg, dFactory)
 
-		conn, e := sut.Get(name+"salt", &gorm.Config{})
+		conn, e := sut.Get("primary", &gorm.Config{})
 		switch {
 		case conn != nil:
 			t.Error("return an unexpected valid connection instance")
@@ -107,13 +103,13 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		expected := fmt.Errorf("error message")
 		name := "primary"
-		partial1 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: "string"}}}
-		source1 := NewMockConfigSource(ctrl)
-		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
 		dFactory := NewMockDialectFactory(ctrl)
-		cfg := sconfig.NewManager(0)
-		_ = cfg.AddSource("id1", 0, source1)
+		cfg := NewMockConfigManager(ctrl)
+		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(nil, expected).Times(1)
 
 		sut, _ := newConnectionFactory(cfg, dFactory)
 
@@ -123,8 +119,8 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 			t.Error("return an unexpected valid connection instance")
 		case e == nil:
 			t.Error("didn't return the expected error")
-		case !errors.Is(e, serr.ErrConversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, serr.ErrConversion)
+		case e.Error() != expected.Error():
+			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
 		}
 	})
 
@@ -134,14 +130,13 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		name := "primary"
-		cfg1 := sconfig.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial1 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
-		source1 := NewMockConfigSource(ctrl)
-		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
+		partial := sconfig.Partial{"dialect": "invalid", "host": ":memory:"}
 		dFactory := NewMockDialectFactory(ctrl)
-		dFactory.EXPECT().Get(&cfg1).Return(nil, expected).Times(1)
-		cfg := sconfig.NewManager(0)
-		_ = cfg.AddSource("id1", 0, source1)
+		dFactory.EXPECT().Get(&partial).Return(nil, expected).Times(1)
+		cfg := NewMockConfigManager(ctrl)
+		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
 
 		sut, _ := newConnectionFactory(cfg, dFactory)
 
@@ -162,16 +157,15 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		name := "primary"
-		cfg1 := sconfig.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial1 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
-		source1 := NewMockConfigSource(ctrl)
-		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
+		partial := sconfig.Partial{"dialect": "invalid", "host": ":memory:"}
 		dialect := NewMockDialect(ctrl)
 		dialect.EXPECT().Initialize(gomock.Any()).Return(expected).Times(1)
 		dFactory := NewMockDialectFactory(ctrl)
-		dFactory.EXPECT().Get(&cfg1).Return(dialect, nil).Times(1)
-		cfg := sconfig.NewManager(0)
-		_ = cfg.AddSource("id1", 0, source1)
+		dFactory.EXPECT().Get(&partial).Return(dialect, nil).Times(1)
+		cfg := NewMockConfigManager(ctrl)
+		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
 
 		sut, _ := newConnectionFactory(cfg, dFactory)
 
@@ -191,16 +185,15 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		defer ctrl.Finish()
 
 		name := "primary"
-		cfg1 := sconfig.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial1 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
-		source1 := NewMockConfigSource(ctrl)
-		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
+		partial := sconfig.Partial{"dialect": "invalid", "host": ":memory:"}
 		dialect := NewMockDialect(ctrl)
 		dialect.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
 		dFactory := NewMockDialectFactory(ctrl)
-		dFactory.EXPECT().Get(&cfg1).Return(dialect, nil).Times(1)
-		cfg := sconfig.NewManager(0)
-		_ = cfg.AddSource("id1", 0, source1)
+		dFactory.EXPECT().Get(&partial).Return(dialect, nil).Times(1)
+		cfg := NewMockConfigManager(ctrl)
+		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
 
 		sut, _ := newConnectionFactory(cfg, dFactory)
 
@@ -216,16 +209,15 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		defer ctrl.Finish()
 
 		name := "primary"
-		cfg1 := sconfig.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial1 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
-		source1 := NewMockConfigSource(ctrl)
-		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
+		partial := sconfig.Partial{"dialect": "invalid", "host": ":memory:"}
 		dialect := NewMockDialect(ctrl)
 		dialect.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
 		dFactory := NewMockDialectFactory(ctrl)
-		dFactory.EXPECT().Get(&cfg1).Return(dialect, nil).Times(1)
-		cfg := sconfig.NewManager(0)
-		_ = cfg.AddSource("id1", 0, source1)
+		dFactory.EXPECT().Get(&partial).Return(dialect, nil).Times(1)
+		cfg := NewMockConfigManager(ctrl)
+		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
 
 		sut, _ := newConnectionFactory(cfg, dFactory)
 

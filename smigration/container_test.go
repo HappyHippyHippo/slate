@@ -54,17 +54,11 @@ func Test_GetDao(t *testing.T) {
 		p := &Provider{}
 		_ = p.Register(container)
 
-		source := NewMockConfigSource(ctrl)
-		source.EXPECT().Get("").Return(sconfig.Partial{
-			"rdb": sconfig.Partial{
-				"connections": sconfig.Partial{
-					"primary": sconfig.Partial{"dialect": "sqlite", "host": ":memory:"},
-				},
-			},
-		}, nil,
-		).Times(1)
-		cfg := sconfig.NewManager(0)
-		_ = cfg.AddSource("id", 0, source)
+		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
+		cfg := NewMockConfigManager(ctrl)
+		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
 		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
 			return cfg, nil
 		})
@@ -122,17 +116,11 @@ func Test_GetMigrator(t *testing.T) {
 		p := &Provider{}
 		_ = p.Register(container)
 
-		source := NewMockConfigSource(ctrl)
-		source.EXPECT().Get("").Return(sconfig.Partial{
-			"rdb": sconfig.Partial{
-				"connections": sconfig.Partial{
-					"primary": sconfig.Partial{"dialect": "sqlite", "host": ":memory:"},
-				},
-			},
-		}, nil,
-		).Times(1)
-		cfg := sconfig.NewManager(0)
-		_ = cfg.AddSource("id", 0, source)
+		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
+		cfg := NewMockConfigManager(ctrl)
+		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
 		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
 			return cfg, nil
 		})

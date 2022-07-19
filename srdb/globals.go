@@ -62,7 +62,7 @@ var (
 
 	// ConnectionsConfigPath contains the configuration path that holds the
 	// relational database connection configurations.
-	ConnectionsConfigPath = senv.String(EnvID+"_CONNECTIONS_CONFIG_PATH", "rdb.connections")
+	ConnectionsConfigPath = senv.String(EnvID+"_CONNECTIONS_CONFIG_PATH", "slate.rdb.connections")
 
 	// ObserveConfig defines the connection factory cfg observing flag
 	// used to register in the cfg object an observer of the connection

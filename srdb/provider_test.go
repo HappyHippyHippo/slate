@@ -266,9 +266,9 @@ func Test_Provider_Register(t *testing.T) {
 			return dFactory, nil
 		})
 		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("rdb.connections.primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("rdb.connections.primary").Return(partial, nil).Times(1)
+		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
 		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
 			return cfg, nil
 		})
@@ -300,9 +300,9 @@ func Test_Provider_Register(t *testing.T) {
 			return dFactory, nil
 		})
 		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("rdb.connections.other_primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("rdb.connections.other_primary").Return(partial, nil).Times(1)
+		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("slate.rdb.connections.other_primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("slate.rdb.connections.other_primary").Return(partial, nil).Times(1)
 		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
 			return cfg, nil
 		})

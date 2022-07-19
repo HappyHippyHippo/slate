@@ -248,9 +248,9 @@ func Test_GetPrimaryConnection(t *testing.T) {
 
 		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
 		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("rdb.connections.primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("rdb.connections.primary").Return(partial, nil).Times(1)
+		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
 		_ = c.Service(sconfig.ContainerID, func() (interface{}, error) {
 			return cfg, nil
 		})
