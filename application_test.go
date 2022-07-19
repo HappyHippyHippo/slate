@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate/serr"
 	"reflect"
 	"testing"
 )
@@ -44,8 +44,8 @@ func Test_Application_Add(t *testing.T) {
 
 		if e := NewApplication().Add(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.ErrNilPointer)
+		} else if !errors.Is(e, serr.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, serr.ErrNilPointer)
 		}
 	})
 

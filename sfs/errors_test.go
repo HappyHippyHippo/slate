@@ -1,4 +1,4 @@
-package slate
+package sfs
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ func Test_ErrNilPointer(t *testing.T) {
 		expected := "invalid nil pointer : dummy argument"
 
 		if e := errNilPointer(arg); !errors.Is(e, serr.ErrNilPointer) {
-			t.Errorf("error not a instance of ErrNilPointer")
+			t.Errorf("error not a instance of NilPointer")
 		} else if e.Error() != expected {
 			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
 		}
@@ -27,19 +27,6 @@ func Test_ErrConversion(t *testing.T) {
 
 		if e := errConversion(arg, typ); !errors.Is(e, serr.ErrConversion) {
 			t.Errorf("error not a instance of Conversion")
-		} else if e.Error() != expected {
-			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
-		}
-	})
-}
-
-func Test_ErrServiceNotFound(t *testing.T) {
-	t.Run("creation", func(t *testing.T) {
-		arg := "dummy argument"
-		expected := "service not found : dummy argument"
-
-		if e := errServiceNotFound(arg); !errors.Is(e, serr.ErrServiceNotFound) {
-			t.Errorf("error not a instance of ErrServiceNotFound")
 		} else if e.Error() != expected {
 			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
 		}

@@ -1,4 +1,4 @@
-package slate
+package srdb
 
 import (
 	"fmt"
@@ -13,6 +13,10 @@ func errConversion(val interface{}, t string) error {
 	return fmt.Errorf("%w : %v to %v", serr.ErrConversion, val, t)
 }
 
-func errServiceNotFound(arg string) error {
-	return fmt.Errorf("%w : %v", serr.ErrServiceNotFound, arg)
+func errDatabaseConfigNotFound(name string) error {
+	return fmt.Errorf("%w : %v", serr.ErrDatabaseConfigNotFound, name)
+}
+
+func errUnknownDatabaseDialect(dialect string) error {
+	return fmt.Errorf("%w : %v", serr.ErrUnknownDatabaseDialect, dialect)
 }

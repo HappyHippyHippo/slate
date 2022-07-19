@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate/serr"
 	"reflect"
 	"testing"
 )
@@ -286,8 +286,8 @@ func Test_ServiceContainer_Service(t *testing.T) {
 
 		if e := (ServiceContainer{}).Service(id, nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.ErrNilPointer) {
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, err.ErrNilPointer)
+		} else if !errors.Is(e, serr.ErrNilPointer) {
+			t.Errorf("returned the error (%v) when was expecting (%v)", e, serr.ErrNilPointer)
 		}
 	})
 
@@ -398,8 +398,8 @@ func Test_ServiceContainer_Factory(t *testing.T) {
 
 		if e := (ServiceContainer{}).Factory(id, nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.ErrNilPointer) {
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, err.ErrNilPointer)
+		} else if !errors.Is(e, serr.ErrNilPointer) {
+			t.Errorf("returned the error (%v) when was expecting (%v)", e, serr.ErrNilPointer)
 		}
 	})
 
@@ -514,8 +514,8 @@ func Test_ServiceContainer_Get(t *testing.T) {
 			t.Error("returned an unexpected valid instance reference")
 		case e == nil:
 			t.Error("didn't returned the expected error instance")
-		case !errors.Is(e, err.ErrServiceNotFound):
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, err.ErrServiceNotFound)
+		case !errors.Is(e, serr.ErrServiceNotFound):
+			t.Errorf("returned the error (%v) when was expecting (%v)", e, serr.ErrServiceNotFound)
 		}
 	})
 
