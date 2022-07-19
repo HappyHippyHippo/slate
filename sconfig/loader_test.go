@@ -290,7 +290,7 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		LoaderSourceListPath = "config_list"
-		defer func() { LoaderSourceListPath = "configs" }()
+		defer func() { LoaderSourceListPath = "slate.config.list" }()
 
 		srcPartial := Partial{"id": "id", "priority": 0}
 		partials := []interface{}{srcPartial}

@@ -82,7 +82,7 @@ const (
 
 const (
 	// EnvID defines the slate.slog package base environment variable name.
-	EnvID = slate.EnvID + "_SLOG"
+	EnvID = slate.EnvID + "_LOG"
 )
 
 var (
@@ -92,7 +92,7 @@ var (
 
 	// LoaderConfigPath defines the entry config source path
 	// to be used as the loader entry.
-	LoaderConfigPath = senv.String(EnvID+"_LOADER_CONFIG_PATH", "slog.streams")
+	LoaderConfigPath = senv.String(EnvID+"_LOADER_CONFIG_PATH", "slate.log.streams")
 
 	// LoaderObserveConfig defines the loader config observing flag
 	// used to register in the config object an observer of the slog

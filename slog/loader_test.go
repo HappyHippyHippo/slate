@@ -74,7 +74,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		manager := NewMockConfigManager(ctrl)
-		manager.EXPECT().List("slog.streams", []interface{}{}).Return(nil, expected).Times(1)
+		manager.EXPECT().List("slate.log.streams", []interface{}{}).Return(nil, expected).Times(1)
 
 		sut, _ := newLoader(manager, NewMockLogger(ctrl), NewMockStreamFactory(ctrl))
 
@@ -90,8 +90,8 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		manager := NewMockConfigManager(ctrl)
-		manager.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{}, nil).Times(1)
-		manager.EXPECT().AddObserver("slog.streams", gomock.Any()).Return(nil).Times(1)
+		manager.EXPECT().List("slate.log.streams", []interface{}{}).Return([]interface{}{}, nil).Times(1)
+		manager.EXPECT().AddObserver("slate.log.streams", gomock.Any()).Return(nil).Times(1)
 
 		sut, _ := newLoader(manager, NewMockLogger(ctrl), NewMockStreamFactory(ctrl))
 
@@ -106,7 +106,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		path := "path"
 		LoaderConfigPath = path
-		defer func() { LoaderConfigPath = "slog.streams" }()
+		defer func() { LoaderConfigPath = "slate.log.streams" }()
 
 		manager := NewMockConfigManager(ctrl)
 		manager.EXPECT().List(path, []interface{}{}).Return([]interface{}{"string"}, nil).Times(1)
@@ -125,7 +125,7 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		manager := NewMockConfigManager(ctrl)
-		manager.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{"string"}, nil).Times(1)
+		manager.EXPECT().List("slate.log.streams", []interface{}{}).Return([]interface{}{"string"}, nil).Times(1)
 
 		sut, _ := newLoader(manager, NewMockLogger(ctrl), NewMockStreamFactory(ctrl))
 
@@ -142,7 +142,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		partial := sconfig.Partial{"id": 123}
 		manager := NewMockConfigManager(ctrl)
-		manager.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
+		manager.EXPECT().List("slate.log.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
 
 		sut, _ := newLoader(manager, NewMockLogger(ctrl), NewMockStreamFactory(ctrl))
 
@@ -160,7 +160,7 @@ func Test_Loader_Load(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		partial := sconfig.Partial{"id": "id", "type": "invalid"}
 		manager := NewMockConfigManager(ctrl)
-		manager.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
+		manager.EXPECT().List("slate.log.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
 		sFactory := NewMockStreamFactory(ctrl)
 		sFactory.EXPECT().CreateFromConfig(&partial).Return(nil, expected).Times(1)
 
@@ -180,7 +180,7 @@ func Test_Loader_Load(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		partial := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
 		manager := NewMockConfigManager(ctrl)
-		manager.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
+		manager.EXPECT().List("slate.log.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
 		stream1 := NewMockStream(ctrl)
 		sFactory := NewMockStreamFactory(ctrl)
 		sFactory.EXPECT().CreateFromConfig(&partial).Return(stream1, nil).Times(1)
@@ -202,8 +202,8 @@ func Test_Loader_Load(t *testing.T) {
 
 		partial := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
 		manager := NewMockConfigManager(ctrl)
-		manager.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
-		manager.EXPECT().AddObserver("slog.streams", gomock.Any()).Return(nil).Times(1)
+		manager.EXPECT().List("slate.log.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
+		manager.EXPECT().AddObserver("slate.log.streams", gomock.Any()).Return(nil).Times(1)
 		stream1 := NewMockStream(ctrl)
 		sFactory := NewMockStreamFactory(ctrl)
 		sFactory.EXPECT().CreateFromConfig(&partial).Return(stream1, nil).Times(1)
@@ -222,7 +222,7 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		config1 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
-		partial := sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{config1}}}
+		partial := sconfig.Partial{"slate": sconfig.Partial{"log": sconfig.Partial{"streams": []interface{}{config1}}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
 		manager := sconfig.NewManager(0)
@@ -237,7 +237,7 @@ func Test_Loader_Load(t *testing.T) {
 		sut, _ := newLoader(manager, logger, sFactory)
 		_ = sut.Load()
 
-		partial = sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{"string"}}}
+		partial = sconfig.Partial{"slate": sconfig.Partial{"log": sconfig.Partial{"streams": []interface{}{"string"}}}}
 		source = NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
 		_ = manager.AddSource("id2", 100, source)
@@ -249,7 +249,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		config1 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
-		partial := sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{config1}}}
+		partial := sconfig.Partial{"slate": sconfig.Partial{"log": sconfig.Partial{"streams": []interface{}{config1}}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
 		manager := sconfig.NewManager(0)
@@ -269,7 +269,7 @@ func Test_Loader_Load(t *testing.T) {
 		_ = sut.Load()
 
 		config2 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
-		partial = sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{config2, config2}}}
+		partial = sconfig.Partial{"slate": sconfig.Partial{"log": sconfig.Partial{"streams": []interface{}{config2, config2}}}}
 		source = NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
 		_ = manager.AddSource("id2", 100, source)
@@ -281,7 +281,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		config1 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
 		config2 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "error"}
-		partial := sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{config1}}}
+		partial := sconfig.Partial{"slate": sconfig.Partial{"log": sconfig.Partial{"streams": []interface{}{config1}}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
 		manager := sconfig.NewManager(0)
@@ -303,7 +303,7 @@ func Test_Loader_Load(t *testing.T) {
 		sut, _ := newLoader(manager, logger, sFactory)
 		_ = sut.Load()
 
-		partial = sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{config2}}}
+		partial = sconfig.Partial{"slate": sconfig.Partial{"log": sconfig.Partial{"streams": []interface{}{config2}}}}
 		source = NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
 		_ = manager.AddSource("id2", 100, source)

@@ -161,7 +161,7 @@ var (
 
 	// LoaderSourceListPath defines the entry config source path of
 	// loading sources.
-	LoaderSourceListPath = senv.String(EnvID+"_LOADER_SOURCE_LIST_PATH", "configs")
+	LoaderSourceListPath = senv.String(EnvID+"_LOADER_SOURCE_LIST_PATH", "slate.config.list")
 
 	// ObserveFrequency defines the id to be used as the default of a
 	// config observable source frequency time in seconds.

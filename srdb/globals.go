@@ -25,7 +25,7 @@ const (
 	// ContainerConfigID defines the id to be used as the container
 	// registration id of the relational database connection configuration
 	// instance.
-	ContainerConfigID = ContainerID + ".cfg"
+	ContainerConfigID = ContainerID + ".config"
 
 	// ContainerDialectStrategyTag defines the tag to be assigned to all
 	// container relational database dialect strategies.
