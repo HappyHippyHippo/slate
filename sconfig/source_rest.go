@@ -8,7 +8,7 @@ import (
 )
 
 // HTTPClient defines the interface of an instance capable to perform the
-// rest sconfig obtain action
+// rest config obtain action
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
@@ -105,5 +105,5 @@ func (s *sourceRest) searchConfig(body IConfig) (IConfig, error) {
 		return &p, nil
 	}
 
-	return nil, errConversion(cfg, "sconfig.Partial")
+	return nil, errConversion(cfg, "IConfig")
 }

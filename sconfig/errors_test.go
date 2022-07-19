@@ -36,7 +36,7 @@ func Test_ErrConversion(t *testing.T) {
 func Test_ErrConfigSourceNotFound(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := "dummy argument"
-		expected := "sconfig source not found : dummy argument"
+		expected := "config source not found : dummy argument"
 
 		if e := errConfigSourceNotFound(arg); !errors.Is(e, serr.ErrConfigSourceNotFound) {
 			t.Errorf("error not a instance of ErrSourceNotFound")
@@ -49,7 +49,7 @@ func Test_ErrConfigSourceNotFound(t *testing.T) {
 func Test_ErrDuplicateConfigSource(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := "dummy argument"
-		expected := "sconfig source already registered : dummy argument"
+		expected := "config source already registered : dummy argument"
 
 		if e := errDuplicateConfigSource(arg); !errors.Is(e, serr.ErrDuplicateConfigSource) {
 			t.Errorf("error not a instance of ErrDuplicateSource")
@@ -62,7 +62,7 @@ func Test_ErrDuplicateConfigSource(t *testing.T) {
 func Test_ErrConfigPathNotFound(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := "dummy argument"
-		expected := "sconfig path not found : dummy argument"
+		expected := "config path not found : dummy argument"
 
 		if e := errConfigPathNotFound(arg); !errors.Is(e, serr.ErrConfigPathNotFound) {
 			t.Errorf("error not a instance of ErrPathNotFound")
@@ -88,7 +88,7 @@ func Test_ErrConfigRestPathNotFound(t *testing.T) {
 func Test_ErrInvalidConfigDecoderFormat(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := DecoderFormatUnknown
-		expected := "invalid sconfig decoder format : unknown"
+		expected := "invalid config decoder format : unknown"
 
 		if e := errInvalidConfigDecoderFormat(arg); !errors.Is(e, serr.ErrInvalidConfigDecoderFormat) {
 			t.Errorf("error not a instance of ErrInvalidDecoderFormat")
@@ -101,7 +101,7 @@ func Test_ErrInvalidConfigDecoderFormat(t *testing.T) {
 func Test_ErrInvalidConfigSourceType(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := SourceTypeUnknown
-		expected := "invalid sconfig source type : unknown"
+		expected := "invalid config source type : unknown"
 
 		if e := errInvalidConfigSourceType(arg); !errors.Is(e, serr.ErrInvalidConfigSourceType) {
 			t.Errorf("error not a instance of ErrInvalidSourceType")
@@ -114,7 +114,7 @@ func Test_ErrInvalidConfigSourceType(t *testing.T) {
 func Test_ErrInvalidConfigSourcePartial(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := Partial{"field": "dummy argument"}
-		expected := "invalid sconfig source sconfig : &map[field:dummy argument]"
+		expected := "invalid config source config : &map[field:dummy argument]"
 
 		if e := errInvalidConfigSourcePartial(&arg); !errors.Is(e, serr.ErrInvalidConfigSourcePartial) {
 			t.Errorf("error not a instance of ErrInvalidSourceConfig")

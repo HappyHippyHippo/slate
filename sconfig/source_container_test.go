@@ -22,7 +22,7 @@ func Test_NewSourceContainer(t *testing.T) {
 		}
 	})
 
-	t.Run("error while retrieving sconfig partial", func(t *testing.T) {
+	t.Run("error while retrieving config partial", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

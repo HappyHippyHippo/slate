@@ -93,7 +93,7 @@ func Test_SourceStrategyDir_Accept(t *testing.T) {
 }
 
 func Test_SourceStrategyDir_AcceptFromConfig(t *testing.T) {
-	t.Run("don't accept on invalid sconfig pointer", func(t *testing.T) {
+	t.Run("don't accept on invalid config pointer", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -137,7 +137,7 @@ func Test_SourceStrategyDir_AcceptFromConfig(t *testing.T) {
 		}
 	})
 
-	t.Run("accept sconfig", func(t *testing.T) {
+	t.Run("accept config", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -258,17 +258,17 @@ func Test_SourceStrategyDir_Create(t *testing.T) {
 
 		path := "path"
 		expected := Partial{"field": "value"}
-		fileinfoname := "file.yaml"
-		fileinfo := NewMockFileInfo(ctrl)
-		fileinfo.EXPECT().IsDir().Return(false).Times(1)
-		fileinfo.EXPECT().Name().Return(fileinfoname).Times(1)
+		fileInfoName := "file.yaml"
+		fileInfo := NewMockFileInfo(ctrl)
+		fileInfo.EXPECT().IsDir().Return(false).Times(1)
+		fileInfo.EXPECT().Name().Return(fileInfoName).Times(1)
 		dir := NewMockFile(ctrl)
-		dir.EXPECT().Readdir(0).Return([]os.FileInfo{fileinfo}, nil).Times(1)
+		dir.EXPECT().Readdir(0).Return([]os.FileInfo{fileInfo}, nil).Times(1)
 		dir.EXPECT().Close().Return(nil).Times(1)
 		file := NewMockFile(ctrl)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
-		fs.EXPECT().OpenFile(path+"/"+fileinfoname, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
@@ -297,7 +297,7 @@ func Test_SourceStrategyDir_Create(t *testing.T) {
 }
 
 func Test_SourceStrategyDir_CreateFromConfig(t *testing.T) {
-	t.Run("error on nil sconfig pointer", func(t *testing.T) {
+	t.Run("error on nil config pointer", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -405,17 +405,17 @@ func Test_SourceStrategyDir_CreateFromConfig(t *testing.T) {
 
 		path := "path"
 		expected := Partial{"field": "value"}
-		fileinfoname := "file.yaml"
-		fileinfo := NewMockFileInfo(ctrl)
-		fileinfo.EXPECT().IsDir().Return(false).Times(1)
-		fileinfo.EXPECT().Name().Return(fileinfoname).Times(1)
+		fileInfoName := "file.yaml"
+		fileInfo := NewMockFileInfo(ctrl)
+		fileInfo.EXPECT().IsDir().Return(false).Times(1)
+		fileInfo.EXPECT().Name().Return(fileInfoName).Times(1)
 		dir := NewMockFile(ctrl)
-		dir.EXPECT().Readdir(0).Return([]os.FileInfo{fileinfo}, nil).Times(1)
+		dir.EXPECT().Readdir(0).Return([]os.FileInfo{fileInfo}, nil).Times(1)
 		dir.EXPECT().Close().Return(nil).Times(1)
 		file := NewMockFile(ctrl)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
-		fs.EXPECT().OpenFile(path+"/"+fileinfoname, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
@@ -442,23 +442,23 @@ func Test_SourceStrategyDir_CreateFromConfig(t *testing.T) {
 		}
 	})
 
-	t.Run("create the dir source defaulting format if not present in sconfig", func(t *testing.T) {
+	t.Run("create the dir source defaulting format if not present in config", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		path := "path"
 		expected := Partial{"field": "value"}
-		fileinfoname := "file.yaml"
-		fileinfo := NewMockFileInfo(ctrl)
-		fileinfo.EXPECT().IsDir().Return(false).Times(1)
-		fileinfo.EXPECT().Name().Return(fileinfoname).Times(1)
+		fileInfoName := "file.yaml"
+		fileInfo := NewMockFileInfo(ctrl)
+		fileInfo.EXPECT().IsDir().Return(false).Times(1)
+		fileInfo.EXPECT().Name().Return(fileInfoName).Times(1)
 		dir := NewMockFile(ctrl)
-		dir.EXPECT().Readdir(0).Return([]os.FileInfo{fileinfo}, nil).Times(1)
+		dir.EXPECT().Readdir(0).Return([]os.FileInfo{fileInfo}, nil).Times(1)
 		dir.EXPECT().Close().Return(nil).Times(1)
 		file := NewMockFile(ctrl)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
-		fs.EXPECT().OpenFile(path+"/"+fileinfoname, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)

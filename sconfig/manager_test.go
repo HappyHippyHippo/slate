@@ -11,7 +11,7 @@ import (
 )
 
 func Test_NewConfig(t *testing.T) {
-	t.Run("new sconfig without reload", func(t *testing.T) {
+	t.Run("new config without reload", func(t *testing.T) {
 		sut := NewManager(0 * time.Second)
 		defer func() { _ = sut.Close() }()
 
@@ -23,11 +23,11 @@ func Test_NewConfig(t *testing.T) {
 		case sut.(*manager).observers == nil:
 			t.Error("didn't instantiate the observers storing array")
 		case sut.(*manager).loader != nil:
-			t.Error("instantiated the sources reload strigger")
+			t.Error("instantiated the sources reload trigger")
 		}
 	})
 
-	t.Run("new sconfig with reload", func(t *testing.T) {
+	t.Run("new config with reload", func(t *testing.T) {
 		sut := NewManager(10 * time.Second)
 		defer func() { _ = sut.Close() }()
 
@@ -39,7 +39,7 @@ func Test_NewConfig(t *testing.T) {
 		case sut.(*manager).observers == nil:
 			t.Error("didn't instantiate the observers storing array")
 		case sut.(*manager).loader == nil:
-			t.Error("didn't instantiate the sources reload strigger")
+			t.Error("didn't instantiate the sources reload trigger")
 		}
 	})
 }
@@ -857,7 +857,7 @@ func Test_Config(t *testing.T) {
 		}
 	})
 
-	t.Run("should call observer callback function on sconfig changes", func(t *testing.T) {
+	t.Run("should call observer callback function on config changes", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -890,14 +890,14 @@ func Test_Config(t *testing.T) {
 		}
 	})
 
-	t.Run("should call observer callback function on sconfig changes on a list", func(t *testing.T) {
+	t.Run("should call observer callback function on config changes on a list", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		check := false
 		sut := NewManager(20 * time.Millisecond)
-		initial := []interface{}{Partial{"subnode": "value1"}}
-		expected := []interface{}{Partial{"subnode": "value2"}}
+		initial := []interface{}{Partial{"sub_node": "value1"}}
+		expected := []interface{}{Partial{"sub_node": "value2"}}
 
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Get("").Return(Partial{"node": initial}, nil).AnyTimes()
@@ -906,10 +906,10 @@ func Test_Config(t *testing.T) {
 		_ = sut.AddObserver("node", func(old, new interface{}) {
 			check = true
 
-			if old.([]interface{})[0].(Partial)["subnode"] != initial[0].(Partial)["subnode"] {
+			if old.([]interface{})[0].(Partial)["sub_node"] != initial[0].(Partial)["sub_node"] {
 				t.Errorf("callback called with (%v) as old value", old)
 			}
-			if new.([]interface{})[0].(Partial)["subnode"] != expected[0].(Partial)["subnode"] {
+			if new.([]interface{})[0].(Partial)["sub_node"] != expected[0].(Partial)["sub_node"] {
 				t.Errorf("callback called with (%v) as new value", new)
 			}
 		})
@@ -920,19 +920,19 @@ func Test_Config(t *testing.T) {
 
 		if !check {
 			t.Errorf("didn't actually called the callback")
-		} else if check := sut.(*manager).observers[0].current; check.([]interface{})[0].(Partial)["subnode"] != expected[0].(Partial)["subnode"] {
+		} else if check := sut.(*manager).observers[0].current; check.([]interface{})[0].(Partial)["sub_node"] != expected[0].(Partial)["sub_node"] {
 			t.Errorf("stored the current value {%v} instead of the expected {%v}", check, expected)
 		}
 	})
 
-	t.Run("should call observer callback function on sconfig changes on a partial", func(t *testing.T) {
+	t.Run("should call observer callback function on config changes on a partial", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		check := false
 		sut := NewManager(20 * time.Millisecond)
-		initial := Partial{"subnode": "value1"}
-		expected := Partial{"subnode": "value2"}
+		initial := Partial{"sub_node": "value1"}
+		expected := Partial{"sub_node": "value2"}
 
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Get("").Return(Partial{"node": initial}, nil).AnyTimes()
@@ -955,7 +955,7 @@ func Test_Config(t *testing.T) {
 
 		if !check {
 			t.Errorf("didn't actually called the callback")
-		} else if check := sut.(*manager).observers[0].current; check.(Partial)["subnode"] != expected["subnode"] {
+		} else if check := sut.(*manager).observers[0].current; check.(Partial)["sub_node"] != expected["sub_node"] {
 			t.Errorf("stored the current value {%v} instead of the expected {%v}", check, expected)
 		}
 	})

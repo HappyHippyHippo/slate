@@ -128,8 +128,8 @@ func Test_DecoderJSON_Decode(t *testing.T) {
 	})
 
 	t.Run("decode json string", func(t *testing.T) {
-		json := `{"node": {"subnode": "data"}}`
-		expected := Partial{"node": Partial{"subnode": "data"}}
+		json := `{"node": {"sub_node": "data"}}`
+		expected := Partial{"node": Partial{"sub_node": "data"}}
 		reader := strings.NewReader(json)
 		sut, _ := newDecoderJSON(reader)
 		defer func() { _ = sut.Close() }()

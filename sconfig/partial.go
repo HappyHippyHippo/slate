@@ -32,7 +32,7 @@ func (p Partial) Clone() Partial {
 	return target
 }
 
-// Has will check if a requested path exists in the sconfig Partial.
+// Has will check if a requested path exists in the config Partial.
 func (p *Partial) Has(path string) bool {
 	_, e := p.path(path)
 	return e == nil
@@ -168,7 +168,7 @@ func (p *Partial) List(path string, def ...[]interface{}) ([]interface{}, error)
 	return v, nil
 }
 
-// Partial will retrieve a value stored in the quested path cast to sconfig
+// Partial will retrieve a value stored in the quested path cast to config
 func (p *Partial) Partial(path string, def ...Partial) (Partial, error) {
 	var val interface{}
 	var e error
@@ -184,7 +184,7 @@ func (p *Partial) Partial(path string, def ...Partial) (Partial, error) {
 
 	v, ok := val.(Partial)
 	if !ok {
-		return nil, errConversion(val, "sconfig.Partial")
+		return nil, errConversion(val, "config.Partial")
 	}
 
 	return v, nil

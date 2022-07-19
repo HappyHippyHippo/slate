@@ -84,7 +84,7 @@ func Test_SourceStrategyRestObservable_Accept(t *testing.T) {
 }
 
 func Test_SourceStrategyRestObservable_AcceptFromConfig(t *testing.T) {
-	t.Run("don't accept on invalid sconfig pointer", func(t *testing.T) {
+	t.Run("don't accept on invalid config pointer", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -128,7 +128,7 @@ func Test_SourceStrategyRestObservable_AcceptFromConfig(t *testing.T) {
 		}
 	})
 
-	t.Run("accept sconfig", func(t *testing.T) {
+	t.Run("accept config", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -192,7 +192,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 		}
 	})
 
-	t.Run("missing sconfig path", func(t *testing.T) {
+	t.Run("missing config path", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -215,7 +215,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 
 		sut, _ := newSourceStrategyObservableRest(NewMockDecoderFactory(ctrl))
 
-		src, e := sut.Create(123, "format", "sconfig path", "timestamp path")
+		src, e := sut.Create(123, "format", "config path", "timestamp path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -232,7 +232,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 
 		sut, _ := newSourceStrategyObservableRest(NewMockDecoderFactory(ctrl))
 
-		src, e := sut.Create("uri", 123, "sconfig path", "timestamp path")
+		src, e := sut.Create("uri", 123, "config path", "timestamp path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -249,7 +249,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 
 		sut, _ := newSourceStrategyObservableRest(NewMockDecoderFactory(ctrl))
 
-		src, e := sut.Create("uri", "format", 123, "sconfig path")
+		src, e := sut.Create("uri", "format", 123, "config path")
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -260,7 +260,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 		}
 	})
 
-	t.Run("non-string sconfig path", func(t *testing.T) {
+	t.Run("non-string config path", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -324,7 +324,7 @@ func Test_SourceStrategyRestObservable_Create(t *testing.T) {
 }
 
 func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
-	t.Run("error on nil sconfig pointer", func(t *testing.T) {
+	t.Run("error on nil config pointer", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -375,7 +375,7 @@ func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 		}
 	})
 
-	t.Run("missing sconfig path", func(t *testing.T) {
+	t.Run("missing config path", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -443,7 +443,7 @@ func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 		}
 	})
 
-	t.Run("non-string sconfig path", func(t *testing.T) {
+	t.Run("non-string config path", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -505,7 +505,7 @@ func Test_SourceStrategyRestObservable_CreateFromConfig(t *testing.T) {
 		}
 	})
 
-	t.Run("create the rest source defaulting format if not present in sconfig", func(t *testing.T) {
+	t.Run("create the rest source defaulting format if not present in config", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

@@ -63,7 +63,7 @@ func Test_StreamStrategyConsole_Accept(t *testing.T) {
 }
 
 func Test_StreamStrategyConsole_AcceptFromConfig(t *testing.T) {
-	t.Run("don't accept if sconfig is a nil pointer", func(t *testing.T) {
+	t.Run("don't accept if config is a nil pointer", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -232,7 +232,7 @@ func Test_StreamStrategyConsole_Create(t *testing.T) {
 }
 
 func Test_StreamStrategyConsole_CreateFromConfig(t *testing.T) {
-	t.Run("error on nil sconfig pointer", func(t *testing.T) {
+	t.Run("error on nil config pointer", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

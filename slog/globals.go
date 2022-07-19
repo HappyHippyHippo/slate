@@ -86,17 +86,17 @@ const (
 )
 
 var (
-	// LoaderActive defines the entry sconfig source active flag
-	// used to signal the sconfig loader to load the streams or not
+	// LoaderActive defines the entry config source active flag
+	// used to signal the config loader to load the streams or not
 	LoaderActive = senv.Bool(EnvID+"_LOADER_ACTIVE", true)
 
-	// LoaderConfigPath defines the entry sconfig source path
+	// LoaderConfigPath defines the entry config source path
 	// to be used as the loader entry.
 	LoaderConfigPath = senv.String(EnvID+"_LOADER_CONFIG_PATH", "slog.streams")
 
-	// LoaderObserveConfig defines the loader sconfig observing flag
-	// used to register in the sconfig object an observer of the slog
-	// sconfig entries list, so it can reload the logger streams.
+	// LoaderObserveConfig defines the loader config observing flag
+	// used to register in the config object an observer of the slog
+	// config entries list, so it can reload the logger streams.
 	LoaderObserveConfig = senv.Bool(EnvID+"_LOADER_OBSERVE_CONFIG", true)
 
 	// LoaderErrorChannel defines the loader error logging channel.

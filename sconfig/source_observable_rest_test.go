@@ -211,7 +211,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		}
 	})
 
-	t.Run("response sconfig path not found", func(t *testing.T) {
+	t.Run("response config path not found", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -261,7 +261,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		}
 	})
 
-	t.Run("response path not pointing to a sconfig Partial", func(t *testing.T) {
+	t.Run("response path not pointing to a config Partial", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -385,7 +385,7 @@ func Test_SourceRestObservable_Reload(t *testing.T) {
 		loaded, e := sut.Reload()
 		switch {
 		case loaded != false:
-			t.Error("unexpectedly reload the source sconfig")
+			t.Error("unexpectedly reload the source config")
 		case e != nil:
 			t.Errorf("returned the eunexpected e : %v", e)
 		default:
@@ -400,7 +400,7 @@ func Test_SourceRestObservable_Reload(t *testing.T) {
 		}
 	})
 
-	t.Run("correctly reload sconfig", func(t *testing.T) {
+	t.Run("correctly reload config", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -431,7 +431,7 @@ func Test_SourceRestObservable_Reload(t *testing.T) {
 		loaded, e := sut.Reload()
 		switch {
 		case loaded != true:
-			t.Error("didn't reload the source sconfig")
+			t.Error("didn't reload the source config")
 		case e != nil:
 			t.Errorf("returned the eunexpected e : %v", e)
 		default:

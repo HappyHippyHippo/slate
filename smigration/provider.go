@@ -5,13 +5,13 @@ import (
 	"github.com/happyhippyhippo/slate/srdb"
 )
 
-// Provider defines the slate.smigration module service provider to be used on
+// Provider defines the slate.migration module service provider to be used on
 // the application initialization to register the migrations service.
 type Provider struct{}
 
 var _ slate.IServiceProvider = &Provider{}
 
-// Register will register the smigration package instances in the
+// Register will register the migration package instances in the
 // application container
 func (p Provider) Register(c slate.ServiceContainer) error {
 	if c == nil {
@@ -49,10 +49,10 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 	return nil
 }
 
-// Boot will start the smigration package
-// If the auto smigration is defined as true, ether by global variable or
+// Boot will start the migration package
+// If the auto migration is defined as true, ether by global variable or
 // by environment variable, the migrator will automatically try to migrate
-// to the last registered smigration
+// to the last registered migration
 func (p Provider) Boot(c slate.ServiceContainer) error {
 	if c == nil {
 		return errNilPointer("container")

@@ -262,9 +262,9 @@ func Test_Partial_Get(t *testing.T) {
 			case e == nil:
 				t.Error("didn't returned the expected error")
 			case !errors.Is(e, serr.ErrConfigPathNotFound):
-				t.Errorf("returned error was not a sconfig path not found error : %v", e)
+				t.Errorf("returned error was not a config path not found error : %v", e)
 			case check != nil:
-				t.Error("unexpectedly returned a valid reference to a stored sconfig value")
+				t.Error("unexpectedly returned a valid reference to a stored config value")
 			}
 		}
 	})

@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// ITrigger defines the interface of a strigger used to execute a function call
+// ITrigger defines the interface of a trigger used to execute a function call
 // on determine time intervals.
 type ITrigger interface {
 	io.Closer
@@ -17,7 +17,7 @@ type trigger struct {
 	callback ICallback
 }
 
-// Delay will retrieve the time period associated to the strigger.
+// Delay will retrieve the time period associated to the trigger.
 func (t trigger) Delay() time.Duration {
 	return t.delay
 }

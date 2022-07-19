@@ -36,7 +36,7 @@ func Test_ErrConversion(t *testing.T) {
 func Test_ErrDatabaseConfigNotFound(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := "dummy argument"
-		expected := "database sconfig not found : dummy argument"
+		expected := "database config not found : dummy argument"
 
 		if e := errDatabaseConfigNotFound(arg); !errors.Is(e, serr.ErrDatabaseConfigNotFound) {
 			t.Errorf("error not a instance of ErrConfigNotFound")

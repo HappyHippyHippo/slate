@@ -7,14 +7,14 @@ import (
 	gormLogger "gorm.io/gorm/logger"
 )
 
-// Provider defines the slate.srdb module service provider to be used on
+// Provider defines the slate.rdb module service provider to be used on
 // the application initialization to register the relational
 // database services.
 type Provider struct{}
 
 var _ slate.IServiceProvider = &Provider{}
 
-// Register will register the srdb package instances in the
+// Register will register the rdb package instances in the
 // application container
 func (p Provider) Register(c slate.ServiceContainer) error {
 	if c == nil {
@@ -60,7 +60,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 	return nil
 }
 
-// Boot will start the srdb package
+// Boot will start the rdb package
 func (p Provider) Boot(c slate.ServiceContainer) error {
 	if c == nil {
 		return errNilPointer("container")

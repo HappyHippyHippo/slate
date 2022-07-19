@@ -30,10 +30,10 @@ func newMigrator(dao IDao) (IMigrator, error) {
 	}, nil
 }
 
-// AddMigration registers a smigration into the smigration manager.
+// AddMigration registers a migration into the migration manager.
 func (m *migrator) AddMigration(migration IMigration) error {
 	if migration == nil {
-		return errNilPointer("smigration")
+		return errNilPointer("migration")
 	}
 
 	m.migrations = append(m.migrations, migration)
@@ -45,7 +45,7 @@ func (m *migrator) AddMigration(migration IMigration) error {
 	return nil
 }
 
-// Current returns the version of the last executed smigration.
+// Current returns the version of the last executed migration.
 func (m migrator) Current() (uint64, error) {
 	current, e := m.dao.Last()
 	if e != nil {
@@ -82,7 +82,7 @@ func (m migrator) Migrate() error {
 	return nil
 }
 
-// Up will try to execute the next smigration in queue to be executed.
+// Up will try to execute the next migration in queue to be executed.
 func (m migrator) Up() error {
 	if len(m.migrations) == 0 {
 		return nil
@@ -107,7 +107,7 @@ func (m migrator) Up() error {
 	return nil
 }
 
-// Down will try to revert the last smigration executed.
+// Down will try to revert the last migration executed.
 func (m migrator) Down() error {
 	if len(m.migrations) == 0 {
 		return nil

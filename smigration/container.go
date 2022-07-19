@@ -2,7 +2,7 @@ package smigration
 
 import "github.com/happyhippyhippo/slate"
 
-// GetDao will try to retrieve a new smigration DAO instances
+// GetDao will try to retrieve a new migration DAO instances
 // from the application service container.
 func GetDao(c slate.ServiceContainer) (IDao, error) {
 	instance, e := c.Get(ContainerDaoID)
@@ -12,7 +12,7 @@ func GetDao(c slate.ServiceContainer) (IDao, error) {
 
 	i, ok := instance.(IDao)
 	if !ok {
-		return nil, errConversion(instance, "IDao")
+		return nil, errConversion(instance, "smigration.IDao")
 	}
 	return i, nil
 }
@@ -27,13 +27,13 @@ func GetMigrator(c slate.ServiceContainer) (IMigrator, error) {
 
 	i, ok := instance.(IMigrator)
 	if !ok {
-		return nil, errConversion(instance, "IMigrator")
+		return nil, errConversion(instance, "smigration.IMigrator")
 	}
 	return i, nil
 }
 
 // GetMigrations will try to retrieve the registered the list of
-// smigration instances from the application service container.
+// migration instances from the application service container.
 func GetMigrations(c slate.ServiceContainer) ([]IMigration, error) {
 	tags, e := c.Tagged(ContainerMigrationTag)
 	if e != nil {
@@ -44,7 +44,7 @@ func GetMigrations(c slate.ServiceContainer) ([]IMigration, error) {
 	for _, service := range tags {
 		s, ok := service.(IMigration)
 		if !ok {
-			return nil, errConversion(service, "IMigration")
+			return nil, errConversion(service, "smigration.IMigration")
 		}
 		list = append(list, s)
 	}

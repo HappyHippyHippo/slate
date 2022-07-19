@@ -1,6 +1,6 @@
 package sconfig
 
-// ILoader defines the interface of a sconfig loader instance.
+// ILoader defines the interface of a config loader instance.
 type ILoader interface {
 	Load() error
 }
@@ -26,7 +26,7 @@ func newLoader(cfg IManager, sFactory ISourceFactory) (ILoader, error) {
 	}, nil
 }
 
-// Load loads the configuration from a base sconfig file defined by a
+// Load loads the configuration from a base config file defined by a
 // path and format.
 func (l loader) Load() error {
 	if src, e := l.sFactory.Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat); e != nil {

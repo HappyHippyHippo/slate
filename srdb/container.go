@@ -30,7 +30,7 @@ func GetDialectFactory(c slate.ServiceContainer) (IDialectFactory, error) {
 
 	i, ok := instance.(IDialectFactory)
 	if !ok {
-		return nil, errConversion(instance, "IDialectFactory")
+		return nil, errConversion(instance, "srdb.IDialectFactory")
 	}
 	return i, nil
 }
@@ -47,7 +47,7 @@ func GetDialectStrategies(c slate.ServiceContainer) ([]IDialectStrategy, error) 
 	for _, service := range tags {
 		s, ok := service.(IDialectStrategy)
 		if !ok {
-			return nil, errConversion(service, "IDialectStrategy")
+			return nil, errConversion(service, "srdb.IDialectStrategy")
 		}
 		list = append(list, s)
 	}
@@ -64,7 +64,7 @@ func GetConnectionFactory(c slate.ServiceContainer) (IConnectionFactory, error) 
 
 	i, ok := instance.(IConnectionFactory)
 	if !ok {
-		return nil, errConversion(instance, "IConnectionFactory")
+		return nil, errConversion(instance, "srdb.IConnectionFactory")
 	}
 	return i, nil
 }

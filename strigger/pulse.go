@@ -11,7 +11,7 @@ type pulse struct {
 
 var _ ITrigger = &pulse{}
 
-// NewPulse instantiate a new pulse strigger that will execute a
+// NewPulse instantiate a new pulse trigger that will execute a
 // callback method after a determined amount of time.
 func NewPulse(delay time.Duration, callback ICallback) (ITrigger, error) {
 	if callback == nil {

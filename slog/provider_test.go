@@ -296,7 +296,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving sconfig on retrieving logger loader", func(t *testing.T) {
+	t.Run("error retrieving config on retrieving logger loader", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.ServiceContainer{}
 		_ = (Provider{}).Register(container)
@@ -311,7 +311,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid sconfig on retrieving logger loader", func(t *testing.T) {
+	t.Run("invalid config on retrieving logger loader", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (sfs.Provider{}).Register(container)
 		_ = (sconfig.Provider{}).Register(container)
@@ -598,7 +598,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid slog entry sconfig", func(t *testing.T) {
+	t.Run("invalid slog entry config", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

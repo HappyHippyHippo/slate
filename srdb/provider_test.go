@@ -56,7 +56,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("always return a new srdb connection cfg every call", func(t *testing.T) {
+	t.Run("always return a new rdb connection cfg every call", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&Provider{}).Register(container)
 
@@ -266,9 +266,9 @@ func Test_Provider_Register(t *testing.T) {
 			return dFactory, nil
 		})
 		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("srdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("srdb.connections.primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("srdb.connections.primary").Return(partial, nil).Times(1)
+		cfg.EXPECT().AddObserver("rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("rdb.connections.primary").Return(partial, nil).Times(1)
 		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
 			return cfg, nil
 		})
@@ -300,9 +300,9 @@ func Test_Provider_Register(t *testing.T) {
 			return dFactory, nil
 		})
 		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("srdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("srdb.connections.other_primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("srdb.connections.other_primary").Return(partial, nil).Times(1)
+		cfg.EXPECT().AddObserver("rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("rdb.connections.other_primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("rdb.connections.other_primary").Return(partial, nil).Times(1)
 		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
 			return cfg, nil
 		})

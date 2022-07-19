@@ -22,7 +22,7 @@ const (
 // and a code level identifier of a logging level.
 var LevelMap = map[string]Level{
 	"fatal":   FATAL,
-	"serr":    ERROR,
+	"error":   ERROR,
 	"warning": WARNING,
 	"notice":  NOTICE,
 	"info":    INFO,

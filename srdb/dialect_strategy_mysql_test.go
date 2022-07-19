@@ -165,7 +165,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 	})
 
 	t.Run("valid connection", func(t *testing.T) {
-		expected := "user:password@protocol(localhost:123)/srdb"
+		expected := "user:password@protocol(localhost:123)/rdb"
 		cfg := &sconfig.Partial{
 			"dialect":  "mysql",
 			"username": "user",
@@ -173,7 +173,7 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 			"protocol": "protocol",
 			"host":     "localhost",
 			"port":     123,
-			"schema":   "srdb",
+			"schema":   "rdb",
 		}
 
 		dialect, e := (&dialectStrategyMySQL{}).Get(cfg)
@@ -190,13 +190,13 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 	})
 
 	t.Run("valid connection with default protocol and port", func(t *testing.T) {
-		expected := "user:password@tcp(localhost:3306)/srdb"
+		expected := "user:password@tcp(localhost:3306)/rdb"
 		cfg := &sconfig.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
 			"host":     "localhost",
-			"schema":   "srdb",
+			"schema":   "rdb",
 		}
 
 		dialect, e := (&dialectStrategyMySQL{}).Get(cfg)
@@ -218,13 +218,13 @@ func Test_DialectStrategyMySql_Get(t *testing.T) {
 	})
 
 	t.Run("valid connection with extra params", func(t *testing.T) {
-		expectedPrefix := "user:password@tcp(localhost:3306)/srdb?"
+		expectedPrefix := "user:password@tcp(localhost:3306)/rdb?"
 		cfg := &sconfig.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
 			"host":     "localhost",
-			"schema":   "srdb",
+			"schema":   "rdb",
 			"params": sconfig.Partial{
 				"param1": "value1",
 				"param2": "value2",

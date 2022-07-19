@@ -41,7 +41,7 @@ func Test_NewMigrator(t *testing.T) {
 }
 
 func Test_Migrator_AddMigration(t *testing.T) {
-	t.Run("error adding nil smigration", func(t *testing.T) {
+	t.Run("error adding nil migration", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -54,7 +54,7 @@ func Test_Migrator_AddMigration(t *testing.T) {
 		}
 	})
 
-	t.Run("adding smigration", func(t *testing.T) {
+	t.Run("adding migration", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -64,13 +64,13 @@ func Test_Migrator_AddMigration(t *testing.T) {
 		if e := sut.AddMigration(migration); e != nil {
 			t.Errorf("returned the unexpected (%v) error", e)
 		} else if !reflect.DeepEqual(sut.(*migrator).migrations, []IMigration{migration}) {
-			t.Error("didn't stored the registering smigration")
+			t.Error("didn't stored the registering migration")
 		}
 	})
 }
 
 func Test_Migrator_Current(t *testing.T) {
-	t.Run("error retrieving the last smigration version", func(t *testing.T) {
+	t.Run("error retrieving the last migration version", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -87,7 +87,7 @@ func Test_Migrator_Current(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieves the last smigration register version", func(t *testing.T) {
+	t.Run("retrieves the last migration register version", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -153,7 +153,7 @@ func Test_Migrator_Migrate(t *testing.T) {
 		}
 	})
 
-	t.Run("error while executing a smigration", func(t *testing.T) {
+	t.Run("error while executing a migration", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -173,7 +173,7 @@ func Test_Migrator_Migrate(t *testing.T) {
 		}
 	})
 
-	t.Run("error while raising the smigration version", func(t *testing.T) {
+	t.Run("error while raising the migration version", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -272,7 +272,7 @@ func Test_Migrator_Up(t *testing.T) {
 		}
 	})
 
-	t.Run("error while executing a smigration", func(t *testing.T) {
+	t.Run("error while executing a migration", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -292,7 +292,7 @@ func Test_Migrator_Up(t *testing.T) {
 		}
 	})
 
-	t.Run("error while raising the smigration version", func(t *testing.T) {
+	t.Run("error while raising the migration version", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -313,7 +313,7 @@ func Test_Migrator_Up(t *testing.T) {
 		}
 	})
 
-	t.Run("execute next smigration", func(t *testing.T) {
+	t.Run("execute next migration", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -370,7 +370,7 @@ func Test_Migrator_Down(t *testing.T) {
 		}
 	})
 
-	t.Run("error while executing a smigration", func(t *testing.T) {
+	t.Run("error while executing a migration", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -391,7 +391,7 @@ func Test_Migrator_Down(t *testing.T) {
 		}
 	})
 
-	t.Run("error while removing the smigration version", func(t *testing.T) {
+	t.Run("error while removing the migration version", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -414,7 +414,7 @@ func Test_Migrator_Down(t *testing.T) {
 		}
 	})
 
-	t.Run("no-op if the smigration was not found", func(t *testing.T) {
+	t.Run("no-op if the migration was not found", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -430,7 +430,7 @@ func Test_Migrator_Down(t *testing.T) {
 		}
 	})
 
-	t.Run("remove smigration", func(t *testing.T) {
+	t.Run("remove migration", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

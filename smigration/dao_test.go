@@ -22,15 +22,15 @@ func (a AnyTime) Match(v driver.Value) bool {
 
 func Test_NewDao(t *testing.T) {
 	t.Run("error on auto migrate", func(t *testing.T) {
-		db, dbmock, e := sqlmock.New()
+		db, mockDB, e := sqlmock.New()
 		if e != nil {
 			t.Fatalf("anerror '%s' was not expected when opening a stub srdb connection", e)
 		}
 		defer func() { _ = db.Close() }()
 
 		expected := fmt.Errorf("error message")
-		dbmock.ExpectQuery("SELECT VERSION()").WillReturnRows(sqlmock.NewRows([]string{"version"}).AddRow("MariaDB"))
-		dbmock.ExpectExec("CREATE TABLE `__version`").WillReturnError(expected)
+		mockDB.ExpectQuery("SELECT VERSION()").WillReturnRows(sqlmock.NewRows([]string{"version"}).AddRow("MariaDB"))
+		mockDB.ExpectExec("CREATE TABLE `__version`").WillReturnError(expected)
 
 		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
 
@@ -46,14 +46,14 @@ func Test_NewDao(t *testing.T) {
 	})
 
 	t.Run("construct", func(t *testing.T) {
-		db, dbmock, e := sqlmock.New()
+		db, mockDB, e := sqlmock.New()
 		if e != nil {
 			t.Fatalf("anerror '%s' was not expected when opening a stub srdb connection", e)
 		}
 		defer func() { _ = db.Close() }()
 
-		dbmock.ExpectQuery("SELECT VERSION()").WillReturnRows(sqlmock.NewRows([]string{"version"}).AddRow("MariaDB"))
-		dbmock.ExpectExec("CREATE TABLE `__version`").WillReturnResult(sqlmock.NewResult(0, 0))
+		mockDB.ExpectQuery("SELECT VERSION()").WillReturnRows(sqlmock.NewRows([]string{"version"}).AddRow("MariaDB"))
+		mockDB.ExpectExec("CREATE TABLE `__version`").WillReturnResult(sqlmock.NewResult(0, 0))
 
 		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
 
@@ -67,14 +67,14 @@ func Test_NewDao(t *testing.T) {
 
 func Test_Dao_Last(t *testing.T) {
 	t.Run("error retrieve last entry", func(t *testing.T) {
-		db, dbmock, e := sqlmock.New()
+		db, mockDB, e := sqlmock.New()
 		if e != nil {
 			t.Fatalf("anerror '%s' was not expected when opening a stub srdb connection", e)
 		}
 		defer func() { _ = db.Close() }()
 
 		errMsg := "error message"
-		dbmock.
+		mockDB.
 			ExpectQuery("SELECT \\* FROM `__version`").
 			WillReturnError(fmt.Errorf("%s", errMsg))
 
@@ -89,13 +89,13 @@ func Test_Dao_Last(t *testing.T) {
 	})
 
 	t.Run("retrieve empty model if no last entry", func(t *testing.T) {
-		db, dbmock, e := sqlmock.New()
+		db, mockDB, e := sqlmock.New()
 		if e != nil {
 			t.Fatalf("anerror '%s' was not expected when opening a stub srdb connection", e)
 		}
 		defer func() { _ = db.Close() }()
 
-		dbmock.
+		mockDB.
 			ExpectQuery("SELECT \\* FROM `__version`").
 			WillReturnRows(sqlmock.NewRows(nil))
 
@@ -110,7 +110,7 @@ func Test_Dao_Last(t *testing.T) {
 	})
 
 	t.Run("retrieve last entry", func(t *testing.T) {
-		db, dbmock, e := sqlmock.New()
+		db, mockDB, e := sqlmock.New()
 		if e != nil {
 			t.Fatalf("anerror '%s' was not expected when opening a stub srdb connection", e)
 		}
@@ -118,7 +118,7 @@ func Test_Dao_Last(t *testing.T) {
 
 		id := uint(12)
 		version := uint64(23)
-		dbmock.
+		mockDB.
 			ExpectQuery("SELECT \\* FROM `__version`").
 			WillReturnRows(sqlmock.NewRows([]string{"id", "version", "created_at", "updated_at", "deleted_at"}).AddRow(id, version, nil, nil, nil))
 		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
@@ -134,7 +134,7 @@ func Test_Dao_Last(t *testing.T) {
 
 func Test_Dao_Up(t *testing.T) {
 	t.Run("error updating last entry", func(t *testing.T) {
-		db, dbmock, e := sqlmock.New()
+		db, mockDB, e := sqlmock.New()
 		if e != nil {
 			t.Fatalf("anerror '%s' was not expected when opening a stub srdb connection", e)
 		}
@@ -142,11 +142,11 @@ func Test_Dao_Up(t *testing.T) {
 
 		version := uint64(12)
 		errMsg := "error message"
-		dbmock.ExpectBegin()
-		dbmock.
+		mockDB.ExpectBegin()
+		mockDB.
 			ExpectExec("INSERT INTO `__version`").
 			WillReturnError(fmt.Errorf("%s", errMsg))
-		dbmock.ExpectRollback()
+		mockDB.ExpectRollback()
 
 		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
 
@@ -159,19 +159,19 @@ func Test_Dao_Up(t *testing.T) {
 	})
 
 	t.Run("updating last entry", func(t *testing.T) {
-		db, dbmock, e := sqlmock.New()
+		db, mockDB, e := sqlmock.New()
 		if e != nil {
 			t.Fatalf("anerror '%s' was not expected when opening a stub srdb connection", e)
 		}
 		defer func() { _ = db.Close() }()
 
 		version := uint64(12)
-		dbmock.ExpectBegin()
-		dbmock.
+		mockDB.ExpectBegin()
+		mockDB.
 			ExpectExec("INSERT INTO `__version`").
 			WithArgs(version, AnyTime{}, AnyTime{}, nil).
 			WillReturnResult(sqlmock.NewResult(1, 1))
-		dbmock.ExpectCommit()
+		mockDB.ExpectCommit()
 
 		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
 
@@ -186,7 +186,7 @@ func Test_Dao_Up(t *testing.T) {
 
 func Test_Dao_Down(t *testing.T) {
 	t.Run("error removing last entry", func(t *testing.T) {
-		db, dbmock, e := sqlmock.New()
+		db, mockDB, e := sqlmock.New()
 		if e != nil {
 			t.Fatalf("anerror '%s' was not expected when opening a stub srdb connection", e)
 		}
@@ -195,12 +195,12 @@ func Test_Dao_Down(t *testing.T) {
 		id := uint(12)
 		version := uint64(23)
 		errMsg := "error message"
-		dbmock.ExpectBegin()
-		dbmock.
+		mockDB.ExpectBegin()
+		mockDB.
 			ExpectExec("DELETE FROM `__version` WHERE `__version`.`id` = ?").
 			WithArgs(id).
 			WillReturnError(fmt.Errorf("%s", errMsg))
-		dbmock.ExpectRollback()
+		mockDB.ExpectRollback()
 
 		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
 
@@ -213,7 +213,7 @@ func Test_Dao_Down(t *testing.T) {
 	})
 
 	t.Run("removing last entry", func(t *testing.T) {
-		db, dbmock, e := sqlmock.New()
+		db, mockDB, e := sqlmock.New()
 		if e != nil {
 			t.Fatalf("anerror '%s' was not expected when opening a stub srdb connection", e)
 		}
@@ -221,12 +221,12 @@ func Test_Dao_Down(t *testing.T) {
 
 		id := uint(12)
 		version := uint64(23)
-		dbmock.ExpectBegin()
-		dbmock.
+		mockDB.ExpectBegin()
+		mockDB.
 			ExpectExec("DELETE FROM `__version` WHERE `__version`.`id` = ?").
 			WithArgs(id).
 			WillReturnResult(sqlmock.NewResult(1, 1))
-		dbmock.ExpectCommit()
+		mockDB.ExpectCommit()
 
 		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
 

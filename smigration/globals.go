@@ -8,7 +8,7 @@ import (
 const (
 	// ContainerID defines the id to be used as the container
 	// registration id of a migrator instance, and as a base id of all
-	// other smigration package instances registered in the application
+	// other migration package instances registered in the application
 	// container.
 	ContainerID = slate.ContainerID + ".migrator"
 
@@ -17,20 +17,20 @@ const (
 	ContainerDaoID = ContainerID + ".dao"
 
 	// ContainerMigrationTag defines the default tag to be used
-	// to identify a smigration entry in the container.
-	ContainerMigrationTag = ContainerID + ".smigration"
+	// to identify a migration entry in the container.
+	ContainerMigrationTag = ContainerID + ".migration"
 )
 
 const (
-	// EnvID defines the slate.smigration package base environment variable name.
-	EnvID = slate.EnvID + "_SMIGRATION"
+	// EnvID defines the slate.migration package base environment variable name.
+	EnvID = slate.EnvID + "_MIGRATION"
 )
 
 var (
-	// Database defines the default smigration manager srdb name.
+	// Database defines the default migration manager rdb name.
 	Database = senv.String(EnvID+"_DATABASE", "primary")
 
 	// AutoMigrate defines the flag that will be used to enable
-	// the auto smigration on application boot.
+	// the auto migration on application boot.
 	AutoMigrate = senv.Bool(EnvID+"_AUTO_MIGRATE", true)
 )

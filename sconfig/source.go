@@ -2,7 +2,7 @@ package sconfig
 
 import "sync"
 
-// ISource defines the base interface of a sconfig source.
+// ISource defines the base interface of a config source.
 type ISource interface {
 	Has(path string) bool
 	Get(path string, def ...interface{}) (interface{}, error)
@@ -10,7 +10,7 @@ type ISource interface {
 
 // ISourceObservable interface extends the ISource interface with methods
 // specific to sources that will be checked for updates in a regular
-// periodicity defined in the sconfig object where the source will be
+// periodicity defined in the config object where the source will be
 // registered.
 type ISourceObservable interface {
 	ISource
@@ -36,7 +36,7 @@ func (s *source) Has(path string) bool {
 // Get will retrieve the value stored in the requested path present in the
 // configuration content.
 // If the path does not exist, then the value nil will be returned.
-// This method will mostly be used by the sconfig object to obtain the full
+// This method will mostly be used by the config object to obtain the full
 // content of the source to aggregate all the data into his internal storing
 // Partial instance.
 func (s *source) Get(path string, def ...interface{}) (interface{}, error) {

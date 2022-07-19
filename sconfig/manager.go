@@ -39,7 +39,7 @@ type observerRef struct {
 	callback IObserver
 }
 
-// IManager defined an interface to a instance that manages configuration
+// IManager defined an interface to an instance that manages configuration
 type IManager interface {
 	IConfig
 	IObservable
@@ -86,8 +86,8 @@ func NewManager(period time.Duration) IManager {
 	return c
 }
 
-// Close terminates the sconfig instance.
-// This will stop the observer strigger and call close on all registered sources.
+// Close terminates the config instance.
+// This will stop the observer trigger and call close on all registered sources.
 func (c *manager) Close() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
@@ -170,7 +170,7 @@ func (c *manager) List(path string, def ...[]interface{}) ([]interface{}, error)
 	return c.partial.List(path, def...)
 }
 
-// Partial will retrieve a sconfig configuration value loaded from a source.
+// Partial will retrieve a config configuration value loaded from a source.
 func (c *manager) Partial(path string, def ...Partial) (Partial, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()

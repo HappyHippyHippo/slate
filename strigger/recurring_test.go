@@ -17,7 +17,7 @@ func Test_NewRecurring(t *testing.T) {
 		}
 	})
 
-	t.Run("new recurring strigger", func(t *testing.T) {
+	t.Run("new recurring trigger", func(t *testing.T) {
 		if _, e := NewRecurring(20*time.Millisecond, func() error {
 			return nil
 		}); e != nil {
@@ -43,7 +43,7 @@ func Test_Recurring_Close(t *testing.T) {
 }
 
 func Test_Recurring_Delay(t *testing.T) {
-	t.Run("retrieves the strigger interval duration", func(t *testing.T) {
+	t.Run("retrieves the trigger interval duration", func(t *testing.T) {
 		duration := 20 * time.Millisecond
 		sut, _ := NewRecurring(duration, func() error {
 			return nil
@@ -57,7 +57,7 @@ func Test_Recurring_Delay(t *testing.T) {
 }
 
 func Test_Recurring(t *testing.T) {
-	t.Run("run strigger multiple times", func(t *testing.T) {
+	t.Run("run trigger multiple times", func(t *testing.T) {
 		count := 0
 		sut, _ := NewRecurring(20*time.Millisecond, func() error {
 			count++
@@ -71,7 +71,7 @@ func Test_Recurring(t *testing.T) {
 		}
 	})
 
-	t.Run("stop the strigger on callback error", func(t *testing.T) {
+	t.Run("stop the trigger on callback error", func(t *testing.T) {
 		count := 0
 		sut, _ := NewRecurring(20*time.Millisecond, func() error {
 			count++

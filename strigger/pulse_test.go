@@ -16,7 +16,7 @@ func Test_NewPulse(t *testing.T) {
 		}
 	})
 
-	t.Run("new pulse strigger", func(t *testing.T) {
+	t.Run("new pulse trigger", func(t *testing.T) {
 		if _, e := NewPulse(20*time.Millisecond, func() error {
 			return nil
 		}); e != nil {
@@ -42,7 +42,7 @@ func Test_Pulse_Close(t *testing.T) {
 }
 
 func Test_Pulse_Delay(t *testing.T) {
-	t.Run("retrieves the strigger delay time", func(t *testing.T) {
+	t.Run("retrieves the trigger delay time", func(t *testing.T) {
 		duration := 20 * time.Millisecond
 		sut, _ := NewPulse(duration, func() error {
 			return nil
@@ -56,7 +56,7 @@ func Test_Pulse_Delay(t *testing.T) {
 }
 
 func Test_Pulse(t *testing.T) {
-	t.Run("only strigger execution once", func(t *testing.T) {
+	t.Run("only trigger execution once", func(t *testing.T) {
 		count := 0
 		sut, _ := NewPulse(20*time.Millisecond, func() error {
 			count++

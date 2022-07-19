@@ -143,7 +143,7 @@ func Test_NewSourceObservableFile(t *testing.T) {
 		}
 	})
 
-	t.Run("create the sconfig observable file source", func(t *testing.T) {
+	t.Run("create the config observable file source", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

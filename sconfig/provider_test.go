@@ -33,35 +33,35 @@ func Test_Provider_Register(t *testing.T) {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
 		case !container.Has(ContainerDecoderStrategyYAMLID):
-			t.Errorf("didn't registered the sconfig decoder strategy yaml : %v", sut)
+			t.Errorf("didn't registered the config decoder strategy yaml : %v", sut)
 		case !container.Has(ContainerDecoderStrategyJSONID):
-			t.Errorf("didn't registered the sconfig decoder strategy json : %v", sut)
+			t.Errorf("didn't registered the config decoder strategy json : %v", sut)
 		case !container.Has(ContainerDecoderFactoryID):
-			t.Errorf("didn't registered the sconfig decoder factory : %v", sut)
+			t.Errorf("didn't registered the config decoder factory : %v", sut)
 		case !container.Has(ContainerSourceStrategyFileID):
-			t.Errorf("didn't registered the sconfig file source strategy : %v", sut)
+			t.Errorf("didn't registered the config file source strategy : %v", sut)
 		case !container.Has(ContainerSourceStrategyFileObservableID):
-			t.Errorf("didn't registered the sconfig observable file source strategy : %v", sut)
+			t.Errorf("didn't registered the config observable file source strategy : %v", sut)
 		case !container.Has(ContainerSourceStrategyDirID):
-			t.Errorf("didn't registered the sconfig dir source strategy : %v", sut)
+			t.Errorf("didn't registered the config dir source strategy : %v", sut)
 		case !container.Has(ContainerSourceStrategyRestID):
-			t.Errorf("didn't registered the sconfig rest source strategy : %v", sut)
+			t.Errorf("didn't registered the config rest source strategy : %v", sut)
 		case !container.Has(ContainerSourceStrategyRestObservableID):
-			t.Errorf("didn't registered the sconfig observable rest source strategy : %v", sut)
+			t.Errorf("didn't registered the config observable rest source strategy : %v", sut)
 		case !container.Has(ContainerSourceStrategyEnvID):
-			t.Errorf("didn't registered the sconfig environment source strategy : %v", sut)
+			t.Errorf("didn't registered the config environment source strategy : %v", sut)
 		case !container.Has(ContainerSourceStrategyContainerID):
-			t.Errorf("didn't registered the sconfig container loading source strategy : %v", sut)
+			t.Errorf("didn't registered the config container loading source strategy : %v", sut)
 		case !container.Has(ContainerSourceFactoryID):
-			t.Errorf("didn't registered the sconfig source factory : %v", sut)
+			t.Errorf("didn't registered the config source factory : %v", sut)
 		case !container.Has(ContainerID):
-			t.Errorf("didn't registered the sconfig : %v", sut)
+			t.Errorf("didn't registered the config : %v", sut)
 		case !container.Has(ContainerLoaderID):
-			t.Errorf("didn't registered the sconfig loader : %v", sut)
+			t.Errorf("didn't registered the config loader : %v", sut)
 		}
 	})
 
-	t.Run("retrieving sconfig yaml decoder factory strategy", func(t *testing.T) {
+	t.Run("retrieving config yaml decoder factory strategy", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&Provider{}).Register(container)
 
@@ -80,7 +80,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving sconfig json decoder factory strategy", func(t *testing.T) {
+	t.Run("retrieving config json decoder factory strategy", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&Provider{}).Register(container)
 
@@ -99,7 +99,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving sconfig decoder factory", func(t *testing.T) {
+	t.Run("retrieving config decoder factory", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&Provider{}).Register(container)
 
@@ -512,7 +512,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving sconfig source factory", func(t *testing.T) {
+	t.Run("retrieving config source factory", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&Provider{}).Register(container)
 
@@ -531,7 +531,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving sconfig", func(t *testing.T) {
+	t.Run("retrieving config", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&(sfs.Provider{})).Register(container)
 		_ = (&Provider{}).Register(container)
@@ -546,12 +546,12 @@ func Test_Provider_Register(t *testing.T) {
 			switch cfg.(type) {
 			case *manager:
 			default:
-				t.Error("didn't returned a sconfig manager reference")
+				t.Error("didn't returned a config manager reference")
 			}
 		}
 	})
 
-	t.Run("error retrieving sconfig on retrieving loader", func(t *testing.T) {
+	t.Run("error retrieving config on retrieving loader", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.ServiceContainer{}
 		_ = (&(sfs.Provider{})).Register(container)
@@ -567,7 +567,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid sconfig on retrieving loader", func(t *testing.T) {
+	t.Run("invalid config on retrieving loader", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&(sfs.Provider{})).Register(container)
 		_ = (&Provider{}).Register(container)
@@ -582,7 +582,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving sconfig source factory on retrieving loader", func(t *testing.T) {
+	t.Run("error retrieving config source factory on retrieving loader", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.ServiceContainer{}
 		_ = (&(sfs.Provider{})).Register(container)
@@ -598,7 +598,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid sconfig source factory on retrieving loader", func(t *testing.T) {
+	t.Run("invalid config source factory on retrieving loader", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&(sfs.Provider{})).Register(container)
 		_ = (&Provider{}).Register(container)
@@ -613,7 +613,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving sconfig loader", func(t *testing.T) {
+	t.Run("retrieving config loader", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&(sfs.Provider{})).Register(container)
 		_ = (&Provider{}).Register(container)
@@ -628,7 +628,7 @@ func Test_Provider_Register(t *testing.T) {
 			switch l.(type) {
 			case *loader:
 			default:
-				t.Error("didn't returned a sconfig loader reference")
+				t.Error("didn't returned a config loader reference")
 			}
 		}
 	})
@@ -643,7 +643,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving sconfig decoder factory", func(t *testing.T) {
+	t.Run("error retrieving config decoder factory", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.ServiceContainer{}
 		sut := &Provider{}
@@ -659,7 +659,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving invalid sconfig decoder factory", func(t *testing.T) {
+	t.Run("retrieving invalid config decoder factory", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		sut := &Provider{}
 		_ = sut.Register(container)
@@ -674,7 +674,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving sconfig decoder strategy", func(t *testing.T) {
+	t.Run("error retrieving config decoder strategy", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.ServiceContainer{}
 		sut := &Provider{}
@@ -690,7 +690,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving invalid sconfig decoder factory strategy", func(t *testing.T) {
+	t.Run("retrieving invalid config decoder factory strategy", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		sut := &Provider{}
 		_ = sut.Register(container)
@@ -705,7 +705,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving sconfig source factory", func(t *testing.T) {
+	t.Run("error retrieving config source factory", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.ServiceContainer{}
 		sut := &Provider{}
@@ -721,7 +721,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving invalid sconfig source factory", func(t *testing.T) {
+	t.Run("retrieving invalid config source factory", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		sut := &Provider{}
 		_ = sut.Register(container)
@@ -736,7 +736,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving sconfig source factory strategy", func(t *testing.T) {
+	t.Run("error retrieving config source factory strategy", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.ServiceContainer{}
 		_ = (&(sfs.Provider{})).Register(container)
@@ -753,7 +753,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving invalid sconfig source factory strategy", func(t *testing.T) {
+	t.Run("retrieving invalid config source factory strategy", func(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&(sfs.Provider{})).Register(container)
 		sut := &Provider{}
@@ -820,7 +820,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("add entry source into the sconfig", func(t *testing.T) {
+	t.Run("add entry source into the config", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

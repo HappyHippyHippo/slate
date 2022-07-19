@@ -8,7 +8,7 @@ import (
 
 // IConnectionFactory defines the interface of a connection factory instance.
 type IConnectionFactory interface {
-	Get(name string, gcfg *gorm.Config) (*gorm.DB, error)
+	Get(name string, gormCfg *gorm.Config) (*gorm.DB, error)
 }
 
 // connectionFactory is a database connection generator.
@@ -51,7 +51,7 @@ func newConnectionFactory(cfg sconfig.IManager, dFactory IDialectFactory) (IConn
 // Get execute the process of the connection creation based on the
 // base configuration defined by the given name of the connection,
 // and apply the extra connection cfg also given as arguments.
-func (f *connectionFactory) Get(name string, gcfg *gorm.Config) (*gorm.DB, error) {
+func (f *connectionFactory) Get(name string, gormCfg *gorm.Config) (*gorm.DB, error) {
 	name = fmt.Sprintf("%s.%s", ConnectionsConfigPath, name)
 
 	if conn, ok := f.instances[name]; ok {
@@ -65,7 +65,7 @@ func (f *connectionFactory) Get(name string, gcfg *gorm.Config) (*gorm.DB, error
 		return nil, e
 	} else if dialect, e := f.dFactory.Get(&cfg); e != nil {
 		return nil, e
-	} else if conn, e := gorm.Open(dialect, gcfg); e != nil {
+	} else if conn, e := gorm.Open(dialect, gormCfg); e != nil {
 		return nil, e
 	} else {
 		f.instances[name] = conn

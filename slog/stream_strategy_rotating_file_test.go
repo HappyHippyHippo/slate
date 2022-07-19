@@ -86,7 +86,7 @@ func Test_StreamStrategyFileRotate_Accept(t *testing.T) {
 }
 
 func Test_StreamStrategyFileRotate_AcceptFromConfig(t *testing.T) {
-	t.Run("don't accept if sconfig is a nil pointer", func(t *testing.T) {
+	t.Run("don't accept if config is a nil pointer", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -306,7 +306,7 @@ func Test_StreamStrategyFileRotate_Create(t *testing.T) {
 }
 
 func Test_StreamStrategyFileRotate_CreateFromConfig(t *testing.T) {
-	t.Run("error on nil sconfig pointer", func(t *testing.T) {
+	t.Run("error on nil config pointer", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

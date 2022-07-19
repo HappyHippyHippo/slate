@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// Record defines the srdb record that stores a smigration.
+// Record defines the rdb record that stores a migration.
 type Record struct {
 	ID uint `json:"id" xml:"id" gorm:"primaryKey"`
 
@@ -22,14 +22,14 @@ func (Record) TableName() string {
 	return "__version"
 }
 
-// IDao defines the interface to the smigration manager DAO instance.
+// IDao defines the interface to the migration manager DAO instance.
 type IDao interface {
 	Last() (Record, error)
 	Up(version uint64) (Record, error)
 	Down(last Record) error
 }
 
-// Dao defines an object to the smigration DAO instance responsible
+// Dao defines an object to the migration DAO instance responsible
 // to manager the installed migrations.
 type Dao struct {
 	db *gorm.DB
@@ -45,7 +45,7 @@ func newDao(db *gorm.DB) (IDao, error) {
 	return &Dao{db: db}, nil
 }
 
-// Last will retrieve the last registered smigration
+// Last will retrieve the last registered migration
 func (d Dao) Last() (Record, error) {
 	model := Record{}
 	result := d.db.
@@ -59,7 +59,7 @@ func (d Dao) Last() (Record, error) {
 	return model, nil
 }
 
-// Up will register a new executed smigration
+// Up will register a new executed migration
 func (d Dao) Up(version uint64) (Record, error) {
 	model := Record{Version: version}
 	if result := d.db.Create(&model); result.Error != nil {
@@ -68,7 +68,7 @@ func (d Dao) Up(version uint64) (Record, error) {
 	return model, nil
 }
 
-// Down will remove the last smigration register
+// Down will remove the last migration register
 func (d Dao) Down(last Record) error {
 	if last.Version != 0 {
 		if result := d.db.Unscoped().Delete(&last); result.Error != nil {

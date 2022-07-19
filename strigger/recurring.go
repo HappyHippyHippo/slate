@@ -13,7 +13,7 @@ type recurring struct {
 
 var _ ITrigger = &recurring{}
 
-// NewRecurring instantiate a new strigger that will execute a
+// NewRecurring instantiate a new trigger that will execute a
 // callback method recurrently with a defined periodicity.
 func NewRecurring(delay time.Duration, callback ICallback) (ITrigger, error) {
 	if callback == nil {

@@ -93,7 +93,7 @@ func Test_SourceStrategyFile_Accept(t *testing.T) {
 }
 
 func Test_SourceStrategyFile_AcceptFromConfig(t *testing.T) {
-	t.Run("don't accept on invalid sconfig pointer", func(t *testing.T) {
+	t.Run("don't accept on invalid config pointer", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -137,7 +137,7 @@ func Test_SourceStrategyFile_AcceptFromConfig(t *testing.T) {
 		}
 	})
 
-	t.Run("accept sconfig", func(t *testing.T) {
+	t.Run("accept config", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -247,7 +247,7 @@ func Test_SourceStrategyFile_Create(t *testing.T) {
 }
 
 func Test_SourceStrategyFile_CreateFromConfig(t *testing.T) {
-	t.Run("error on nil sconfig pointer", func(t *testing.T) {
+	t.Run("error on nil config pointer", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -352,7 +352,7 @@ func Test_SourceStrategyFile_CreateFromConfig(t *testing.T) {
 		}
 	})
 
-	t.Run("create the file source defaulting format if not present in sconfig", func(t *testing.T) {
+	t.Run("create the file source defaulting format if not present in config", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

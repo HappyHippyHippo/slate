@@ -78,7 +78,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 	return nil
 }
 
-// Boot will start the logger package sconfig instance by calling the
+// Boot will start the logger package config instance by calling the
 // logger loader with the defined provider base entry information.
 func (p Provider) Boot(c slate.ServiceContainer) error {
 	if c == nil {

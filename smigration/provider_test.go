@@ -64,7 +64,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving db connection sconfig when retrieving migrator DAO", func(t *testing.T) {
+	t.Run("error retrieving db connection config when retrieving migrator DAO", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -84,7 +84,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid db connection sconfig when retrieving migrator DAO", func(t *testing.T) {
+	t.Run("invalid db connection config when retrieving migrator DAO", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -131,9 +131,9 @@ func Test_Provider_Register(t *testing.T) {
 
 		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
 		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("srdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("srdb.connections.primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("srdb.connections.primary").Return(partial, nil).Times(1)
+		cfg.EXPECT().AddObserver("rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("rdb.connections.primary").Return(partial, nil).Times(1)
 		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
 			return cfg, nil
 		})
@@ -153,7 +153,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving migrator DAO with db name from senv", func(t *testing.T) {
+	t.Run("retrieving migrator DAO with db name from env", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -168,9 +168,9 @@ func Test_Provider_Register(t *testing.T) {
 
 		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
 		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("srdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("srdb.connections.secondary").Return(true).Times(1)
-		cfg.EXPECT().Partial("srdb.connections.secondary").Return(partial, nil).Times(1)
+		cfg.EXPECT().AddObserver("rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("rdb.connections.secondary").Return(true).Times(1)
+		cfg.EXPECT().Partial("rdb.connections.secondary").Return(partial, nil).Times(1)
 		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
 			return cfg, nil
 		})
@@ -241,9 +241,9 @@ func Test_Provider_Register(t *testing.T) {
 
 		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
 		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("srdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("srdb.connections.primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("srdb.connections.primary").Return(partial, nil).Times(1)
+		cfg.EXPECT().AddObserver("rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("rdb.connections.primary").Return(partial, nil).Times(1)
 		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
 			return cfg, nil
 		})
@@ -273,7 +273,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("disable auto smigration", func(t *testing.T) {
+	t.Run("disable auto migration", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -288,7 +288,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("disable migrator auto smigration by environment variable", func(t *testing.T) {
+	t.Run("disable migrator auto migration by environment variable", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -347,9 +347,9 @@ func Test_Provider_Boot(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
 		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("srdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("srdb.connections.primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("srdb.connections.primary").Return(partial, nil).Times(1)
+		cfg.EXPECT().AddObserver("rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("rdb.connections.primary").Return(partial, nil).Times(1)
 		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
 			return cfg, nil
 		})
@@ -368,7 +368,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid smigration on retrieving migrations", func(t *testing.T) {
+	t.Run("invalid migration on retrieving migrations", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -379,9 +379,9 @@ func Test_Provider_Boot(t *testing.T) {
 
 		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
 		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("srdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("srdb.connections.primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("srdb.connections.primary").Return(partial, nil).Times(1)
+		cfg.EXPECT().AddObserver("rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("rdb.connections.primary").Return(partial, nil).Times(1)
 		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
 			return cfg, nil
 		})
@@ -411,9 +411,9 @@ func Test_Provider_Boot(t *testing.T) {
 
 		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
 		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("srdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("srdb.connections.primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("srdb.connections.primary").Return(partial, nil).Times(1)
+		cfg.EXPECT().AddObserver("rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfg.EXPECT().Has("rdb.connections.primary").Return(true).Times(1)
+		cfg.EXPECT().Partial("rdb.connections.primary").Return(partial, nil).Times(1)
 		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
 			return cfg, nil
 		})

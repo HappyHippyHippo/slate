@@ -57,7 +57,7 @@ func Test_StreamFactory_Create(t *testing.T) {
 		}
 	})
 
-	t.Run("create the sconfig stream", func(t *testing.T) {
+	t.Run("create the config stream", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -81,7 +81,7 @@ func Test_StreamFactory_Create(t *testing.T) {
 }
 
 func Test_StreamFactory_CreateFromConfig(t *testing.T) {
-	t.Run("nil sconfig", func(t *testing.T) {
+	t.Run("nil config", func(t *testing.T) {
 		src, e := (&StreamFactory{}).CreateFromConfig(nil)
 		switch {
 		case src != nil:
@@ -107,7 +107,7 @@ func Test_StreamFactory_CreateFromConfig(t *testing.T) {
 		stream, e := sut.CreateFromConfig(cfg)
 		switch {
 		case stream != nil:
-			t.Error("returned a sconfig stream")
+			t.Error("returned a config stream")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, serr.ErrInvalidLogStreamConfig):
@@ -115,7 +115,7 @@ func Test_StreamFactory_CreateFromConfig(t *testing.T) {
 		}
 	})
 
-	t.Run("create the sconfig stream", func(t *testing.T) {
+	t.Run("create the config stream", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

@@ -56,7 +56,7 @@ func Test_GetDao(t *testing.T) {
 
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(sconfig.Partial{
-			"srdb": sconfig.Partial{
+			"rdb": sconfig.Partial{
 				"connections": sconfig.Partial{
 					"primary": sconfig.Partial{"dialect": "sqlite", "host": ":memory:"},
 				},
@@ -124,7 +124,7 @@ func Test_GetMigrator(t *testing.T) {
 
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(sconfig.Partial{
-			"srdb": sconfig.Partial{
+			"rdb": sconfig.Partial{
 				"connections": sconfig.Partial{
 					"primary": sconfig.Partial{"dialect": "sqlite", "host": ":memory:"},
 				},
@@ -166,7 +166,7 @@ func Test_GetMigrations(t *testing.T) {
 		}
 	})
 
-	t.Run("non smigration tagged service", func(t *testing.T) {
+	t.Run("non migration tagged service", func(t *testing.T) {
 		c := slate.ServiceContainer{}
 		_ = c.Service("dummy", func() (any, error) {
 			return "string", nil
@@ -183,7 +183,7 @@ func Test_GetMigrations(t *testing.T) {
 		}
 	})
 
-	t.Run("valid smigration list returned", func(t *testing.T) {
+	t.Run("valid migration list returned", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

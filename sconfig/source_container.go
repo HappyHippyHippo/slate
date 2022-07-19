@@ -6,14 +6,14 @@ import (
 
 type sourceContainer struct {
 	source
-	cfgs []IConfig
+	configs []IConfig
 }
 
 var _ ISource = &sourceContainer{}
 
-func newSourceContainer(cfgs []IConfig) (ISource, error) {
-	if cfgs == nil {
-		return nil, errNilPointer("partials")
+func newSourceContainer(configs []IConfig) (ISource, error) {
+	if configs == nil {
+		return nil, errNilPointer("configs")
 	}
 
 	s := &sourceContainer{
@@ -21,7 +21,7 @@ func newSourceContainer(cfgs []IConfig) (ISource, error) {
 			mutex:   &sync.Mutex{},
 			partial: Partial{},
 		},
-		cfgs: cfgs,
+		configs: configs,
 	}
 
 	if e := s.load(); e != nil {
@@ -32,8 +32,8 @@ func newSourceContainer(cfgs []IConfig) (ISource, error) {
 }
 
 func (s *sourceContainer) load() error {
-	for _, cfg := range s.cfgs {
-		partial, e := cfg.Partial("", Partial{})
+	for _, config := range s.configs {
+		partial, e := config.Partial("", Partial{})
 		if e != nil {
 			return e
 		}

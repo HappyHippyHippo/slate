@@ -12,7 +12,7 @@ func GetDecoderFactory(c slate.ServiceContainer) (IDecoderFactory, error) {
 
 	i, ok := instance.(IDecoderFactory)
 	if !ok {
-		return nil, errConversion(instance, "IDecoderFactory")
+		return nil, errConversion(instance, "sconfig.IDecoderFactory")
 	}
 	return i, nil
 }
@@ -29,7 +29,7 @@ func GetDecoderStrategies(c slate.ServiceContainer) ([]IDecoderStrategy, error) 
 	for _, service := range tags {
 		s, ok := service.(IDecoderStrategy)
 		if !ok {
-			return nil, errConversion(service, "IDecoderStrategy")
+			return nil, errConversion(service, "sconfig.IDecoderStrategy")
 		}
 		list = append(list, s)
 	}
@@ -46,7 +46,7 @@ func GetSourceFactory(c slate.ServiceContainer) (ISourceFactory, error) {
 
 	i, ok := instance.(ISourceFactory)
 	if !ok {
-		return nil, errConversion(instance, "ISourceFactory")
+		return nil, errConversion(instance, "sconfig.ISourceFactory")
 	}
 	return i, nil
 }
@@ -63,7 +63,7 @@ func GetSourceStrategies(c slate.ServiceContainer) ([]ISourceStrategy, error) {
 	for _, service := range tags {
 		s, ok := service.(ISourceStrategy)
 		if !ok {
-			return nil, errConversion(service, "ISourceStrategy")
+			return nil, errConversion(service, "sconfig.ISourceStrategy")
 		}
 		list = append(list, s)
 	}
@@ -82,14 +82,14 @@ func GetSourceContainerPartials(c slate.ServiceContainer) ([]IConfig, error) {
 	for _, service := range tags {
 		s, ok := service.(IConfig)
 		if !ok {
-			return nil, errConversion(service, "IConfig")
+			return nil, errConversion(service, "sconfig.IConfig")
 		}
 		list = append(list, s)
 	}
 	return list, nil
 }
 
-// Get will try to retrieve the registered sconfig
+// Get will try to retrieve the registered config
 // instance from the application service container.
 func Get(c slate.ServiceContainer) (IManager, error) {
 	instance, e := c.Get(ContainerID)
@@ -99,7 +99,7 @@ func Get(c slate.ServiceContainer) (IManager, error) {
 
 	i, ok := instance.(IManager)
 	if !ok {
-		return nil, errConversion(instance, "IManager")
+		return nil, errConversion(instance, "sconfig.IManager")
 	}
 	return i, nil
 }
@@ -114,7 +114,7 @@ func GetLoader(c slate.ServiceContainer) (ILoader, error) {
 
 	i, ok := instance.(ILoader)
 	if !ok {
-		return nil, errConversion(instance, "ILoader")
+		return nil, errConversion(instance, "sconfig.ILoader")
 	}
 	return i, nil
 }

@@ -111,7 +111,7 @@ func Test_NewSourceFile(t *testing.T) {
 		}
 	})
 
-	t.Run("creates the sconfig file source", func(t *testing.T) {
+	t.Run("creates the config file source", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

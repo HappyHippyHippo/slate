@@ -128,8 +128,8 @@ func Test_DecoderYAML_Decode(t *testing.T) {
 	})
 
 	t.Run("decode yaml string", func(t *testing.T) {
-		yaml := "node:\n  subnode: data"
-		expected := Partial{"node": Partial{"subnode": "data"}}
+		yaml := "node:\n  sub_node: data"
+		expected := Partial{"node": Partial{"sub_node": "data"}}
 		reader := strings.NewReader(yaml)
 		sut, _ := newDecoderYAML(reader)
 		defer func() { _ = sut.Close() }()

@@ -56,7 +56,7 @@ func Test_SourceFactory_Create(t *testing.T) {
 		}
 	})
 
-	t.Run("create the requested sconfig source", func(t *testing.T) {
+	t.Run("create the requested config source", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -79,7 +79,7 @@ func Test_SourceFactory_Create(t *testing.T) {
 }
 
 func Test_SourceFactory_CreateConfig(t *testing.T) {
-	t.Run("nil sconfig", func(t *testing.T) {
+	t.Run("nil config", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -115,7 +115,7 @@ func Test_SourceFactory_CreateConfig(t *testing.T) {
 		}
 	})
 
-	t.Run("create the sconfig source", func(t *testing.T) {
+	t.Run("create the config source", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

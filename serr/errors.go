@@ -14,30 +14,30 @@ var (
 	// ErrServiceNotFound defines a service not found on the container.
 	ErrServiceNotFound = fmt.Errorf("service not found")
 
-	// ErrConfigSourceNotFound defines a source sconfig source not found error.
-	ErrConfigSourceNotFound = fmt.Errorf("sconfig source not found")
+	// ErrConfigSourceNotFound defines a source config source not found error.
+	ErrConfigSourceNotFound = fmt.Errorf("config source not found")
 
-	// ErrDuplicateConfigSource defines a duplicate sconfig source
+	// ErrDuplicateConfigSource defines a duplicate config source
 	// registration attempt.
-	ErrDuplicateConfigSource = fmt.Errorf("sconfig source already registered")
+	ErrDuplicateConfigSource = fmt.Errorf("config source already registered")
 
 	// ErrConfigPathNotFound defines a path in Partial not found error.
-	ErrConfigPathNotFound = fmt.Errorf("sconfig path not found")
+	ErrConfigPathNotFound = fmt.Errorf("config path not found")
 
-	// ErrConfigRestPathNotFound defines a sconfig path not found error.
+	// ErrConfigRestPathNotFound defines a config path not found error.
 	ErrConfigRestPathNotFound = fmt.Errorf("rest path not found")
 
 	// ErrInvalidConfigDecoderFormat defines an error that signal an
-	// unexpected/unknown sconfig source decoder format.
-	ErrInvalidConfigDecoderFormat = fmt.Errorf("invalid sconfig decoder format")
+	// unexpected/unknown config source decoder format.
+	ErrInvalidConfigDecoderFormat = fmt.Errorf("invalid config decoder format")
 
 	// ErrInvalidConfigSourceType defines an error that signal an
-	// unexpected/unknown sconfig source type.
-	ErrInvalidConfigSourceType = fmt.Errorf("invalid sconfig source type")
+	// unexpected/unknown config source type.
+	ErrInvalidConfigSourceType = fmt.Errorf("invalid config source type")
 
 	// ErrInvalidConfigSourcePartial defines an error that signal an
 	// invalid source configuration Partial.
-	ErrInvalidConfigSourcePartial = fmt.Errorf("invalid sconfig source sconfig")
+	ErrInvalidConfigSourcePartial = fmt.Errorf("invalid config source config")
 
 	// ErrInvalidLogFormat defines an error that signal an invalid
 	// slog format.
@@ -59,11 +59,11 @@ var (
 	// ErrInvalidLogStreamConfig defines an error that signal that the
 	// given slog stream configuration was unable to be parsed correctly
 	// enabling the slog stream generation.
-	ErrInvalidLogStreamConfig = fmt.Errorf("invalid slog stream sconfig")
+	ErrInvalidLogStreamConfig = fmt.Errorf("invalid slog stream config")
 
 	// ErrDatabaseConfigNotFound defines an error that signal that the
 	// configuration to the requested database connection was not found.
-	ErrDatabaseConfigNotFound = fmt.Errorf("database sconfig not found")
+	ErrDatabaseConfigNotFound = fmt.Errorf("database config not found")
 
 	// ErrUnknownDatabaseDialect defines an error that signal that the
 	// requested database connection configured dialect is unknown.

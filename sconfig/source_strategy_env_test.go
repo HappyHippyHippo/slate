@@ -9,16 +9,16 @@ import (
 )
 
 func Test_SourceStrategyEnv_Accept(t *testing.T) {
-	t.Run("accept only senv type", func(t *testing.T) {
+	t.Run("accept only env type", func(t *testing.T) {
 		scenarios := []struct {
 			sourceType string
 			expected   bool
 		}{
-			{ // _test senv type
+			{ // _test env type
 				sourceType: SourceTypeEnv,
 				expected:   true,
 			},
-			{ // _test non-senv type
+			{ // _test non-env type
 				sourceType: SourceTypeUnknown,
 				expected:   false,
 			},
@@ -34,7 +34,7 @@ func Test_SourceStrategyEnv_Accept(t *testing.T) {
 }
 
 func Test_SourceStrategyEnv_AcceptFromConfig(t *testing.T) {
-	t.Run("don't accept on invalid sconfig pointer", func(t *testing.T) {
+	t.Run("don't accept on invalid config pointer", func(t *testing.T) {
 		if (&sourceStrategyEnv{}).AcceptFromConfig(nil) {
 			t.Error("returned true")
 		}
@@ -52,7 +52,7 @@ func Test_SourceStrategyEnv_AcceptFromConfig(t *testing.T) {
 		}
 	})
 
-	t.Run("don't accept if type is not senv", func(t *testing.T) {
+	t.Run("don't accept if type is not env", func(t *testing.T) {
 		if (&sourceStrategyEnv{}).AcceptFromConfig(&Partial{"type": SourceTypeUnknown}) {
 			t.Error("returned true")
 		}
@@ -85,7 +85,7 @@ func Test_SourceStrategyEnv_Create(t *testing.T) {
 	})
 
 	t.Run("create the source with a map mappings", func(t *testing.T) {
-		env := "senv"
+		env := "env"
 		value := "value"
 		_ = os.Setenv(env, value)
 		defer func() { _ = os.Setenv(env, "") }()
@@ -106,14 +106,14 @@ func Test_SourceStrategyEnv_Create(t *testing.T) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
-				t.Error("didn't returned a new senv src")
+				t.Error("didn't returned a new env src")
 			}
 		}
 	})
 }
 
 func Test_SourceStrategyEnv_CreateFromConfig(t *testing.T) {
-	t.Run("error on nil sconfig pointer", func(t *testing.T) {
+	t.Run("error on nil config pointer", func(t *testing.T) {
 		src, e := (&sourceStrategyEnv{}).CreateFromConfig(nil)
 		switch {
 		case src != nil:
@@ -138,7 +138,7 @@ func Test_SourceStrategyEnv_CreateFromConfig(t *testing.T) {
 	})
 
 	t.Run("create the source", func(t *testing.T) {
-		env := "senv"
+		env := "env"
 		value := "value"
 		_ = os.Setenv(env, value)
 		defer func() { _ = os.Setenv(env, "") }()
@@ -159,12 +159,12 @@ func Test_SourceStrategyEnv_CreateFromConfig(t *testing.T) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
-				t.Error("didn't returned a new senv src")
+				t.Error("didn't returned a new env src")
 			}
 		}
 	})
 
-	t.Run("no mappings on sconfig", func(t *testing.T) {
+	t.Run("no mappings on config", func(t *testing.T) {
 		expected := Partial{}
 
 		src, e := (&sourceStrategyEnv{}).CreateFromConfig(&Partial{})
@@ -180,7 +180,7 @@ func Test_SourceStrategyEnv_CreateFromConfig(t *testing.T) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
-				t.Error("didn't returned a new senv src")
+				t.Error("didn't returned a new env src")
 			}
 		}
 	})

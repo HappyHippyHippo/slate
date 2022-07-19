@@ -29,7 +29,7 @@ func (f *StreamFactory) Register(strategy IStreamStrategy) error {
 	return nil
 }
 
-// Create will instantiate and return a new sconfig stream.
+// Create will instantiate and return a new config stream.
 func (f StreamFactory) Create(streamType string, args ...interface{}) (IStream, error) {
 	for _, s := range f {
 		if s.Accept(streamType) {
@@ -39,7 +39,7 @@ func (f StreamFactory) Create(streamType string, args ...interface{}) (IStream, 
 	return nil, errInvalidStreamType("streamType")
 }
 
-// CreateFromConfig will instantiate and return a new sconfig stream loaded
+// CreateFromConfig will instantiate and return a new config stream loaded
 // by a configuration instance.
 func (f StreamFactory) CreateFromConfig(cfg sconfig.IConfig) (IStream, error) {
 	if cfg == nil {

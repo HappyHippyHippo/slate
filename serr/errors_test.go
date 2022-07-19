@@ -27,7 +27,7 @@ func Test_ErrServiceNotFound(t *testing.T) {
 }
 
 func Test_ErrConfigSourceNotFound(t *testing.T) {
-	expected := "sconfig source not found"
+	expected := "config source not found"
 
 	if chk := ErrConfigSourceNotFound.Error(); chk != expected {
 		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
@@ -35,7 +35,7 @@ func Test_ErrConfigSourceNotFound(t *testing.T) {
 }
 
 func Test_ErrDuplicateConfigSource(t *testing.T) {
-	expected := "sconfig source already registered"
+	expected := "config source already registered"
 
 	if chk := ErrDuplicateConfigSource.Error(); chk != expected {
 		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
@@ -43,7 +43,7 @@ func Test_ErrDuplicateConfigSource(t *testing.T) {
 }
 
 func Test_ErrConfigPathNotFound(t *testing.T) {
-	expected := "sconfig path not found"
+	expected := "config path not found"
 
 	if chk := ErrConfigPathNotFound.Error(); chk != expected {
 		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
@@ -59,7 +59,7 @@ func Test_ErrConfigRestPathNotFound(t *testing.T) {
 }
 
 func Test_ErrInvalidConfigDecoderFormat(t *testing.T) {
-	expected := "invalid sconfig decoder format"
+	expected := "invalid config decoder format"
 
 	if chk := ErrInvalidConfigDecoderFormat.Error(); chk != expected {
 		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
@@ -67,7 +67,7 @@ func Test_ErrInvalidConfigDecoderFormat(t *testing.T) {
 }
 
 func Test_ErrInvalidConfigSourceType(t *testing.T) {
-	expected := "invalid sconfig source type"
+	expected := "invalid config source type"
 
 	if chk := ErrInvalidConfigSourceType.Error(); chk != expected {
 		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
@@ -75,7 +75,7 @@ func Test_ErrInvalidConfigSourceType(t *testing.T) {
 }
 
 func Test_ErrInvalidConfigSourcePartial(t *testing.T) {
-	expected := "invalid sconfig source sconfig"
+	expected := "invalid config source config"
 
 	if chk := ErrInvalidConfigSourcePartial.Error(); chk != expected {
 		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
@@ -115,7 +115,7 @@ func Test_ErrInvalidLogStreamType(t *testing.T) {
 }
 
 func Test_ErrInvalidLogStreamConfig(t *testing.T) {
-	expected := "invalid slog stream sconfig"
+	expected := "invalid slog stream config"
 
 	if chk := ErrInvalidLogStreamConfig.Error(); chk != expected {
 		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
@@ -123,7 +123,7 @@ func Test_ErrInvalidLogStreamConfig(t *testing.T) {
 }
 
 func Test_ErrDatabaseConfigNotFound(t *testing.T) {
-	expected := "database sconfig not found"
+	expected := "database config not found"
 
 	if chk := ErrDatabaseConfigNotFound.Error(); chk != expected {
 		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)

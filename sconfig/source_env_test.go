@@ -30,7 +30,7 @@ func Test_NewSourceEnv(t *testing.T) {
 	})
 
 	t.Run("with root mappings", func(t *testing.T) {
-		env := "senv"
+		env := "env"
 		value := "value"
 		_ = os.Setenv(env, value)
 		defer func() { _ = os.Setenv(env, "") }()
@@ -59,7 +59,7 @@ func Test_NewSourceEnv(t *testing.T) {
 	})
 
 	t.Run("with multi-level mappings", func(t *testing.T) {
-		env := "senv"
+		env := "env"
 		value := "value"
 		_ = os.Setenv(env, value)
 		defer func() { _ = os.Setenv(env, "") }()

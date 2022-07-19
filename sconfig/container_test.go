@@ -238,7 +238,7 @@ func Test_GetSourceContainerPartials(t *testing.T) {
 		}
 	})
 
-	t.Run("valid sconfig list returned", func(t *testing.T) {
+	t.Run("valid config list returned", func(t *testing.T) {
 		c := slate.ServiceContainer{}
 		_ = (&Provider{}).Register(c)
 		_ = c.Service("dummy", func() (any, error) {
@@ -270,7 +270,7 @@ func Test_Get(t *testing.T) {
 		}
 	})
 
-	t.Run("non sconfig instance", func(t *testing.T) {
+	t.Run("non config instance", func(t *testing.T) {
 		c := slate.ServiceContainer{}
 		_ = c.Service(ContainerID, func() (any, error) {
 			return "string", nil
@@ -316,7 +316,7 @@ func Test_GetLoader(t *testing.T) {
 		}
 	})
 
-	t.Run("non sconfig instance", func(t *testing.T) {
+	t.Run("non config instance", func(t *testing.T) {
 		c := slate.ServiceContainer{}
 		_ = c.Service(ContainerLoaderID, func() (any, error) {
 			return "string", nil

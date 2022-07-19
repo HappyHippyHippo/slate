@@ -1,6 +1,6 @@
 package sconfig
 
-// ISourceFactory defined the interface of a sconfig source dFactory instance.
+// ISourceFactory defined the interface of a config source dFactory instance.
 type ISourceFactory interface {
 	Register(strategy ISourceStrategy) error
 	Create(sourceType string, args ...interface{}) (ISource, error)
@@ -23,7 +23,7 @@ func (f *sourceFactory) Register(strategy ISourceStrategy) error {
 	return nil
 }
 
-// Create will instantiate and return a new sconfig source by the type requested.
+// Create will instantiate and return a new config source by the type requested.
 func (f sourceFactory) Create(sourceType string, args ...interface{}) (ISource, error) {
 	for _, strategy := range f {
 		if strategy.Accept(sourceType) {
@@ -34,7 +34,7 @@ func (f sourceFactory) Create(sourceType string, args ...interface{}) (ISource, 
 	return nil, errInvalidConfigSourceType(sourceType)
 }
 
-// CreateFromConfig will instantiate and return a new sconfig source where the
+// CreateFromConfig will instantiate and return a new config source where the
 // data used to decide the strategy to be used and also the initialization
 // data comes from a configuration storing Partial instance.
 func (f sourceFactory) CreateFromConfig(cfg IConfig) (ISource, error) {

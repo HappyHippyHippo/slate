@@ -51,8 +51,8 @@ func Test_NewConnectionFactory(t *testing.T) {
 		name := "primary"
 		cfg1 := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
 		cfg2 := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
-		partial1 := sconfig.Partial{"srdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
-		partial2 := sconfig.Partial{"srdb": sconfig.Partial{"connections": sconfig.Partial{name + "salt": cfg2}}}
+		partial1 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
+		partial2 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name + "salt": cfg2}}}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
 		source2 := NewMockConfigSource(ctrl)
@@ -83,7 +83,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 
 		name := "primary"
 		cfg1 := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
-		partial1 := sconfig.Partial{"srdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
+		partial1 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
 		dFactory := NewMockDialectFactory(ctrl)
@@ -108,7 +108,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		defer ctrl.Finish()
 
 		name := "primary"
-		partial1 := sconfig.Partial{"srdb": sconfig.Partial{"connections": sconfig.Partial{name: "string"}}}
+		partial1 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: "string"}}}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
 		dFactory := NewMockDialectFactory(ctrl)
@@ -135,7 +135,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		name := "primary"
 		cfg1 := sconfig.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial1 := sconfig.Partial{"srdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
+		partial1 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
 		dFactory := NewMockDialectFactory(ctrl)
@@ -163,7 +163,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		name := "primary"
 		cfg1 := sconfig.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial1 := sconfig.Partial{"srdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
+		partial1 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
 		dialect := NewMockDialect(ctrl)
@@ -192,7 +192,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 
 		name := "primary"
 		cfg1 := sconfig.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial1 := sconfig.Partial{"srdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
+		partial1 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
 		dialect := NewMockDialect(ctrl)
@@ -217,7 +217,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 
 		name := "primary"
 		cfg1 := sconfig.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial1 := sconfig.Partial{"srdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
+		partial1 := sconfig.Partial{"rdb": sconfig.Partial{"connections": sconfig.Partial{name: cfg1}}}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
 		dialect := NewMockDialect(ctrl)

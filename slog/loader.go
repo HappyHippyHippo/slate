@@ -21,7 +21,7 @@ var _ ILoader = &Loader{}
 
 func newLoader(cfg sconfig.IManager, logger ILogger, sFactory IStreamFactory) (ILoader, error) {
 	if cfg == nil {
-		return nil, errNilPointer("sconfig")
+		return nil, errNilPointer("cfg")
 	}
 	if logger == nil {
 		return nil, errNilPointer("logger")

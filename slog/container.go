@@ -12,7 +12,7 @@ func GetFormatterFactory(c slate.ServiceContainer) (IFormatterFactory, error) {
 
 	i, ok := instance.(IFormatterFactory)
 	if !ok {
-		return nil, errConversion(instance, "IFormatterFactory")
+		return nil, errConversion(instance, "slog.IFormatterFactory")
 	}
 	return i, nil
 }
@@ -29,7 +29,7 @@ func GetFormatterStrategies(c slate.ServiceContainer) ([]IFormatterStrategy, err
 	for _, service := range tags {
 		s, ok := service.(IFormatterStrategy)
 		if !ok {
-			return nil, errConversion(service, "IFormatterStrategy")
+			return nil, errConversion(service, "slog.IFormatterStrategy")
 		}
 		list = append(list, s)
 	}
@@ -46,7 +46,7 @@ func GetStreamFactory(c slate.ServiceContainer) (IStreamFactory, error) {
 
 	i, ok := instance.(IStreamFactory)
 	if !ok {
-		return nil, errConversion(instance, "IStreamFactory")
+		return nil, errConversion(instance, "slog.IStreamFactory")
 	}
 	return i, nil
 }
@@ -63,7 +63,7 @@ func GetStreamStrategies(c slate.ServiceContainer) ([]IStreamStrategy, error) {
 	for _, service := range tags {
 		s, ok := service.(IStreamStrategy)
 		if !ok {
-			return nil, errConversion(service, "IStreamStrategy")
+			return nil, errConversion(service, "slog.IStreamStrategy")
 		}
 		list = append(list, s)
 	}
@@ -80,7 +80,7 @@ func Get(c slate.ServiceContainer) (ILogger, error) {
 
 	i, ok := instance.(ILogger)
 	if !ok {
-		return nil, errConversion(instance, "ILogger")
+		return nil, errConversion(instance, "slog.ILogger")
 	}
 	return i, nil
 }
@@ -95,7 +95,7 @@ func GetLoader(c slate.ServiceContainer) (ILoader, error) {
 
 	i, ok := instance.(ILoader)
 	if !ok {
-		return nil, errConversion(instance, "ILoader")
+		return nil, errConversion(instance, "slog.ILoader")
 	}
 	return i, nil
 }

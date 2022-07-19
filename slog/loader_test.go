@@ -10,7 +10,7 @@ import (
 )
 
 func Test_NewLoader(t *testing.T) {
-	t.Run("error when missing the sconfig", func(t *testing.T) {
+	t.Run("error when missing the config", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -73,10 +73,10 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().List("slog.streams", []interface{}{}).Return(nil, expected).Times(1)
+		manager := NewMockConfigManager(ctrl)
+		manager.EXPECT().List("slog.streams", []interface{}{}).Return(nil, expected).Times(1)
 
-		sut, _ := newLoader(cfg, NewMockLogger(ctrl), NewMockStreamFactory(ctrl))
+		sut, _ := newLoader(manager, NewMockLogger(ctrl), NewMockStreamFactory(ctrl))
 
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
@@ -89,18 +89,18 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{}, nil).Times(1)
-		cfg.EXPECT().AddObserver("slog.streams", gomock.Any()).Return(nil).Times(1)
+		manager := NewMockConfigManager(ctrl)
+		manager.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{}, nil).Times(1)
+		manager.EXPECT().AddObserver("slog.streams", gomock.Any()).Return(nil).Times(1)
 
-		sut, _ := newLoader(cfg, NewMockLogger(ctrl), NewMockStreamFactory(ctrl))
+		sut, _ := newLoader(manager, NewMockLogger(ctrl), NewMockStreamFactory(ctrl))
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%s) error", e)
 		}
 	})
 
-	t.Run("request sconfig path from global variable", func(t *testing.T) {
+	t.Run("request config path from global variable", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -108,10 +108,10 @@ func Test_Loader_Load(t *testing.T) {
 		LoaderConfigPath = path
 		defer func() { LoaderConfigPath = "slog.streams" }()
 
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().List(path, []interface{}{}).Return([]interface{}{"string"}, nil).Times(1)
+		manager := NewMockConfigManager(ctrl)
+		manager.EXPECT().List(path, []interface{}{}).Return([]interface{}{"string"}, nil).Times(1)
 
-		sut, _ := newLoader(cfg, NewMockLogger(ctrl), NewMockStreamFactory(ctrl))
+		sut, _ := newLoader(manager, NewMockLogger(ctrl), NewMockStreamFactory(ctrl))
 
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
@@ -124,10 +124,10 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{"string"}, nil).Times(1)
+		manager := NewMockConfigManager(ctrl)
+		manager.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{"string"}, nil).Times(1)
 
-		sut, _ := newLoader(cfg, NewMockLogger(ctrl), NewMockStreamFactory(ctrl))
+		sut, _ := newLoader(manager, NewMockLogger(ctrl), NewMockStreamFactory(ctrl))
 
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
@@ -141,10 +141,10 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		partial := sconfig.Partial{"id": 123}
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
+		manager := NewMockConfigManager(ctrl)
+		manager.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
 
-		sut, _ := newLoader(cfg, NewMockLogger(ctrl), NewMockStreamFactory(ctrl))
+		sut, _ := newLoader(manager, NewMockLogger(ctrl), NewMockStreamFactory(ctrl))
 
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
@@ -159,12 +159,12 @@ func Test_Loader_Load(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		partial := sconfig.Partial{"id": "id", "type": "invalid"}
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
+		manager := NewMockConfigManager(ctrl)
+		manager.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
 		sFactory := NewMockStreamFactory(ctrl)
 		sFactory.EXPECT().CreateFromConfig(&partial).Return(nil, expected).Times(1)
 
-		sut, _ := newLoader(cfg, NewMockLogger(ctrl), sFactory)
+		sut, _ := newLoader(manager, NewMockLogger(ctrl), sFactory)
 
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
@@ -179,15 +179,15 @@ func Test_Loader_Load(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		partial := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
+		manager := NewMockConfigManager(ctrl)
+		manager.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
 		stream1 := NewMockStream(ctrl)
 		sFactory := NewMockStreamFactory(ctrl)
 		sFactory.EXPECT().CreateFromConfig(&partial).Return(stream1, nil).Times(1)
 		logger := NewMockLogger(ctrl)
 		logger.EXPECT().AddStream("id", stream1).Return(expected).Times(1)
 
-		sut, _ := newLoader(cfg, logger, sFactory)
+		sut, _ := newLoader(manager, logger, sFactory)
 
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
@@ -201,16 +201,16 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		partial := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
-		cfg.EXPECT().AddObserver("slog.streams", gomock.Any()).Return(nil).Times(1)
+		manager := NewMockConfigManager(ctrl)
+		manager.EXPECT().List("slog.streams", []interface{}{}).Return([]interface{}{partial}, nil).Times(1)
+		manager.EXPECT().AddObserver("slog.streams", gomock.Any()).Return(nil).Times(1)
 		stream1 := NewMockStream(ctrl)
 		sFactory := NewMockStreamFactory(ctrl)
 		sFactory.EXPECT().CreateFromConfig(&partial).Return(stream1, nil).Times(1)
 		logger := NewMockLogger(ctrl)
 		logger.EXPECT().AddStream("id", stream1).Return(nil).Times(1)
 
-		sut, _ := newLoader(cfg, logger, sFactory)
+		sut, _ := newLoader(manager, logger, sFactory)
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -221,26 +221,26 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		scfg1 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
-		partial := sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{scfg1}}}
+		config1 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
+		partial := sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{config1}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
-		cfg := sconfig.NewManager(0)
-		_ = cfg.AddSource("id", 0, source)
+		manager := sconfig.NewManager(0)
+		_ = manager.AddSource("id", 0, source)
 		stream1 := NewMockStream(ctrl)
 		sFactory := NewMockStreamFactory(ctrl)
-		sFactory.EXPECT().CreateFromConfig(&scfg1).Return(stream1, nil).Times(1)
+		sFactory.EXPECT().CreateFromConfig(&config1).Return(stream1, nil).Times(1)
 		logger := NewMockLogger(ctrl)
 		logger.EXPECT().AddStream("id", stream1).Return(nil).Times(1)
 		logger.EXPECT().Signal("exec", ERROR, "reloading slog streams error", gomock.Any()).Return(nil).Times(1)
 
-		sut, _ := newLoader(cfg, logger, sFactory)
+		sut, _ := newLoader(manager, logger, sFactory)
 		_ = sut.Load()
 
 		partial = sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{"string"}}}
 		source = NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
-		_ = cfg.AddSource("id2", 100, source)
+		_ = manager.AddSource("id2", 100, source)
 	})
 
 	t.Run("error on storing the reconfigured slog streams", func(t *testing.T) {
@@ -248,50 +248,50 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		scfg1 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
-		partial := sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{scfg1}}}
+		config1 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
+		partial := sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{config1}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
-		cfg := sconfig.NewManager(0)
-		_ = cfg.AddSource("id", 0, source)
+		manager := sconfig.NewManager(0)
+		_ = manager.AddSource("id", 0, source)
 		stream1 := NewMockStream(ctrl)
 		sFactory := NewMockStreamFactory(ctrl)
 		gomock.InOrder(
-			sFactory.EXPECT().CreateFromConfig(&scfg1).Return(stream1, nil),
-			sFactory.EXPECT().CreateFromConfig(&scfg1).Return(nil, expected),
+			sFactory.EXPECT().CreateFromConfig(&config1).Return(stream1, nil),
+			sFactory.EXPECT().CreateFromConfig(&config1).Return(nil, expected),
 		)
 		logger := NewMockLogger(ctrl)
 		logger.EXPECT().AddStream("id", stream1).Return(nil).Times(1)
 		logger.EXPECT().RemoveAllStreams().Times(1)
 		logger.EXPECT().Signal("exec", ERROR, "reloading slog streams error", gomock.Any()).Return(nil).Times(1)
 
-		sut, _ := newLoader(cfg, logger, sFactory)
+		sut, _ := newLoader(manager, logger, sFactory)
 		_ = sut.Load()
 
-		scfg2 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
-		partial = sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{scfg2, scfg2}}}
+		config2 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
+		partial = sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{config2, config2}}}
 		source = NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
-		_ = cfg.AddSource("id2", 100, source)
+		_ = manager.AddSource("id2", 100, source)
 	})
 
 	t.Run("reconfigured slog streams", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		scfg1 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
-		scfg2 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "error"}
-		partial := sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{scfg1}}}
+		config1 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
+		config2 := sconfig.Partial{"id": "id", "type": "console", "format": "json", "channels": []interface{}{}, "level": "error"}
+		partial := sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{config1}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
-		cfg := sconfig.NewManager(0)
-		_ = cfg.AddSource("id", 0, source)
+		manager := sconfig.NewManager(0)
+		_ = manager.AddSource("id", 0, source)
 		stream1 := NewMockStream(ctrl)
 		stream2 := NewMockStream(ctrl)
 		sFactory := NewMockStreamFactory(ctrl)
 		gomock.InOrder(
-			sFactory.EXPECT().CreateFromConfig(&scfg1).Return(stream1, nil),
-			sFactory.EXPECT().CreateFromConfig(&scfg2).Return(stream2, nil),
+			sFactory.EXPECT().CreateFromConfig(&config1).Return(stream1, nil),
+			sFactory.EXPECT().CreateFromConfig(&config2).Return(stream2, nil),
 		)
 		logger := NewMockLogger(ctrl)
 		gomock.InOrder(
@@ -300,12 +300,12 @@ func Test_Loader_Load(t *testing.T) {
 		)
 		logger.EXPECT().RemoveAllStreams().Times(1)
 
-		sut, _ := newLoader(cfg, logger, sFactory)
+		sut, _ := newLoader(manager, logger, sFactory)
 		_ = sut.Load()
 
-		partial = sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{scfg2}}}
+		partial = sconfig.Partial{"slog": sconfig.Partial{"streams": []interface{}{config2}}}
 		source = NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
-		_ = cfg.AddSource("id2", 100, source)
+		_ = manager.AddSource("id2", 100, source)
 	})
 }

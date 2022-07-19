@@ -20,7 +20,7 @@ const (
 	// registration id of a relational database connection factory instance,
 	// and as a base id of all other relational database package instances
 	// registered in the application container.
-	ContainerID = slate.ContainerID + ".srdb"
+	ContainerID = slate.ContainerID + ".rdb"
 
 	// ContainerConfigID defines the id to be used as the container
 	// registration id of the relational database connection configuration
@@ -52,8 +52,8 @@ const (
 )
 
 const (
-	// EnvID defines the slate.srdb package base environment variable name.
-	EnvID = slate.EnvID + "_SRDB"
+	// EnvID defines the slate.rdb package base environment variable name.
+	EnvID = slate.EnvID + "_RDB"
 )
 
 var (
@@ -62,7 +62,7 @@ var (
 
 	// ConnectionsConfigPath contains the configuration path that holds the
 	// relational database connection configurations.
-	ConnectionsConfigPath = senv.String(EnvID+"_CONNECTIONS_CONFIG_PATH", "srdb.connections")
+	ConnectionsConfigPath = senv.String(EnvID+"_CONNECTIONS_CONFIG_PATH", "rdb.connections")
 
 	// ObserveConfig defines the connection factory cfg observing flag
 	// used to register in the cfg object an observer of the connection

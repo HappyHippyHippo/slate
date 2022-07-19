@@ -185,7 +185,7 @@ func Test_NewSourceRest(t *testing.T) {
 		}
 	})
 
-	t.Run("response path not pointing to a sconfig Partial", func(t *testing.T) {
+	t.Run("response path not pointing to a config Partial", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

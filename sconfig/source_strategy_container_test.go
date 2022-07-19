@@ -8,16 +8,16 @@ import (
 )
 
 func Test_SourceStrategyContainer_Accept(t *testing.T) {
-	t.Run("accept only senv type", func(t *testing.T) {
+	t.Run("accept only env type", func(t *testing.T) {
 		scenarios := []struct {
 			sourceType string
 			expected   bool
 		}{
-			{ // _test senv type
+			{ // _test env type
 				sourceType: SourceTypeContainer,
 				expected:   true,
 			},
-			{ // _test non-senv type
+			{ // _test non-env type
 				sourceType: SourceTypeUnknown,
 				expected:   false,
 			},
@@ -35,7 +35,7 @@ func Test_SourceStrategyContainer_Accept(t *testing.T) {
 }
 
 func Test_SourceStrategyContainer_AcceptFromConfig(t *testing.T) {
-	t.Run("don't accept on invalid sconfig pointer", func(t *testing.T) {
+	t.Run("don't accept on invalid config pointer", func(t *testing.T) {
 		if (&sourceStrategyContainer{
 			partials: []IConfig{},
 		}).AcceptFromConfig(nil) {
@@ -59,7 +59,7 @@ func Test_SourceStrategyContainer_AcceptFromConfig(t *testing.T) {
 		}
 	})
 
-	t.Run("don't accept if type is not senv", func(t *testing.T) {
+	t.Run("don't accept if type is not env", func(t *testing.T) {
 		if (&sourceStrategyContainer{
 			partials: []IConfig{},
 		}).AcceptFromConfig(&Partial{"type": SourceTypeUnknown}) {
@@ -88,7 +88,7 @@ func Test_SourceStrategyContainer_Create(t *testing.T) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
-				t.Error("didn't returned a new senv src")
+				t.Error("didn't returned a new env src")
 			}
 		}
 	})
@@ -113,14 +113,14 @@ func Test_SourceStrategyContainer_Create(t *testing.T) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
-				t.Error("didn't returned a new senv src")
+				t.Error("didn't returned a new env src")
 			}
 		}
 	})
 }
 
 func Test_SourceStrategyContainer_CreateFromConfig(t *testing.T) {
-	t.Run("error on nil sconfig pointer", func(t *testing.T) {
+	t.Run("error on nil config pointer", func(t *testing.T) {
 		src, e := (&sourceStrategyContainer{
 			partials: []IConfig{},
 		}).CreateFromConfig(nil)
@@ -153,7 +153,7 @@ func Test_SourceStrategyContainer_CreateFromConfig(t *testing.T) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
-				t.Error("didn't returned a new senv src")
+				t.Error("didn't returned a new env src")
 			}
 		}
 	})
@@ -178,7 +178,7 @@ func Test_SourceStrategyContainer_CreateFromConfig(t *testing.T) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
-				t.Error("didn't returned a new senv src")
+				t.Error("didn't returned a new env src")
 			}
 		}
 	})

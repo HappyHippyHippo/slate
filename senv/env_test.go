@@ -9,7 +9,7 @@ import (
 func Test_Bool(t *testing.T) {
 	env := "__ENV_VARIABLE__"
 
-	t.Run("no senv value", func(t *testing.T) {
+	t.Run("no environment value", func(t *testing.T) {
 		value := ""
 		cur := os.Getenv(env)
 		_ = os.Setenv(env, value)
@@ -27,7 +27,7 @@ func Test_Bool(t *testing.T) {
 		})
 	})
 
-	t.Run("senv value with the string 'true'", func(t *testing.T) {
+	t.Run("environment value with the string 'true'", func(t *testing.T) {
 		value := "true"
 		cur := os.Getenv(env)
 		_ = os.Setenv(env, value)
@@ -38,7 +38,7 @@ func Test_Bool(t *testing.T) {
 		}
 	})
 
-	t.Run("senv value with the string 'TRUE'", func(t *testing.T) {
+	t.Run("environment value with the string 'TRUE'", func(t *testing.T) {
 		value := "TRUE"
 		cur := os.Getenv(env)
 		_ = os.Setenv(env, value)
@@ -49,7 +49,7 @@ func Test_Bool(t *testing.T) {
 		}
 	})
 
-	t.Run("senv value with the string '1'", func(t *testing.T) {
+	t.Run("environment value with the string '1'", func(t *testing.T) {
 		value := "1"
 		cur := os.Getenv(env)
 		_ = os.Setenv(env, value)
@@ -65,7 +65,7 @@ func Test_Int(t *testing.T) {
 	def := 123
 	env := "__ENV_VARIABLE__"
 
-	t.Run("no senv value", func(t *testing.T) {
+	t.Run("no environment value", func(t *testing.T) {
 		value := ""
 		cur := os.Getenv(env)
 		_ = os.Setenv(env, value)
@@ -76,7 +76,7 @@ func Test_Int(t *testing.T) {
 		}
 	})
 
-	t.Run("senv value with an invalid string", func(t *testing.T) {
+	t.Run("environment value with an invalid string", func(t *testing.T) {
 		value := "abc"
 		cur := os.Getenv(env)
 		_ = os.Setenv(env, value)
@@ -87,7 +87,7 @@ func Test_Int(t *testing.T) {
 		}
 	})
 
-	t.Run("senv value with a valid string", func(t *testing.T) {
+	t.Run("environment value with a valid string", func(t *testing.T) {
 		value := "456"
 		cur := os.Getenv(env)
 		_ = os.Setenv(env, value)
@@ -103,7 +103,7 @@ func Test_String(t *testing.T) {
 	def := "default"
 	env := "__ENV_VARIABLE__"
 
-	t.Run("no senv value", func(t *testing.T) {
+	t.Run("no environment value", func(t *testing.T) {
 		value := ""
 		cur := os.Getenv(env)
 		_ = os.Setenv(env, value)
@@ -114,8 +114,8 @@ func Test_String(t *testing.T) {
 		}
 	})
 
-	t.Run("senv value with a string", func(t *testing.T) {
-		value := "senv string"
+	t.Run("environment value with a string", func(t *testing.T) {
+		value := "env string"
 		cur := os.Getenv(env)
 		_ = os.Setenv(env, value)
 		defer func() { _ = os.Setenv(env, cur) }()
@@ -130,7 +130,7 @@ func Test_List(t *testing.T) {
 	def := []string{"default"}
 	env := "__ENV_VARIABLE__"
 
-	t.Run("no senv value", func(t *testing.T) {
+	t.Run("no environment value", func(t *testing.T) {
 		value := ""
 		cur := os.Getenv(env)
 		_ = os.Setenv(env, value)
@@ -141,7 +141,7 @@ func Test_List(t *testing.T) {
 		}
 	})
 
-	t.Run("senv value with a single string", func(t *testing.T) {
+	t.Run("environment value with a single string", func(t *testing.T) {
 		value := "string"
 		cur := os.Getenv(env)
 		_ = os.Setenv(env, value)
@@ -152,7 +152,7 @@ func Test_List(t *testing.T) {
 		}
 	})
 
-	t.Run("senv value with multi strings", func(t *testing.T) {
+	t.Run("environment value with multi strings", func(t *testing.T) {
 		value1 := "string1"
 		value2 := "string2"
 		expected := []string{value1, value2}

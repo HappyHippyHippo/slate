@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-// Provider defines the slate.sconfig module service provider to be used on
-// the application initialization to register the sconfig service.
+// Provider defines the slate.config module service provider to be used on
+// the application initialization to register the config service.
 type Provider struct{}
 
 var _ slate.IServiceProvider = &Provider{}
@@ -111,7 +111,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 	return nil
 }
 
-// Boot will start the configuration sconfig instance by calling the
+// Boot will start the configuration config instance by calling the
 // configuration loader with the defined provider base entry information.
 func (p Provider) Boot(c slate.ServiceContainer) error {
 	if c == nil {

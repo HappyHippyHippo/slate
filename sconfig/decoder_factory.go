@@ -1,6 +1,6 @@
 package sconfig
 
-// IDecoderFactory defined the interface of a sconfig decoder factory instance.
+// IDecoderFactory defined the interface of a config decoder factory instance.
 type IDecoderFactory interface {
 	Register(strategy IDecoderStrategy) error
 	Create(format string, args ...interface{}) (IDecoder, error)
