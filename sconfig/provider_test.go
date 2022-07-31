@@ -50,7 +50,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("didn't registered the config observable rest source strategy : %v", sut)
 		case !container.Has(ContainerSourceStrategyEnvID):
 			t.Errorf("didn't registered the config environment source strategy : %v", sut)
-		case !container.Has(ContainerSourceStrategyContainerID):
+		case !container.Has(ContainerSourceStrategyAggregateID):
 			t.Errorf("didn't registered the config container loading source strategy : %v", sut)
 		case !container.Has(ContainerSourceFactoryID):
 			t.Errorf("didn't registered the config source factory : %v", sut)
@@ -486,7 +486,7 @@ func Test_Provider_Register(t *testing.T) {
 			return "string", nil
 		}, ContainerSourceContainerPartialTag)
 
-		if _, e := container.Get(ContainerSourceStrategyContainerID); e == nil {
+		if _, e := container.Get(ContainerSourceStrategyAggregateID); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, serr.ErrConversion) {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, serr.ErrConversion)
@@ -497,7 +497,7 @@ func Test_Provider_Register(t *testing.T) {
 		container := slate.ServiceContainer{}
 		_ = (&Provider{}).Register(container)
 
-		strategy, e := container.Get(ContainerSourceStrategyContainerID)
+		strategy, e := container.Get(ContainerSourceStrategyAggregateID)
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e (%v)", e)
@@ -505,7 +505,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch strategy.(type) {
-			case *sourceStrategyContainer:
+			case *sourceStrategyAggregate:
 			default:
 				t.Error("didn't returned a source container strategy reference")
 			}

@@ -19,7 +19,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 
 		dFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := newSourceObservableRest(nil, "uri", "format", dFactory, "timestampPath", "configPath")
+		sut, e := NewSourceObservableRest(nil, "uri", "format", dFactory, "timestampPath", "configPath")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -36,7 +36,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 
 		client := NewMockHTTPClient(ctrl)
 
-		sut, e := newSourceObservableRest(client, "uri", "format", nil, "timestampPath", "configPath")
+		sut, e := NewSourceObservableRest(client, "uri", "format", nil, "timestampPath", "configPath")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -55,7 +55,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		dFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := newSourceObservableRest(client, "\n", "format", dFactory, "timestampPath", "configPath")
+		sut, e := NewSourceObservableRest(client, "\n", "format", dFactory, "timestampPath", "configPath")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -75,7 +75,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		client.EXPECT().Do(gomock.Any()).Return(nil, expected).Times(1)
 		dFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := newSourceObservableRest(client, "uri", "format", dFactory, "timestampPath", "configPath")
+		sut, e := NewSourceObservableRest(client, "uri", "format", dFactory, "timestampPath", "configPath")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -98,7 +98,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create("format", gomock.Any()).Return(nil, expected).Times(1)
 
-		sut, e := newSourceObservableRest(client, "uri", "format", dFactory, "timestampPath", "configPath")
+		sut, e := NewSourceObservableRest(client, "uri", "format", dFactory, "timestampPath", "configPath")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -124,7 +124,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create("yaml", gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceObservableRest(client, "uri", "yaml", dFactory, "timestampPath", "configPath")
+		sut, e := NewSourceObservableRest(client, "uri", "yaml", dFactory, "timestampPath", "configPath")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -149,7 +149,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create("yaml", gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceObservableRest(client, "uri", "yaml", dFactory, "timestampPath", "configPath")
+		sut, e := NewSourceObservableRest(client, "uri", "yaml", dFactory, "timestampPath", "configPath")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -174,7 +174,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create("yaml", gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "configPath")
+		sut, e := NewSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "configPath")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -200,7 +200,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create("yaml", gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "configPath")
+		sut, e := NewSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "configPath")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -225,7 +225,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create("yaml", gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "configPath")
+		sut, e := NewSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "configPath")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -250,7 +250,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create("yaml", gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "path.node")
+		sut, e := NewSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "path.node")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -275,7 +275,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create("yaml", gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "path")
+		sut, e := NewSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -301,7 +301,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create("yaml", gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "path")
+		sut, e := NewSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "path")
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e : %v", e)
@@ -334,7 +334,7 @@ func Test_NewSourceRestObservable(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create("yaml", gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "node..inner_node")
+		sut, e := NewSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "node..inner_node")
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e : %v", e)
@@ -380,7 +380,7 @@ func Test_SourceRestObservable_Reload(t *testing.T) {
 			dFactory.EXPECT().Create("yaml", gomock.Any()).Return(decoder2, nil),
 		)
 
-		sut, _ := newSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "node")
+		sut, _ := NewSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "node")
 
 		loaded, e := sut.Reload()
 		switch {
@@ -426,7 +426,7 @@ func Test_SourceRestObservable_Reload(t *testing.T) {
 			dFactory.EXPECT().Create("yaml", gomock.Any()).Return(decoder2, nil),
 		)
 
-		sut, _ := newSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "node")
+		sut, _ := NewSourceObservableRest(client, "uri", "yaml", dFactory, "timestamp", "node")
 
 		loaded, e := sut.Reload()
 		switch {

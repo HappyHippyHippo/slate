@@ -43,7 +43,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		} else if dFactory, e := GetDialectFactory(c); e != nil {
 			return nil, e
 		} else {
-			return newConnectionFactory(cfg, dFactory)
+			return NewConnectionFactory(cfg, dFactory)
 		}
 	})
 

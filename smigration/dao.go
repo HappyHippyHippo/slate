@@ -37,7 +37,8 @@ type Dao struct {
 
 var _ IDao = &Dao{}
 
-func newDao(db *gorm.DB) (IDao, error) {
+// NewDao will instantiate a new migration DAO instance.
+func NewDao(db *gorm.DB) (IDao, error) {
 	if e := db.AutoMigrate(&Record{}); e != nil {
 		return nil, e
 	}

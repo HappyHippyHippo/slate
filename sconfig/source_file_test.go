@@ -15,7 +15,7 @@ func Test_NewSourceFile(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, e := newSourceFile("path", DecoderFormatYAML, nil, NewMockDecoderFactory(ctrl))
+		sut, e := NewSourceFile("path", DecoderFormatYAML, nil, NewMockDecoderFactory(ctrl))
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -30,7 +30,7 @@ func Test_NewSourceFile(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, e := newSourceFile("path", DecoderFormatYAML, NewMockFs(ctrl), nil)
+		sut, e := NewSourceFile("path", DecoderFormatYAML, NewMockFs(ctrl), nil)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -50,7 +50,7 @@ func Test_NewSourceFile(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 
-		sut, e := newSourceFile(path, DecoderFormatYAML, fs, NewMockDecoderFactory(ctrl))
+		sut, e := NewSourceFile(path, DecoderFormatYAML, fs, NewMockDecoderFactory(ctrl))
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -74,7 +74,7 @@ func Test_NewSourceFile(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatUnknown, file).Return(nil, expected).Times(1)
 
-		sut, e := newSourceFile(path, DecoderFormatUnknown, fs, dFactory)
+		sut, e := NewSourceFile(path, DecoderFormatUnknown, fs, dFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -100,7 +100,7 @@ func Test_NewSourceFile(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceFile(path, DecoderFormatYAML, fs, dFactory)
+		sut, e := NewSourceFile(path, DecoderFormatYAML, fs, dFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -126,7 +126,7 @@ func Test_NewSourceFile(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceFile(path, DecoderFormatYAML, fs, dFactory)
+		sut, e := NewSourceFile(path, DecoderFormatYAML, fs, dFactory)
 		switch {
 		case sut == nil:
 			t.Error("didn't returned a valid reference")

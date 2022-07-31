@@ -13,7 +13,10 @@ type sourceObservableRest struct {
 
 var _ ISourceObservable = &sourceObservableRest{}
 
-func newSourceObservableRest(client HTTPClient, uri, format string, dFactory IDecoderFactory, timestampPath, configPath string) (ISourceObservable, error) {
+// NewSourceObservableRest will instantiate a new configuration source
+// that will read a REST endpoint for configuration info, opening the
+// possibility for on-the-fly update on source content change.
+func NewSourceObservableRest(client HTTPClient, uri, format string, dFactory IDecoderFactory, timestampPath, configPath string) (ISourceObservable, error) {
 	if client == nil {
 		return nil, errNilPointer("client")
 	}

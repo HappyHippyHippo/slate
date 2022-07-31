@@ -8,7 +8,7 @@ import (
 
 func Test_NewSourceEnv(t *testing.T) {
 	t.Run("with empty mappings", func(t *testing.T) {
-		sut, e := newSourceEnv(map[string]string{})
+		sut, e := NewSourceEnv(map[string]string{})
 		switch {
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
@@ -37,7 +37,7 @@ func Test_NewSourceEnv(t *testing.T) {
 
 		expected := Partial{"id": value}
 
-		sut, e := newSourceEnv(map[string]string{env: "id"})
+		sut, e := NewSourceEnv(map[string]string{env: "id"})
 		switch {
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
@@ -66,7 +66,7 @@ func Test_NewSourceEnv(t *testing.T) {
 
 		expected := Partial{"root": Partial{"node": value}}
 
-		sut, e := newSourceEnv(map[string]string{env: "root.node"})
+		sut, e := NewSourceEnv(map[string]string{env: "root.node"})
 		switch {
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
@@ -95,7 +95,7 @@ func Test_NewSourceEnv(t *testing.T) {
 
 		expected := Partial{"root": Partial{"node": "value"}}
 
-		sut, e := newSourceEnv(map[string]string{"env1": "root.node"})
+		sut, e := NewSourceEnv(map[string]string{"env1": "root.node"})
 		switch {
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")

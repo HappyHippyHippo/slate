@@ -13,7 +13,10 @@ type sourceObservableFile struct {
 
 var _ ISourceObservable = &sourceObservableFile{}
 
-func newSourceObservableFile(path, format string, fs afero.Fs, dFactory IDecoderFactory) (ISourceObservable, error) {
+// NewSourceObservableFile will instantiate a new configuration source
+// that will read a file for configuration info, opening the
+// possibility for on-the-fly update on source content change.
+func NewSourceObservableFile(path, format string, fs afero.Fs, dFactory IDecoderFactory) (ISourceObservable, error) {
 	if fs == nil {
 		return nil, errNilPointer("sfs")
 	}

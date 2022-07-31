@@ -17,7 +17,9 @@ type sourceDir struct {
 
 var _ ISource = &sourceDir{}
 
-func newSourceDir(path, format string, recursive bool, fs afero.Fs, dFactory IDecoderFactory) (ISource, error) {
+// NewSourceDir will instantiate a new configuration source
+// that will read a directory files for configuration information.
+func NewSourceDir(path, format string, recursive bool, fs afero.Fs, dFactory IDecoderFactory) (ISource, error) {
 	if fs == nil {
 		return nil, errNilPointer("sfs")
 	}

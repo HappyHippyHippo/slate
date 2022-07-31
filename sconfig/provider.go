@@ -81,13 +81,13 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 		return &sourceStrategyEnv{}, nil
 	}, ContainerSourceStrategyTag)
 
-	_ = c.Service(ContainerSourceStrategyContainerID, func() (interface{}, error) {
+	_ = c.Service(ContainerSourceStrategyAggregateID, func() (interface{}, error) {
 		partials, e := GetSourceContainerPartials(c)
 		if e != nil {
 			return nil, e
 		}
 
-		return &sourceStrategyContainer{partials: partials}, nil
+		return &sourceStrategyAggregate{partials: partials}, nil
 	}, ContainerSourceStrategyTag)
 
 	_ = c.Service(ContainerSourceFactoryID, func() (interface{}, error) {

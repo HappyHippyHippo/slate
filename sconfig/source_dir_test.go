@@ -15,7 +15,7 @@ func Test_NewSourceDir(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, e := newSourceDir("path", DecoderFormatYAML, true, nil, NewMockDecoderFactory(ctrl))
+		sut, e := NewSourceDir("path", DecoderFormatYAML, true, nil, NewMockDecoderFactory(ctrl))
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -30,7 +30,7 @@ func Test_NewSourceDir(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, e := newSourceDir("path", DecoderFormatYAML, true, NewMockFs(ctrl), nil)
+		sut, e := NewSourceDir("path", DecoderFormatYAML, true, NewMockFs(ctrl), nil)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -51,7 +51,7 @@ func Test_NewSourceDir(t *testing.T) {
 		fs.EXPECT().Open(path).Return(nil, expected).Times(1)
 		dFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := newSourceDir(path, DecoderFormatYAML, true, fs, dFactory)
+		sut, e := NewSourceDir(path, DecoderFormatYAML, true, fs, dFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -75,7 +75,7 @@ func Test_NewSourceDir(t *testing.T) {
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
 		dFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := newSourceDir(path, DecoderFormatYAML, true, fs, dFactory)
+		sut, e := NewSourceDir(path, DecoderFormatYAML, true, fs, dFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -98,7 +98,7 @@ func Test_NewSourceDir(t *testing.T) {
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
 		dFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := newSourceDir(path, DecoderFormatYAML, true, fs, dFactory)
+		sut, e := NewSourceDir(path, DecoderFormatYAML, true, fs, dFactory)
 		switch {
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
@@ -143,7 +143,7 @@ func Test_NewSourceDir(t *testing.T) {
 		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 		dFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := newSourceDir(path, DecoderFormatUnknown, true, fs, dFactory)
+		sut, e := NewSourceDir(path, DecoderFormatUnknown, true, fs, dFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -175,7 +175,7 @@ func Test_NewSourceDir(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatUnknown, file).Return(nil, expected).Times(1)
 
-		sut, e := newSourceDir(path, DecoderFormatUnknown, true, fs, dFactory)
+		sut, e := NewSourceDir(path, DecoderFormatUnknown, true, fs, dFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -210,7 +210,7 @@ func Test_NewSourceDir(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceDir(path, DecoderFormatYAML, true, fs, dFactory)
+		sut, e := NewSourceDir(path, DecoderFormatYAML, true, fs, dFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -244,7 +244,7 @@ func Test_NewSourceDir(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceDir(path, DecoderFormatYAML, true, fs, dFactory)
+		sut, e := NewSourceDir(path, DecoderFormatYAML, true, fs, dFactory)
 		switch {
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
@@ -299,7 +299,7 @@ func Test_NewSourceDir(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceDir(path, DecoderFormatYAML, false, fs, dFactory)
+		sut, e := NewSourceDir(path, DecoderFormatYAML, false, fs, dFactory)
 		switch {
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
@@ -358,7 +358,7 @@ func Test_NewSourceDir(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatYAML, file1).Return(decoder1, nil).Times(1)
 
-		sut, e := newSourceDir(path, DecoderFormatYAML, true, fs, dFactory)
+		sut, e := NewSourceDir(path, DecoderFormatYAML, true, fs, dFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -414,7 +414,7 @@ func Test_NewSourceDir(t *testing.T) {
 		dFactory.EXPECT().Create(DecoderFormatYAML, file1).Return(decoder1, nil).Times(1)
 		dFactory.EXPECT().Create(DecoderFormatYAML, file2).Return(decoder2, nil).Times(1)
 
-		sut, e := newSourceDir(path, DecoderFormatYAML, true, fs, dFactory)
+		sut, e := NewSourceDir(path, DecoderFormatYAML, true, fs, dFactory)
 		switch {
 		case sut == nil:
 			t.Error("didn't returned a valid reference")

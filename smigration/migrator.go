@@ -19,7 +19,8 @@ type migrator struct {
 
 var _ IMigrator = &migrator{}
 
-func newMigrator(dao IDao) (IMigrator, error) {
+// NewMigrator will instantiate a new migrator instance.
+func NewMigrator(dao IDao) (IMigrator, error) {
 	if dao == nil {
 		return nil, errNilPointer("dao")
 	}

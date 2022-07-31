@@ -12,7 +12,7 @@ import (
 
 func Test_NewDecoderYAML(t *testing.T) {
 	t.Run("nil reader", func(t *testing.T) {
-		sut, e := newDecoderYAML(nil)
+		sut, e := NewDecoderYAML(nil)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -30,7 +30,7 @@ func Test_NewDecoderYAML(t *testing.T) {
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
 
-		if sut, e := newDecoderYAML(reader); sut == nil {
+		if sut, e := NewDecoderYAML(reader); sut == nil {
 			t.Errorf("didn't returned a valid reference")
 		} else {
 			defer func() { _ = sut.Close() }()
@@ -51,7 +51,7 @@ func Test_DecoderYAML_Close(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Return(expected).Times(1)
-		sut, _ := newDecoderYAML(reader)
+		sut, _ := NewDecoderYAML(reader)
 
 		if e := sut.Close(); e == nil {
 			t.Errorf("didn't returned the expected error")
@@ -66,7 +66,7 @@ func Test_DecoderYAML_Close(t *testing.T) {
 
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		sut, _ := newDecoderYAML(reader)
+		sut, _ := NewDecoderYAML(reader)
 
 		_ = sut.Close()
 		_ = sut.Close()
@@ -81,7 +81,7 @@ func Test_DecoderYAML_Decode(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		sut, _ := newDecoderYAML(reader)
+		sut, _ := NewDecoderYAML(reader)
 		defer func() { _ = sut.Close() }()
 		yaml := NewMockYamler(ctrl)
 		yaml.EXPECT().Decode(&Partial{}).DoAndReturn(func(p *Partial) error {
@@ -107,7 +107,7 @@ func Test_DecoderYAML_Decode(t *testing.T) {
 		data := Partial{"node": "data"}
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		sut, _ := newDecoderYAML(reader)
+		sut, _ := NewDecoderYAML(reader)
 		defer func() { _ = sut.Close() }()
 		yaml := NewMockYamler(ctrl)
 		yaml.EXPECT().Decode(&Partial{}).DoAndReturn(func(p *Partial) error {
@@ -131,7 +131,7 @@ func Test_DecoderYAML_Decode(t *testing.T) {
 		yaml := "node:\n  sub_node: data"
 		expected := Partial{"node": Partial{"sub_node": "data"}}
 		reader := strings.NewReader(yaml)
-		sut, _ := newDecoderYAML(reader)
+		sut, _ := NewDecoderYAML(reader)
 		defer func() { _ = sut.Close() }()
 
 		check, e := sut.Decode()

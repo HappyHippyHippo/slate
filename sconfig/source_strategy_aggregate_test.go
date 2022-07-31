@@ -7,14 +7,14 @@ import (
 	"testing"
 )
 
-func Test_SourceStrategyContainer_Accept(t *testing.T) {
+func Test_SourceStrategyAggregate_Accept(t *testing.T) {
 	t.Run("accept only env type", func(t *testing.T) {
 		scenarios := []struct {
 			sourceType string
 			expected   bool
 		}{
 			{ // _test env type
-				sourceType: SourceTypeContainer,
+				sourceType: SourceTypeAggregate,
 				expected:   true,
 			},
 			{ // _test non-env type
@@ -24,7 +24,7 @@ func Test_SourceStrategyContainer_Accept(t *testing.T) {
 		}
 
 		for _, scenario := range scenarios {
-			sut := &sourceStrategyContainer{
+			sut := &sourceStrategyAggregate{
 				partials: []IConfig{},
 			}
 			if check := sut.Accept(scenario.sourceType); check != scenario.expected {
@@ -34,9 +34,9 @@ func Test_SourceStrategyContainer_Accept(t *testing.T) {
 	})
 }
 
-func Test_SourceStrategyContainer_AcceptFromConfig(t *testing.T) {
+func Test_SourceStrategyAggregate_AcceptFromConfig(t *testing.T) {
 	t.Run("don't accept on invalid config pointer", func(t *testing.T) {
-		if (&sourceStrategyContainer{
+		if (&sourceStrategyAggregate{
 			partials: []IConfig{},
 		}).AcceptFromConfig(nil) {
 			t.Error("returned true")
@@ -44,7 +44,7 @@ func Test_SourceStrategyContainer_AcceptFromConfig(t *testing.T) {
 	})
 
 	t.Run("don't accept if type is missing", func(t *testing.T) {
-		if (&sourceStrategyContainer{
+		if (&sourceStrategyAggregate{
 			partials: []IConfig{},
 		}).AcceptFromConfig(&Partial{}) {
 			t.Error("returned true")
@@ -52,7 +52,7 @@ func Test_SourceStrategyContainer_AcceptFromConfig(t *testing.T) {
 	})
 
 	t.Run("don't accept if type is not a string", func(t *testing.T) {
-		if (&sourceStrategyContainer{
+		if (&sourceStrategyAggregate{
 			partials: []IConfig{},
 		}).AcceptFromConfig(&Partial{"type": 123}) {
 			t.Error("returned true")
@@ -60,7 +60,7 @@ func Test_SourceStrategyContainer_AcceptFromConfig(t *testing.T) {
 	})
 
 	t.Run("don't accept if type is not env", func(t *testing.T) {
-		if (&sourceStrategyContainer{
+		if (&sourceStrategyAggregate{
 			partials: []IConfig{},
 		}).AcceptFromConfig(&Partial{"type": SourceTypeUnknown}) {
 			t.Error("returned true")
@@ -68,12 +68,12 @@ func Test_SourceStrategyContainer_AcceptFromConfig(t *testing.T) {
 	})
 }
 
-func Test_SourceStrategyContainer_Create(t *testing.T) {
+func Test_SourceStrategyAggregate_Create(t *testing.T) {
 	t.Run("create the source with a single partial", func(t *testing.T) {
 		value := Partial{"key": "value"}
 
 		expected := value
-		sut := &sourceStrategyContainer{partials: []IConfig{&value}}
+		sut := &sourceStrategyAggregate{partials: []IConfig{&value}}
 
 		src, e := sut.Create()
 		switch {
@@ -83,7 +83,7 @@ func Test_SourceStrategyContainer_Create(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch s := src.(type) {
-			case *sourceContainer:
+			case *sourceAggregate:
 				if !reflect.DeepEqual(s.partial, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
@@ -98,7 +98,7 @@ func Test_SourceStrategyContainer_Create(t *testing.T) {
 		value2 := Partial{"key2": "value 2"}
 
 		expected := Partial{"key1": "value 1", "key2": "value 2"}
-		sut := &sourceStrategyContainer{partials: []IConfig{&value1, &value2}}
+		sut := &sourceStrategyAggregate{partials: []IConfig{&value1, &value2}}
 
 		src, e := sut.Create()
 		switch {
@@ -108,7 +108,7 @@ func Test_SourceStrategyContainer_Create(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch s := src.(type) {
-			case *sourceContainer:
+			case *sourceAggregate:
 				if !reflect.DeepEqual(s.partial, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
@@ -119,9 +119,9 @@ func Test_SourceStrategyContainer_Create(t *testing.T) {
 	})
 }
 
-func Test_SourceStrategyContainer_CreateFromConfig(t *testing.T) {
+func Test_SourceStrategyAggregate_CreateFromConfig(t *testing.T) {
 	t.Run("error on nil config pointer", func(t *testing.T) {
-		src, e := (&sourceStrategyContainer{
+		src, e := (&sourceStrategyAggregate{
 			partials: []IConfig{},
 		}).CreateFromConfig(nil)
 		switch {
@@ -138,7 +138,7 @@ func Test_SourceStrategyContainer_CreateFromConfig(t *testing.T) {
 		value := Partial{"key": "value"}
 
 		expected := value
-		sut := &sourceStrategyContainer{partials: []IConfig{&value}}
+		sut := &sourceStrategyAggregate{partials: []IConfig{&value}}
 
 		src, e := sut.CreateFromConfig(&Partial{})
 		switch {
@@ -148,7 +148,7 @@ func Test_SourceStrategyContainer_CreateFromConfig(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch s := src.(type) {
-			case *sourceContainer:
+			case *sourceAggregate:
 				if !reflect.DeepEqual(s.partial, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
@@ -163,7 +163,7 @@ func Test_SourceStrategyContainer_CreateFromConfig(t *testing.T) {
 		value2 := Partial{"key2": "value 2"}
 
 		expected := Partial{"key1": "value 1", "key2": "value 2"}
-		sut := &sourceStrategyContainer{partials: []IConfig{&value1, &value2}}
+		sut := &sourceStrategyAggregate{partials: []IConfig{&value1, &value2}}
 
 		src, e := sut.CreateFromConfig(&Partial{})
 		switch {
@@ -173,7 +173,7 @@ func Test_SourceStrategyContainer_CreateFromConfig(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch s := src.(type) {
-			case *sourceContainer:
+			case *sourceAggregate:
 				if !reflect.DeepEqual(s.partial, expected) {
 					t.Error("didn't loaded the content correctly")
 				}

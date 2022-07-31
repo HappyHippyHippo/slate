@@ -24,7 +24,9 @@ type sourceRest struct {
 
 var _ ISource = &sourceRest{}
 
-func newSourceRest(client HTTPClient, uri, format string, dFactory IDecoderFactory, configPath string) (ISource, error) {
+// NewSourceRest will instantiate a new configuration source
+// that will read a REST endpoint for configuration info.
+func NewSourceRest(client HTTPClient, uri, format string, dFactory IDecoderFactory, configPath string) (ISource, error) {
 	if client == nil {
 		return nil, errNilPointer("client")
 	}

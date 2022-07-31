@@ -16,7 +16,9 @@ type sourceFile struct {
 
 var _ ISource = &sourceFile{}
 
-func newSourceFile(path, format string, fs afero.Fs, dFactory IDecoderFactory) (ISource, error) {
+// NewSourceFile will instantiate a new configuration source
+// that will read a file for configuration info.
+func NewSourceFile(path, format string, fs afero.Fs, dFactory IDecoderFactory) (ISource, error) {
 	if fs == nil {
 		return nil, errNilPointer("sfs")
 	}

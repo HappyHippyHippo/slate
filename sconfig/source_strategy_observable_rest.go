@@ -59,7 +59,7 @@ func (s sourceStrategyObservableRest) Create(args ...interface{}) (ISource, erro
 	} else if configPath, ok := args[3].(string); !ok {
 		return nil, errConversion(args[3], "string")
 	} else {
-		return newSourceObservableRest(s.cFactory(), uri, format, s.dFactory, timestampPath, configPath)
+		return NewSourceObservableRest(s.cFactory(), uri, format, s.dFactory, timestampPath, configPath)
 	}
 }
 

@@ -26,7 +26,8 @@ type logger struct {
 
 var _ ILogger = &logger{}
 
-func newLogger() *logger {
+// NewLogger instantiate a new logger instance.
+func NewLogger() ILogger {
 	return &logger{
 		mutex:   &sync.Mutex{},
 		streams: map[string]IStream{},

@@ -56,7 +56,7 @@ func (s sourceStrategyRest) Create(args ...interface{}) (ISource, error) {
 	} else if configPath, ok := args[2].(string); !ok {
 		return nil, errConversion(args[2], "string")
 	} else {
-		return newSourceRest(s.cFactory(), uri, format, s.dFactory, configPath)
+		return NewSourceRest(s.cFactory(), uri, format, s.dFactory, configPath)
 	}
 }
 

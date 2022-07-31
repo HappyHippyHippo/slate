@@ -57,7 +57,7 @@ func (s sourceStrategyFile) Create(args ...interface{}) (ISource, error) {
 	} else if format, ok := args[1].(string); !ok {
 		return nil, errConversion(args[1], "string")
 	} else {
-		return newSourceFile(path, format, s.fs, s.dFactory)
+		return NewSourceFile(path, format, s.fs, s.dFactory)
 	}
 }
 

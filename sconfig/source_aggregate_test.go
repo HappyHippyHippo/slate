@@ -9,9 +9,9 @@ import (
 	"testing"
 )
 
-func Test_NewSourceContainer(t *testing.T) {
+func Test_NewSourceAggregate(t *testing.T) {
 	t.Run("nil list of configs", func(t *testing.T) {
-		sut, e := newSourceContainer(nil)
+		sut, e := newSourceAggregate(nil)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -31,7 +31,7 @@ func Test_NewSourceContainer(t *testing.T) {
 		cfg := NewMockConfig(ctrl)
 		cfg.EXPECT().Partial("", Partial{}).Return(nil, expected).Times(1)
 
-		sut, e := newSourceContainer([]IConfig{cfg})
+		sut, e := newSourceAggregate([]IConfig{cfg})
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -50,14 +50,14 @@ func Test_NewSourceContainer(t *testing.T) {
 		cfg := NewMockConfig(ctrl)
 		cfg.EXPECT().Partial("", Partial{}).Return(expected, nil).Times(1)
 
-		sut, e := newSourceContainer([]IConfig{cfg})
+		sut, e := newSourceAggregate([]IConfig{cfg})
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e : %v", e)
 		case sut == nil:
 			t.Error("didn't returned the expected valid reference")
-		case !reflect.DeepEqual(sut.(*sourceContainer).partial, expected):
-			t.Errorf("returned the (%v) partial when expecting (%v)", sut.(*sourceContainer).partial, expected)
+		case !reflect.DeepEqual(sut.(*sourceAggregate).partial, expected):
+			t.Errorf("returned the (%v) partial when expecting (%v)", sut.(*sourceAggregate).partial, expected)
 		}
 	})
 
@@ -71,14 +71,14 @@ func Test_NewSourceContainer(t *testing.T) {
 		cfg2 := NewMockConfig(ctrl)
 		cfg2.EXPECT().Partial("", Partial{}).Return(Partial{"id 2": "value 2"}, nil).Times(1)
 
-		sut, e := newSourceContainer([]IConfig{cfg1, cfg2})
+		sut, e := newSourceAggregate([]IConfig{cfg1, cfg2})
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e : %v", e)
 		case sut == nil:
 			t.Error("didn't returned the expected valid reference")
-		case !reflect.DeepEqual(sut.(*sourceContainer).partial, expected):
-			t.Errorf("returned the (%v) partial when expecting (%v)", sut.(*sourceContainer).partial, expected)
+		case !reflect.DeepEqual(sut.(*sourceAggregate).partial, expected):
+			t.Errorf("returned the (%v) partial when expecting (%v)", sut.(*sourceAggregate).partial, expected)
 		}
 	})
 }

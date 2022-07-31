@@ -48,9 +48,9 @@ const (
 	// environment config source type.
 	SourceTypeEnv = "env"
 
-	// SourceTypeContainer defines the value to be used to declare a
+	// SourceTypeAggregate defines the value to be used to declare a
 	// container loading configs source type.
-	SourceTypeContainer = "container"
+	SourceTypeAggregate = "aggregate"
 )
 
 const (
@@ -111,10 +111,10 @@ const (
 	// factory strategy instance.
 	ContainerSourceStrategyEnvID = ContainerID + ".source.strategy.env"
 
-	// ContainerSourceStrategyContainerID defines the id to be used as
+	// ContainerSourceStrategyAggregateID defines the id to be used as
 	// the container registration id of a container loading config source
 	// factory strategy instance.
-	ContainerSourceStrategyContainerID = ContainerID + ".source.strategy.container"
+	ContainerSourceStrategyAggregateID = ContainerID + ".source.strategy.aggregate"
 
 	// ContainerSourceFactoryID defines the id to be used as the
 	// container registration id config source factory instance.

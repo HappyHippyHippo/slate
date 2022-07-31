@@ -4,19 +4,19 @@ import (
 	"sync"
 )
 
-type sourceContainer struct {
+type sourceAggregate struct {
 	source
 	configs []IConfig
 }
 
-var _ ISource = &sourceContainer{}
+var _ ISource = &sourceAggregate{}
 
-func newSourceContainer(configs []IConfig) (ISource, error) {
+func newSourceAggregate(configs []IConfig) (ISource, error) {
 	if configs == nil {
 		return nil, errNilPointer("configs")
 	}
 
-	s := &sourceContainer{
+	s := &sourceAggregate{
 		source: source{
 			mutex:   &sync.Mutex{},
 			partial: Partial{},
@@ -31,7 +31,7 @@ func newSourceContainer(configs []IConfig) (ISource, error) {
 	return s, nil
 }
 
-func (s *sourceContainer) load() error {
+func (s *sourceAggregate) load() error {
 	for _, config := range s.configs {
 		partial, e := config.Partial("", Partial{})
 		if e != nil {

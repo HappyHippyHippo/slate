@@ -13,7 +13,10 @@ type sourceEnv struct {
 
 var _ ISource = &sourceEnv{}
 
-func newSourceEnv(mappings map[string]string) (ISource, error) {
+// NewSourceEnv will instantiate a new configuration source
+// that will map environmental variables to configuration
+// path values.
+func NewSourceEnv(mappings map[string]string) (ISource, error) {
 	s := &sourceEnv{
 		source: source{
 			mutex:   &sync.Mutex{},

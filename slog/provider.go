@@ -60,7 +60,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 	})
 
 	_ = c.Service(ContainerID, func() (interface{}, error) {
-		return newLogger(), nil
+		return NewLogger(), nil
 	})
 
 	_ = c.Service(ContainerLoaderID, func() (interface{}, error) {

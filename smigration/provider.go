@@ -34,7 +34,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 			return nil, e
 		}
 
-		return newDao(conn)
+		return NewDao(conn)
 	})
 
 	_ = c.Service(ContainerID, func() (interface{}, error) {
@@ -43,7 +43,7 @@ func (p Provider) Register(c slate.ServiceContainer) error {
 			return nil, e
 		}
 
-		return newMigrator(dao)
+		return NewMigrator(dao)
 	})
 
 	return nil

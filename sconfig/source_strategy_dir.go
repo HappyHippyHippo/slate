@@ -59,7 +59,7 @@ func (s sourceStrategyDir) Create(args ...interface{}) (ISource, error) {
 	} else if recursive, ok := args[2].(bool); !ok {
 		return nil, errConversion(args[2], "bool")
 	} else {
-		return newSourceDir(path, format, recursive, s.fs, s.dFactory)
+		return NewSourceDir(path, format, recursive, s.fs, s.dFactory)
 	}
 }
 

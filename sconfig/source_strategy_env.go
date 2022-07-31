@@ -32,7 +32,7 @@ func (s sourceStrategyEnv) Create(args ...interface{}) (ISource, error) {
 	}
 
 	if mappings, ok := args[0].(map[string]string); ok {
-		return newSourceEnv(mappings)
+		return NewSourceEnv(mappings)
 	}
 
 	return nil, errConversion(args[0], "map[string]string")

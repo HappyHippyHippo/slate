@@ -16,7 +16,8 @@ type decoderJSON struct {
 
 var _ IDecoder = &decoderJSON{}
 
-func newDecoderJSON(reader io.Reader) (IDecoder, error) {
+// NewDecoderJSON will instantiate a new JSON configuration decoder.
+func NewDecoderJSON(reader io.Reader) (IDecoder, error) {
 	if reader == nil {
 		return nil, errNilPointer("reader")
 	}

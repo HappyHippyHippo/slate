@@ -20,7 +20,9 @@ type connectionFactory struct {
 
 var _ IConnectionFactory = &connectionFactory{}
 
-func newConnectionFactory(cfg sconfig.IManager, dFactory IDialectFactory) (IConnectionFactory, error) {
+// NewConnectionFactory will instantiate a new relational
+// database connection factory instance.
+func NewConnectionFactory(cfg sconfig.IManager, dFactory IDialectFactory) (IConnectionFactory, error) {
 	if cfg == nil {
 		return nil, errNilPointer("cfg")
 	}

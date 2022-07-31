@@ -19,7 +19,7 @@ func Test_NewSourceRest(t *testing.T) {
 
 		dFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := newSourceRest(nil, "uri", DecoderFormatUnknown, dFactory, "path")
+		sut, e := NewSourceRest(nil, "uri", DecoderFormatUnknown, dFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -36,7 +36,7 @@ func Test_NewSourceRest(t *testing.T) {
 
 		client := NewMockHTTPClient(ctrl)
 
-		sut, e := newSourceRest(client, "uri", DecoderFormatUnknown, nil, "path")
+		sut, e := NewSourceRest(client, "uri", DecoderFormatUnknown, nil, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -55,7 +55,7 @@ func Test_NewSourceRest(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		dFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := newSourceRest(client, "\n", DecoderFormatUnknown, dFactory, "path")
+		sut, e := NewSourceRest(client, "\n", DecoderFormatUnknown, dFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -75,7 +75,7 @@ func Test_NewSourceRest(t *testing.T) {
 		client.EXPECT().Do(gomock.Any()).Return(nil, expected).Times(1)
 		dFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := newSourceRest(client, "uri", DecoderFormatUnknown, dFactory, "path")
+		sut, e := NewSourceRest(client, "uri", DecoderFormatUnknown, dFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -98,7 +98,7 @@ func Test_NewSourceRest(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatUnknown, gomock.Any()).Return(nil, expected).Times(1)
 
-		sut, e := newSourceRest(client, "uri", DecoderFormatUnknown, dFactory, "path")
+		sut, e := NewSourceRest(client, "uri", DecoderFormatUnknown, dFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -124,7 +124,7 @@ func Test_NewSourceRest(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatYAML, gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path")
+		sut, e := NewSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -149,7 +149,7 @@ func Test_NewSourceRest(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatYAML, gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path")
+		sut, e := NewSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -174,7 +174,7 @@ func Test_NewSourceRest(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatYAML, gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path.node")
+		sut, e := NewSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path.node")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -199,7 +199,7 @@ func Test_NewSourceRest(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatYAML, gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path")
+		sut, e := NewSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -225,7 +225,7 @@ func Test_NewSourceRest(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatYAML, gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path")
+		sut, e := NewSourceRest(client, "uri", DecoderFormatYAML, dFactory, "path")
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e : %v", e)
@@ -258,7 +258,7 @@ func Test_NewSourceRest(t *testing.T) {
 		dFactory := NewMockDecoderFactory(ctrl)
 		dFactory.EXPECT().Create(DecoderFormatYAML, gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := newSourceRest(client, "uri", DecoderFormatYAML, dFactory, "node..inner_node")
+		sut, e := NewSourceRest(client, "uri", DecoderFormatYAML, dFactory, "node..inner_node")
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e : %v", e)

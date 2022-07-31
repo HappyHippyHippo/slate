@@ -21,5 +21,5 @@ func (decoderStrategyYAML) Create(args ...interface{}) (IDecoder, error) {
 	if !ok {
 		return nil, errConversion(args[0], "io.Reader")
 	}
-	return newDecoderYAML(reader)
+	return NewDecoderYAML(reader)
 }

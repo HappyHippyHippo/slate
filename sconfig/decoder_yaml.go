@@ -16,7 +16,8 @@ type decoderYAML struct {
 
 var _ IDecoder = &decoderYAML{}
 
-func newDecoderYAML(reader io.Reader) (IDecoder, error) {
+// NewDecoderYAML will instantiate a new YAML configuration decoder.
+func NewDecoderYAML(reader io.Reader) (IDecoder, error) {
 	if reader == nil {
 		return nil, errNilPointer("reader")
 	}

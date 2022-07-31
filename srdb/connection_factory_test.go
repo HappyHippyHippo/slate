@@ -13,7 +13,7 @@ import (
 
 func Test_NewConnectionFactory(t *testing.T) {
 	t.Run("missing configuration", func(t *testing.T) {
-		sut, e := newConnectionFactory(nil, &DialectFactory{})
+		sut, e := NewConnectionFactory(nil, &DialectFactory{})
 		switch {
 		case sut != nil:
 			t.Error("return an unexpected valid connection factory instance")
@@ -25,7 +25,7 @@ func Test_NewConnectionFactory(t *testing.T) {
 	})
 
 	t.Run("missing dialect factory", func(t *testing.T) {
-		sut, e := newConnectionFactory(sconfig.NewManager(0), nil)
+		sut, e := NewConnectionFactory(sconfig.NewManager(0), nil)
 		switch {
 		case sut != nil:
 			t.Error("return an unexpected valid connection factory instance")
@@ -37,7 +37,7 @@ func Test_NewConnectionFactory(t *testing.T) {
 	})
 
 	t.Run("valid creation", func(t *testing.T) {
-		if sut, e := newConnectionFactory(sconfig.NewManager(0), &DialectFactory{}); sut == nil {
+		if sut, e := NewConnectionFactory(sconfig.NewManager(0), &DialectFactory{}); sut == nil {
 			t.Error("didn't returned the expected valid connection factory instance")
 		} else if e != nil {
 			t.Errorf("return the unexpected error : %v", e)
@@ -62,7 +62,7 @@ func Test_NewConnectionFactory(t *testing.T) {
 		cfg := sconfig.NewManager(0)
 		_ = cfg.AddSource("id1", 0, source1)
 
-		sut, _ := newConnectionFactory(cfg, dFactory)
+		sut, _ := NewConnectionFactory(cfg, dFactory)
 
 		_, _ = sut.Get(name, &gorm.Config{Logger: gormLogger.Discard})
 		if len(sut.(*connectionFactory).instances) != 1 {
@@ -86,7 +86,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
 		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(false).Times(1)
 
-		sut, _ := newConnectionFactory(cfg, dFactory)
+		sut, _ := NewConnectionFactory(cfg, dFactory)
 
 		conn, e := sut.Get("primary", &gorm.Config{})
 		switch {
@@ -111,7 +111,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
 		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(nil, expected).Times(1)
 
-		sut, _ := newConnectionFactory(cfg, dFactory)
+		sut, _ := NewConnectionFactory(cfg, dFactory)
 
 		conn, e := sut.Get(name, &gorm.Config{})
 		switch {
@@ -138,7 +138,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
 		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
 
-		sut, _ := newConnectionFactory(cfg, dFactory)
+		sut, _ := NewConnectionFactory(cfg, dFactory)
 
 		conn, e := sut.Get(name, &gorm.Config{})
 		switch {
@@ -167,7 +167,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
 		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
 
-		sut, _ := newConnectionFactory(cfg, dFactory)
+		sut, _ := NewConnectionFactory(cfg, dFactory)
 
 		conn, e := sut.Get(name, &gorm.Config{Logger: gormLogger.Discard})
 		switch {
@@ -195,7 +195,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
 		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
 
-		sut, _ := newConnectionFactory(cfg, dFactory)
+		sut, _ := NewConnectionFactory(cfg, dFactory)
 
 		if check, e := sut.Get(name, &gorm.Config{Logger: gormLogger.Discard}); check == nil {
 			t.Error("didn't return the expected connection instance")
@@ -219,7 +219,7 @@ func Test_ConnectionFactory_Get(t *testing.T) {
 		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
 		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
 
-		sut, _ := newConnectionFactory(cfg, dFactory)
+		sut, _ := NewConnectionFactory(cfg, dFactory)
 
 		conn, _ := sut.Get(name, &gorm.Config{Logger: gormLogger.Discard})
 		check, e := sut.Get(name, &gorm.Config{Logger: gormLogger.Discard})

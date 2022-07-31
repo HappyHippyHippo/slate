@@ -58,7 +58,7 @@ func (s sourceStrategyObservableFile) Create(args ...interface{}) (ISource, erro
 	} else if format, ok := args[1].(string); !ok {
 		return nil, errConversion(args[1], "string")
 	} else {
-		return newSourceObservableFile(path, format, s.fs, s.dFactory)
+		return NewSourceObservableFile(path, format, s.fs, s.dFactory)
 	}
 }
 

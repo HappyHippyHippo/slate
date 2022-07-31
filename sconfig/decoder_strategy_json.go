@@ -21,5 +21,5 @@ func (decoderStrategyJSON) Create(args ...interface{}) (IDecoder, error) {
 	if !ok {
 		return nil, errConversion(args[0], "io.Reader")
 	}
-	return newDecoderJSON(reader)
+	return NewDecoderJSON(reader)
 }

@@ -12,7 +12,7 @@ import (
 
 func Test_NewDecoderJSON(t *testing.T) {
 	t.Run("nil reader", func(t *testing.T) {
-		sut, e := newDecoderJSON(nil)
+		sut, e := NewDecoderJSON(nil)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -30,7 +30,7 @@ func Test_NewDecoderJSON(t *testing.T) {
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
 
-		if sut, e := newDecoderJSON(reader); sut == nil {
+		if sut, e := NewDecoderJSON(reader); sut == nil {
 			t.Errorf("didn't returned a valid reference")
 		} else {
 			defer func() { _ = sut.Close() }()
@@ -51,7 +51,7 @@ func Test_DecoderJSON_Close(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Return(expected).Times(1)
-		sut, _ := newDecoderJSON(reader)
+		sut, _ := NewDecoderJSON(reader)
 
 		if e := sut.Close(); e == nil {
 			t.Errorf("didn't returned the expected error")
@@ -66,7 +66,7 @@ func Test_DecoderJSON_Close(t *testing.T) {
 
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		sut, _ := newDecoderJSON(reader)
+		sut, _ := NewDecoderJSON(reader)
 
 		_ = sut.Close()
 		_ = sut.Close()
@@ -81,7 +81,7 @@ func Test_DecoderJSON_Decode(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		sut, _ := newDecoderJSON(reader)
+		sut, _ := NewDecoderJSON(reader)
 		defer func() { _ = sut.Close() }()
 		json := NewMockJsoner(ctrl)
 		json.EXPECT().Decode(&map[string]interface{}{}).DoAndReturn(func(p *map[string]interface{}) error {
@@ -107,7 +107,7 @@ func Test_DecoderJSON_Decode(t *testing.T) {
 		data := Partial{"node": "data"}
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
-		sut, _ := newDecoderJSON(reader)
+		sut, _ := NewDecoderJSON(reader)
 		defer func() { _ = sut.Close() }()
 		json := NewMockJsoner(ctrl)
 		json.EXPECT().Decode(&map[string]interface{}{}).DoAndReturn(func(p *map[string]interface{}) error {
@@ -131,7 +131,7 @@ func Test_DecoderJSON_Decode(t *testing.T) {
 		json := `{"node": {"sub_node": "data"}}`
 		expected := Partial{"node": Partial{"sub_node": "data"}}
 		reader := strings.NewReader(json)
-		sut, _ := newDecoderJSON(reader)
+		sut, _ := NewDecoderJSON(reader)
 		defer func() { _ = sut.Close() }()
 
 		check, e := sut.Decode()
