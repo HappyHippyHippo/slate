@@ -29,7 +29,7 @@ func (s sourceStrategyAggregate) AcceptFromConfig(cfg IConfig) bool {
 
 // Create will instantiate the desired environment source instance.
 func (s sourceStrategyAggregate) Create(_ ...interface{}) (ISource, error) {
-	return newSourceAggregate(s.partials)
+	return NewSourceAggregate(s.partials)
 }
 
 // CreateFromConfig will instantiate the desired environment source instance

@@ -11,7 +11,9 @@ type sourceAggregate struct {
 
 var _ ISource = &sourceAggregate{}
 
-func newSourceAggregate(configs []IConfig) (ISource, error) {
+// NewSourceAggregate will instantiate a new config source
+// that aggregate a list of configs elements.
+func NewSourceAggregate(configs []IConfig) (ISource, error) {
 	if configs == nil {
 		return nil, errNilPointer("configs")
 	}

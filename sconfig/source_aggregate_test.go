@@ -11,7 +11,7 @@ import (
 
 func Test_NewSourceAggregate(t *testing.T) {
 	t.Run("nil list of configs", func(t *testing.T) {
-		sut, e := newSourceAggregate(nil)
+		sut, e := NewSourceAggregate(nil)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -31,7 +31,7 @@ func Test_NewSourceAggregate(t *testing.T) {
 		cfg := NewMockConfig(ctrl)
 		cfg.EXPECT().Partial("", Partial{}).Return(nil, expected).Times(1)
 
-		sut, e := newSourceAggregate([]IConfig{cfg})
+		sut, e := NewSourceAggregate([]IConfig{cfg})
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -50,7 +50,7 @@ func Test_NewSourceAggregate(t *testing.T) {
 		cfg := NewMockConfig(ctrl)
 		cfg.EXPECT().Partial("", Partial{}).Return(expected, nil).Times(1)
 
-		sut, e := newSourceAggregate([]IConfig{cfg})
+		sut, e := NewSourceAggregate([]IConfig{cfg})
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e : %v", e)
@@ -71,7 +71,7 @@ func Test_NewSourceAggregate(t *testing.T) {
 		cfg2 := NewMockConfig(ctrl)
 		cfg2.EXPECT().Partial("", Partial{}).Return(Partial{"id 2": "value 2"}, nil).Times(1)
 
-		sut, e := newSourceAggregate([]IConfig{cfg1, cfg2})
+		sut, e := NewSourceAggregate([]IConfig{cfg1, cfg2})
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e : %v", e)
