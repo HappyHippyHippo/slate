@@ -3,10 +3,11 @@ package slate
 import (
 	"errors"
 	"fmt"
-	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/serr"
 	"reflect"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+	serror "github.com/happyhippyhippo/slate/error"
 )
 
 func assertPanic(t *testing.T, expected interface{}) {
@@ -44,8 +45,8 @@ func Test_Application_Add(t *testing.T) {
 
 		if e := NewApplication().Add(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serr.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, serr.ErrNilPointer)
+		} else if !errors.Is(e, serror.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, serror.ErrNilPointer)
 		}
 	})
 

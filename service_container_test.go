@@ -3,10 +3,11 @@ package slate
 import (
 	"errors"
 	"fmt"
-	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/serr"
+	serror "github.com/happyhippyhippo/slate/error"
 	"reflect"
 	"testing"
+
+	"github.com/golang/mock/gomock"
 )
 
 func Test_ServiceContainer_Close(t *testing.T) {
@@ -286,8 +287,8 @@ func Test_ServiceContainer_Service(t *testing.T) {
 
 		if e := (ServiceContainer{}).Service(id, nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serr.ErrNilPointer) {
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, serr.ErrNilPointer)
+		} else if !errors.Is(e, serror.ErrNilPointer) {
+			t.Errorf("returned the error (%v) when was expecting (%v)", e, serror.ErrNilPointer)
 		}
 	})
 
@@ -398,8 +399,8 @@ func Test_ServiceContainer_Factory(t *testing.T) {
 
 		if e := (ServiceContainer{}).Factory(id, nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serr.ErrNilPointer) {
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, serr.ErrNilPointer)
+		} else if !errors.Is(e, serror.ErrNilPointer) {
+			t.Errorf("returned the error (%v) when was expecting (%v)", e, serror.ErrNilPointer)
 		}
 	})
 
@@ -514,8 +515,8 @@ func Test_ServiceContainer_Get(t *testing.T) {
 			t.Error("returned an unexpected valid instance reference")
 		case e == nil:
 			t.Error("didn't returned the expected error instance")
-		case !errors.Is(e, serr.ErrServiceNotFound):
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, serr.ErrServiceNotFound)
+		case !errors.Is(e, serror.ErrServiceNotFound):
+			t.Errorf("returned the error (%v) when was expecting (%v)", e, serror.ErrServiceNotFound)
 		}
 	})
 
