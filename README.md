@@ -1,6 +1,6 @@
 # slate
 
-#### Opinionated golang application scafolding
+### Opinionated golang application scafolding
 
 - [x] slate
   - [x] err
@@ -10,10 +10,41 @@
   - [x] config
   - [x] log
   - [x] rdb
-  - [ ] migration
-  - [ ] rest
-    - [ ] log
-    - [ ] envelope
-    - [ ] validation
-    - [ ] cache
-    - [ ] health
+  - [x] migration
+  - [x] watchdog
+
+### err
+
+TBD
+
+### env
+
+TBD
+
+### trigger
+
+TBD
+
+### fs
+
+TBD
+
+### config
+
+TBD
+
+### log
+
+TBD
+
+### rdb
+
+TBD
+
+### migration
+
+TBD
+
+### watchdog
+
+TBD
