@@ -1,36 +1,46 @@
 package config
 
-// IDecoderFactory defined the interface of a config decoder factory instance.
+// IDecoderFactory defined the interface of a config decoder
+// factory instance.
 type IDecoderFactory interface {
 	Register(strategy IDecoderStrategy) error
 	Create(format string, args ...interface{}) (IDecoder, error)
 }
 
-type decoderFactory []IDecoderStrategy
+// DecoderFactory defines a decoder instantiation factory.
+type DecoderFactory []IDecoderStrategy
 
-var _ IDecoderFactory = &decoderFactory{}
+var _ IDecoderFactory = &DecoderFactory{}
 
 // Register will store a new decoder factory strategy to be used
 // to evaluate a request of an instance capable to parse a specific format.
 // If the strategy accepts the format, then it will be used to instantiate the
 // appropriate decoder that will be used to decode the configuration content.
-func (f *decoderFactory) Register(strategy IDecoderStrategy) error {
+func (f *DecoderFactory) Register(
+	strategy IDecoderStrategy,
+) error {
+	// check for a valid strategy reference
 	if strategy == nil {
 		return errNilPointer("strategy")
 	}
-
+	// store the strategy reference
 	*f = append(*f, strategy)
-
 	return nil
 }
 
 // Create will instantiate the requested new decoder capable to
-// parse the formatted content into a usable configuration Partial.
-func (f decoderFactory) Create(format string, args ...interface{}) (IDecoder, error) {
+// parse the formatted content into a usable configuration.
+func (f DecoderFactory) Create(
+	format string,
+	args ...interface{},
+) (IDecoder, error) {
+	// find a stored strategy that will accept the requested format
 	for _, s := range f {
 		if s.Accept(format) {
+			// return the decoder instantiation
 			return s.Create(args...)
 		}
 	}
-	return nil, errInvalidConfigDecoderFormat(format)
+	// signal that no strategy was found that would accept the requested format
+	return nil, errInvalidFormat(format)
 }

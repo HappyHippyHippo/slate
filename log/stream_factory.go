@@ -1,14 +1,13 @@
 package log
 
 import (
-	sconfig "github.com/happyhippyhippo/slate/config"
+	"github.com/happyhippyhippo/slate/config"
 )
 
 // IStreamFactory defined the interface of a log stream factory instance.
 type IStreamFactory interface {
 	Register(strategy IStreamStrategy) error
-	Create(streamType string, args ...interface{}) (IStream, error)
-	CreateFromConfig(cfg sconfig.IConfig) (IStream, error)
+	Create(cfg config.IConfig) (IStream, error)
 }
 
 // StreamFactory is a logging stream generator based on a
@@ -19,37 +18,35 @@ var _ IStreamFactory = &StreamFactory{}
 
 // Register will register a new stream factory strategy to be used
 // on creation requests.
-func (f *StreamFactory) Register(strategy IStreamStrategy) error {
+func (f *StreamFactory) Register(
+	strategy IStreamStrategy,
+) error {
+	// check stream factory argument reference
 	if strategy == nil {
 		return errNilPointer("strategy")
 	}
-
+	// add the strategy to the stream factory strategy pool
 	*f = append(*f, strategy)
-
 	return nil
 }
 
-// Create will instantiate and return a new config stream.
-func (f StreamFactory) Create(streamType string, args ...interface{}) (IStream, error) {
-	for _, s := range f {
-		if s.Accept(streamType) {
-			return s.Create(args...)
-		}
-	}
-	return nil, errInvalidStreamType("streamType")
-}
-
-// CreateFromConfig will instantiate and return a new config stream loaded
+// Create will instantiate and return a new config stream loaded
 // by a configuration instance.
-func (f StreamFactory) CreateFromConfig(cfg sconfig.IConfig) (IStream, error) {
+func (f StreamFactory) Create(
+	cfg config.IConfig,
+) (IStream, error) {
+	// check config argument reference
 	if cfg == nil {
-		return nil, errNilPointer("cfg")
+		return nil, errNilPointer("config")
 	}
-
+	// search in the factory strategy pool for one that would accept
+	// to generate the requested stream with the requested format defined
+	// in the given config
 	for _, s := range f {
-		if s.AcceptFromConfig(cfg) {
-			return s.CreateFromConfig(cfg)
+		if s.Accept(cfg) {
+			// return the creation of the requested stream
+			return s.Create(cfg)
 		}
 	}
-	return nil, errInvalidStreamConfig(cfg)
+	return nil, errInvalidConfig(cfg)
 }

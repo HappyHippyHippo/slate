@@ -6,15 +6,15 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	serror "github.com/happyhippyhippo/slate/error"
+	"github.com/happyhippyhippo/slate/err"
 )
 
 func Test_StreamFactory_Register(t *testing.T) {
 	t.Run("nil strategy", func(t *testing.T) {
 		if e := (&StreamFactory{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrNilPointer)
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
 		}
 	})
 
@@ -34,63 +34,15 @@ func Test_StreamFactory_Register(t *testing.T) {
 }
 
 func Test_StreamFactory_Create(t *testing.T) {
-	t.Run("unrecognized stream type", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		streamType := "type"
-		path := "path"
-		format := "format"
-		strategy := NewMockStreamStrategy(ctrl)
-		strategy.EXPECT().Accept(streamType).Return(false).Times(1)
-
-		sut := &StreamFactory{}
-		_ = sut.Register(strategy)
-
-		stream, e := sut.Create(streamType, path, format)
-		switch {
-		case stream != nil:
-			t.Error("returned an valid reference")
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, serror.ErrInvalidLogStreamType):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrInvalidLogStreamType)
-		}
-	})
-
-	t.Run("create the config stream", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		sourceType := "type"
-		path := "path"
-		format := "format"
-		stream := NewMockStream(ctrl)
-		strategy := NewMockStreamStrategy(ctrl)
-		strategy.EXPECT().Accept(sourceType).Return(true).Times(1)
-		strategy.EXPECT().Create(path, format).Return(stream, nil).Times(1)
-
-		sut := &StreamFactory{}
-		_ = sut.Register(strategy)
-
-		if s, e := sut.Create(sourceType, path, format); e != nil {
-			t.Errorf("returned the (%v) error", e)
-		} else if !reflect.DeepEqual(s, stream) {
-			t.Error("didn't returned the created stream")
-		}
-	})
-}
-
-func Test_StreamFactory_CreateFromConfig(t *testing.T) {
 	t.Run("nil config", func(t *testing.T) {
-		src, e := (&StreamFactory{}).CreateFromConfig(nil)
+		src, e := (&StreamFactory{}).Create(nil)
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, serror.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrNilPointer)
+		case !errors.Is(e, err.NilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
 		}
 	})
 
@@ -98,21 +50,21 @@ func Test_StreamFactory_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewMockConfigManager(ctrl)
+		cfg := NewMockConfig(ctrl)
 		strategy := NewMockStreamStrategy(ctrl)
-		strategy.EXPECT().AcceptFromConfig(cfg).Return(false).Times(1)
+		strategy.EXPECT().Accept(cfg).Return(false).Times(1)
 
 		sut := &StreamFactory{}
 		_ = sut.Register(strategy)
 
-		stream, e := sut.CreateFromConfig(cfg)
+		stream, e := sut.Create(cfg)
 		switch {
 		case stream != nil:
 			t.Error("returned a config stream")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, serror.ErrInvalidLogStreamConfig):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrInvalidLogStreamConfig)
+		case !errors.Is(e, err.InvalidLogConfig):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.InvalidLogConfig)
 		}
 	})
 
@@ -120,16 +72,16 @@ func Test_StreamFactory_CreateFromConfig(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewMockConfigManager(ctrl)
+		cfg := NewMockConfig(ctrl)
 		stream := NewMockStream(ctrl)
 		strategy := NewMockStreamStrategy(ctrl)
-		strategy.EXPECT().AcceptFromConfig(cfg).Return(true).Times(1)
-		strategy.EXPECT().CreateFromConfig(cfg).Return(stream, nil).Times(1)
+		strategy.EXPECT().Accept(cfg).Return(true).Times(1)
+		strategy.EXPECT().Create(cfg).Return(stream, nil).Times(1)
 
 		sut := &StreamFactory{}
 		_ = sut.Register(strategy)
 
-		if s, e := sut.CreateFromConfig(cfg); e != nil {
+		if s, e := sut.Create(cfg); e != nil {
 			t.Errorf("returned the (%v) error", e)
 		} else if !reflect.DeepEqual(s, stream) {
 			t.Error("didn't returned the created stream")

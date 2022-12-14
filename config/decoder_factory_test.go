@@ -6,24 +6,24 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	serror "github.com/happyhippyhippo/slate/error"
+	"github.com/happyhippyhippo/slate/err"
 )
 
 func Test_DecoderFactory_Register(t *testing.T) {
 	t.Run("nil strategy", func(t *testing.T) {
-		if e := (&decoderFactory{}).Register(nil); e == nil {
+		if e := (&DecoderFactory{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrNilPointer)
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.NilPointer)
 		}
 	})
 
-	t.Run("register the decoder decoderFactory strategy", func(t *testing.T) {
+	t.Run("register the decoder factory strategy", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		strategy := NewMockDecoderStrategy(ctrl)
-		sut := decoderFactory{}
+		sut := DecoderFactory{}
 
 		if e := sut.Register(strategy); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -38,11 +38,11 @@ func Test_DecoderFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		format := DecoderFormatUnknown
+		format := FormatUnknown
 		reader := NewMockReader(ctrl)
 		strategy := NewMockDecoderStrategy(ctrl)
 		strategy.EXPECT().Accept(format).Return(false).Times(1)
-		sut := decoderFactory{}
+		sut := DecoderFactory{}
 		_ = sut.Register(strategy)
 
 		check, e := sut.Create(format, reader)
@@ -51,8 +51,8 @@ func Test_DecoderFactory_Create(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, serror.ErrInvalidConfigDecoderFormat):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrInvalidConfigDecoderFormat)
+		case !errors.Is(e, err.InvalidConfigFormat):
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.InvalidConfigFormat)
 		}
 	})
 
@@ -60,13 +60,13 @@ func Test_DecoderFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		format := DecoderFormatUnknown
+		format := FormatUnknown
 		reader := NewMockReader(ctrl)
 		decoder := NewMockDecoder(ctrl)
 		strategy := NewMockDecoderStrategy(ctrl)
 		strategy.EXPECT().Accept(format).Return(true).Times(1)
 		strategy.EXPECT().Create(reader).Return(decoder, nil).Times(1)
-		sut := decoderFactory{}
+		sut := DecoderFactory{}
 		_ = sut.Register(strategy)
 
 		if check, e := sut.Create(format, reader); e != nil {

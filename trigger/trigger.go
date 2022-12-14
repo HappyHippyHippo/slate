@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// ICallback used as a trigger execution process.
+type ICallback func() error
+
 // ITrigger defines the interface of a trigger used to execute a function call
 // on determine time intervals.
 type ITrigger interface {

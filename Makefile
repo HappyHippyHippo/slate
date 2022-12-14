@@ -2,8 +2,8 @@ MODULE   = $(shell env GO111MODULE=on $(GO) list -m)
 DATE    ?= $(shell date +%FT%T%z)
 VERSION ?= $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || \
 			cat $(CURDIR)/.version 2> /dev/null || echo v0)
-PKGS     = $(or $(PKG),$(shell env GO111MODULE=on $(GO) list ./...))
-TESTPKGS = $(shell env GO111MODULE=on $(GO) list ./...)
+PKGS     = $(or $(PKG),$(shell env GO111MODULE=on $(GO) list ./... | grep -v dig))
+TESTPKGS = $(shell env GO111MODULE=on $(GO) list ./... | grep -v dig)
 BIN      = $(CURDIR)/_bin
 
 GO      = go
@@ -27,8 +27,8 @@ $(BIN)/%: | $(BIN) ; $(info $(M) building $(PACKAGE)…)
 		|| ret=$$?; \
 	   rm -rf $$tmp ; exit $$ret
 
-GOLINT = $(BIN)/golint
-$(BIN)/golint: PACKAGE=golang.org/x/lint/golint
+GOLINT = $(BIN)/revive
+$(BIN)/revive: PACKAGE=github.com/mgechev/revive
 
 GOCRITIC = $(BIN)/gocritic
 $(BIN)/gocritic: PACKAGE=github.com/go-critic/go-critic/cmd/gocritic
@@ -77,7 +77,7 @@ test-coverage: fmt lint critic test-coverage-tools ; $(info $(M) running coverag
 	$Q $(GOCOV) convert $(COVERAGE_PROFILE) | $(GOCOVXML) > $(COVERAGE_XML)
 
 .PHONY: lint
-lint: | $(GOLINT) ; $(info $(M) running golint…) @ ## Run golint
+lint: | $(GOLINT) ; $(info $(M) running revive…) @ ## Run revive
 	$Q $(GOLINT) -set_exit_status $(PKGS)
 
 .PHONY: critic

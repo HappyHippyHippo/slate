@@ -6,7 +6,7 @@ type Level int
 const (
 	// FATAL defines a fatal logging level.
 	FATAL Level = 1 + iota
-	// ERROR defines a error logging level.
+	// ERROR defines a err logging level.
 	ERROR
 	// WARNING defines a warning logging level.
 	WARNING

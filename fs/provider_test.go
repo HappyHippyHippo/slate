@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/happyhippyhippo/slate"
-	serror "github.com/happyhippyhippo/slate/error"
+	"github.com/happyhippyhippo/slate/err"
 	"github.com/spf13/afero"
 )
 
@@ -13,19 +13,19 @@ func Test_Provider_Register(t *testing.T) {
 	t.Run("nil container", func(t *testing.T) {
 		if e := (Provider{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, serror.ErrNilPointer)
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) err when expected (%v)", e, err.NilPointer)
 		}
 	})
 
 	t.Run("register the file system", func(t *testing.T) {
 		app := slate.NewApplication()
-		_ = app.Add(Provider{})
+		_ = app.Provider(Provider{})
 
-		system, e := app.Container.Get(ContainerID)
+		system, e := app.Get(ID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("returned the unexpected err (%v)", e)
 		case system == nil:
 			t.Error("didn't returned the expected instance")
 		default:
@@ -42,14 +42,14 @@ func Test_Provider_Boot(t *testing.T) {
 	t.Run("nil container", func(t *testing.T) {
 		if e := (Provider{}).Boot(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, serror.ErrNilPointer)
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) err when expected (%v)", e, err.NilPointer)
 		}
 	})
 
 	t.Run("successful boot", func(t *testing.T) {
 		app := slate.NewApplication()
-		_ = app.Add(Provider{})
+		_ = app.Provider(Provider{})
 
 		if e := app.Boot(); e != nil {
 			t.Errorf("returned the (%v) error", e)

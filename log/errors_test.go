@@ -4,95 +4,82 @@ import (
 	"errors"
 	"testing"
 
-	sconfig "github.com/happyhippyhippo/slate/config"
-	serror "github.com/happyhippyhippo/slate/error"
+	"github.com/happyhippyhippo/slate/config"
+	"github.com/happyhippyhippo/slate/err"
 )
 
-func Test_ErrNilPointer(t *testing.T) {
+func Test_errNilPointer(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := "dummy argument"
 		expected := "invalid nil pointer : dummy argument"
 
-		if e := errNilPointer(arg); !errors.Is(e, serror.ErrNilPointer) {
-			t.Errorf("error not a instance of NilPointer")
+		if e := errNilPointer(arg); !errors.Is(e, err.NilPointer) {
+			t.Errorf("error not a instance of err.NilPointer")
 		} else if e.Error() != expected {
 			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
 		}
 	})
 }
 
-func Test_ErrConversion(t *testing.T) {
+func Test_errConversion(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := "dummy value"
 		typ := "dummy type"
 		expected := "invalid type conversion : dummy value to dummy type"
 
-		if e := errConversion(arg, typ); !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("error not a instance of Conversion")
+		if e := errConversion(arg, typ); !errors.Is(e, err.Conversion) {
+			t.Errorf("error not a instance of err.Conversion")
 		} else if e.Error() != expected {
 			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
 		}
 	})
 }
 
-func Test_ErrInvalidFormat(t *testing.T) {
+func Test_errInvalidFormat(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := "dummy argument"
-		expected := "invalid output format : dummy argument"
+		expected := "invalid output log format : dummy argument"
 
-		if e := errInvalidFormat(arg); !errors.Is(e, serror.ErrInvalidLogFormat) {
-			t.Errorf("error not a instance of ErrInvalidFormat")
+		if e := errInvalidFormat(arg); !errors.Is(e, err.InvalidLogFormat) {
+			t.Errorf("err not a instance of err.InvalidFormat")
 		} else if e.Error() != expected {
-			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
+			t.Errorf("err message (%v) not same as expected (%v)", e, expected)
 		}
 	})
 }
 
-func Test_ErrInvalidLevel(t *testing.T) {
+func Test_errInvalidLevel(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := "dummy argument"
-		expected := "invalid logger level : dummy argument"
+		expected := "invalid log level : dummy argument"
 
-		if e := errInvalidLevel(arg); !errors.Is(e, serror.ErrInvalidLogLevel) {
-			t.Errorf("error not a instance of ErrInvalidLevel")
+		if e := errInvalidLevel(arg); !errors.Is(e, err.InvalidLogLevel) {
+			t.Errorf("error not a instance of err.InvalidLogLevel")
 		} else if e.Error() != expected {
 			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
 		}
 	})
 }
 
-func Test_ErrDuplicateStream(t *testing.T) {
+func Test_errInvalidType(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := "dummy argument"
-		expected := "stream already registered : dummy argument"
+		expected := "invalid log stream type : dummy argument"
 
-		if e := errDuplicateStream(arg); !errors.Is(e, serror.ErrDuplicateLogStream) {
-			t.Errorf("error not a instance of ErrDuplicateStream")
+		if e := errInvalidType(arg); !errors.Is(e, err.InvalidLogStream) {
+			t.Errorf("error not a instance of err.InvalidLogStream")
 		} else if e.Error() != expected {
 			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
 		}
 	})
 }
 
-func Test_ErrInvalidStreamType(t *testing.T) {
+func Test_errInvalidConfig(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
-		arg := "dummy argument"
-		expected := "invalid stream type : dummy argument"
+		arg := &config.Config{}
 
-		if e := errInvalidStreamType(arg); !errors.Is(e, serror.ErrInvalidLogStreamType) {
-			t.Errorf("error not a instance of ErrInvalidStreamType")
-		} else if e.Error() != expected {
-			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
-		}
-	})
-}
-
-func Test_ErrInvalidStreamConfig(t *testing.T) {
-	t.Run("creation", func(t *testing.T) {
-		arg := &sconfig.Partial{}
-
-		if e := errInvalidStreamConfig(arg); !errors.Is(e, serror.ErrInvalidLogStreamConfig) {
-			t.Errorf("error not a instance of ErrInvalidStreamConfig")
+		if e := errInvalidConfig(arg); !errors.Is(e, err.InvalidLogConfig) {
+			t.Errorf("error not a instance of err.InvalidLogConfig")
 		}
 	})
 }

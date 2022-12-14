@@ -3,41 +3,60 @@ package config
 import (
 	"fmt"
 
-	serror "github.com/happyhippyhippo/slate/error"
+	"github.com/happyhippyhippo/slate/err"
 )
 
-func errNilPointer(arg string) error {
-	return fmt.Errorf("%w : %v", serror.ErrNilPointer, arg)
+func errNilPointer(
+	arg string,
+) error {
+	return fmt.Errorf("%w : %v", err.NilPointer, arg)
 }
 
-func errConversion(val interface{}, t string) error {
-	return fmt.Errorf("%w : %v to %v", serror.ErrConversion, val, t)
+func errConversion(
+	val interface{},
+	t string,
+) error {
+	return fmt.Errorf("%w : %v to %v", err.Conversion, val, t)
 }
 
-func errConfigSourceNotFound(id string) error {
-	return fmt.Errorf("%w : %v", serror.ErrConfigSourceNotFound, id)
+func errPathNotFound(
+	path string,
+) error {
+	return fmt.Errorf("%w : %v", err.ConfigPathNotFound, path)
 }
 
-func errDuplicateConfigSource(id string) error {
-	return fmt.Errorf("%w : %v", serror.ErrDuplicateConfigSource, id)
+func errInvalidFormat(
+	format string,
+) error {
+	return fmt.Errorf("%w : %v", err.InvalidConfigFormat, format)
 }
 
-func errConfigPathNotFound(path string) error {
-	return fmt.Errorf("%w : %v", serror.ErrConfigPathNotFound, path)
+func errInvalidSource(
+	sourceType string,
+) error {
+	return fmt.Errorf("%w : %v", err.InvalidConfigSource, sourceType)
 }
 
-func errConfigRestPathNotFound(path string) error {
-	return fmt.Errorf("%w : %v", serror.ErrConfigRestPathNotFound, path)
+func errRestPathNotFound(
+	path string,
+) error {
+	return fmt.Errorf("%w : %v", err.ConfigRestPathNotFound, path)
 }
 
-func errInvalidConfigDecoderFormat(format string) error {
-	return fmt.Errorf("%w : %v", serror.ErrInvalidConfigDecoderFormat, format)
+func errInvalidSourceData(
+	cfg IConfig,
+) error {
+	return fmt.Errorf("%w : %v", err.InvalidConfigSourceData, cfg)
 }
 
-func errInvalidConfigSourceType(sourceType string) error {
-	return fmt.Errorf("%w : %v", serror.ErrInvalidConfigSourceType, sourceType)
+func errSourceNotFound(
+	id string,
+) error {
+	return fmt.Errorf("%w : %v", err.ConfigSourceNotFound, id)
 }
 
-func errInvalidConfigSourcePartial(cfg IConfig) error {
-	return fmt.Errorf("%w : %v", serror.ErrInvalidConfigSourcePartial, cfg)
+func errDuplicateSource(
+	id string,
+) error {
+	return fmt.Errorf("%w : %v", err.DuplicateConfigSource, id)
 }

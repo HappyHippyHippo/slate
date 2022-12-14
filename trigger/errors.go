@@ -3,9 +3,11 @@ package trigger
 import (
 	"fmt"
 
-	serror "github.com/happyhippyhippo/slate/error"
+	"github.com/happyhippyhippo/slate/err"
 )
 
-func errNilPointer(arg string) error {
-	return fmt.Errorf("%w : %v", serror.ErrNilPointer, arg)
+func errNilPointer(
+	arg string,
+) error {
+	return fmt.Errorf("%w : %v", err.NilPointer, arg)
 }

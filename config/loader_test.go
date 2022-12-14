@@ -6,37 +6,37 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	serror "github.com/happyhippyhippo/slate/error"
+	"github.com/happyhippyhippo/slate/err"
 )
 
 func Test_NewLoader(t *testing.T) {
-	t.Run("nil cfg", func(t *testing.T) {
+	t.Run("nil manager", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, e := newLoader(nil, NewMockSourceFactory(ctrl))
+		sut, e := NewLoader(nil, NewMockSourceFactory(ctrl))
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, serror.ErrNilPointer):
-			t.Errorf("returned (%v) error when expecting (%v)", e, serror.ErrNilPointer)
+		case !errors.Is(e, err.NilPointer):
+			t.Errorf("returned (%v) err when expecting (%v)", e, err.NilPointer)
 		}
 	})
 
-	t.Run("nil source decoderFactory", func(t *testing.T) {
+	t.Run("nil source dFactory", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, e := newLoader(NewMockManager(ctrl), nil)
+		sut, e := NewLoader(NewMockManager(ctrl), nil)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, serror.ErrNilPointer):
-			t.Errorf("returned (%v) error when expecting (%v)", e, serror.ErrNilPointer)
+		case !errors.Is(e, err.NilPointer):
+			t.Errorf("returned (%v) err when expecting (%v)", e, err.NilPointer)
 		}
 	})
 
@@ -44,7 +44,7 @@ func Test_NewLoader(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		if sut, e := newLoader(NewMockManager(ctrl), NewMockSourceFactory(ctrl)); sut == nil {
+		if sut, e := NewLoader(NewMockManager(ctrl), NewMockSourceFactory(ctrl)); sut == nil {
 			t.Error("didn't returned a valid reference")
 		} else if e != nil {
 			t.Errorf("return the (%v) error", e)
@@ -55,26 +55,26 @@ func Test_NewLoader(t *testing.T) {
 func Test_Loader_Load(t *testing.T) {
 	LoaderSourceID = "base_source_id"
 	LoaderSourcePath = "base_source_path"
-	LoaderSourceFormat = DecoderFormatYAML
+	LoaderSourceFormat = FormatYAML
 	defer func() {
 		LoaderSourceID = "main"
 		LoaderSourcePath = "config/config.yaml"
-		LoaderSourceFormat = DecoderFormatYAML
+		LoaderSourceFormat = FormatYAML
 	}()
 
 	t.Run("error getting the base source", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("error message")
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat).Return(nil, expected).Times(1)
-		sut, _ := newLoader(NewMockManager(ctrl), sourceFactory)
+		expected := fmt.Errorf("err message")
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(nil, expected).Times(1)
+		sut, _ := NewLoader(NewMockManager(ctrl), sFactory)
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("returned the (%v) err when expecting (%v)", e, expected)
 		}
 	})
 
@@ -82,18 +82,18 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("error message")
+		expected := fmt.Errorf("err message")
 		src := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat).Return(src, nil).Times(1)
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(expected).Times(1)
-		sut, _ := newLoader(mockManager, sourceFactory)
+		sut, _ := NewLoader(mockManager, sFactory)
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned (%v) error when expecting (%v)", e, expected)
+			t.Errorf("returned (%v) err when expecting (%v)", e, expected)
 		}
 	})
 
@@ -102,12 +102,12 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		src := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat).Return(src, nil).Times(1)
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().List(LoaderSourceListPath).Return([]interface{}{}, nil).Times(1)
-		sut, _ := newLoader(mockManager, sourceFactory)
+		sut, _ := NewLoader(mockManager, sFactory)
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -118,16 +118,34 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		expected := fmt.Errorf("err message")
 		src := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat).Return(src, nil).Times(1)
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		mockManager := NewMockManager(ctrl)
+		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
+		mockManager.EXPECT().List(LoaderSourceListPath).Return(nil, expected).Times(1)
+		sut, _ := NewLoader(mockManager, sFactory)
+
+		if e := sut.Load(); e != nil {
+			t.Errorf("returned the unexpected err : %v", e)
+		}
+	})
+
+	t.Run("invalid entry in list of sources results in an empty sources list", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		src := NewMockSource(ctrl)
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().List(LoaderSourceListPath).Return([]interface{}{123}, nil).Times(1)
-		sut, _ := newLoader(mockManager, sourceFactory)
+		sut, _ := NewLoader(mockManager, sFactory)
 
 		if e := sut.Load(); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("returned the unexpected err : %v", e)
 		}
 	})
 
@@ -135,19 +153,19 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partials := []interface{}{Partial{}}
+		partials := []interface{}{Config{}}
 		src := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat).Return(src, nil).Times(1)
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().List(LoaderSourceListPath).Return(partials, nil).Times(1)
-		sut, _ := newLoader(mockManager, sourceFactory)
+		sut, _ := NewLoader(mockManager, sFactory)
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConfigPathNotFound) {
-			t.Errorf("returned (%v) error when expecting (%v)", e, serror.ErrConfigPathNotFound)
+		} else if !errors.Is(e, err.ConfigPathNotFound) {
+			t.Errorf("returned (%v) err when expecting (%v)", e, err.ConfigPathNotFound)
 		}
 	})
 
@@ -155,19 +173,19 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partials := []interface{}{Partial{"id": 12}}
+		partials := []interface{}{Config{"id": 12}}
 		src := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat).Return(src, nil).Times(1)
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().List(LoaderSourceListPath).Return(partials, nil).Times(1)
-		sut, _ := newLoader(mockManager, sourceFactory)
+		sut, _ := NewLoader(mockManager, sFactory)
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Conversion) {
+			t.Errorf("returned (%v) err when expecting (%v)", e, err.Conversion)
 		}
 	})
 
@@ -175,19 +193,19 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partials := []interface{}{Partial{"id": "id", "priority": "string"}}
+		partials := []interface{}{Config{"id": "id", "priority": "string"}}
 		src := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat).Return(src, nil).Times(1)
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().List(LoaderSourceListPath).Return(partials, nil).Times(1)
-		sut, _ := newLoader(mockManager, sourceFactory)
+		sut, _ := NewLoader(mockManager, sFactory)
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Conversion) {
+			t.Errorf("returned (%v) err when expecting (%v)", e, err.Conversion)
 		}
 	})
 
@@ -195,22 +213,22 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("error message")
-		srcPartial := Partial{"id": "id", "priority": 0}
+		expected := fmt.Errorf("err message")
+		srcPartial := Config{"id": "id", "priority": 0}
 		partials := []interface{}{srcPartial}
 		src := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat).Return(src, nil).Times(1)
-		sourceFactory.EXPECT().CreateFromConfig(&srcPartial).Return(nil, expected).Times(1)
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&srcPartial).Return(nil, expected).Times(1)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().List(LoaderSourceListPath).Return(partials, nil).Times(1)
-		sut, _ := newLoader(mockManager, sourceFactory)
+		sut, _ := NewLoader(mockManager, sFactory)
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned (%v) error when expecting (%v)", e, expected)
+			t.Errorf("returned (%v) err when expecting (%v)", e, expected)
 		}
 	})
 
@@ -218,24 +236,24 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("error message")
-		srcPartial := Partial{"id": "id", "priority": 0}
+		expected := fmt.Errorf("err message")
+		srcPartial := Config{"id": "id", "priority": 0}
 		partials := []interface{}{srcPartial}
 		src := NewMockSource(ctrl)
 		src1 := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat).Return(src, nil).Times(1)
-		sourceFactory.EXPECT().CreateFromConfig(&srcPartial).Return(src1, nil)
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&srcPartial).Return(src1, nil)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().List(LoaderSourceListPath).Return(partials, nil).Times(1)
 		mockManager.EXPECT().AddSource("id", 0, src1).Return(expected).Times(1)
-		sut, _ := newLoader(mockManager, sourceFactory)
+		sut, _ := NewLoader(mockManager, sFactory)
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned (%v) error when expecting (%v)", e, expected)
+			t.Errorf("returned (%v) err when expecting (%v)", e, expected)
 		}
 	})
 
@@ -243,18 +261,18 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		srcPartial := Partial{"id": "id", "priority": 0}
+		srcPartial := Config{"id": "id", "priority": 0}
 		partials := []interface{}{srcPartial}
 		src := NewMockSource(ctrl)
 		src1 := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat).Return(src, nil).Times(1)
-		sourceFactory.EXPECT().CreateFromConfig(&srcPartial).Return(src1, nil)
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&srcPartial).Return(src1, nil)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().List(LoaderSourceListPath).Return(partials, nil).Times(1)
 		mockManager.EXPECT().AddSource("id", 0, src1).Return(nil).Times(1)
-		sut, _ := newLoader(mockManager, sourceFactory)
+		sut, _ := NewLoader(mockManager, sFactory)
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -268,18 +286,18 @@ func Test_Loader_Load(t *testing.T) {
 		LoaderSourcePath = "config.yaml"
 		defer func() { LoaderSourcePath = "config/config.yaml" }()
 
-		srcPartial := Partial{"id": "id", "priority": 0}
+		srcPartial := Config{"id": "id", "priority": 0}
 		partials := []interface{}{srcPartial}
 		src := NewMockSource(ctrl)
 		src1 := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(SourceTypeFile, "config.yaml", LoaderSourceFormat).Return(src, nil).Times(1)
-		sourceFactory.EXPECT().CreateFromConfig(&srcPartial).Return(src1, nil)
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": "config.yaml", "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&srcPartial).Return(src1, nil)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().List(LoaderSourceListPath).Return(partials, nil).Times(1)
 		mockManager.EXPECT().AddSource("id", 0, src1).Return(nil).Times(1)
-		sut, _ := newLoader(mockManager, sourceFactory)
+		sut, _ := NewLoader(mockManager, sFactory)
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -293,18 +311,18 @@ func Test_Loader_Load(t *testing.T) {
 		LoaderSourceListPath = "config_list"
 		defer func() { LoaderSourceListPath = "slate.config.list" }()
 
-		srcPartial := Partial{"id": "id", "priority": 0}
+		srcPartial := Config{"id": "id", "priority": 0}
 		partials := []interface{}{srcPartial}
 		src := NewMockSource(ctrl)
 		src1 := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat).Return(src, nil).Times(1)
-		sourceFactory.EXPECT().CreateFromConfig(&srcPartial).Return(src1, nil)
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&srcPartial).Return(src1, nil)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().List("config_list").Return(partials, nil).Times(1)
 		mockManager.EXPECT().AddSource("id", 0, src1).Return(nil).Times(1)
-		sut, _ := newLoader(mockManager, sourceFactory)
+		sut, _ := NewLoader(mockManager, sFactory)
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -318,18 +336,18 @@ func Test_Loader_Load(t *testing.T) {
 		LoaderSourceFormat = "json"
 		defer func() { LoaderSourceFormat = "yaml" }()
 
-		srcPartial := Partial{"id": "id", "priority": 0}
+		srcPartial := Config{"id": "id", "priority": 0}
 		partials := []interface{}{srcPartial}
 		src := NewMockSource(ctrl)
 		src1 := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(SourceTypeFile, LoaderSourcePath, "json").Return(src, nil).Times(1)
-		sourceFactory.EXPECT().CreateFromConfig(&srcPartial).Return(src1, nil)
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": LoaderSourcePath, "format": "json"}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&srcPartial).Return(src1, nil)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().List(LoaderSourceListPath).Return(partials, nil).Times(1)
 		mockManager.EXPECT().AddSource("id", 0, src1).Return(nil).Times(1)
-		sut, _ := newLoader(mockManager, sourceFactory)
+		sut, _ := NewLoader(mockManager, sFactory)
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -340,18 +358,18 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		srcPartial := Partial{"id": "id"}
+		srcPartial := Config{"id": "id"}
 		partials := []interface{}{srcPartial}
 		src := NewMockSource(ctrl)
 		src1 := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat).Return(src, nil).Times(1)
-		sourceFactory.EXPECT().CreateFromConfig(&srcPartial).Return(src1, nil)
+		sFactory := NewMockSourceFactory(ctrl)
+		sFactory.EXPECT().Create(&Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&srcPartial).Return(src1, nil)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().List(LoaderSourceListPath).Return(partials, nil).Times(1)
 		mockManager.EXPECT().AddSource("id", 0, src1).Return(nil).Times(1)
-		sut, _ := newLoader(mockManager, sourceFactory)
+		sut, _ := NewLoader(mockManager, sFactory)
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)

@@ -7,61 +7,47 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
-	sconfig "github.com/happyhippyhippo/slate/config"
-	serror "github.com/happyhippyhippo/slate/error"
-	srdb "github.com/happyhippyhippo/slate/rdb"
+	"github.com/happyhippyhippo/slate/config"
+	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate/rdb"
+	"gorm.io/gorm"
 )
 
 func Test_Provider_Register(t *testing.T) {
 	t.Run("nil container", func(t *testing.T) {
 		if e := (&Provider{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, serror.ErrNilPointer)
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
 		}
 	})
 
 	t.Run("register components", func(t *testing.T) {
-		container := slate.ServiceContainer{}
+		container := slate.NewContainer()
 		sut := &Provider{}
 
 		e := sut.Register(container)
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
-		case !container.Has(ContainerID):
+		case !container.Has(ID):
 			t.Errorf("didn't registered the migrator : %v", sut)
-		case !container.Has(ContainerDaoID):
+		case !container.Has(DaoID):
 			t.Errorf("didn't registered the migrator DAO : %v", sut)
 		}
 	})
 
 	t.Run("error retrieving db connection factory when retrieving migrator DAO", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
+		container := slate.NewContainer()
+		_ = (&rdb.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(srdb.ContainerID, func() (interface{}, error) {
-			return nil, expected
-		})
+		_ = container.Service(rdb.ID, func() (rdb.IConnectionFactory, error) { return nil, expected })
 
-		if _, e := container.Get(ContainerDaoID); e == nil {
+		if _, e := container.Get(DaoID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
-		}
-	})
-
-	t.Run("invalid db connection factory when retrieving migrator DAO", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&Provider{}).Register(container)
-		_ = container.Service(srdb.ContainerID, func() (interface{}, error) {
-			return "string", nil
-		})
-
-		if _, e := container.Get(ContainerDaoID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Container)
 		}
 	})
 
@@ -70,37 +56,16 @@ func Test_Provider_Register(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
-		_ = (&sconfig.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Register(container)
+		container := slate.NewContainer()
+		_ = (&config.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(srdb.ContainerConfigID, func() (interface{}, error) {
-			return nil, expected
-		})
+		_ = container.Service(rdb.ConfigID, func() (*gorm.Config, error) { return nil, expected })
 
-		if _, e := container.Get(ContainerDaoID); e == nil {
+		if _, e := container.Get(DaoID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
-		}
-	})
-
-	t.Run("invalid db connection config when retrieving migrator DAO", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		container := slate.ServiceContainer{}
-		_ = (&sconfig.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Register(container)
-		_ = (&Provider{}).Register(container)
-		_ = container.Service(srdb.ContainerConfigID, func() (interface{}, error) {
-			return "string", nil
-		})
-
-		if _, e := container.Get(ContainerDaoID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Container)
 		}
 	})
 
@@ -108,15 +73,15 @@ func Test_Provider_Register(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		container := slate.ServiceContainer{}
-		_ = (&sconfig.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Register(container)
+		container := slate.NewContainer()
+		_ = (&config.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		if _, e := container.Get(ContainerDaoID); e == nil {
+		if _, e := container.Get(DaoID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrDatabaseConfigNotFound) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrDatabaseConfigNotFound)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Container)
 		}
 	})
 
@@ -124,25 +89,23 @@ func Test_Provider_Register(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		container := slate.ServiceContainer{}
-		_ = (&sconfig.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Boot(container)
+		container := slate.NewContainer()
+		_ = (&config.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Boot(container)
 		_ = (&Provider{}).Register(container)
 
-		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
-		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
-			return cfg, nil
-		})
+		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
+		cfgManager := NewMockConfigManager(ctrl)
+		cfgManager.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfgManager.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
+		cfgManager.EXPECT().Config("slate.rdb.connections.primary").Return(&partial, nil).Times(1)
+		_ = container.Service(config.ID, func() config.IManager { return cfgManager })
 
-		sut, e := container.Get(ContainerDaoID)
+		sut, e := container.Get(DaoID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpectederror (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case sut == nil:
 			t.Error("didn't returned a reference to the migrator DAO")
 		default:
@@ -161,25 +124,23 @@ func Test_Provider_Register(t *testing.T) {
 		Database = "secondary"
 		defer func() { Database = "primary" }()
 
-		container := slate.ServiceContainer{}
-		_ = (&sconfig.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Boot(container)
+		container := slate.NewContainer()
+		_ = (&config.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Boot(container)
 		_ = (&Provider{}).Register(container)
 
-		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("slate.rdb.connections.secondary").Return(true).Times(1)
-		cfg.EXPECT().Partial("slate.rdb.connections.secondary").Return(partial, nil).Times(1)
-		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
-			return cfg, nil
-		})
+		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
+		cfgManager := NewMockConfigManager(ctrl)
+		cfgManager.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfgManager.EXPECT().Has("slate.rdb.connections.secondary").Return(true).Times(1)
+		cfgManager.EXPECT().Config("slate.rdb.connections.secondary").Return(&partial, nil).Times(1)
+		_ = container.Service(config.ID, func() config.IManager { return cfgManager })
 
-		sut, e := container.Get(ContainerDaoID)
+		sut, e := container.Get(DaoID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpectederror (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case sut == nil:
 			t.Error("didn't returned a reference to the migrator DAO")
 		default:
@@ -195,18 +156,17 @@ func Test_Provider_Register(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		container := slate.ServiceContainer{}
-		_ = (&sconfig.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Register(container)
+		expected := fmt.Errorf("error message")
+		container := slate.NewContainer()
+		_ = (&config.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerDaoID, func() (interface{}, error) {
-			return "string", nil
-		})
+		_ = container.Service(DaoID, func() (IDao, error) { return nil, expected })
 
-		if _, e := container.Get(ContainerID); e == nil {
+		if _, e := container.Get(ID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Container)
 		}
 	})
 
@@ -215,18 +175,16 @@ func Test_Provider_Register(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
-		_ = (&sconfig.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Register(container)
+		container := slate.NewContainer()
+		_ = (&config.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerDaoID, func() (interface{}, error) {
-			return nil, expected
-		})
+		_ = container.Service(DaoID, func() (IDao, error) { return nil, expected })
 
-		if _, e := container.Get(ContainerID); e == nil {
+		if _, e := container.Get(ID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Container)
 		}
 	})
 
@@ -234,30 +192,28 @@ func Test_Provider_Register(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		container := slate.ServiceContainer{}
-		_ = (&sconfig.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Boot(container)
+		container := slate.NewContainer()
+		_ = (&config.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Boot(container)
 		_ = (&Provider{}).Register(container)
 
-		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
-		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
-			return cfg, nil
-		})
+		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
+		cfgManager := NewMockConfigManager(ctrl)
+		cfgManager.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfgManager.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
+		cfgManager.EXPECT().Config("slate.rdb.connections.primary").Return(&partial, nil).Times(1)
+		_ = container.Service(config.ID, func() (config.IManager, error) { return cfgManager, nil })
 
-		sut, e := container.Get(ContainerID)
+		sut, e := container.Get(ID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpectederror (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case sut == nil:
 			t.Error("didn't returned a reference to the migrator")
 		default:
 			switch sut.(type) {
-			case *migrator:
+			case *Migrator:
 			default:
 				t.Error("didn't returned a migrator reference")
 			}
@@ -269,8 +225,8 @@ func Test_Provider_Boot(t *testing.T) {
 	t.Run("nil container", func(t *testing.T) {
 		if e := (&Provider{}).Boot(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, serror.ErrNilPointer)
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
 		}
 	})
 
@@ -281,11 +237,11 @@ func Test_Provider_Boot(t *testing.T) {
 		AutoMigrate = false
 		defer func() { AutoMigrate = true }()
 
-		container := slate.ServiceContainer{}
+		container := slate.NewContainer()
 		sut := &Provider{}
 
 		if e := sut.Boot(container); e != nil {
-			t.Errorf("returned the unexpected error, (%v)", e)
+			t.Errorf("returned the unexpected serr, (%v)", e)
 		}
 	})
 
@@ -296,43 +252,39 @@ func Test_Provider_Boot(t *testing.T) {
 		AutoMigrate = false
 		defer func() { AutoMigrate = true }()
 
-		container := slate.ServiceContainer{}
+		container := slate.NewContainer()
 		sut := &Provider{}
 		_ = sut.Register(container)
 
 		if e := sut.Boot(container); e != nil {
-			t.Errorf("returned the unexpected error, (%v)", e)
+			t.Errorf("returned the unexpected serr, (%v)", e)
 		}
 	})
 
 	t.Run("error on retrieving migrator", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
+		container := slate.NewContainer()
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(ContainerID, func() (interface{}, error) {
-			return nil, expected
-		})
+		_ = container.Service(ID, func() (IMigrator, error) { return nil, expected })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Container)
 		}
 	})
 
 	t.Run("invalid retrieved migrator", func(t *testing.T) {
-		container := slate.ServiceContainer{}
+		container := slate.NewContainer()
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(ContainerID, func() (interface{}, error) {
-			return "string", nil
-		})
+		_ = container.Service(ID, func() (interface{}, error) { return "string", nil })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Conversion) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Conversion)
 		}
 	})
 
@@ -340,32 +292,27 @@ func Test_Provider_Boot(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		container := slate.ServiceContainer{}
-		_ = (&sconfig.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Boot(container)
+		container := slate.NewContainer()
+		_ = (&config.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Boot(container)
 
 		expected := fmt.Errorf("error message")
-		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
-		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
-			return cfg, nil
-		})
-
-		_ = container.Service("id", func() (interface{}, error) {
-			return nil, expected
-		}, ContainerMigrationTag)
+		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
+		cfgManager := NewMockConfigManager(ctrl)
+		cfgManager.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfgManager.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
+		cfgManager.EXPECT().Config("slate.rdb.connections.primary").Return(&partial, nil).Times(1)
+		_ = container.Service(config.ID, func() (config.IManager, error) { return cfgManager, nil })
+		_ = container.Service("id", func() (interface{}, error) { return nil, expected }, MigrationTag)
 
 		sut := &Provider{}
 		_ = sut.Register(container)
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Container)
 		}
 	})
 
@@ -373,31 +320,26 @@ func Test_Provider_Boot(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		container := slate.ServiceContainer{}
-		_ = (&sconfig.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Boot(container)
+		container := slate.NewContainer()
+		_ = (&config.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Boot(container)
 
-		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
-		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
-			return cfg, nil
-		})
-
-		_ = container.Service("id", func() (interface{}, error) {
-			return "string", nil
-		}, ContainerMigrationTag)
+		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
+		cfgManager := NewMockConfigManager(ctrl)
+		cfgManager.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfgManager.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
+		cfgManager.EXPECT().Config("slate.rdb.connections.primary").Return(&partial, nil).Times(1)
+		_ = container.Service(config.ID, func() (config.IManager, error) { return cfgManager, nil })
+		_ = container.Service("id", func() (interface{}, error) { return "string", nil }, MigrationTag)
 
 		sut := &Provider{}
 		_ = sut.Register(container)
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Conversion) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Conversion)
 		}
 	})
 
@@ -405,32 +347,30 @@ func Test_Provider_Boot(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		container := slate.ServiceContainer{}
-		_ = (&sconfig.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Register(container)
-		_ = (&srdb.Provider{}).Boot(container)
+		container := slate.NewContainer()
+		_ = (&config.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Boot(container)
 
-		partial := sconfig.Partial{"dialect": "sqlite", "host": ":memory:"}
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
-		cfg.EXPECT().Partial("slate.rdb.connections.primary").Return(partial, nil).Times(1)
-		_ = container.Service(sconfig.ContainerID, func() (interface{}, error) {
-			return cfg, nil
-		})
+		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
+		cfgManager := NewMockConfigManager(ctrl)
+		cfgManager.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
+		cfgManager.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
+		cfgManager.EXPECT().Config("slate.rdb.connections.primary").Return(&partial, nil).Times(1)
+		_ = container.Service(config.ID, func() (config.IManager, error) { return cfgManager, nil })
 
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(uint64(1)).Times(1)
 		migration.EXPECT().Up().Times(1)
 		_ = container.Service("id", func() (interface{}, error) {
 			return migration, nil
-		}, ContainerMigrationTag)
+		}, MigrationTag)
 
 		sut := &Provider{}
 		_ = sut.Register(container)
 
 		if e := sut.Boot(container); e != nil {
-			t.Errorf("returned the unexpectederror : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		}
 	})
 }

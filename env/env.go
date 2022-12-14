@@ -6,8 +6,12 @@ import (
 	"strings"
 )
 
-// Bool will try to retrieve a boolean value from the environment variable.
-func Bool(name string, def bool) bool {
+// Bool will try to retrieve a boolean value from the
+// environment variable.
+func Bool(
+	name string,
+	def bool,
+) bool {
 	result := def
 	if value, ok := os.LookupEnv(name); ok && value != "" {
 		result, _ = strconv.ParseBool(value)
@@ -15,8 +19,12 @@ func Bool(name string, def bool) bool {
 	return result
 }
 
-// Int will try to retrieve an integer value from the environment variable.
-func Int(name string, def int) int {
+// Int will try to retrieve an integer value from the
+// environment variable.
+func Int(
+	name string,
+	def int,
+) int {
 	result := def
 	if value, ok := os.LookupEnv(name); ok && value != "" {
 		var e error
@@ -28,8 +36,12 @@ func Int(name string, def int) int {
 	return result
 }
 
-// String will try to retrieve a string value from the environment variable.
-func String(name, def string) string {
+// String will try to retrieve a string value from the
+// environment variable.
+func String(
+	name,
+	def string,
+) string {
 	result := def
 	if value, ok := os.LookupEnv(name); ok && value != "" {
 		result = value
@@ -39,7 +51,10 @@ func String(name, def string) string {
 
 // List will try to retrieve a list of strings values from the
 // environment variable.
-func List(name string, def []string) []string {
+func List(
+	name string,
+	def []string,
+) []string {
 	result := def
 	if value, ok := os.LookupEnv(name); ok && value != "" {
 		result = strings.Split(value, ",")

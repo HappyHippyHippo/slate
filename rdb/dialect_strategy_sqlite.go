@@ -4,35 +4,59 @@ import (
 	"fmt"
 	"strings"
 
-	sconfig "github.com/happyhippyhippo/slate/config"
+	"github.com/happyhippyhippo/slate/config"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-type dialectStrategySqlite struct{}
+// SqliteDialectStrategy define a Sqlite dialect generation strategy instance.
+type SqliteDialectStrategy struct{}
 
-var _ IDialectStrategy = &dialectStrategySqlite{}
+var _ IDialectStrategy = &SqliteDialectStrategy{}
 
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
-func (dialectStrategySqlite) Accept(name string) bool {
-	return strings.EqualFold(strings.ToLower(name), DialectSqlite)
+func (SqliteDialectStrategy) Accept(
+	cfg config.IConfig,
+) bool {
+	// check config argument reference
+	if cfg == nil {
+		return false
+	}
+	// retrieve the connection dialect from the configuration
+	dc := struct{ Dialect string }{}
+	_, e := cfg.Populate("", &dc)
+	if e != nil {
+		return false
+	}
+	// only accepts a mysql dialect request
+	return strings.EqualFold(strings.ToLower(dc.Dialect), DialectSqlite)
 }
 
 // Get instantiates the requested mysql connection dialect.
-func (dialectStrategySqlite) Get(cfg sconfig.IConfig) (gorm.Dialector, error) {
-	if dsn, e := cfg.String("host"); e != nil {
-		return nil, e
-	} else if params, e := cfg.Partial("params", nil); e != nil {
-		return nil, e
-	} else {
-		if len(params) > 0 {
-			dsn += "?"
-			for key, value := range params {
-				dsn += fmt.Sprintf("&%s=%v", key, value)
-			}
-		}
-
-		return sqlite.Open(dsn), nil
+func (SqliteDialectStrategy) Get(
+	cfg config.IConfig,
+) (gorm.Dialector, error) {
+	// check config argument reference
+	if cfg == nil {
+		return nil, errNilPointer("cfg")
 	}
+	// retrieve the data from the configuration
+	dc := struct {
+		Host   string
+		Params config.Config
+	}{}
+	_, e := cfg.Populate("", &dc)
+	if e != nil {
+		return nil, e
+	}
+	// add the extra parameters to the generated DSN string
+	if len(dc.Params) > 0 {
+		dc.Host += "?"
+		for key, value := range dc.Params {
+			dc.Host += fmt.Sprintf("&%s=%v", key, value)
+		}
+	}
+	// create the connection dialect instance
+	return sqlite.Open(dc.Host), nil
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	gormLogger "gorm.io/gorm/logger"
+	"gorm.io/gorm/logger"
 )
 
 type AnyTime struct{}
@@ -30,10 +30,16 @@ func Test_NewDao(t *testing.T) {
 		defer func() { _ = db.Close() }()
 
 		expected := fmt.Errorf("error message")
-		mockDB.ExpectQuery("SELECT VERSION()").WillReturnRows(sqlmock.NewRows([]string{"version"}).AddRow("MariaDB"))
-		mockDB.ExpectExec("CREATE TABLE `__version`").WillReturnError(expected)
+		mockDB.
+			ExpectQuery("SELECT VERSION()").
+			WillReturnRows(sqlmock.
+				NewRows([]string{"version"}).
+				AddRow("MariaDB"))
+		mockDB.
+			ExpectExec("CREATE TABLE `__version`").
+			WillReturnError(expected)
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
+		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
 
 		sut, e := NewDao(gdb)
 		switch {
@@ -53,13 +59,20 @@ func Test_NewDao(t *testing.T) {
 		}
 		defer func() { _ = db.Close() }()
 
-		mockDB.ExpectQuery("SELECT VERSION()").WillReturnRows(sqlmock.NewRows([]string{"version"}).AddRow("MariaDB"))
-		mockDB.ExpectExec("CREATE TABLE `__version`").WillReturnResult(sqlmock.NewResult(0, 0))
+		mockDB.
+			ExpectQuery("SELECT VERSION()").
+			WillReturnRows(sqlmock.
+				NewRows([]string{"version"}).
+				AddRow("MariaDB"))
+		mockDB.
+			ExpectExec("CREATE TABLE `__version`").
+			WillReturnResult(sqlmock.
+				NewResult(0, 0))
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
+		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
 
 		if sut, e := NewDao(gdb); e != nil {
-			t.Errorf("return the unexpectederror : (%v)", e)
+			t.Errorf("return the unexpected error : (%v)", e)
 		} else if sut == nil {
 			t.Error("didn't return the expected parser instance")
 		}
@@ -74,18 +87,27 @@ func Test_Dao_Last(t *testing.T) {
 		}
 		defer func() { _ = db.Close() }()
 
-		errMsg := "error message"
+		expected := fmt.Errorf("error message")
+		mockDB.
+			ExpectQuery("SELECT VERSION()").
+			WillReturnRows(sqlmock.
+				NewRows([]string{"version"}).
+				AddRow("MariaDB"))
+		mockDB.
+			ExpectExec("CREATE TABLE `__version`").
+			WillReturnResult(sqlmock.
+				NewResult(0, 0))
 		mockDB.
 			ExpectQuery("SELECT \\* FROM `__version`").
-			WillReturnError(fmt.Errorf("%s", errMsg))
+			WillReturnError(expected)
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
+		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
 
-		sut := &Dao{db: gdb}
+		sut, _ := NewDao(gdb)
 		if _, e := sut.Last(); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if check := e.Error(); check != errMsg {
-			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", check, errMsg)
+		} else if e.Error() != expected.Error() {
+			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", e, expected)
 		}
 	})
 
@@ -97,14 +119,24 @@ func Test_Dao_Last(t *testing.T) {
 		defer func() { _ = db.Close() }()
 
 		mockDB.
+			ExpectQuery("SELECT VERSION()").
+			WillReturnRows(sqlmock.
+				NewRows([]string{"version"}).
+				AddRow("MariaDB"))
+		mockDB.
+			ExpectExec("CREATE TABLE `__version`").
+			WillReturnResult(sqlmock.
+				NewResult(0, 0))
+		mockDB.
 			ExpectQuery("SELECT \\* FROM `__version`").
-			WillReturnRows(sqlmock.NewRows(nil))
+			WillReturnRows(sqlmock.
+				NewRows(nil))
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
+		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
 
-		sut := &Dao{db: gdb}
+		sut, _ := NewDao(gdb)
 		if record, e := sut.Last(); e != nil {
-			t.Errorf("returned the unexpectederror : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if record.ID != 0 {
 			t.Error("return an unexpected last record")
 		}
@@ -120,13 +152,24 @@ func Test_Dao_Last(t *testing.T) {
 		id := uint(12)
 		version := uint64(23)
 		mockDB.
+			ExpectQuery("SELECT VERSION()").
+			WillReturnRows(sqlmock.
+				NewRows([]string{"version"}).
+				AddRow("MariaDB"))
+		mockDB.
+			ExpectExec("CREATE TABLE `__version`").
+			WillReturnResult(sqlmock.
+				NewResult(0, 0))
+		mockDB.
 			ExpectQuery("SELECT \\* FROM `__version`").
-			WillReturnRows(sqlmock.NewRows([]string{"id", "version", "created_at", "updated_at", "deleted_at"}).AddRow(id, version, nil, nil, nil))
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
+			WillReturnRows(sqlmock.
+				NewRows([]string{"id", "version", "created_at", "updated_at", "deleted_at"}).
+				AddRow(id, version, nil, nil, nil))
+		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
 
-		sut := &Dao{db: gdb}
+		sut, _ := NewDao(gdb)
 		if record, e := sut.Last(); e != nil {
-			t.Errorf("returned the unexpectederror : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if record.ID != id || record.Version != version {
 			t.Error("return an invalid last record")
 		}
@@ -143,15 +186,24 @@ func Test_Dao_Up(t *testing.T) {
 
 		version := uint64(12)
 		errMsg := "error message"
+		mockDB.
+			ExpectQuery("SELECT VERSION()").
+			WillReturnRows(sqlmock.
+				NewRows([]string{"version"}).
+				AddRow("MariaDB"))
+		mockDB.
+			ExpectExec("CREATE TABLE `__version`").
+			WillReturnResult(sqlmock.
+				NewResult(0, 0))
 		mockDB.ExpectBegin()
 		mockDB.
 			ExpectExec("INSERT INTO `__version`").
 			WillReturnError(fmt.Errorf("%s", errMsg))
 		mockDB.ExpectRollback()
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
+		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
 
-		sut := &Dao{db: gdb}
+		sut, _ := NewDao(gdb)
 		if _, e := sut.Up(version); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if check := e.Error(); check != errMsg {
@@ -167,6 +219,15 @@ func Test_Dao_Up(t *testing.T) {
 		defer func() { _ = db.Close() }()
 
 		version := uint64(12)
+		mockDB.
+			ExpectQuery("SELECT VERSION()").
+			WillReturnRows(sqlmock.
+				NewRows([]string{"version"}).
+				AddRow("MariaDB"))
+		mockDB.
+			ExpectExec("CREATE TABLE `__version`").
+			WillReturnResult(sqlmock.
+				NewResult(0, 0))
 		mockDB.ExpectBegin()
 		mockDB.
 			ExpectExec("INSERT INTO `__version`").
@@ -174,11 +235,11 @@ func Test_Dao_Up(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mockDB.ExpectCommit()
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
+		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
 
-		sut := &Dao{db: gdb}
+		sut, _ := NewDao(gdb)
 		if record, e := sut.Up(version); e != nil {
-			t.Errorf("returned the unexpectederror : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if reflect.DeepEqual(Record{Version: version}, record) {
 			t.Errorf("returned the unexpected model (%v) when expecting : %v", record, Record{Version: version})
 		}
@@ -196,6 +257,15 @@ func Test_Dao_Down(t *testing.T) {
 		id := uint(12)
 		version := uint64(23)
 		errMsg := "error message"
+		mockDB.
+			ExpectQuery("SELECT VERSION()").
+			WillReturnRows(sqlmock.
+				NewRows([]string{"version"}).
+				AddRow("MariaDB"))
+		mockDB.
+			ExpectExec("CREATE TABLE `__version`").
+			WillReturnResult(sqlmock.
+				NewResult(0, 0))
 		mockDB.ExpectBegin()
 		mockDB.
 			ExpectExec("DELETE FROM `__version` WHERE `__version`.`id` = ?").
@@ -203,9 +273,9 @@ func Test_Dao_Down(t *testing.T) {
 			WillReturnError(fmt.Errorf("%s", errMsg))
 		mockDB.ExpectRollback()
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
+		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
 
-		sut := &Dao{db: gdb}
+		sut, _ := NewDao(gdb)
 		if e := sut.Down(Record{ID: id, Version: version}); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if check := e.Error(); check != errMsg {
@@ -222,6 +292,15 @@ func Test_Dao_Down(t *testing.T) {
 
 		id := uint(12)
 		version := uint64(23)
+		mockDB.
+			ExpectQuery("SELECT VERSION()").
+			WillReturnRows(sqlmock.
+				NewRows([]string{"version"}).
+				AddRow("MariaDB"))
+		mockDB.
+			ExpectExec("CREATE TABLE `__version`").
+			WillReturnResult(sqlmock.
+				NewResult(0, 0))
 		mockDB.ExpectBegin()
 		mockDB.
 			ExpectExec("DELETE FROM `__version` WHERE `__version`.`id` = ?").
@@ -229,11 +308,11 @@ func Test_Dao_Down(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mockDB.ExpectCommit()
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: gormLogger.Discard})
+		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
 
-		sut := &Dao{db: gdb}
+		sut, _ := NewDao(gdb)
 		if e := sut.Down(Record{ID: id, Version: version}); e != nil {
-			t.Errorf("returned the unexpectederror : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		}
 	})
 }

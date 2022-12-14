@@ -12,7 +12,7 @@ func Test_Stream_Level(t *testing.T) {
 	defer ctrl.Finish()
 
 	level := WARNING
-	sut := &stream{NewMockFormatter(ctrl), []string{}, level}
+	sut := &Stream{NewMockFormatter(ctrl), []string{}, level}
 
 	t.Run("retrieve the filtering level", func(t *testing.T) {
 		if check := sut.Level(); check != level {
@@ -25,7 +25,7 @@ func Test_Stream_HasChannel(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	sut := &stream{NewMockFormatter(ctrl), []string{"channel.1", "channel.2"}, WARNING}
+	sut := &Stream{NewMockFormatter(ctrl), []string{"channel.1", "channel.2"}, WARNING}
 
 	t.Run("check the channel registration", func(t *testing.T) {
 		switch {
@@ -44,7 +44,7 @@ func Test_Stream_ListChannels(t *testing.T) {
 	defer ctrl.Finish()
 
 	channels := []string{"channel.1", "channel.2"}
-	sut := &stream{NewMockFormatter(ctrl), channels, WARNING}
+	sut := &Stream{NewMockFormatter(ctrl), channels, WARNING}
 
 	t.Run("list the registered channels", func(t *testing.T) {
 		if check := sut.ListChannels(); !reflect.DeepEqual(check, channels) {
@@ -103,7 +103,7 @@ func Test_Stream_AddChannel(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				defer func() { ctrl.Finish() }()
 
-				sut := &stream{NewMockFormatter(ctrl), scn.state.channels, scn.state.level}
+				sut := &Stream{NewMockFormatter(ctrl), scn.state.channels, scn.state.level}
 				sut.AddChannel(scn.channel)
 
 				if check := sut.ListChannels(); !reflect.DeepEqual(check, scn.expected) {
@@ -165,7 +165,7 @@ func Test_Stream_RemoveChannel(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				defer func() { ctrl.Finish() }()
 
-				sut := &stream{NewMockFormatter(ctrl), scn.state.channels, scn.state.level}
+				sut := &Stream{NewMockFormatter(ctrl), scn.state.channels, scn.state.level}
 				sut.RemoveChannel(scn.channel)
 
 				if check := sut.ListChannels(); !reflect.DeepEqual(check, scn.expected) {
@@ -181,7 +181,7 @@ func Test_Stream_Format(t *testing.T) {
 	t.Run("return message if there is no formatter", func(t *testing.T) {
 		msg := "message"
 		level := WARNING
-		sut := &stream{nil, []string{}, level}
+		sut := &Stream{nil, []string{}, level}
 
 		if check := sut.format(level, msg, map[string]interface{}{"field": "value"}); check != msg {
 			t.Errorf("returned the (%v) formatted message", check)
@@ -198,7 +198,7 @@ func Test_Stream_Format(t *testing.T) {
 		level := WARNING
 		formatter := NewMockFormatter(ctrl)
 		formatter.EXPECT().Format(level, msg, ctx).Return(expected).Times(1)
-		sut := &stream{formatter, []string{}, level}
+		sut := &Stream{formatter, []string{}, level}
 
 		if check := sut.format(level, msg, ctx); check != expected {
 			t.Errorf("returned the (%v) formatted message", check)

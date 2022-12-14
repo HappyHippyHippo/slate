@@ -5,57 +5,86 @@ type ILoader interface {
 	Load() error
 }
 
-type loader struct {
-	cfg           IManager
+// Loader defines an object responsible to initialize a
+// configuration manager.
+type Loader struct {
+	manager       IManager
 	sourceFactory ISourceFactory
 }
 
-var _ ILoader = &loader{}
+var _ ILoader = &Loader{}
 
-func newLoader(cfg IManager, sourceFactory ISourceFactory) (ILoader, error) {
-	if cfg == nil {
-		return nil, errNilPointer("cfg")
+// NewLoader instantiate a new configuration loader instance.
+func NewLoader(
+	manager IManager,
+	sourceFactory ISourceFactory,
+) (*Loader, error) {
+	// check manager argument reference
+	if manager == nil {
+		return nil, errNilPointer("manager")
 	}
+	// check source factory argument reference
 	if sourceFactory == nil {
 		return nil, errNilPointer("sourceFactory")
 	}
-
-	return &loader{
-		cfg:           cfg,
+	// instantiate the config loader
+	return &Loader{
+		manager:       manager,
 		sourceFactory: sourceFactory,
 	}, nil
 }
 
 // Load loads the configuration from a base config file defined by a
 // path and format.
-func (l loader) Load() error {
-	if src, e := l.sourceFactory.Create(SourceTypeFile, LoaderSourcePath, LoaderSourceFormat); e != nil {
+func (l Loader) Load() error {
+	// retrieve the loader entry file config content
+	sourceConfig := &Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}
+	src, e := l.sourceFactory.Create(sourceConfig)
+	if e != nil {
 		return e
-	} else if e := l.cfg.AddSource(LoaderSourceID, 0, src); e != nil {
+	}
+	// add the loaded entry file content into the manager
+	if e := l.manager.AddSource(LoaderSourceID, 0, src); e != nil {
 		return e
-	} else if sources, e := l.cfg.List(LoaderSourceListPath); e != nil {
+	}
+	// retrieve from the loaded info the config entries list
+	sources, e := l.manager.List(LoaderSourceListPath)
+	if e != nil {
 		return nil
-	} else {
-		for _, src := range sources {
-			if s, ok := src.(Partial); ok {
-				if e := l.loadSource(&s); e != nil {
-					return e
-				}
+	}
+	// iterate through the sources list
+	for _, src := range sources {
+		if s, ok := src.(Config); ok {
+			// load the source
+			if e := l.loadSource(&s); e != nil {
+				return e
 			}
 		}
 	}
-
 	return nil
 }
 
-func (l loader) loadSource(cfg IConfig) error {
-	if id, e := cfg.String("id"); e != nil {
+func (l Loader) loadSource(
+	cfg IConfig,
+) error {
+	// parse the configuration
+	sourceConfig := struct {
+		ID       string
+		Priority int
+	}{}
+	_, e := cfg.Populate("", &sourceConfig)
+	if e != nil {
 		return e
-	} else if priority, e := cfg.Int("priority", 0); e != nil {
-		return e
-	} else if src, e := l.sourceFactory.CreateFromConfig(cfg); e != nil {
-		return e
-	} else {
-		return l.cfg.AddSource(id, priority, src)
 	}
+	// validate configuration
+	if sourceConfig.ID == "" {
+		return errPathNotFound("id")
+	}
+	// create the config source
+	src, e := l.sourceFactory.Create(cfg)
+	if e != nil {
+		return e
+	}
+	// add the loaded source to the manager
+	return l.manager.AddSource(sourceConfig.ID, sourceConfig.Priority, src)
 }

@@ -6,24 +6,24 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	serror "github.com/happyhippyhippo/slate/error"
+	"github.com/happyhippyhippo/slate/err"
 )
 
 func Test_SourceFactory_Register(t *testing.T) {
 	t.Run("nil strategy", func(t *testing.T) {
-		if e := (&sourceFactory{}).Register(nil); e == nil {
+		if e := (&SourceFactory{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrNilPointer)
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.NilPointer)
 		}
 	})
 
-	t.Run("register the source decoderFactory strategy", func(t *testing.T) {
+	t.Run("register the source dFactory strategy", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		strategy := NewMockSourceStrategy(ctrl)
-		sut := &sourceFactory{}
+		sut := &SourceFactory{}
 
 		if e := sut.Register(strategy); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -34,6 +34,19 @@ func Test_SourceFactory_Register(t *testing.T) {
 }
 
 func Test_SourceFactory_Create(t *testing.T) {
+	t.Run("nil config", func(t *testing.T) {
+		sut := &SourceFactory{}
+		src, e := sut.Create(nil)
+		switch {
+		case src != nil:
+			t.Error("returned an unexpected source")
+		case e == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(e, err.NilPointer):
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.NilPointer)
+		}
+	})
+
 	t.Run("error on unrecognized format", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -41,19 +54,20 @@ func Test_SourceFactory_Create(t *testing.T) {
 		sourceType := "type"
 		path := "path"
 		format := "format"
+		config := &Config{"type": sourceType, "path": path, "format": format}
 		strategy := NewMockSourceStrategy(ctrl)
-		strategy.EXPECT().Accept(sourceType).Return(false).Times(1)
-		sut := &sourceFactory{}
+		strategy.EXPECT().Accept(config).Return(false).Times(1)
+		sut := &SourceFactory{}
 		_ = sut.Register(strategy)
 
-		src, e := sut.Create(sourceType, path, format)
+		src, e := sut.Create(config)
 		switch {
 		case src != nil:
 			t.Error("returned an unexpected source")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, serror.ErrInvalidConfigSourceType):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrInvalidConfigSourceType)
+		case !errors.Is(e, err.InvalidConfigSourceData):
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.InvalidConfigSourceData)
 		}
 	})
 
@@ -64,74 +78,18 @@ func Test_SourceFactory_Create(t *testing.T) {
 		sourceType := "type"
 		path := "path"
 		format := "format"
-		src := &source{}
+		config := &Config{"type": sourceType, "path": path, "format": format}
+		src := NewMockSource(ctrl)
 		strategy := NewMockSourceStrategy(ctrl)
-		strategy.EXPECT().Accept(sourceType).Return(true).Times(1)
-		strategy.EXPECT().Create(path, format).Return(src, nil).Times(1)
-		sut := &sourceFactory{}
+		strategy.EXPECT().Accept(config).Return(true).Times(1)
+		strategy.EXPECT().Create(config).Return(src, nil).Times(1)
+		sut := &SourceFactory{}
 		_ = sut.Register(strategy)
 
-		if check, e := sut.Create(sourceType, path, format); e != nil {
+		if check, e := sut.Create(config); e != nil {
 			t.Errorf("returned the (%v) error", e)
 		} else if !reflect.DeepEqual(check, src) {
 			t.Error("didn't returned the created source")
-		}
-	})
-}
-
-func Test_SourceFactory_CreateConfig(t *testing.T) {
-	t.Run("nil config", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		src, e := (&sourceFactory{}).CreateFromConfig(nil)
-		switch {
-		case src != nil:
-			t.Error("returned a valid reference")
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, serror.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrNilPointer)
-		}
-	})
-
-	t.Run("error on unrecognized format", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		data := Partial{}
-		strategy := NewMockSourceStrategy(ctrl)
-		strategy.EXPECT().AcceptFromConfig(&data).Return(false).Times(1)
-		sut := &sourceFactory{}
-		_ = sut.Register(strategy)
-
-		src, e := sut.CreateFromConfig(&data)
-		switch {
-		case src != nil:
-			t.Error("returned a valid reference")
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, serror.ErrInvalidConfigSourcePartial):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrInvalidConfigSourcePartial)
-		}
-	})
-
-	t.Run("create the config source", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		data := Partial{}
-		src := NewMockSource(ctrl)
-		strategy := NewMockSourceStrategy(ctrl)
-		strategy.EXPECT().AcceptFromConfig(&data).Return(true).Times(1)
-		strategy.EXPECT().CreateFromConfig(&data).Return(src, nil).Times(1)
-		sut := &sourceFactory{}
-		_ = sut.Register(strategy)
-
-		if check, e := sut.CreateFromConfig(&data); e != nil {
-			t.Errorf("returned the (%v) error", e)
-		} else if !reflect.DeepEqual(check, src) {
-			t.Error("didn't returned the created src")
 		}
 	})
 }

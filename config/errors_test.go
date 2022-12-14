@@ -4,123 +4,123 @@ import (
 	"errors"
 	"testing"
 
-	serror "github.com/happyhippyhippo/slate/error"
+	"github.com/happyhippyhippo/slate/err"
 )
 
-func Test_ErrNilPointer(t *testing.T) {
+func Test_errNilPointer(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := "dummy argument"
 		expected := "invalid nil pointer : dummy argument"
 
-		if e := errNilPointer(arg); !errors.Is(e, serror.ErrNilPointer) {
-			t.Errorf("error not a instance of NilPointer")
+		if e := errNilPointer(arg); !errors.Is(e, err.NilPointer) {
+			t.Errorf("error not a instance of err.NilPointer")
 		} else if e.Error() != expected {
 			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
 		}
 	})
 }
 
-func Test_ErrConversion(t *testing.T) {
+func Test_errConversion(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := "dummy value"
 		typ := "dummy type"
 		expected := "invalid type conversion : dummy value to dummy type"
 
-		if e := errConversion(arg, typ); !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("error not a instance of Conversion")
+		if e := errConversion(arg, typ); !errors.Is(e, err.Conversion) {
+			t.Errorf("error not a instance of err.Conversion")
 		} else if e.Error() != expected {
 			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
 		}
 	})
 }
 
-func Test_ErrConfigSourceNotFound(t *testing.T) {
-	t.Run("creation", func(t *testing.T) {
-		arg := "dummy argument"
-		expected := "config source not found : dummy argument"
-
-		if e := errConfigSourceNotFound(arg); !errors.Is(e, serror.ErrConfigSourceNotFound) {
-			t.Errorf("error not a instance of ErrSourceNotFound")
-		} else if e.Error() != expected {
-			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
-		}
-	})
-}
-
-func Test_ErrDuplicateConfigSource(t *testing.T) {
-	t.Run("creation", func(t *testing.T) {
-		arg := "dummy argument"
-		expected := "config source already registered : dummy argument"
-
-		if e := errDuplicateConfigSource(arg); !errors.Is(e, serror.ErrDuplicateConfigSource) {
-			t.Errorf("error not a instance of ErrDuplicateSource")
-		} else if e.Error() != expected {
-			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
-		}
-	})
-}
-
-func Test_ErrConfigPathNotFound(t *testing.T) {
+func Test_errConfigPathNotFound(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := "dummy argument"
 		expected := "config path not found : dummy argument"
 
-		if e := errConfigPathNotFound(arg); !errors.Is(e, serror.ErrConfigPathNotFound) {
-			t.Errorf("error not a instance of ErrPathNotFound")
+		if e := errPathNotFound(arg); !errors.Is(e, err.ConfigPathNotFound) {
+			t.Errorf("error not a instance of err.ConfigPathNotFound")
 		} else if e.Error() != expected {
 			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
 		}
 	})
 }
 
-func Test_ErrConfigRestPathNotFound(t *testing.T) {
+func Test_errInvalidFormat(t *testing.T) {
+	t.Run("creation", func(t *testing.T) {
+		arg := FormatUnknown
+		expected := "invalid config format : unknown"
+
+		if e := errInvalidFormat(arg); !errors.Is(e, err.InvalidConfigFormat) {
+			t.Errorf("error not a instance of err.InvalidConfigFormat")
+		} else if e.Error() != expected {
+			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
+		}
+	})
+}
+
+func Test_errInvalidSource(t *testing.T) {
+	t.Run("creation", func(t *testing.T) {
+		arg := SourceUnknown
+		expected := "invalid config source type : unknown"
+
+		if e := errInvalidSource(arg); !errors.Is(e, err.InvalidConfigSource) {
+			t.Errorf("error not a instance of err.InvalidConfigSource")
+		} else if e.Error() != expected {
+			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
+		}
+	})
+}
+
+func Test_errRestPathNotFound(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
 		arg := "dummy argument"
 		expected := "rest path not found : dummy argument"
 
-		if e := errConfigRestPathNotFound(arg); !errors.Is(e, serror.ErrConfigRestPathNotFound) {
-			t.Errorf("error not a instance of ErrRestConfigPathNotFound")
+		if e := errRestPathNotFound(arg); !errors.Is(e, err.ConfigRestPathNotFound) {
+			t.Errorf("error not a instance of err.ConfigRestPathNotFound")
 		} else if e.Error() != expected {
 			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
 		}
 	})
 }
 
-func Test_ErrInvalidConfigDecoderFormat(t *testing.T) {
+func Test_errInvalidSourceData(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
-		arg := DecoderFormatUnknown
-		expected := "invalid config decoder format : unknown"
+		arg := Config{"field": "dummy argument"}
+		expected := "invalid config source data : &map[field:dummy argument]"
 
-		if e := errInvalidConfigDecoderFormat(arg); !errors.Is(e, serror.ErrInvalidConfigDecoderFormat) {
-			t.Errorf("error not a instance of ErrInvalidDecoderFormat")
+		if e := errInvalidSourceData(&arg); !errors.Is(e, err.InvalidConfigSourceData) {
+			t.Errorf("error not a instance of err.InvalidConfigSourceData")
 		} else if e.Error() != expected {
 			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
 		}
 	})
 }
 
-func Test_ErrInvalidConfigSourceType(t *testing.T) {
+func Test_errSourceNotFound(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
-		arg := SourceTypeUnknown
-		expected := "invalid config source type : unknown"
+		arg := "dummy argument"
+		expected := "config source not found : dummy argument"
 
-		if e := errInvalidConfigSourceType(arg); !errors.Is(e, serror.ErrInvalidConfigSourceType) {
-			t.Errorf("error not a instance of ErrInvalidSourceType")
+		if e := errSourceNotFound(arg); !errors.Is(e, err.ConfigSourceNotFound) {
+			t.Errorf("err not a instance of err.ConfigSourceNotFound")
 		} else if e.Error() != expected {
-			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
+			t.Errorf("err message (%v) not same as expected (%v)", e, expected)
 		}
 	})
 }
 
-func Test_ErrInvalidConfigSourcePartial(t *testing.T) {
+func Test_errDuplicateSource(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
-		arg := Partial{"field": "dummy argument"}
-		expected := "invalid config source config : &map[field:dummy argument]"
+		arg := "dummy argument"
+		expected := "config source already registered : dummy argument"
 
-		if e := errInvalidConfigSourcePartial(&arg); !errors.Is(e, serror.ErrInvalidConfigSourcePartial) {
-			t.Errorf("error not a instance of ErrInvalidSourceConfig")
+		if e := errDuplicateSource(arg); !errors.Is(e, err.DuplicateConfigSource) {
+			t.Errorf("err not a instance of err.DuplicateConfigSource")
 		} else if e.Error() != expected {
-			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
+			t.Errorf("err message (%v) not same as expected (%v)", e, expected)
 		}
 	})
 }

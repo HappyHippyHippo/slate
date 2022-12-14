@@ -3,47 +3,42 @@ package log
 import (
 	"strings"
 
-	sconfig "github.com/happyhippyhippo/slate/config"
+	"github.com/happyhippyhippo/slate/config"
 )
 
 // IStreamStrategy interface defines the methods of the stream
 // factory strategy that can validate creation requests and instantiation
 // of particular type of stream.
 type IStreamStrategy interface {
-	Accept(sourceType string) bool
-	AcceptFromConfig(cfg sconfig.IConfig) bool
-	Create(args ...interface{}) (IStream, error)
-	CreateFromConfig(cfg sconfig.IConfig) (IStream, error)
+	Accept(cfg config.IConfig) bool
+	Create(cfg config.IConfig) (IStream, error)
 }
 
-type streamStrategy struct{}
+// StreamStrategy defines a new log stream base instance structure.
+type StreamStrategy struct{}
 
-func (streamStrategy) level(cfg sconfig.IConfig) (Level, error) {
-	level, e := cfg.String("level")
-	if e != nil {
-		return FATAL, e
-	}
-
+func (StreamStrategy) level(
+	level string,
+) (Level, error) {
+	// check if the retrieved level string can be mapped to a
+	// level typed value
 	level = strings.ToLower(level)
 	if _, ok := LevelMap[level]; !ok {
 		return FATAL, errInvalidLevel(level)
 	}
+	// return the level typed value of the retrieved level string
 	return LevelMap[level], nil
 }
 
-func (streamStrategy) channels(cfg sconfig.IConfig) ([]string, error) {
-	entries, e := cfg.List("channels")
-	if e != nil {
-		return nil, e
-	}
-
-	var channels []string
-	for _, entry := range entries {
-		channel, ok := entry.(string)
-		if !ok {
-			return nil, errConversion(entry, "string")
+func (StreamStrategy) channels(
+	list []interface{},
+) []string {
+	var result []string
+	for _, channel := range list {
+		c, ok := channel.(string)
+		if ok {
+			result = append(result, c)
 		}
-		channels = append(channels, channel)
 	}
-	return channels, nil
+	return result
 }

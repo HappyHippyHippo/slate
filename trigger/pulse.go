@@ -4,21 +4,26 @@ import (
 	"time"
 )
 
-type pulse struct {
+// Pulse defines an instance used to execute a callback function
+// after a defined time.
+type Pulse struct {
 	trigger
 	timer *time.Timer
 }
 
-var _ ITrigger = &pulse{}
+var _ ITrigger = &Pulse{}
 
 // NewPulse instantiate a new pulse trigger that will execute a
 // callback method after a determined amount of time.
-func NewPulse(delay time.Duration, callback ICallback) (ITrigger, error) {
+func NewPulse(
+	delay time.Duration,
+	callback ICallback,
+) (*Pulse, error) {
 	if callback == nil {
 		return nil, errNilPointer("callback")
 	}
 
-	t := &pulse{
+	t := &Pulse{
 		trigger: trigger{
 			delay:    delay,
 			callback: callback,
@@ -26,7 +31,7 @@ func NewPulse(delay time.Duration, callback ICallback) (ITrigger, error) {
 		timer: time.NewTimer(delay),
 	}
 
-	go func(t *pulse) {
+	go func(t *Pulse) {
 		<-t.timer.C
 		_ = t.callback()
 	}(t)
@@ -34,7 +39,8 @@ func NewPulse(delay time.Duration, callback ICallback) (ITrigger, error) {
 	return t, nil
 }
 
-func (t *pulse) Close() error {
+// Close will stop the trigger and release all the associated resources.
+func (t *Pulse) Close() error {
 	t.timer.Stop()
 	return nil
 }

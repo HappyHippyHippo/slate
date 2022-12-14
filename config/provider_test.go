@@ -9,8 +9,9 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
-	serror "github.com/happyhippyhippo/slate/error"
-	sfs "github.com/happyhippyhippo/slate/fs"
+	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate/fs"
+	"github.com/spf13/afero"
 )
 
 func Test_Provider_Register(t *testing.T) {
@@ -20,432 +21,388 @@ func Test_Provider_Register(t *testing.T) {
 
 		if e := sut.Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, serror.ErrNilPointer)
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) err when expected (%v)", e, err.NilPointer)
 		}
 	})
 
 	t.Run("register components", func(t *testing.T) {
-		container := slate.ServiceContainer{}
+		container := slate.NewContainer()
 		sut := &Provider{}
 
 		e := sut.Register(container)
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
-		case !container.Has(ContainerDecoderStrategyYAMLID):
+		case !container.Has(YAMLDecoderStrategyID):
 			t.Errorf("didn't registered the config decoder strategy yaml : %v", sut)
-		case !container.Has(ContainerDecoderStrategyJSONID):
+		case !container.Has(JSONDecoderStrategyID):
 			t.Errorf("didn't registered the config decoder strategy json : %v", sut)
-		case !container.Has(ContainerDecoderFactoryID):
+		case !container.Has(DecoderFactoryID):
 			t.Errorf("didn't registered the config decoder factory : %v", sut)
-		case !container.Has(ContainerSourceStrategyFileID):
+		case !container.Has(FileSourceStrategyID):
 			t.Errorf("didn't registered the config file source strategy : %v", sut)
-		case !container.Has(ContainerSourceStrategyFileObservableID):
+		case !container.Has(ObservableFileSourceStrategyID):
 			t.Errorf("didn't registered the config observable file source strategy : %v", sut)
-		case !container.Has(ContainerSourceStrategyDirID):
+		case !container.Has(DirSourceStrategyID):
 			t.Errorf("didn't registered the config dir source strategy : %v", sut)
-		case !container.Has(ContainerSourceStrategyRestID):
+		case !container.Has(RestSourceStrategyID):
 			t.Errorf("didn't registered the config rest source strategy : %v", sut)
-		case !container.Has(ContainerSourceStrategyRestObservableID):
+		case !container.Has(ObservableRestSourceStrategyID):
 			t.Errorf("didn't registered the config observable rest source strategy : %v", sut)
-		case !container.Has(ContainerSourceStrategyEnvID):
+		case !container.Has(EnvSourceStrategyID):
 			t.Errorf("didn't registered the config environment source strategy : %v", sut)
-		case !container.Has(ContainerSourceStrategyAggregateID):
+		case !container.Has(AggregateSourceStrategyID):
 			t.Errorf("didn't registered the config container loading source strategy : %v", sut)
-		case !container.Has(ContainerSourceFactoryID):
+		case !container.Has(SourceFactoryID):
 			t.Errorf("didn't registered the config source factory : %v", sut)
-		case !container.Has(ContainerID):
+		case !container.Has(ID):
 			t.Errorf("didn't registered the config : %v", sut)
-		case !container.Has(ContainerLoaderID):
+		case !container.Has(LoaderID):
 			t.Errorf("didn't registered the config loader : %v", sut)
 		}
 	})
 
 	t.Run("retrieving config yaml decoder factory strategy", func(t *testing.T) {
-		container := slate.ServiceContainer{}
+		container := slate.NewContainer()
 		_ = (&Provider{}).Register(container)
 
-		strategy, e := container.Get(ContainerDecoderStrategyYAMLID)
+		strategy, e := container.Get(YAMLDecoderStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("returned the unexpected err (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
 			switch strategy.(type) {
-			case *decoderStrategyYAML:
+			case *YAMLDecoderStrategy:
 			default:
-				t.Error("didn't returned a yaml decoder factory strategy reference")
+				t.Error("didn't return a yaml decoder factory strategy reference")
 			}
 		}
 	})
 
 	t.Run("retrieving config json decoder factory strategy", func(t *testing.T) {
-		container := slate.ServiceContainer{}
+		container := slate.NewContainer()
 		_ = (&Provider{}).Register(container)
 
-		strategy, e := container.Get(ContainerDecoderStrategyJSONID)
+		strategy, e := container.Get(JSONDecoderStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("returned the unexpected err (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
 			switch strategy.(type) {
-			case *decoderStrategyJSON:
+			case *JSONDecoderStrategy:
 			default:
-				t.Error("didn't returned a json decoder factory strategy reference")
+				t.Error("didn't return a json decoder factory strategy reference")
 			}
 		}
 	})
 
 	t.Run("retrieving config decoder factory", func(t *testing.T) {
-		container := slate.ServiceContainer{}
+		container := slate.NewContainer()
 		_ = (&Provider{}).Register(container)
 
-		factory, e := container.Get(ContainerDecoderFactoryID)
+		factory, e := container.Get(DecoderFactoryID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("returned the unexpected err (%v)", e)
 		case factory == nil:
 			t.Error("didn't returned a valid reference")
 		default:
 			switch factory.(type) {
-			case *decoderFactory:
+			case *DecoderFactory:
 			default:
-				t.Error("didn't returned a decoder factory reference")
+				t.Error("didn't return a decoder factory reference")
 			}
 		}
 	})
 
-	t.Run("error retrieving file system on retrieving the source factory strategy file", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
+	t.Run("retrieving the source factory strategy env", func(t *testing.T) {
+		container := slate.NewContainer()
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(sfs.ContainerID, func() (interface{}, error) {
-			return nil, expected
-		})
 
-		if _, e := container.Get(ContainerSourceStrategyFileID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		strategy, e := container.Get(EnvSourceStrategyID)
+		switch {
+		case e != nil:
+			t.Errorf("returned the unexpected err (%v)", e)
+		case strategy == nil:
+			t.Error("didn't returned a valid reference")
+		default:
+			switch strategy.(type) {
+			case *EnvSourceStrategy:
+			default:
+				t.Error("didn't return a source env strategy reference")
+			}
 		}
 	})
 
-	t.Run("invalid file system on retrieving the source factory strategy file", func(t *testing.T) {
-		container := slate.ServiceContainer{}
+	t.Run("error retrieving the file system when retrieving source factory strategy file", func(t *testing.T) {
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(sfs.ContainerID, func() (interface{}, error) {
-			return "string", nil
-		})
+		_ = container.Service(fs.ID, func() afero.Fs { return nil })
 
-		if _, e := container.Get(ContainerSourceStrategyFileID); e == nil {
+		if _, e := container.Get(FileSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
-	t.Run("error retrieving decoder factory on retrieving the source factory strategy file", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
-		_ = (&sfs.Provider{}).Register(container)
+	t.Run("error retrieving the decoder factory when retrieving source factory strategy file", func(t *testing.T) {
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerDecoderFactoryID, func() (interface{}, error) {
-			return nil, expected
-		})
+		_ = container.Service(DecoderFactoryID, func() IDecoderFactory { return nil })
 
-		if _, e := container.Get(ContainerSourceStrategyFileID); e == nil {
+		if _, e := container.Get(FileSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
-		}
-	})
-
-	t.Run("invalid decoder factory on retrieving the source factory strategy file", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
-		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerDecoderFactoryID, func() (interface{}, error) {
-			return "string", nil
-		})
-
-		if _, e := container.Get(ContainerSourceStrategyFileID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
 	t.Run("retrieving the source factory strategy file", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		strategy, e := container.Get(ContainerSourceStrategyFileID)
+		strategy, e := container.Get(FileSourceStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("returned the unexpected err (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
 			switch strategy.(type) {
-			case *sourceStrategyFile:
+			case *FileSourceStrategy:
 			default:
-				t.Error("didn't returned a source file strategy reference")
+				t.Error("didn't return a source file strategy reference")
 			}
 		}
 	})
 
-	t.Run("error retrieving file system on retrieving the source factory strategy observable file", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
+	t.Run("error retrieving the file system when retrieving source factory strategy observable file", func(t *testing.T) {
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(sfs.ContainerID, func() (interface{}, error) {
-			return nil, expected
-		})
+		_ = container.Service(fs.ID, func() afero.Fs { return nil })
 
-		if _, e := container.Get(ContainerSourceStrategyFileObservableID); e == nil {
+		if _, e := container.Get(ObservableFileSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
-	t.Run("invalid file system on retrieving the source factory strategy observable file", func(t *testing.T) {
-		container := slate.ServiceContainer{}
+	t.Run("error retrieving the decoder factory when retrieving source factory strategy observable file", func(t *testing.T) {
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(sfs.ContainerID, func() (interface{}, error) {
-			return "string", nil
-		})
+		_ = container.Service(DecoderFactoryID, func() IDecoderFactory { return nil })
 
-		if _, e := container.Get(ContainerSourceStrategyFileObservableID); e == nil {
+		if _, e := container.Get(ObservableFileSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
-		}
-	})
-
-	t.Run("error retrieving decoder factory on retrieving the source factory strategy observable file", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
-		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerDecoderFactoryID, func() (interface{}, error) {
-			return nil, expected
-		})
-
-		if _, e := container.Get(ContainerSourceStrategyFileObservableID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
-		}
-	})
-
-	t.Run("invalid decoder factory on retrieving the source factory strategy observable file", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
-		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerDecoderFactoryID, func() (interface{}, error) {
-			return "string", nil
-		})
-
-		if _, e := container.Get(ContainerSourceStrategyFileObservableID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
 	t.Run("retrieving the source factory strategy observable file", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		strategy, e := container.Get(ContainerSourceStrategyFileObservableID)
+		strategy, e := container.Get(ObservableFileSourceStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("returned the unexpected err (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
 			switch strategy.(type) {
-			case *sourceStrategyObservableFile:
+			case *ObservableFileSourceStrategy:
 			default:
-				t.Error("didn't returned a source observable file strategy reference")
+				t.Error("didn't return a source observable file strategy reference")
 			}
 		}
 	})
 
-	t.Run("error retrieving file system on retrieving the source factory strategy dir", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
+	t.Run("error retrieving the file system when retrieving source factory strategy dir", func(t *testing.T) {
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(sfs.ContainerID, func() (interface{}, error) {
-			return nil, expected
-		})
+		_ = container.Service(fs.ID, func() afero.Fs { return nil })
 
-		if _, e := container.Get(ContainerSourceStrategyDirID); e == nil {
+		if _, e := container.Get(DirSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
-	t.Run("invalid file system on retrieving the source factory strategy dir", func(t *testing.T) {
-		container := slate.ServiceContainer{}
+	t.Run("error retrieving the decoder factory when retrieving source factory strategy dir", func(t *testing.T) {
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(sfs.ContainerID, func() (interface{}, error) {
-			return "string", nil
-		})
+		_ = container.Service(DecoderFactoryID, func() IDecoderFactory { return nil })
 
-		if _, e := container.Get(ContainerSourceStrategyDirID); e == nil {
+		if _, e := container.Get(DirSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
-		}
-	})
-
-	t.Run("error retrieving decoder factory on retrieving the source factory strategy dir", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
-		_ = (&sfs.Provider{}).Register(container)
-		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerDecoderFactoryID, func() (interface{}, error) {
-			return nil, expected
-		})
-
-		if _, e := container.Get(ContainerSourceStrategyDirID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
-		}
-	})
-
-	t.Run("invalid decoder factory on retrieving the source factory strategy dir", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
-		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerDecoderFactoryID, func() (interface{}, error) {
-			return "string", nil
-		})
-
-		if _, e := container.Get(ContainerSourceStrategyDirID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
 	t.Run("retrieving the source factory strategy dir", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		strategy, e := container.Get(ContainerSourceStrategyDirID)
+		strategy, e := container.Get(DirSourceStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected e (%v)", e)
+			t.Errorf("returned the unexpected err (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
 			switch strategy.(type) {
-			case *sourceStrategyDir:
+			case *DirSourceStrategy:
 			default:
-				t.Error("didn't returned a source dir strategy reference")
+				t.Error("didn't return a source dir strategy reference")
 			}
 		}
 	})
 
-	t.Run("error retrieving decoder factory on retrieving the source factory strategy rest", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
+	t.Run("error retrieving the decoder factory when retrieving source factory strategy rest", func(t *testing.T) {
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerDecoderFactoryID, func() (interface{}, error) {
-			return nil, expected
-		})
+		_ = container.Service(DecoderFactoryID, func() IDecoderFactory { return nil })
 
-		if _, e := container.Get(ContainerSourceStrategyRestID); e == nil {
+		if _, e := container.Get(RestSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
-		}
-	})
-
-	t.Run("invalid decoder factory on retrieving the source factory strategy rest", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
-		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerDecoderFactoryID, func() (interface{}, error) {
-			return "string", nil
-		})
-
-		if _, e := container.Get(ContainerSourceStrategyRestID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
 	t.Run("retrieving the source factory strategy rest", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		strategy, e := container.Get(ContainerSourceStrategyRestID)
+		strategy, e := container.Get(RestSourceStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected e (%v)", e)
+			t.Errorf("returned the unexpected err (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
 			switch strategy.(type) {
-			case *sourceStrategyRest:
+			case *RestSourceStrategy:
 			default:
-				t.Error("didn't returned a source rest strategy reference")
+				t.Error("didn't return a source rest strategy reference")
 			}
 		}
 	})
 
-	t.Run("error retrieving decoder factory on retrieving the source factory strategy observable rest", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
+	t.Run("error retrieving the decoder factory when retrieving source factory strategy observable rest", func(t *testing.T) {
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerDecoderFactoryID, func() (interface{}, error) {
-			return nil, expected
-		})
+		_ = container.Service(DecoderFactoryID, func() IDecoderFactory { return nil })
 
-		if _, e := container.Get(ContainerSourceStrategyRestObservableID); e == nil {
+		if _, e := container.Get(ObservableRestSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
-		}
-	})
-
-	t.Run("invalid decoder factory on retrieving the source factory strategy observable rest", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
-		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerDecoderFactoryID, func() (interface{}, error) {
-			return "string", nil
-		})
-
-		if _, e := container.Get(ContainerSourceStrategyRestObservableID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
 	t.Run("retrieving the source factory strategy observable rest", func(t *testing.T) {
-		container := slate.ServiceContainer{}
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		strategy, e := container.Get(ContainerSourceStrategyRestObservableID)
+		strategy, e := container.Get(ObservableRestSourceStrategyID)
+		switch {
+		case e != nil:
+			t.Errorf("returned the unexpected err (%v)", e)
+		case strategy == nil:
+			t.Error("didn't returned a valid reference")
+		default:
+			switch strategy.(type) {
+			case *ObservableRestSourceStrategy:
+			default:
+				t.Error("didn't return a source observable rest strategy reference")
+			}
+		}
+	})
+
+	t.Run("retrieving the source factory strategy aggregate", func(t *testing.T) {
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
+		_ = (&Provider{}).Register(container)
+
+		strategy, e := container.Get(AggregateSourceStrategyID)
+		switch {
+		case e != nil:
+			t.Errorf("returned the unexpected err (%v)", e)
+		case strategy == nil:
+			t.Error("didn't returned a valid reference")
+		default:
+			switch strategy.(type) {
+			case *AggregateSourceStrategy:
+			default:
+				t.Error("didn't return a source aggregate strategy reference")
+			}
+		}
+	})
+
+	t.Run("invalid config on retrieving the source factory strategy aggregate", func(t *testing.T) {
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
+		_ = (&Provider{}).Register(container)
+		_ = container.Service("id", func() interface{} { return "string" }, AggregateSourceTag)
+
+		strategy, e := container.Get(AggregateSourceStrategyID)
+		switch {
+		case e != nil:
+			t.Errorf("returned the unexpected err (%v)", e)
+		case strategy == nil:
+			t.Error("didn't return a valid strategy reference")
+		case len(strategy.(*AggregateSourceStrategy).partials) != 0:
+			t.Error("stored an unexpected instance of a config")
+		}
+	})
+
+	t.Run("valid config on retrieving the source factory strategy aggregate", func(t *testing.T) {
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
+		_ = (&Provider{}).Register(container)
+		_ = container.Service("id", func() IConfig { return &Config{} }, AggregateSourceTag)
+
+		strategy, e := container.Get(AggregateSourceStrategyID)
+		switch {
+		case e != nil:
+			t.Errorf("returned the unexpected err (%v)", e)
+		case strategy == nil:
+			t.Error("didn't return a valid strategy reference")
+		case len(strategy.(*AggregateSourceStrategy).partials) != 1:
+			t.Error("didn't stored the expected config")
+		}
+	})
+
+	t.Run("retrieving the config source factory", func(t *testing.T) {
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
+		_ = (&Provider{}).Register(container)
+
+		strategy, e := container.Get(SourceFactoryID)
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e (%v)", e)
@@ -453,91 +410,19 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch strategy.(type) {
-			case *sourceStrategyObservableRest:
+			case *SourceFactory:
 			default:
-				t.Error("didn't returned a source observable rest strategy reference")
-			}
-		}
-	})
-
-	t.Run("retrieving the source factory strategy environment", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&Provider{}).Register(container)
-
-		strategy, e := container.Get(ContainerSourceStrategyEnvID)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected e (%v)", e)
-		case strategy == nil:
-			t.Error("didn't returned a valid reference")
-		default:
-			switch strategy.(type) {
-			case *sourceStrategyEnv:
-			default:
-				t.Error("didn't returned a source environment strategy reference")
-			}
-		}
-	})
-
-	t.Run("invalid partial on retrieving the source factory strategy container", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
-		_ = (&Provider{}).Register(container)
-		_ = container.Service("id", func() (interface{}, error) {
-			return "string", nil
-		}, ContainerSourceContainerPartialTag)
-
-		if _, e := container.Get(ContainerSourceStrategyAggregateID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
-		}
-	})
-
-	t.Run("retrieving the source factory strategy container", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&Provider{}).Register(container)
-
-		strategy, e := container.Get(ContainerSourceStrategyAggregateID)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected e (%v)", e)
-		case strategy == nil:
-			t.Error("didn't returned a valid reference")
-		default:
-			switch strategy.(type) {
-			case *sourceStrategyAggregate:
-			default:
-				t.Error("didn't returned a source container strategy reference")
-			}
-		}
-	})
-
-	t.Run("retrieving config source factory", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&Provider{}).Register(container)
-
-		factory, e := container.Get(ContainerSourceFactoryID)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected e (%v)", e)
-		case factory == nil:
-			t.Error("didn't returned a valid reference")
-		default:
-			switch factory.(type) {
-			case *sourceFactory:
-			default:
-				t.Error("didn't returned a source factory reference")
+				t.Error("didn't return a source factory reference")
 			}
 		}
 	})
 
 	t.Run("retrieving config", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		cfg, e := container.Get(ContainerID)
+		cfg, e := container.Get(ID)
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e (%v)", e)
@@ -545,81 +430,45 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch cfg.(type) {
-			case *manager:
+			case *Manager:
 			default:
-				t.Error("didn't returned a config manager reference")
+				t.Error("didn't return a config manager reference")
 			}
 		}
 	})
 
 	t.Run("error retrieving config on retrieving loader", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerID, func() (interface{}, error) {
-			return nil, expected
-		})
+		_ = container.Service(ID, func() IManager { return nil })
 
-		if _, e := container.Get(ContainerLoaderID); e == nil {
+		if _, e := container.Get(LoaderID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
-	t.Run("invalid config on retrieving loader", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
+	t.Run("error retrieving config on retrieving loader", func(t *testing.T) {
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerID, func() (interface{}, error) {
-			return "string", nil
-		})
+		_ = container.Service(SourceFactoryID, func() ISourceFactory { return nil })
 
-		if _, e := container.Get(ContainerLoaderID); e == nil {
+		if _, e := container.Get(LoaderID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
-		}
-	})
-
-	t.Run("error retrieving config source factory on retrieving loader", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
-		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerSourceFactoryID, func() (interface{}, error) {
-			return nil, expected
-		})
-
-		if _, e := container.Get(ContainerLoaderID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
-		}
-	})
-
-	t.Run("invalid config source factory on retrieving loader", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
-		_ = (&Provider{}).Register(container)
-		_ = container.Service(ContainerSourceFactoryID, func() (interface{}, error) {
-			return "string", nil
-		})
-
-		if _, e := container.Get(ContainerLoaderID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
 	t.Run("retrieving config loader", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
+		container := slate.NewContainer()
+		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		l, e := container.Get(ContainerLoaderID)
+		l, e := container.Get(LoaderID)
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e (%v)", e)
@@ -627,9 +476,9 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch l.(type) {
-			case *loader:
+			case *Loader:
 			default:
-				t.Error("didn't returned a config loader reference")
+				t.Error("didn't return a config loader reference")
 			}
 		}
 	})
@@ -639,149 +488,104 @@ func Test_Provider_Boot(t *testing.T) {
 	t.Run("nil container", func(t *testing.T) {
 		if e := (&Provider{}).Boot(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, serror.ErrNilPointer)
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) err when expected (%v)", e, err.NilPointer)
 		}
 	})
 
 	t.Run("error retrieving config decoder factory", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
+		expected := fmt.Errorf("err message")
 		sut := &Provider{}
+		container := slate.NewContainer()
 		_ = sut.Register(container)
-		_ = container.Service(ContainerDecoderFactoryID, func() (interface{}, error) {
-			return nil, expected
-		})
+		_ = container.Service(DecoderFactoryID, func() (IDecoderFactory, error) { return nil, expected })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
-	t.Run("retrieving invalid config decoder factory", func(t *testing.T) {
-		container := slate.ServiceContainer{}
+	t.Run("invalid config decoder factory", func(t *testing.T) {
 		sut := &Provider{}
+		container := slate.NewContainer()
 		_ = sut.Register(container)
-		_ = container.Service(ContainerDecoderFactoryID, func() (interface{}, error) {
-			return "string", nil
-		})
+		_ = container.Service(DecoderFactoryID, func() IDecoderFactory { return nil })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Conversion) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Conversion)
 		}
 	})
 
 	t.Run("error retrieving config decoder strategy", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
+		expected := fmt.Errorf("err message")
 		sut := &Provider{}
+		container := slate.NewContainer()
 		_ = sut.Register(container)
-		_ = container.Service("id", func() (interface{}, error) {
-			return nil, expected
-		}, ContainerDecoderStrategyTag)
+		_ = container.Service("id", func() (IDecoderStrategy, error) { return nil, expected }, DecoderStrategyTag)
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
-		}
-	})
-
-	t.Run("retrieving invalid config decoder factory strategy", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		sut := &Provider{}
-		_ = sut.Register(container)
-		_ = container.Service("id", func() (interface{}, error) {
-			return "string", nil
-		}, ContainerDecoderStrategyTag)
-
-		if e := sut.Boot(container); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
 	t.Run("error retrieving config source factory", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
+		expected := fmt.Errorf("err message")
 		sut := &Provider{}
+		container := slate.NewContainer()
 		_ = sut.Register(container)
-		_ = container.Service(ContainerSourceFactoryID, func() (interface{}, error) {
-			return nil, expected
-		})
+
+		_ = container.Service(SourceFactoryID, func() (ISourceFactory, error) { return nil, expected })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
-	t.Run("retrieving invalid config source factory", func(t *testing.T) {
-		container := slate.ServiceContainer{}
+	t.Run("invalid config source factory", func(t *testing.T) {
 		sut := &Provider{}
+		container := slate.NewContainer()
 		_ = sut.Register(container)
-		_ = container.Service(ContainerSourceFactoryID, func() (interface{}, error) {
-			return "string", nil
-		})
+		_ = container.Service(SourceFactoryID, func() ISourceFactory { return nil })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Conversion) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Conversion)
 		}
 	})
 
-	t.Run("error retrieving config source factory strategy", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
+	t.Run("error retrieving config source strategy", func(t *testing.T) {
+		expected := fmt.Errorf("err message")
 		sut := &Provider{}
+		container := slate.NewContainer()
 		_ = sut.Register(container)
-		_ = container.Service("id", func() (interface{}, error) {
-			return nil, expected
-		}, ContainerSourceStrategyTag)
+		_ = container.Service("id", func() (ISourceStrategy, error) { return nil, expected }, SourceStrategyTag)
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
-		}
-	})
-
-	t.Run("retrieving invalid config source factory strategy", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
-		sut := &Provider{}
-		_ = sut.Register(container)
-		_ = container.Service("id", func() (interface{}, error) {
-			return "string", nil
-		}, ContainerSourceStrategyTag)
-
-		if e := sut.Boot(container); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
 	t.Run("no entry source active", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
 		LoaderActive = false
 		defer func() { LoaderActive = true }()
 
-		expected := fmt.Errorf("error message")
+		expected := fmt.Errorf("err message")
+		container := slate.NewContainer()
+		_ = fs.Provider{}.Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(ContainerLoaderID, func() (interface{}, error) {
-			return nil, expected
-		})
+		_ = container.Service(LoaderID, func() (ILoader, error) { return nil, expected })
 
 		if e := sut.Boot(container); e != nil {
 			t.Errorf("returned the unexpected e (%v)", e)
@@ -789,35 +593,31 @@ func Test_Provider_Boot(t *testing.T) {
 	})
 
 	t.Run("error retrieving loader", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
+		expected := fmt.Errorf("err message")
+		container := slate.NewContainer()
+		_ = fs.Provider{}.Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(ContainerLoaderID, func() (interface{}, error) {
-			return nil, expected
-		})
+		_ = container.Service(LoaderID, func() (ILoader, error) { return nil, expected })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
+		} else if !errors.Is(e, err.Container) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
 		}
 	})
 
 	t.Run("invalid loader", func(t *testing.T) {
-		container := slate.ServiceContainer{}
-		_ = (&(sfs.Provider{})).Register(container)
+		container := slate.NewContainer()
+		_ = fs.Provider{}.Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(ContainerLoaderID, func() (interface{}, error) {
-			return "string", nil
-		})
+		_ = container.Service(LoaderID, func() ILoader { return nil })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrConversion)
+		} else if !errors.Is(e, err.Conversion) {
+			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Conversion)
 		}
 	})
 
@@ -834,10 +634,8 @@ func Test_Provider_Boot(t *testing.T) {
 		file.EXPECT().Close().Times(1)
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile(LoaderSourcePath, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		container := slate.ServiceContainer{}
-		_ = container.Service(sfs.ContainerID, func() (interface{}, error) {
-			return fileSystem, nil
-		})
+		container := slate.NewContainer()
+		_ = container.Service(fs.ID, func() afero.Fs { return fileSystem })
 		sut := &Provider{}
 		_ = sut.Register(container)
 

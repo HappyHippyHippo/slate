@@ -6,23 +6,23 @@ import (
 	"testing"
 	"time"
 
-	serror "github.com/happyhippyhippo/slate/error"
+	"github.com/happyhippyhippo/slate/err"
 )
 
 func Test_NewRecurring(t *testing.T) {
 	t.Run("nil callback", func(t *testing.T) {
 		if _, e := NewRecurring(20*time.Millisecond, nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, serror.ErrNilPointer)
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) err when expected (%v)", e, err.NilPointer)
 		}
 	})
 
-	t.Run("new recurring trigger", func(t *testing.T) {
+	t.Run("new Recurring trigger", func(t *testing.T) {
 		if _, e := NewRecurring(20*time.Millisecond, func() error {
 			return nil
 		}); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("returned the unexpected err : %v", e)
 		}
 	})
 }
@@ -38,7 +38,7 @@ func Test_Recurring_Close(t *testing.T) {
 		time.Sleep(40 * time.Millisecond)
 
 		if called {
-			t.Error("didn't stop the recurring to be executed")
+			t.Error("didn't stop the Recurring to be executed")
 		}
 	})
 }
@@ -82,7 +82,7 @@ func Test_Recurring(t *testing.T) {
 		time.Sleep(100 * time.Millisecond)
 
 		if count != 1 {
-			t.Error("didn't stop recursion calls after the first error")
+			t.Error("didn't stop recursion calls after the first err")
 		}
 	})
 }

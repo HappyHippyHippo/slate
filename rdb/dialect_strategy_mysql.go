@@ -4,50 +4,74 @@ import (
 	"fmt"
 	"strings"
 
-	sconfig "github.com/happyhippyhippo/slate/config"
+	"github.com/happyhippyhippo/slate/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-type dialectStrategyMySQL struct{}
+// MySQLDialectStrategy define a MySQL dialect generation strategy instance.
+type MySQLDialectStrategy struct{}
 
-var _ IDialectStrategy = &dialectStrategyMySQL{}
+var _ IDialectStrategy = &MySQLDialectStrategy{}
 
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
-func (dialectStrategyMySQL) Accept(dialect string) bool {
-	return strings.EqualFold(strings.ToLower(dialect), DialectMySQL)
+func (MySQLDialectStrategy) Accept(
+	cfg config.IConfig,
+) bool {
+	// check config argument reference
+	if cfg == nil {
+		return false
+	}
+	// retrieve the connection dialect from the configuration
+	dc := struct{ Dialect string }{}
+	_, e := cfg.Populate("", &dc)
+	if e != nil {
+		return false
+	}
+	// only accepts a mysql dialect request
+	return strings.EqualFold(strings.ToLower(dc.Dialect), DialectMySQL)
 }
 
 // Get instantiates the requested mysql connection dialect.
-func (dialectStrategyMySQL) Get(cfg sconfig.IConfig) (gorm.Dialector, error) {
-	if username, e := cfg.String("username"); e != nil {
-		return nil, e
-	} else if password, e := cfg.String("password"); e != nil {
-		return nil, e
-	} else if protocol, e := cfg.String("protocol", "tcp"); e != nil {
-		return nil, e
-	} else if host, e := cfg.String("host"); e != nil {
-		return nil, e
-	} else if port, e := cfg.Int("port", 3306); e != nil {
-		return nil, e
-	} else if schema, e := cfg.String("schema"); e != nil {
-		return nil, e
-	} else {
-		dsn := fmt.Sprintf("%s:%s@%s(%s:%d)/%s", username, password, protocol, host, port, schema)
-
-		params, e := cfg.Partial("params", sconfig.Partial{})
-		if e != nil {
-			return nil, e
-		}
-
-		if len(params) > 0 {
-			dsn += "?"
-			for key, value := range params {
-				dsn += fmt.Sprintf("&%s=%v", key, value)
-			}
-		}
-
-		return mysql.Open(dsn), nil
+func (MySQLDialectStrategy) Get(
+	cfg config.IConfig,
+) (gorm.Dialector, error) {
+	// check config argument reference
+	if cfg == nil {
+		return nil, errNilPointer("cfg")
 	}
+	// retrieve the data from the configuration
+	dc := struct {
+		Username string
+		Password string
+		Protocol string
+		Host     string
+		Port     int
+		Schema   string
+		Params   config.Config
+	}{Protocol: "tcp", Port: 3306}
+	_, e := cfg.Populate("", &dc)
+	if e != nil {
+		return nil, e
+	}
+	// compose the connection DSN string
+	dsn := fmt.Sprintf(
+		"%s:%s@%s(%s:%d)/%s",
+		dc.Username,
+		dc.Password,
+		dc.Protocol,
+		dc.Host,
+		dc.Port,
+		dc.Schema,
+	)
+	// add the extra parameters to the generated DSN string
+	if len(dc.Params) > 0 {
+		dsn += "?"
+		for key, value := range dc.Params {
+			dsn += fmt.Sprintf("&%s=%v", key, value)
+		}
+	}
+	// create the connection dialect instance
+	return mysql.Open(dsn), nil
 }

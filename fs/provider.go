@@ -5,28 +5,35 @@ import (
 	"github.com/spf13/afero"
 )
 
-// Provider defines the fs module service provider to be used on
-// the application initialization to register the file system adapter service.
+const (
+	// ID defines the application container package
+	// that provides the service's id base string.
+	ID = slate.ID + ".fs"
+)
+
+// Provider defines the fs module service provider to
+// be used on the application initialization to register the file system
+// adapter service.
 type Provider struct{}
 
-var _ slate.IServiceProvider = &Provider{}
+var _ slate.IProvider = &Provider{}
 
 // Register will add to the container a new file system adapter instance.
-func (Provider) Register(c slate.ServiceContainer) error {
-	if c == nil {
+func (Provider) Register(
+	container slate.IContainer,
+) error {
+	if container == nil {
 		return errNilPointer("container")
 	}
-
-	return c.Service(ContainerID, func() (interface{}, error) {
-		return afero.NewOsFs(), nil
-	})
+	return container.Service(ID, afero.NewOsFs)
 }
 
 // Boot (no-op).
-func (Provider) Boot(c slate.ServiceContainer) error {
-	if c == nil {
+func (Provider) Boot(
+	container slate.IContainer,
+) error {
+	if container == nil {
 		return errNilPointer("container")
 	}
-
 	return nil
 }

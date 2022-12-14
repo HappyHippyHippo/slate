@@ -5,23 +5,23 @@ import (
 	"testing"
 	"time"
 
-	serror "github.com/happyhippyhippo/slate/error"
+	"github.com/happyhippyhippo/slate/err"
 )
 
 func Test_NewPulse(t *testing.T) {
 	t.Run("nil callback", func(t *testing.T) {
 		if _, e := NewPulse(20*time.Millisecond, nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, serror.ErrNilPointer)
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) err when expected (%v)", e, err.NilPointer)
 		}
 	})
 
-	t.Run("new pulse trigger", func(t *testing.T) {
+	t.Run("new Pulse trigger", func(t *testing.T) {
 		if _, e := NewPulse(20*time.Millisecond, func() error {
 			return nil
 		}); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("returned the unexpected err : %v", e)
 		}
 	})
 }
@@ -37,7 +37,7 @@ func Test_Pulse_Close(t *testing.T) {
 		time.Sleep(40 * time.Millisecond)
 
 		if called {
-			t.Error("didn't prevented the pulse to execute")
+			t.Error("didn't prevented the Pulse to execute")
 		}
 	})
 }

@@ -1,13 +1,13 @@
 package migration
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	serror "github.com/happyhippyhippo/slate/error"
-	"github.com/pkg/errors"
+	"github.com/happyhippyhippo/slate/err"
 )
 
 func Test_NewMigrator(t *testing.T) {
@@ -18,8 +18,8 @@ func Test_NewMigrator(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, serror.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrNilPointer)
+		case !errors.Is(e, err.NilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
 		}
 	})
 
@@ -32,10 +32,10 @@ func Test_NewMigrator(t *testing.T) {
 		sut, e := NewMigrator(dao)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpectederror (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case sut == nil:
 			t.Error("didn't return the expected migrator instance")
-		case !reflect.DeepEqual(sut.(*migrator).dao, dao):
+		case !reflect.DeepEqual(sut.(*Migrator).dao, dao):
 			t.Error("didn't stored the given dao")
 		}
 	})
@@ -50,8 +50,8 @@ func Test_Migrator_AddMigration(t *testing.T) {
 
 		if e := sut.AddMigration(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serror.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, serror.ErrNilPointer)
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
 		}
 	})
 
@@ -64,7 +64,7 @@ func Test_Migrator_AddMigration(t *testing.T) {
 
 		if e := sut.AddMigration(migration); e != nil {
 			t.Errorf("returned the unexpected (%v) error", e)
-		} else if !reflect.DeepEqual(sut.(*migrator).migrations, []IMigration{migration}) {
+		} else if !reflect.DeepEqual(sut.(*Migrator).migrations, []IMigration{migration}) {
 			t.Error("didn't stored the registering migration")
 		}
 	})

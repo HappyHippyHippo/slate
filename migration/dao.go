@@ -39,20 +39,25 @@ type Dao struct {
 var _ IDao = &Dao{}
 
 // NewDao will instantiate a new migration DAO instance.
-func NewDao(db *gorm.DB) (IDao, error) {
+func NewDao(
+	db *gorm.DB,
+) (IDao, error) {
+	// execute the dao auto migration to guarantee the table existence
 	if e := db.AutoMigrate(&Record{}); e != nil {
 		return nil, e
 	}
-
+	// instantiate the DAO
 	return &Dao{db: db}, nil
 }
 
 // Last will retrieve the last registered migration
 func (d Dao) Last() (Record, error) {
+	// retrieve the last record from the version control table
 	model := Record{}
 	result := d.db.
 		Order("created_at desc").
 		FirstOrInit(&model, Record{Version: 0})
+	// check for retrieval error
 	if result.Error != nil {
 		if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return Record{}, result.Error
@@ -62,7 +67,10 @@ func (d Dao) Last() (Record, error) {
 }
 
 // Up will register a new executed migration
-func (d Dao) Up(version uint64) (Record, error) {
+func (d Dao) Up(
+	version uint64,
+) (Record, error) {
+	// add the new version info into the database
 	model := Record{Version: version}
 	if result := d.db.Create(&model); result.Error != nil {
 		return Record{}, result.Error
@@ -71,12 +79,15 @@ func (d Dao) Up(version uint64) (Record, error) {
 }
 
 // Down will remove the last migration register
-func (d Dao) Down(last Record) error {
+func (d Dao) Down(
+	last Record,
+) error {
+	// check if there is info of the last entry
 	if last.Version != 0 {
+		// remove the last version entry from the database
 		if result := d.db.Unscoped().Delete(&last); result.Error != nil {
 			return result.Error
 		}
 	}
-
 	return nil
 }

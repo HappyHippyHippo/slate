@@ -2,79 +2,146 @@ package rdb
 
 import (
 	"github.com/happyhippyhippo/slate"
-	sconfig "github.com/happyhippyhippo/slate/config"
 	"gorm.io/gorm"
-	gormLogger "gorm.io/gorm/logger"
+	"gorm.io/gorm/logger"
 )
 
-// Provider defines the rdb module service provider to be used on
+const (
+	// ID defines the id to be used as the container
+	// registration id of a relational database connection factory instance,
+	// and as a base id of all other relational database package instances
+	// registered in the application container.
+	ID = slate.ID + ".rdb"
+
+	// ConfigID defines the id to be used as the container
+	// registration id of the relational database connection configuration
+	// instance.
+	ConfigID = ID + ".config"
+
+	// DialectStrategyTag defines the tag to be assigned to all
+	// container relational database dialect strategies.
+	DialectStrategyTag = ID + ".dialect.strategy"
+
+	// MySQLDialectStrategyID defines the id to be used
+	// as the container registration id of the relational database connection
+	// MySQL dialect instance.
+	MySQLDialectStrategyID = ID + ".dialect.strategy.mysql"
+
+	// SqliteDialectStrategyID defines the id to be used
+	// as the container registration id of the relational database connection
+	// sqlite dialect instance.
+	SqliteDialectStrategyID = ID + ".dialect.strategy.sqlite"
+
+	// DialectFactoryID defines the id to be used as the
+	// container registration id of the relational database connection dialect
+	// factory instance.
+	DialectFactoryID = ID + ".dialect.factory"
+
+	// PrimaryID defines the id to be used as the container
+	// registration id of primary relational database instance.
+	PrimaryID = ID + ".primary"
+)
+
+// Provider defines the slate.rdb module service provider to be used on
 // the application initialization to register the relational
 // database services.
 type Provider struct{}
 
-var _ slate.IServiceProvider = &Provider{}
+var _ slate.IProvider = &Provider{}
 
 // Register will register the rdb package instances in the
 // application container
-func (p Provider) Register(c slate.ServiceContainer) error {
-	if c == nil {
+func (p Provider) Register(
+	container slate.IContainer,
+) error {
+	// check container argument reference
+	if container == nil {
 		return errNilPointer("container")
 	}
-
-	_ = c.Factory(ContainerConfigID, func() (interface{}, error) {
-		return &gorm.Config{Logger: gormLogger.Discard}, nil
+	// add the connection configuration service
+	_ = container.Service(ConfigID, func() *gorm.Config {
+		return &gorm.Config{Logger: logger.Discard}
 	})
-
-	_ = c.Service(ContainerDialectStrategyMySQLID, func() (interface{}, error) {
-		return &dialectStrategyMySQL{}, nil
-	}, ContainerDialectStrategyTag)
-
-	_ = c.Service(ContainerDialectStrategySqliteID, func() (interface{}, error) {
-		return &dialectStrategySqlite{}, nil
-	}, ContainerDialectStrategyTag)
-
-	_ = c.Service(ContainerDialectFactoryID, func() (interface{}, error) {
-		return &DialectFactory{}, nil
+	// add mysql dialect strategy
+	_ = container.Service(MySQLDialectStrategyID, func() *MySQLDialectStrategy {
+		return &MySQLDialectStrategy{}
+	}, DialectStrategyTag)
+	// add sqlite dialect strategy
+	_ = container.Service(SqliteDialectStrategyID, func() *SqliteDialectStrategy {
+		return &SqliteDialectStrategy{}
+	}, DialectStrategyTag)
+	// add dialect factory
+	_ = container.Service(DialectFactoryID, func() IDialectFactory {
+		return &DialectFactory{}
 	})
-
-	_ = c.Service(ContainerID, func() (interface{}, error) {
-		if cfg, e := sconfig.Get(c); e != nil {
-			return nil, e
-		} else if dialectFactory, e := GetDialectFactory(c); e != nil {
-			return nil, e
-		} else {
-			return NewConnectionFactory(cfg, dialectFactory)
-		}
+	// add connection factory
+	_ = container.Service(ID, NewConnectionFactory)
+	// add the primary connection auxiliary service
+	_ = container.Service(PrimaryID, func(
+		connectionFactory IConnectionFactory,
+		cfg *gorm.Config,
+	) (*gorm.DB, error) {
+		return connectionFactory.Get(Primary, cfg)
 	})
-
-	_ = c.Factory(ContainerPrimaryID, func() (interface{}, error) {
-		if connFactory, e := GetConnectionFactory(c); e != nil {
-			return nil, e
-		} else if cfg, e := GetConfig(c); e != nil {
-			return nil, e
-		} else {
-			return connFactory.Get(Primary, cfg)
-		}
-	})
-
 	return nil
 }
 
 // Boot will start the rdb package
-func (p Provider) Boot(c slate.ServiceContainer) error {
-	if c == nil {
+func (p Provider) Boot(
+	container slate.IContainer,
+) error {
+	// check container argument reference
+	if container == nil {
 		return errNilPointer("container")
 	}
-
-	if dialectFactory, e := GetDialectFactory(c); e != nil {
+	// populate the container dialect factory with all
+	// registered dialect strategies
+	dialectFactory, e := p.getDialectFactory(container)
+	if e != nil {
 		return e
-	} else if strategies, e := GetDialectStrategies(c); e != nil {
-		return e
-	} else {
-		for _, strategy := range strategies {
-			_ = dialectFactory.Register(strategy)
-		}
 	}
-
+	strategies, e := p.getDialectStrategies(container)
+	if e != nil {
+		return e
+	}
+	for _, strategy := range strategies {
+		_ = dialectFactory.Register(strategy)
+	}
 	return nil
+}
+
+func (Provider) getDialectFactory(
+	container slate.IContainer,
+) (IDialectFactory, error) {
+	// retrieve the factory entry
+	instance, e := container.Get(DialectFactoryID)
+	if e != nil {
+		return nil, e
+	}
+	// validate the retrieved entry type
+	i, ok := instance.(IDialectFactory)
+	if !ok {
+		return nil, errConversion(instance, "rdb.IDialectFactory")
+	}
+	return i, nil
+}
+
+func (Provider) getDialectStrategies(
+	container slate.IContainer,
+) ([]IDialectStrategy, error) {
+	// retrieve the strategies entries
+	tags, e := container.Tag(DialectStrategyTag)
+	if e != nil {
+		return nil, e
+	}
+	// type check the retrieved strategies
+	var list []IDialectStrategy
+	for _, service := range tags {
+		s, ok := service.(IDialectStrategy)
+		if !ok {
+			return nil, errConversion(service, "rdb.IDialectStrategy")
+		}
+		list = append(list, s)
+	}
+	return list, nil
 }
