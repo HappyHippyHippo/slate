@@ -3,13 +3,17 @@ package slate
 import (
 	"errors"
 	"fmt"
-	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/serr"
 	"reflect"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/happyhippyhippo/slate/err"
 )
 
-func assertPanic(t *testing.T, expected interface{}) {
+func assertPanic(
+	t *testing.T,
+	expected interface{},
+) {
 	if r := recover(); r == nil {
 		t.Error("did not panic")
 	} else if !reflect.DeepEqual(expected, r) {
@@ -18,8 +22,14 @@ func assertPanic(t *testing.T, expected interface{}) {
 }
 
 func Test_NewApplication(t *testing.T) {
+	t.Run("instantiate a application entries list", func(t *testing.T) {
+		if NewApplication().entries == nil {
+			t.Error("didn't created the application entries list")
+		}
+	})
+
 	t.Run("instantiate a application container", func(t *testing.T) {
-		if NewApplication().Container == nil {
+		if NewApplication().container == nil {
 			t.Error("didn't created the application container")
 		}
 	})
@@ -37,28 +47,28 @@ func Test_NewApplication(t *testing.T) {
 	})
 }
 
-func Test_Application_Add(t *testing.T) {
+func Test_Application_Provider(t *testing.T) {
 	t.Run("nil provider", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		if e := NewApplication().Add(nil); e == nil {
+		if e := NewApplication().Provider(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, serr.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, serr.ErrNilPointer)
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
 		}
 	})
 
-	t.Run("error registering provider", func(t *testing.T) {
+	t.Run("errorregistering provider", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("error")
+		expected := fmt.Errorf("error message")
 		sut := NewApplication()
 		provider := NewMockServiceProvider(ctrl)
-		provider.EXPECT().Register(sut.Container).Return(expected).Times(1)
+		provider.EXPECT().Register(sut).Return(expected).Times(1)
 
-		e := sut.Add(provider)
+		e := sut.Provider(provider)
 		switch {
 		case e == nil:
 			t.Error("didn't returned the expected error")
@@ -75,9 +85,9 @@ func Test_Application_Add(t *testing.T) {
 
 		sut := NewApplication()
 		provider := NewMockServiceProvider(ctrl)
-		provider.EXPECT().Register(sut.Container).Return(nil).Times(1)
+		provider.EXPECT().Register(sut).Return(nil).Times(1)
 
-		if e := sut.Add(provider); e != nil {
+		if e := sut.Provider(provider); e != nil {
 			t.Errorf("returned the (%v) error", e)
 		} else if len(sut.providers) != 1 || sut.providers[0] != provider {
 			t.Error("didn't stored the added provider")
@@ -93,11 +103,9 @@ func Test_Application_Boot(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		sut := NewApplication()
 		provider := NewMockServiceProvider(ctrl)
-		provider.EXPECT().Register(sut.Container).Return(nil).Times(1)
-		provider.EXPECT().Boot(sut.Container).DoAndReturn(func(ServiceContainer) error {
-			panic(expected)
-		}).Times(1)
-		_ = sut.Add(provider)
+		provider.EXPECT().Register(sut).Return(nil).Times(1)
+		provider.EXPECT().Boot(sut).DoAndReturn(func(IContainer) error { panic(expected) }).Times(1)
+		_ = sut.Provider(provider)
 
 		if e := sut.Boot(); e == nil {
 			t.Error("didn't returned the expected error")
@@ -113,26 +121,24 @@ func Test_Application_Boot(t *testing.T) {
 		expected := "error message"
 		sut := NewApplication()
 		provider := NewMockServiceProvider(ctrl)
-		provider.EXPECT().Register(sut.Container).Return(nil).Times(1)
-		provider.EXPECT().Boot(sut.Container).DoAndReturn(func(ServiceContainer) error {
-			panic(expected)
-		}).Times(1)
-		_ = sut.Add(provider)
+		provider.EXPECT().Register(sut).Return(nil).Times(1)
+		provider.EXPECT().Boot(sut).DoAndReturn(func(IContainer) error { panic(expected) }).Times(1)
+		_ = sut.Provider(provider)
 
 		defer assertPanic(t, expected)
 		_ = sut.Boot()
 	})
 
-	t.Run("error on boot", func(t *testing.T) {
+	t.Run("erroron boot", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := "error"
+		expected := "error message"
 		sut := NewApplication()
 		provider := NewMockServiceProvider(ctrl)
-		provider.EXPECT().Register(sut.Container).Return(nil).Times(1)
-		provider.EXPECT().Boot(sut.Container).Return(fmt.Errorf("%s", expected)).Times(1)
-		_ = sut.Add(provider)
+		provider.EXPECT().Register(sut).Return(nil).Times(1)
+		provider.EXPECT().Boot(sut).Return(fmt.Errorf("%s", expected)).Times(1)
+		_ = sut.Provider(provider)
 
 		if e := sut.Boot(); e == nil {
 			t.Error("didn't returned the expected error")
@@ -147,9 +153,9 @@ func Test_Application_Boot(t *testing.T) {
 
 		sut := NewApplication()
 		provider := NewMockServiceProvider(ctrl)
-		provider.EXPECT().Register(sut.Container).Times(1)
-		provider.EXPECT().Boot(sut.Container).Times(1)
-		_ = sut.Add(provider)
+		provider.EXPECT().Register(sut).Times(1)
+		provider.EXPECT().Boot(sut).Times(1)
+		_ = sut.Provider(provider)
 		_ = sut.Boot()
 		_ = sut.Boot()
 
