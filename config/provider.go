@@ -91,42 +91,42 @@ var _ slate.IProvider = &Provider{}
 // Register will register the configuration section instances in the
 // application container.
 func (Provider) Register(
-	container slate.IContainer,
+	container ...slate.IContainer,
 ) error {
 	// check container argument reference
-	if container == nil {
+	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
 	// add YAML decoder strategy
-	_ = container.Service(YAMLDecoderStrategyID, func() *YAMLDecoderStrategy {
+	_ = container[0].Service(YAMLDecoderStrategyID, func() *YAMLDecoderStrategy {
 		return &YAMLDecoderStrategy{}
 	}, DecoderStrategyTag)
 	// add JSON decoder strategy
-	_ = container.Service(JSONDecoderStrategyID, func() *JSONDecoderStrategy {
+	_ = container[0].Service(JSONDecoderStrategyID, func() *JSONDecoderStrategy {
 		return &JSONDecoderStrategy{}
 	}, DecoderStrategyTag)
 	// add decoder factory
-	_ = container.Service(DecoderFactoryID, func() IDecoderFactory {
+	_ = container[0].Service(DecoderFactoryID, func() IDecoderFactory {
 		return &DecoderFactory{}
 	})
 	// add environment source strategy
-	_ = container.Service(EnvSourceStrategyID, func() *EnvSourceStrategy {
+	_ = container[0].Service(EnvSourceStrategyID, func() *EnvSourceStrategy {
 		return &EnvSourceStrategy{}
 	}, SourceStrategyTag)
 	// add file source strategy
-	_ = container.Service(FileSourceStrategyID, NewFileSourceStrategy, SourceStrategyTag)
+	_ = container[0].Service(FileSourceStrategyID, NewFileSourceStrategy, SourceStrategyTag)
 	// add observable file source strategy
-	_ = container.Service(ObservableFileSourceStrategyID, NewObservableFileSourceStrategy, SourceStrategyTag)
+	_ = container[0].Service(ObservableFileSourceStrategyID, NewObservableFileSourceStrategy, SourceStrategyTag)
 	// add directory source strategy
-	_ = container.Service(DirSourceStrategyID, NewDirSourceStrategy, SourceStrategyTag)
+	_ = container[0].Service(DirSourceStrategyID, NewDirSourceStrategy, SourceStrategyTag)
 	// add rest source strategy
-	_ = container.Service(RestSourceStrategyID, NewRestSourceStrategy, SourceStrategyTag)
+	_ = container[0].Service(RestSourceStrategyID, NewRestSourceStrategy, SourceStrategyTag)
 	// add observable rest source strategy
-	_ = container.Service(ObservableRestSourceStrategyID, NewObservableRestSourceStrategy, SourceStrategyTag)
+	_ = container[0].Service(ObservableRestSourceStrategyID, NewObservableRestSourceStrategy, SourceStrategyTag)
 	// add aggregate source strategy
-	_ = container.Service(AggregateSourceStrategyID, func() *AggregateSourceStrategy {
+	_ = container[0].Service(AggregateSourceStrategyID, func() *AggregateSourceStrategy {
 		// get all the registered config partials
-		tagged, _ := container.Tag(AggregateSourceTag)
+		tagged, _ := container[0].Tag(AggregateSourceTag)
 		var partials []IConfig
 		for _, t := range tagged {
 			if p, ok := t.(IConfig); ok {
@@ -137,33 +137,33 @@ func (Provider) Register(
 		return &AggregateSourceStrategy{partials: partials}
 	}, SourceStrategyTag)
 	// add source factory
-	_ = container.Service(SourceFactoryID, func() ISourceFactory {
+	_ = container[0].Service(SourceFactoryID, func() ISourceFactory {
 		return &SourceFactory{}
 	})
 	// add config manager
-	_ = container.Service(ID, func() IManager {
+	_ = container[0].Service(ID, func() IManager {
 		return NewManager(time.Duration(ObserveFrequency) * time.Second)
 	})
 	// add loader
-	_ = container.Service(LoaderID, NewLoader)
+	_ = container[0].Service(LoaderID, NewLoader)
 	return nil
 }
 
 // Boot will start the configuration config instance by calling the
 // configuration loader with the defined provider base entry information.
 func (p Provider) Boot(
-	container slate.IContainer,
+	container ...slate.IContainer,
 ) error {
 	// check container argument reference
-	if container == nil {
+	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
 	// populate the container decoder factory with all registered decoder strategies
-	decoderFactory, e := p.getDecoderFactory(container)
+	decoderFactory, e := p.getDecoderFactory(container[0])
 	if e != nil {
 		return e
 	}
-	decoderStrategies, e := p.getDecoderStrategies(container)
+	decoderStrategies, e := p.getDecoderStrategies(container[0])
 	if e != nil {
 		return e
 	}
@@ -171,11 +171,11 @@ func (p Provider) Boot(
 		_ = decoderFactory.Register(strategy)
 	}
 	// populate the container source factory with all registered source strategies
-	sourceFactory, e := p.getSourceFactory(container)
+	sourceFactory, e := p.getSourceFactory(container[0])
 	if e != nil {
 		return e
 	}
-	sourceStrategies, e := p.getSourceStrategies(container)
+	sourceStrategies, e := p.getSourceStrategies(container[0])
 	if e != nil {
 		return e
 	}
@@ -187,7 +187,7 @@ func (p Provider) Boot(
 		return nil
 	}
 	// get the container registered loader
-	loader, e := p.getLoader(container)
+	loader, e := p.getLoader(container[0])
 	if e != nil {
 		return e
 	}

@@ -10,6 +10,14 @@ import (
 )
 
 func Test_Provider_Register(t *testing.T) {
+	t.Run("no argument", func(t *testing.T) {
+		if e := (Provider{}).Register(); e == nil {
+			t.Error("didn't returned the expected error")
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) err when expected (%v)", e, err.NilPointer)
+		}
+	})
+
 	t.Run("nil container", func(t *testing.T) {
 		if e := (Provider{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
@@ -20,7 +28,7 @@ func Test_Provider_Register(t *testing.T) {
 
 	t.Run("register the file system", func(t *testing.T) {
 		app := slate.NewApplication()
-		_ = app.Provider(Provider{})
+		_ = app.Provide(Provider{})
 
 		system, e := app.Get(ID)
 		switch {
@@ -39,6 +47,14 @@ func Test_Provider_Register(t *testing.T) {
 }
 
 func Test_Provider_Boot(t *testing.T) {
+	t.Run("no argument", func(t *testing.T) {
+		if e := (Provider{}).Boot(nil); e == nil {
+			t.Error("didn't returned the expected error")
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) err when expected (%v)", e, err.NilPointer)
+		}
+	})
+
 	t.Run("nil container", func(t *testing.T) {
 		if e := (Provider{}).Boot(nil); e == nil {
 			t.Error("didn't returned the expected error")
@@ -49,7 +65,7 @@ func Test_Provider_Boot(t *testing.T) {
 
 	t.Run("successful boot", func(t *testing.T) {
 		app := slate.NewApplication()
-		_ = app.Provider(Provider{})
+		_ = app.Provide(Provider{})
 
 		if e := app.Boot(); e != nil {
 			t.Errorf("returned the (%v) error", e)

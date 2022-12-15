@@ -13,6 +13,6 @@ const (
 // the application container and do some necessary boot actions on
 // initialization.
 type IProvider interface {
-	Register(IContainer) error
-	Boot(IContainer) error
+	Register(...IContainer) error
+	Boot(...IContainer) error
 }

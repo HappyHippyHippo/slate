@@ -20,19 +20,19 @@ var _ slate.IProvider = &Provider{}
 
 // Register will add to the container a new file system adapter instance.
 func (Provider) Register(
-	container slate.IContainer,
+	container ...slate.IContainer,
 ) error {
-	if container == nil {
+	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
-	return container.Service(ID, afero.NewOsFs)
+	return container[0].Service(ID, afero.NewOsFs)
 }
 
 // Boot (no-op).
 func (Provider) Boot(
-	container slate.IContainer,
+	container ...slate.IContainer,
 ) error {
-	if container == nil {
+	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
 	return nil

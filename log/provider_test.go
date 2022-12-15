@@ -14,10 +14,16 @@ import (
 )
 
 func Test_Provider_Register(t *testing.T) {
-	t.Run("nil container", func(t *testing.T) {
-		sut := &Provider{}
+	t.Run("no argument", func(t *testing.T) {
+		if e := (&Provider{}).Register(); e == nil {
+			t.Error("didn't returned the expected error")
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		}
+	})
 
-		if e := sut.Register(nil); e == nil {
+	t.Run("nil container", func(t *testing.T) {
+		if e := (&Provider{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, err.NilPointer) {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
@@ -323,6 +329,14 @@ func Test_Provider_Register(t *testing.T) {
 }
 
 func Test_Provider_Boot(t *testing.T) {
+	t.Run("no argument", func(t *testing.T) {
+		if e := (&Provider{}).Boot(); e == nil {
+			t.Error("didn't returned the expected error")
+		} else if !errors.Is(e, err.NilPointer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		}
+	})
+
 	t.Run("nil container", func(t *testing.T) {
 		if e := (&Provider{}).Boot(nil); e == nil {
 			t.Error("didn't returned the expected error")

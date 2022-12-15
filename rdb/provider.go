@@ -52,32 +52,32 @@ var _ slate.IProvider = &Provider{}
 // Register will register the rdb package instances in the
 // application container
 func (p Provider) Register(
-	container slate.IContainer,
+	container ...slate.IContainer,
 ) error {
 	// check container argument reference
-	if container == nil {
+	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
 	// add the connection configuration service
-	_ = container.Service(ConfigID, func() *gorm.Config {
+	_ = container[0].Service(ConfigID, func() *gorm.Config {
 		return &gorm.Config{Logger: logger.Discard}
 	})
 	// add mysql dialect strategy
-	_ = container.Service(MySQLDialectStrategyID, func() *MySQLDialectStrategy {
+	_ = container[0].Service(MySQLDialectStrategyID, func() *MySQLDialectStrategy {
 		return &MySQLDialectStrategy{}
 	}, DialectStrategyTag)
 	// add sqlite dialect strategy
-	_ = container.Service(SqliteDialectStrategyID, func() *SqliteDialectStrategy {
+	_ = container[0].Service(SqliteDialectStrategyID, func() *SqliteDialectStrategy {
 		return &SqliteDialectStrategy{}
 	}, DialectStrategyTag)
 	// add dialect factory
-	_ = container.Service(DialectFactoryID, func() IDialectFactory {
+	_ = container[0].Service(DialectFactoryID, func() IDialectFactory {
 		return &DialectFactory{}
 	})
 	// add connection factory
-	_ = container.Service(ID, NewConnectionFactory)
+	_ = container[0].Service(ID, NewConnectionFactory)
 	// add the primary connection auxiliary service
-	_ = container.Service(PrimaryID, func(
+	_ = container[0].Service(PrimaryID, func(
 		connectionFactory IConnectionFactory,
 		cfg *gorm.Config,
 	) (*gorm.DB, error) {
@@ -88,19 +88,19 @@ func (p Provider) Register(
 
 // Boot will start the rdb package
 func (p Provider) Boot(
-	container slate.IContainer,
+	container ...slate.IContainer,
 ) error {
 	// check container argument reference
-	if container == nil {
+	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
 	// populate the container dialect factory with all
 	// registered dialect strategies
-	dialectFactory, e := p.getDialectFactory(container)
+	dialectFactory, e := p.getDialectFactory(container[0])
 	if e != nil {
 		return e
 	}
-	strategies, e := p.getDialectStrategies(container)
+	strategies, e := p.getDialectStrategies(container[0])
 	if e != nil {
 		return e
 	}

@@ -41,24 +41,24 @@ var _ slate.IProvider = &Provider{}
 // Register will register the migration package instances in the
 // application container
 func (p Provider) Register(
-	container slate.IContainer,
+	container ...slate.IContainer,
 ) error {
 	// check container argument reference
-	if container == nil {
+	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
 	// add the default log formatter strategy
-	_ = container.Service(DefaultLogFormatterStrategyID, func() *LogFormatterStrategy {
+	_ = container[0].Service(DefaultLogFormatterStrategyID, func() *LogFormatterStrategy {
 		return &LogFormatterStrategy{}
 	}, LogFormatterStrategyTag)
 	// add the watchdog log formatter factory
-	_ = container.Service(LogFormatterFactoryID, func() ILogFormatterFactory {
+	_ = container[0].Service(LogFormatterFactoryID, func() ILogFormatterFactory {
 		return &LogFormatterFactory{}
 	})
 	// add the watchdog factory
-	_ = container.Service(FactoryID, NewFactory)
+	_ = container[0].Service(FactoryID, NewFactory)
 	// add the watchdog kennel
-	_ = container.Service(ID, NewKennel)
+	_ = container[0].Service(ID, NewKennel)
 	return nil
 }
 
@@ -67,19 +67,19 @@ func (p Provider) Register(
 // by environment variable, the migrator will automatically try to migrate
 // to the last registered migration
 func (p Provider) Boot(
-	container slate.IContainer,
+	container ...slate.IContainer,
 ) error {
 	// check container argument reference
-	if container == nil {
+	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
 	// populate the container log formatter factory with
 	// all registered log formatter strategies
-	formatterFactory, e := p.getLogFormatterFactory(container)
+	formatterFactory, e := p.getLogFormatterFactory(container[0])
 	if e != nil {
 		return e
 	}
-	formatterStrategies, e := p.getLogFormatterStrategies(container)
+	formatterStrategies, e := p.getLogFormatterStrategies(container[0])
 	if e != nil {
 		return e
 	}
@@ -88,11 +88,11 @@ func (p Provider) Boot(
 	}
 	// populate the watchdog kennel with all the processes
 	// registered in the container
-	kennel, e := p.getKennel(container)
+	kennel, e := p.getKennel(container[0])
 	if e != nil {
 		return e
 	}
-	procs, e := p.getProcesses(container)
+	procs, e := p.getProcesses(container[0])
 	if e != nil {
 		return e
 	}

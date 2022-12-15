@@ -60,53 +60,53 @@ var _ slate.IProvider = &Provider{}
 // Register will register the logger package instances in the
 // application container.
 func (p Provider) Register(
-	container slate.IContainer,
+	container ...slate.IContainer,
 ) error {
 	// check container argument reference
-	if container == nil {
+	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
 	// add JSON formatter strategy
-	_ = container.Service(JSONFormatterStrategyID, func() *JSONFormatterStrategy {
+	_ = container[0].Service(JSONFormatterStrategyID, func() *JSONFormatterStrategy {
 		return &JSONFormatterStrategy{}
 	}, FormatterStrategyTag)
 	// add formatter factory
-	_ = container.Service(FormatterFactoryID, func() IFormatterFactory {
+	_ = container[0].Service(FormatterFactoryID, func() IFormatterFactory {
 		return &FormatterFactory{}
 	})
 	// add console stream strategy
-	_ = container.Service(ConsoleStreamStrategyID, NewConsoleStreamStrategy, StreamStrategyTag)
+	_ = container[0].Service(ConsoleStreamStrategyID, NewConsoleStreamStrategy, StreamStrategyTag)
 	// add file stream strategy
-	_ = container.Service(FileStreamStrategyID, NewFileStreamStrategy, StreamStrategyTag)
+	_ = container[0].Service(FileStreamStrategyID, NewFileStreamStrategy, StreamStrategyTag)
 	// add rotating file stream strategy
-	_ = container.Service(RotatingFileStreamStrategyID, NewRotatingFileStreamStrategy, StreamStrategyTag)
+	_ = container[0].Service(RotatingFileStreamStrategyID, NewRotatingFileStreamStrategy, StreamStrategyTag)
 	// add stream factory
-	_ = container.Service(StreamFactoryID, func() IStreamFactory {
+	_ = container[0].Service(StreamFactoryID, func() IStreamFactory {
 		return &StreamFactory{}
 	})
 	// add log
-	_ = container.Service(ID, NewLog)
+	_ = container[0].Service(ID, NewLog)
 	// add loader
-	_ = container.Service(LoaderID, NewLoader)
+	_ = container[0].Service(LoaderID, NewLoader)
 	return nil
 }
 
 // Boot will start the logger package config instance by calling the
 // logger loader with the defined provider base entry information.
 func (p Provider) Boot(
-	container slate.IContainer,
+	container ...slate.IContainer,
 ) error {
 	// check container argument reference
-	if container == nil {
+	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
 	// populate the container formatter factory with
 	// all registered formatter strategies
-	formatterFactory, e := p.getFormatterFactory(container)
+	formatterFactory, e := p.getFormatterFactory(container[0])
 	if e != nil {
 		return e
 	}
-	formatterStrategies, e := p.getFormatterStrategies(container)
+	formatterStrategies, e := p.getFormatterStrategies(container[0])
 	if e != nil {
 		return e
 	}
@@ -115,11 +115,11 @@ func (p Provider) Boot(
 	}
 	// populate the container stream factory with all
 	// registered stream strategies
-	streamFactory, e := p.getStreamFactory(container)
+	streamFactory, e := p.getStreamFactory(container[0])
 	if e != nil {
 		return e
 	}
-	streamStrategies, e := p.getStreamStrategies(container)
+	streamStrategies, e := p.getStreamStrategies(container[0])
 	if e != nil {
 		return e
 	}
@@ -131,7 +131,7 @@ func (p Provider) Boot(
 		return nil
 	}
 	// get the container registered loader
-	loader, e := p.getLoader(container)
+	loader, e := p.getLoader(container[0])
 	if e != nil {
 		return e
 	}

@@ -31,14 +31,14 @@ var _ slate.IProvider = &Provider{}
 // Register will register the migration package instances in the
 // application container
 func (p Provider) Register(
-	container slate.IContainer,
+	container ...slate.IContainer,
 ) error {
 	// check container argument reference
-	if container == nil {
+	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
 	// add the migration DAO
-	_ = container.Service(DaoID, func(connectionFactory rdb.IConnectionFactory, cfg *gorm.Config) (IDao, error) {
+	_ = container[0].Service(DaoID, func(connectionFactory rdb.IConnectionFactory, cfg *gorm.Config) (IDao, error) {
 		// retrieve the connection instance to be given to the
 		// version control DAO instance
 		conn, e := connectionFactory.Get(Database, cfg)
@@ -49,7 +49,7 @@ func (p Provider) Register(
 		return NewDao(conn)
 	})
 	// add the migration manager
-	_ = container.Service(ID, NewMigrator)
+	_ = container[0].Service(ID, NewMigrator)
 	return nil
 }
 
@@ -58,10 +58,10 @@ func (p Provider) Register(
 // by environment variable, the migrator will automatically try to migrate
 // to the last registered migration
 func (p Provider) Boot(
-	container slate.IContainer,
+	container ...slate.IContainer,
 ) error {
 	// check container argument reference
-	if container == nil {
+	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
 	// check the application auto migration flag
@@ -69,12 +69,12 @@ func (p Provider) Boot(
 		return nil
 	}
 	// retrieve the migration manager
-	migrator, e := p.getMigrator(container)
+	migrator, e := p.getMigrator(container[0])
 	if e != nil {
 		return e
 	}
 	// retrieve the list of migrations of the application
-	migrations, e := p.getMigrations(container)
+	migrations, e := p.getMigrations(container[0])
 	if e != nil {
 		return e
 	}
