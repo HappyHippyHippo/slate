@@ -22,6 +22,17 @@ type Factory struct {
 
 var _ IFactory = &Factory{}
 
+type watchdogConfig struct {
+	Service string
+	Channel string
+	Level   struct {
+		Start string
+		Error string
+		Done  string
+	}
+	Formatter string
+}
+
 // NewFactory will generate a new watchdog factory instance.
 func NewFactory(
 	cfg config.IManager,
@@ -59,16 +70,7 @@ func (f *Factory) Create(
 		return nil, e
 	}
 	// parse the retrieved configuration
-	wc := struct {
-		Service string
-		Channel string
-		Level   struct {
-			Start string
-			Error string
-			Done  string
-		}
-		Formatter string
-	}{
+	wc := watchdogConfig{
 		Channel: LogChannel,
 		Level: struct {
 			Start string

@@ -6,6 +6,10 @@ type EnvSourceStrategy struct{}
 
 var _ ISourceStrategy = &EnvSourceStrategy{}
 
+type envSourceConfig struct {
+	Mappings Config
+}
+
 // Accept will check if the source factory strategy can instantiate
 // a source where the data to check comes from a configuration
 // instance.
@@ -36,7 +40,7 @@ func (s EnvSourceStrategy) Create(
 		return nil, errNilPointer("config")
 	}
 	// retrieve the data from the configuration
-	sc := struct{ Mappings Config }{}
+	sc := envSourceConfig{}
 	_, e := config.Populate("", &sc)
 	if e != nil {
 		return nil, e

@@ -13,6 +13,11 @@ type FileSourceStrategy struct {
 
 var _ ISourceStrategy = &FileSourceStrategy{}
 
+type fileSourceConfig struct {
+	Path   string
+	Format string
+}
+
 // NewFileSourceStrategy instantiates a new file config source
 // creation strategy.
 func NewFileSourceStrategy(
@@ -64,10 +69,7 @@ func (s FileSourceStrategy) Create(
 		return nil, errNilPointer("config")
 	}
 	// retrieve the data from the configuration
-	sc := struct {
-		Path   string
-		Format string
-	}{Format: DefaultFileFormat}
+	sc := fileSourceConfig{Format: DefaultFileFormat}
 	_, e := config.Populate("", &sc)
 	if e != nil {
 		return nil, e

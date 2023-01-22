@@ -14,6 +14,11 @@ type Loader struct {
 
 var _ ILoader = &Loader{}
 
+type sourceConfig struct {
+	ID       string
+	Priority int
+}
+
 // NewLoader instantiate a new configuration loader instance.
 func NewLoader(
 	manager IManager,
@@ -38,8 +43,8 @@ func NewLoader(
 // path and format.
 func (l Loader) Load() error {
 	// retrieve the loader entry file config content
-	sourceConfig := &Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}
-	src, e := l.sourceFactory.Create(sourceConfig)
+	sc := &Config{"type": SourceFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}
+	src, e := l.sourceFactory.Create(sc)
 	if e != nil {
 		return e
 	}
@@ -68,16 +73,13 @@ func (l Loader) loadSource(
 	cfg IConfig,
 ) error {
 	// parse the configuration
-	sourceConfig := struct {
-		ID       string
-		Priority int
-	}{}
-	_, e := cfg.Populate("", &sourceConfig)
+	sc := sourceConfig{}
+	_, e := cfg.Populate("", &sc)
 	if e != nil {
 		return e
 	}
 	// validate configuration
-	if sourceConfig.ID == "" {
+	if sc.ID == "" {
 		return errPathNotFound("id")
 	}
 	// create the config source
@@ -86,5 +88,5 @@ func (l Loader) loadSource(
 		return e
 	}
 	// add the loaded source to the manager
-	return l.manager.AddSource(sourceConfig.ID, sourceConfig.Priority, src)
+	return l.manager.AddSource(sc.ID, sc.Priority, src)
 }

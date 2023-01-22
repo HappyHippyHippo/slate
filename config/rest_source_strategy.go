@@ -13,6 +13,14 @@ type RestSourceStrategy struct {
 
 var _ ISourceStrategy = &RestSourceStrategy{}
 
+type restSourceConfig struct {
+	URI    string
+	Format string
+	Path   struct {
+		Config string
+	}
+}
+
 // NewRestSourceStrategy instantiates a new REST service config
 // source creation strategy.
 func NewRestSourceStrategy(
@@ -59,13 +67,7 @@ func (s RestSourceStrategy) Create(
 		return nil, errNilPointer("config")
 	}
 	// retrieve the data from the configuration
-	sc := struct {
-		URI    string
-		Format string
-		Path   struct {
-			Config string
-		}
-	}{Format: DefaultRestFormat}
+	sc := restSourceConfig{Format: DefaultRestFormat}
 	_, e := config.Populate("", &sc)
 	if e != nil {
 		return nil, e

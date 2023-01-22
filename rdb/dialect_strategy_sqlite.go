@@ -14,6 +14,11 @@ type SqliteDialectStrategy struct{}
 
 var _ IDialectStrategy = &SqliteDialectStrategy{}
 
+type sqliteDialectConfig struct {
+	Host   string
+	Params config.Config
+}
+
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
 func (SqliteDialectStrategy) Accept(
@@ -42,10 +47,7 @@ func (SqliteDialectStrategy) Get(
 		return nil, errNilPointer("cfg")
 	}
 	// retrieve the data from the configuration
-	dc := struct {
-		Host   string
-		Params config.Config
-	}{}
+	dc := sqliteDialectConfig{}
 	_, e := cfg.Populate("", &dc)
 	if e != nil {
 		return nil, e

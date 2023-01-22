@@ -12,6 +12,15 @@ type ObservableRestSourceStrategy struct {
 
 var _ ISourceStrategy = &ObservableRestSourceStrategy{}
 
+type observableRestSourceConfig struct {
+	URI    string
+	Format string
+	Path   struct {
+		Config    string
+		Timestamp string
+	}
+}
+
 // NewObservableRestSourceStrategy instantiates a new observable REST
 // service config source creation strategy.
 func NewObservableRestSourceStrategy(
@@ -60,14 +69,7 @@ func (s ObservableRestSourceStrategy) Create(
 		return nil, errNilPointer("config")
 	}
 	// retrieve the data from the configuration
-	sc := struct {
-		URI    string
-		Format string
-		Path   struct {
-			Config    string
-			Timestamp string
-		}
-	}{Format: DefaultRestFormat}
+	sc := observableRestSourceConfig{Format: DefaultRestFormat}
 	_, e := config.Populate("", &sc)
 	if e != nil {
 		return nil, e

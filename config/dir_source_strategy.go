@@ -11,6 +11,12 @@ type DirSourceStrategy struct {
 	decoderFactory IDecoderFactory
 }
 
+type dirSourceConfig struct {
+	Path      string
+	Format    string
+	Recursive bool
+}
+
 var _ ISourceStrategy = &DirSourceStrategy{}
 
 // NewDirSourceStrategy instantiates a new dir config
@@ -64,11 +70,7 @@ func (s DirSourceStrategy) Create(
 		return nil, errNilPointer("config")
 	}
 	// retrieve the data from the configuration
-	sc := struct {
-		Path      string
-		Format    string
-		Recursive bool
-	}{Format: DefaultFileFormat}
+	sc := dirSourceConfig{Format: DefaultFileFormat}
 	_, e := config.Populate("", &sc)
 	if e != nil {
 		return nil, e

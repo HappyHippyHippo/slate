@@ -4,12 +4,6 @@ import (
 	"github.com/happyhippyhippo/slate/config"
 )
 
-type consoleStreamConfig struct {
-	Format   string
-	Channels []interface{}
-	Level    string
-}
-
 // ConsoleStreamStrategy defines a console log stream generation strategy.
 type ConsoleStreamStrategy struct {
 	StreamStrategy
@@ -17,6 +11,12 @@ type ConsoleStreamStrategy struct {
 }
 
 var _ IStreamStrategy = &ConsoleStreamStrategy{}
+
+type consoleStreamConfig struct {
+	Format   string
+	Channels []interface{}
+	Level    string
+}
 
 // NewConsoleStreamStrategy generates a new console log stream
 // generation strategy instance.

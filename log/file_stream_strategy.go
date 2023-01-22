@@ -7,13 +7,6 @@ import (
 	"github.com/spf13/afero"
 )
 
-type fileStreamConfig struct {
-	Path     string
-	Format   string
-	Channels []interface{}
-	Level    string
-}
-
 // FileStreamStrategy defines a file log stream generation strategy.
 type FileStreamStrategy struct {
 	StreamStrategy
@@ -22,6 +15,13 @@ type FileStreamStrategy struct {
 }
 
 var _ IStreamStrategy = &FileStreamStrategy{}
+
+type fileStreamConfig struct {
+	Path     string
+	Format   string
+	Channels []interface{}
+	Level    string
+}
 
 // NewFileStreamStrategy generates a new file log stream
 // generation strategy instance.

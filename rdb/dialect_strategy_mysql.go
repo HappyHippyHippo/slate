@@ -14,6 +14,16 @@ type MySQLDialectStrategy struct{}
 
 var _ IDialectStrategy = &MySQLDialectStrategy{}
 
+type mysqlDialectConfig struct {
+	Username string
+	Password string
+	Protocol string
+	Host     string
+	Port     int
+	Schema   string
+	Params   config.Config
+}
+
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
 func (MySQLDialectStrategy) Accept(
@@ -42,15 +52,7 @@ func (MySQLDialectStrategy) Get(
 		return nil, errNilPointer("cfg")
 	}
 	// retrieve the data from the configuration
-	dc := struct {
-		Username string
-		Password string
-		Protocol string
-		Host     string
-		Port     int
-		Schema   string
-		Params   config.Config
-	}{Protocol: "tcp", Port: 3306}
+	dc := mysqlDialectConfig{Protocol: "tcp", Port: 3306}
 	_, e := cfg.Populate("", &dc)
 	if e != nil {
 		return nil, e

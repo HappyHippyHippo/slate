@@ -180,16 +180,7 @@ func Test_Factory_Create(t *testing.T) {
 
 		service := "service"
 		cfg := NewMockConfig(ctrl)
-		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *struct {
-			Service string
-			Channel string
-			Level   struct {
-				Start string
-				Error string
-				Done  string
-			}
-			Formatter string
-		}, icase ...bool) (interface{}, error) {
+		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
 			c.Level.Start = "invalid"
 			return nil, nil
 		}).Times(1)
@@ -205,7 +196,7 @@ func Test_Factory_Create(t *testing.T) {
 			t.Errorf("returned an unexpected watchdog reference")
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
-		case errors.Is(err.Conversion, e):
+		case !errors.Is(e, err.Conversion):
 			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Conversion)
 		}
 	})
@@ -220,16 +211,7 @@ func Test_Factory_Create(t *testing.T) {
 
 		service := "service"
 		cfg := NewMockConfig(ctrl)
-		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *struct {
-			Service string
-			Channel string
-			Level   struct {
-				Start string
-				Error string
-				Done  string
-			}
-			Formatter string
-		}, icase ...bool) (interface{}, error) {
+		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
 			c.Level.Error = "invalid"
 			return nil, nil
 		}).Times(1)
@@ -245,7 +227,7 @@ func Test_Factory_Create(t *testing.T) {
 			t.Errorf("returned an unexpected watchdog reference")
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
-		case errors.Is(err.Conversion, e):
+		case !errors.Is(e, err.Conversion):
 			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Conversion)
 		}
 	})
@@ -260,16 +242,7 @@ func Test_Factory_Create(t *testing.T) {
 
 		service := "service"
 		cfg := NewMockConfig(ctrl)
-		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *struct {
-			Service string
-			Channel string
-			Level   struct {
-				Start string
-				Error string
-				Done  string
-			}
-			Formatter string
-		}, icase ...bool) (interface{}, error) {
+		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
 			c.Level.Done = "invalid"
 			return nil, nil
 		}).Times(1)
@@ -285,7 +258,7 @@ func Test_Factory_Create(t *testing.T) {
 			t.Errorf("returned an unexpected watchdog reference")
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
-		case errors.Is(err.Conversion, e):
+		case !errors.Is(e, err.Conversion):
 			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Conversion)
 		}
 	})
@@ -331,16 +304,7 @@ func Test_Factory_Create(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		service := "service"
 		cfg := NewMockConfig(ctrl)
-		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *struct {
-			Service string
-			Channel string
-			Level   struct {
-				Start string
-				Error string
-				Done  string
-			}
-			Formatter string
-		}, icase ...bool) (interface{}, error) {
+		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
 			c.Formatter = "my_formatter"
 			return nil, nil
 		}).Times(1)
@@ -372,16 +336,7 @@ func Test_Factory_Create(t *testing.T) {
 
 		service := "service"
 		cfg := NewMockConfig(ctrl)
-		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *struct {
-			Service string
-			Channel string
-			Level   struct {
-				Start string
-				Error string
-				Done  string
-			}
-			Formatter string
-		}, icase ...bool) (interface{}, error) {
+		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
 			c.Service = service
 			return nil, nil
 		}).Times(1)

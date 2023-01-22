@@ -5,13 +5,6 @@ import (
 	"github.com/spf13/afero"
 )
 
-type rotatingFileStreamConfig struct {
-	Path     string
-	Format   string
-	Channels []interface{}
-	Level    string
-}
-
 // RotatingFileStreamStrategy define a new rotating file log
 // stream generation strategy.
 type RotatingFileStreamStrategy struct {
@@ -19,6 +12,13 @@ type RotatingFileStreamStrategy struct {
 }
 
 var _ IStreamStrategy = &RotatingFileStreamStrategy{}
+
+type rotatingFileStreamConfig struct {
+	Path     string
+	Format   string
+	Channels []interface{}
+	Level    string
+}
 
 // NewRotatingFileStreamStrategy generate a new rotating file log stream
 // generation strategy.

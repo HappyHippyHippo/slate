@@ -12,6 +12,11 @@ type ObservableFileSourceStrategy struct {
 
 var _ ISourceStrategy = &ObservableFileSourceStrategy{}
 
+type observableFileSourceConfig struct {
+	Path   string
+	Format string
+}
+
 // NewObservableFileSourceStrategy instantiates a new observable
 // file config source creation strategy.
 func NewObservableFileSourceStrategy(
@@ -64,10 +69,7 @@ func (s ObservableFileSourceStrategy) Create(
 		return nil, errNilPointer("config")
 	}
 	// retrieve the data from the configuration
-	sc := struct {
-		Path   string
-		Format string
-	}{Format: DefaultFileFormat}
+	sc := observableFileSourceConfig{Format: DefaultFileFormat}
 	_, e := config.Populate("", &sc)
 	if e != nil {
 		return nil, e

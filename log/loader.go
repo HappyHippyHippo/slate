@@ -19,6 +19,10 @@ type Loader struct {
 
 var _ ILoader = &Loader{}
 
+type streamConfig struct {
+	ID string
+}
+
 // NewLoader generates a new log initialization instance.
 func NewLoader(
 	cfg config.IManager,
@@ -123,13 +127,13 @@ func (l Loader) load(
 	// iterate through the given stream config list
 	for _, entry := range entries {
 		// parse the configuration
-		streamConfig := struct{ ID string }{}
-		_, e := entry.Populate("", &streamConfig)
+		sc := streamConfig{}
+		_, e := entry.Populate("", &sc)
 		if e != nil {
 			return e
 		}
 		// validate configuration
-		if streamConfig.ID == "" {
+		if sc.ID == "" {
 			return errInvalidConfig(&entry)
 		}
 		// generate the new stream
@@ -138,7 +142,7 @@ func (l Loader) load(
 			return e
 		}
 		// add the stream to the log stream pool
-		e = l.log.AddStream(streamConfig.ID, stream)
+		e = l.log.AddStream(sc.ID, stream)
 		if e != nil {
 			return e
 		}
