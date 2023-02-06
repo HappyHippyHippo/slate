@@ -4,12 +4,11 @@ import (
 	"github.com/spf13/afero"
 )
 
-// DirSourceStrategy defines a strategy used to instantiate
-// a dir config source creation strategy.
-type DirSourceStrategy struct {
-	fs             afero.Fs
-	decoderFactory IDecoderFactory
-}
+const (
+	// SourceStrategyDirectory defines the value to be used to declare a
+	// simple dir config source type.
+	SourceStrategyDirectory = "dir"
+)
 
 type dirSourceConfig struct {
 	Path      string
@@ -17,17 +16,24 @@ type dirSourceConfig struct {
 	Recursive bool
 }
 
+// DirSourceStrategy defines a strategy used to instantiate
+// a dir config source creation strategy.
+type DirSourceStrategy struct {
+	fileSystem     afero.Fs
+	decoderFactory IDecoderFactory
+}
+
 var _ ISourceStrategy = &DirSourceStrategy{}
 
 // NewDirSourceStrategy instantiates a new dir config
 // source creation strategy.
 func NewDirSourceStrategy(
-	fs afero.Fs,
+	fileSystem afero.Fs,
 	decoderFactory IDecoderFactory,
 ) (*DirSourceStrategy, error) {
 	// check the file system argument reference
-	if fs == nil {
-		return nil, errNilPointer("fs")
+	if fileSystem == nil {
+		return nil, errNilPointer("fileSystem")
 	}
 	// check the decoder factory argument reference
 	if decoderFactory == nil {
@@ -35,7 +41,7 @@ func NewDirSourceStrategy(
 	}
 	// instantiate the strategy
 	return &DirSourceStrategy{
-		fs:             fs,
+		fileSystem:     fileSystem,
 		decoderFactory: decoderFactory,
 	}, nil
 }
@@ -55,7 +61,7 @@ func (s DirSourceStrategy) Accept(
 	_, e := config.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == SourceDirectory
+		return sc.Type == SourceStrategyDirectory
 	}
 	return false
 }
@@ -84,7 +90,7 @@ func (s DirSourceStrategy) Create(
 		sc.Path,
 		sc.Format,
 		sc.Recursive,
-		s.fs,
+		s.fileSystem,
 		s.decoderFactory,
 	)
 }

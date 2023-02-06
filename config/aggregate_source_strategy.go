@@ -1,9 +1,15 @@
 package config
 
+const (
+	// SourceStrategyAggregate defines the value to be used to declare a
+	// container loading configs source type.
+	SourceStrategyAggregate = "aggregate"
+)
+
 // AggregateSourceStrategy defines a strategy used to instantiate
 // a config aggregation config source creation strategy.
 type AggregateSourceStrategy struct {
-	partials []IConfig
+	configs []IConfig
 }
 
 var _ ISourceStrategy = &AggregateSourceStrategy{}
@@ -23,7 +29,7 @@ func (s AggregateSourceStrategy) Accept(
 	_, e := config.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == SourceAggregate
+		return sc.Type == SourceStrategyAggregate
 	}
 	return false
 }
@@ -34,5 +40,5 @@ func (s AggregateSourceStrategy) Create(
 	_ IConfig,
 ) (ISource, error) {
 	// create the aggregate config source
-	return NewAggregateSource(s.partials)
+	return NewAggregateSource(s.configs)
 }

@@ -4,6 +4,15 @@ import (
 	"github.com/happyhippyhippo/slate/config"
 )
 
+const (
+	// FormatterUnknown is used to signal that the log formatter is unknown.
+	FormatterUnknown = "unknown"
+
+	// FormatterDefault is used to signal that the log formatter to be
+	// used is the default slate message formatter.
+	FormatterDefault = "default"
+)
+
 // ILogFormatterStrategy defines a log formatter creation strategy
 // instance interface.
 type ILogFormatterStrategy interface {

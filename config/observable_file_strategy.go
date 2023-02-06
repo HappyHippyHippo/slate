@@ -4,6 +4,17 @@ import (
 	"github.com/spf13/afero"
 )
 
+const (
+	// SourceStrategyObservableFile defines the value to be used to
+	// declare an observable file config source type.
+	SourceStrategyObservableFile = "observable-file"
+)
+
+type observableFileSourceConfig struct {
+	Path   string
+	Format string
+}
+
 // ObservableFileSourceStrategy defines a strategy used to instantiate
 // an observable file config source creation strategy.
 type ObservableFileSourceStrategy struct {
@@ -12,20 +23,15 @@ type ObservableFileSourceStrategy struct {
 
 var _ ISourceStrategy = &ObservableFileSourceStrategy{}
 
-type observableFileSourceConfig struct {
-	Path   string
-	Format string
-}
-
 // NewObservableFileSourceStrategy instantiates a new observable
 // file config source creation strategy.
 func NewObservableFileSourceStrategy(
-	fs afero.Fs,
+	fileSystem afero.Fs,
 	decoderFactory IDecoderFactory,
 ) (*ObservableFileSourceStrategy, error) {
 	// check the file system argument reference
-	if fs == nil {
-		return nil, errNilPointer("fs")
+	if fileSystem == nil {
+		return nil, errNilPointer("fileSystem")
 	}
 	// check the decoder factory argument reference
 	if decoderFactory == nil {
@@ -34,7 +40,7 @@ func NewObservableFileSourceStrategy(
 	// instantiate the strategy
 	return &ObservableFileSourceStrategy{
 		FileSourceStrategy: FileSourceStrategy{
-			fs:             fs,
+			fileSystem:     fileSystem,
 			decoderFactory: decoderFactory,
 		},
 	}, nil
@@ -54,7 +60,7 @@ func (s ObservableFileSourceStrategy) Accept(
 	_, e := config.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == SourceObservableFile
+		return sc.Type == SourceStrategyObservableFile
 	}
 	return false
 }
@@ -79,5 +85,5 @@ func (s ObservableFileSourceStrategy) Create(
 		return nil, errPathNotFound("path")
 	}
 	// return acceptance for the read config type
-	return NewObservableFileSource(sc.Path, sc.Format, s.fs, s.decoderFactory)
+	return NewObservableFileSource(sc.Path, sc.Format, s.fileSystem, s.decoderFactory)
 }

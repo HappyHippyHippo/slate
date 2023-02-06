@@ -100,4 +100,9 @@ var (
 	DuplicateWatchdogService = fmt.Errorf("duplicate watchdog service")
 )
 
+var (
+	// TranslatorNotFound @todo doc
+	TranslatorNotFound = fmt.Errorf("translator not found")
+)
+
 //revive:enable:error-naming

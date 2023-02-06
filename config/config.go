@@ -32,7 +32,7 @@ func (c Config) Clone() Config {
 		switch v := value.(type) {
 		// recursive list scenario
 		case []interface{}:
-			result := []interface{}{}
+			var result []interface{}
 			for _, i := range v {
 				result = append(result, cloner(i))
 			}
@@ -342,7 +342,7 @@ func (Config) convert(
 		return p
 	}
 	if v, ok := val.([]interface{}); ok {
-		p := []interface{}{}
+		var p []interface{}
 		for _, i := range v {
 			p = append(p, (Config{}).convert(i))
 		}

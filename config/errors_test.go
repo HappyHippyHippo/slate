@@ -49,7 +49,7 @@ func Test_errConfigPathNotFound(t *testing.T) {
 
 func Test_errInvalidFormat(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
-		arg := FormatUnknown
+		arg := DecoderFormatUnknown
 		expected := "invalid config format : unknown"
 
 		if e := errInvalidFormat(arg); !errors.Is(e, err.InvalidConfigFormat) {
@@ -62,7 +62,7 @@ func Test_errInvalidFormat(t *testing.T) {
 
 func Test_errInvalidSource(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
-		arg := SourceUnknown
+		arg := SourceStrategyUnknown
 		expected := "invalid config source type : unknown"
 
 		if e := errInvalidSource(arg); !errors.Is(e, err.InvalidConfigSource) {

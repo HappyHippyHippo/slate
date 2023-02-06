@@ -4,15 +4,6 @@ import (
 	"fmt"
 )
 
-const (
-	// FormatterUnknown is used to signal that the log formatter is unknown.
-	FormatterUnknown = "unknown"
-
-	// FormatterDefault is used to signal that the log formatter to be
-	// used is the default slate message formatter.
-	FormatterDefault = "default"
-)
-
 // ILogFormatter defines an interface to a watchdog logging message formatter.
 type ILogFormatter interface {
 	Start(service string) string

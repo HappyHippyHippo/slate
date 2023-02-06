@@ -4,6 +4,18 @@ import (
 	"github.com/happyhippyhippo/slate/config"
 )
 
+const (
+	// StreamStrategyConsole defines the value to be used to declare a
+	// console Log stream type.
+	StreamStrategyConsole = "console"
+)
+
+type consoleStreamConfig struct {
+	Format   string
+	Channels []interface{}
+	Level    string
+}
+
 // ConsoleStreamStrategy defines a console log stream generation strategy.
 type ConsoleStreamStrategy struct {
 	StreamStrategy
@@ -11,12 +23,6 @@ type ConsoleStreamStrategy struct {
 }
 
 var _ IStreamStrategy = &ConsoleStreamStrategy{}
-
-type consoleStreamConfig struct {
-	Format   string
-	Channels []interface{}
-	Level    string
-}
 
 // NewConsoleStreamStrategy generates a new console log stream
 // generation strategy instance.
@@ -48,7 +54,7 @@ func (s ConsoleStreamStrategy) Accept(
 	_, e := cfg.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == StreamConsole
+		return sc.Type == StreamStrategyConsole
 	}
 	return false
 }

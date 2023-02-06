@@ -6,6 +6,12 @@ import (
 	"github.com/happyhippyhippo/slate/config"
 )
 
+const (
+	// StreamStrategyUnknown defines the value to be used to declare an
+	// unknown Log stream type.
+	StreamStrategyUnknown = "unknown"
+)
+
 // IStreamStrategy interface defines the methods of the stream
 // factory strategy that can validate creation requests and instantiation
 // of particular type of stream.

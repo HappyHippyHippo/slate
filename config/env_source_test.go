@@ -18,7 +18,7 @@ func Test_NewEnvSource(t *testing.T) {
 			switch {
 			case sut.mutex == nil:
 				t.Error("didn't created the access mutex")
-			case !reflect.DeepEqual(sut.partial, Config{}):
+			case !reflect.DeepEqual(sut.config, Config{}):
 				t.Error("didn't loaded the content correctly")
 			}
 		}
@@ -42,8 +42,8 @@ func Test_NewEnvSource(t *testing.T) {
 			switch {
 			case sut.mutex == nil:
 				t.Error("didn't created the access mutex")
-			case !reflect.DeepEqual(sut.partial, expected):
-				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.partial, expected)
+			case !reflect.DeepEqual(sut.config, expected):
+				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.config, expected)
 			}
 		}
 	})
@@ -66,8 +66,8 @@ func Test_NewEnvSource(t *testing.T) {
 			switch {
 			case sut.mutex == nil:
 				t.Error("didn't created the access mutex")
-			case !reflect.DeepEqual(sut.partial, expected):
-				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.partial, expected)
+			case !reflect.DeepEqual(sut.config, expected):
+				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.config, expected)
 			}
 		}
 	})
@@ -90,8 +90,8 @@ func Test_NewEnvSource(t *testing.T) {
 			switch {
 			case sut.mutex == nil:
 				t.Error("didn't created the access mutex")
-			case !reflect.DeepEqual(sut.partial, expected):
-				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.partial, expected)
+			case !reflect.DeepEqual(sut.config, expected):
+				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.config, expected)
 			}
 		}
 	})

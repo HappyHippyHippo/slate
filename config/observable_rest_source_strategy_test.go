@@ -93,7 +93,7 @@ func Test_SourceStrategyRestObservable_Accept(t *testing.T) {
 
 		sut, _ := NewObservableRestSourceStrategy(NewMockDecoderFactory(ctrl))
 
-		if sut.Accept(&Config{"type": SourceUnknown}) {
+		if sut.Accept(&Config{"type": SourceStrategyUnknown}) {
 			t.Error("returned true")
 		}
 	})
@@ -104,7 +104,7 @@ func Test_SourceStrategyRestObservable_Accept(t *testing.T) {
 
 		sut, _ := NewObservableRestSourceStrategy(NewMockDecoderFactory(ctrl))
 
-		if !sut.Accept(&Config{"type": SourceObservableRest}) {
+		if !sut.Accept(&Config{"type": SourceStrategyObservableRest}) {
 			t.Error("returned false")
 		}
 	})
@@ -252,7 +252,7 @@ func Test_ObservableRestSourceStrategy_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		uri := "uri"
-		format := FormatJSON
+		format := DecoderFormatJSON
 		timestampPath := "timestamp"
 		configPath := "path"
 		field := "field"
@@ -263,7 +263,7 @@ func Test_ObservableRestSourceStrategy_Create(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(FormatJSON, gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(DecoderFormatJSON, gomock.Any()).Return(decoder, nil).Times(1)
 
 		sut, _ := NewObservableRestSourceStrategy(decoderFactory)
 		response := http.Response{}
@@ -281,7 +281,7 @@ func Test_ObservableRestSourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *ObservableRestSource:
-				if !reflect.DeepEqual(s.partial, expected) {
+				if !reflect.DeepEqual(s.config, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
@@ -305,7 +305,7 @@ func Test_ObservableRestSourceStrategy_Create(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(FormatJSON, gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(DecoderFormatJSON, gomock.Any()).Return(decoder, nil).Times(1)
 
 		sut, _ := NewObservableRestSourceStrategy(decoderFactory)
 		response := http.Response{}
@@ -323,7 +323,7 @@ func Test_ObservableRestSourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *ObservableRestSource:
-				if !reflect.DeepEqual(s.partial, expected) {
+				if !reflect.DeepEqual(s.config, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:

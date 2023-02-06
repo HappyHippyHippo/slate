@@ -386,7 +386,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("returned the unexpected err (%v)", e)
 		case strategy == nil:
 			t.Error("didn't return a valid strategy reference")
-		case len(strategy.(*AggregateSourceStrategy).partials) != 0:
+		case len(strategy.(*AggregateSourceStrategy).configs) != 0:
 			t.Error("stored an unexpected instance of a config")
 		}
 	})
@@ -403,7 +403,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("returned the unexpected err (%v)", e)
 		case strategy == nil:
 			t.Error("didn't return a valid strategy reference")
-		case len(strategy.(*AggregateSourceStrategy).partials) != 1:
+		case len(strategy.(*AggregateSourceStrategy).configs) != 1:
 			t.Error("didn't stored the expected config")
 		}
 	})

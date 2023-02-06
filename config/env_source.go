@@ -24,8 +24,8 @@ func NewEnvSource(
 	// instantiate the source
 	s := &EnvSource{
 		Source: Source{
-			mutex:   &sync.Mutex{},
-			partial: Config{},
+			mutex:  &sync.Mutex{},
+			config: Config{},
 		},
 		mappings: mappings,
 	}
@@ -40,7 +40,7 @@ func (s *EnvSource) load() error {
 		// retrieve the mapped value from the environment
 		if env := os.Getenv(key); env != "" {
 			// navigate to the target storing path of the environment value
-			step := s.partial
+			step := s.config
 			sections := strings.Split(path, ".")
 			for i, section := range sections {
 				if i != len(sections)-1 {

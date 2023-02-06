@@ -9,8 +9,9 @@ import (
 type ILog interface {
 	io.Closer
 
-	Signal(channel string, level Level, msg string, ctx map[string]interface{}) error
-	Broadcast(level Level, msg string, ctx map[string]interface{}) error
+	Signal(channel string, level Level, msg string, ctx ...Context) error
+	Broadcast(level Level, msg string, ctx ...Context) error
+
 	HasStream(id string) bool
 	ListStreams() []string
 	AddStream(id string, stream IStream) error
@@ -50,14 +51,14 @@ func (l *Log) Signal(
 	channel string,
 	level Level,
 	msg string,
-	ctx map[string]interface{},
+	ctx ...Context,
 ) error {
 	// lock the log for handling
 	l.mutex.Lock()
 	defer func() { l.mutex.Unlock() }()
 	// propagate the signal request to all registered stream
 	for _, s := range l.streams {
-		if e := s.Signal(channel, level, msg, ctx); e != nil {
+		if e := s.Signal(channel, level, msg, ctx...); e != nil {
 			return e
 		}
 	}
@@ -68,14 +69,14 @@ func (l *Log) Signal(
 func (l *Log) Broadcast(
 	level Level,
 	msg string,
-	ctx map[string]interface{},
+	ctx ...Context,
 ) error {
 	// lock the log for handling
 	l.mutex.Lock()
 	defer func() { l.mutex.Unlock() }()
 	// propagate the broadcast request to all registered stream
 	for _, s := range l.streams {
-		if e := s.Broadcast(level, msg, ctx); e != nil {
+		if e := s.Broadcast(level, msg, ctx...); e != nil {
 			return e
 		}
 	}

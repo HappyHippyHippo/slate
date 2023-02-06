@@ -57,8 +57,8 @@ func Test_NewAggregateSource(t *testing.T) {
 			t.Errorf("returned the unexpected e : %v", e)
 		case sut == nil:
 			t.Error("didn't returned the expected valid reference")
-		case !reflect.DeepEqual(sut.partial, expected):
-			t.Errorf("returned the (%v) config when expecting (%v)", sut.partial, expected)
+		case !reflect.DeepEqual(sut.config, expected):
+			t.Errorf("returned the (%v) config when expecting (%v)", sut.config, expected)
 		}
 	})
 
@@ -78,8 +78,8 @@ func Test_NewAggregateSource(t *testing.T) {
 			t.Errorf("returned the unexpected e : %v", e)
 		case sut == nil:
 			t.Error("didn't returned the expected valid reference")
-		case !reflect.DeepEqual(sut.partial, expected):
-			t.Errorf("returned the (%v) config when expecting (%v)", sut.partial, expected)
+		case !reflect.DeepEqual(sut.config, expected):
+			t.Errorf("returned the (%v) config when expecting (%v)", sut.config, expected)
 		}
 	})
 }

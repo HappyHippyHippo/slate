@@ -17,7 +17,7 @@ func Test_Source_Has(t *testing.T) {
 		locker.EXPECT().Lock().Times(1)
 		locker.EXPECT().Unlock().Times(1)
 
-		sut := &Source{mutex: locker, partial: data}
+		sut := &Source{mutex: locker, config: data}
 
 		if value := sut.Has(search); value != true {
 			t.Errorf("returned the (%v) value", value)
@@ -37,7 +37,7 @@ func Test_Source_Get(t *testing.T) {
 		locker.EXPECT().Lock().Times(1)
 		locker.EXPECT().Unlock().Times(1)
 
-		sut := &Source{mutex: locker, partial: data}
+		sut := &Source{mutex: locker, config: data}
 
 		if value, e := sut.Get(search); e != nil {
 			t.Errorf("returned the unexpected err : %v", e)

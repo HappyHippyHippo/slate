@@ -46,8 +46,8 @@ func NewRestSource(
 	// instantiates the config source
 	s := &RestSource{
 		Source: Source{
-			mutex:   &sync.Mutex{},
-			partial: Config{},
+			mutex:  &sync.Mutex{},
+			config: Config{},
 		},
 		client:         client,
 		uri:            uri,
@@ -75,7 +75,7 @@ func (s *RestSource) load() error {
 	}
 	// store the retrieved config
 	s.mutex.Lock()
-	s.partial = *c
+	s.config = *c
 	s.mutex.Unlock()
 	return nil
 }

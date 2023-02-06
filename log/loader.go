@@ -74,7 +74,7 @@ func (l Loader) Load() error {
 							LoaderErrorChannel,
 							ERROR,
 							"reloading log streams error",
-							map[string]interface{}{"error": e},
+							Context{"error": e},
 						)
 					}
 				}()
@@ -92,7 +92,7 @@ func (l Loader) Load() error {
 						LoaderErrorChannel,
 						ERROR,
 						"reloading log streams error",
-						map[string]interface{}{"error": e},
+						Context{"error": e},
 					)
 				}
 			},

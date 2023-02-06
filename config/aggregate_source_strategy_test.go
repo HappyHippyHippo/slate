@@ -8,7 +8,7 @@ import (
 func Test_SourceStrategyAggregate_Accept(t *testing.T) {
 	t.Run("don't accept on invalid config pointer", func(t *testing.T) {
 		if (&AggregateSourceStrategy{
-			partials: []IConfig{},
+			configs: []IConfig{},
 		}).Accept(nil) {
 			t.Error("returned true")
 		}
@@ -16,7 +16,7 @@ func Test_SourceStrategyAggregate_Accept(t *testing.T) {
 
 	t.Run("don't accept if type is missing", func(t *testing.T) {
 		if (&AggregateSourceStrategy{
-			partials: []IConfig{},
+			configs: []IConfig{},
 		}).Accept(&Config{}) {
 			t.Error("returned true")
 		}
@@ -24,7 +24,7 @@ func Test_SourceStrategyAggregate_Accept(t *testing.T) {
 
 	t.Run("don't accept if type is not a string", func(t *testing.T) {
 		if (&AggregateSourceStrategy{
-			partials: []IConfig{},
+			configs: []IConfig{},
 		}).Accept(&Config{"type": 123}) {
 			t.Error("returned true")
 		}
@@ -32,8 +32,8 @@ func Test_SourceStrategyAggregate_Accept(t *testing.T) {
 
 	t.Run("don't accept if type is not env", func(t *testing.T) {
 		if (&AggregateSourceStrategy{
-			partials: []IConfig{},
-		}).Accept(&Config{"type": SourceUnknown}) {
+			configs: []IConfig{},
+		}).Accept(&Config{"type": SourceStrategyUnknown}) {
 			t.Error("returned true")
 		}
 	})
@@ -41,7 +41,7 @@ func Test_SourceStrategyAggregate_Accept(t *testing.T) {
 
 func Test_AggregateSourceStrategy_Create(t *testing.T) {
 	t.Run("accept nil config pointer", func(t *testing.T) {
-		sut := &AggregateSourceStrategy{partials: []IConfig{}}
+		sut := &AggregateSourceStrategy{configs: []IConfig{}}
 		src, e := sut.Create(&Config{})
 		switch {
 		case e != nil:
@@ -61,7 +61,7 @@ func Test_AggregateSourceStrategy_Create(t *testing.T) {
 		value := Config{"key": "value"}
 
 		expected := value
-		sut := &AggregateSourceStrategy{partials: []IConfig{&value}}
+		sut := &AggregateSourceStrategy{configs: []IConfig{&value}}
 
 		src, e := sut.Create(&Config{})
 		switch {
@@ -72,7 +72,7 @@ func Test_AggregateSourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *AggregateSource:
-				if !reflect.DeepEqual(s.partial, expected) {
+				if !reflect.DeepEqual(s.config, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
@@ -86,7 +86,7 @@ func Test_AggregateSourceStrategy_Create(t *testing.T) {
 		value2 := Config{"key2": "value 2"}
 
 		expected := Config{"key1": "value 1", "key2": "value 2"}
-		sut := &AggregateSourceStrategy{partials: []IConfig{&value1, &value2}}
+		sut := &AggregateSourceStrategy{configs: []IConfig{&value1, &value2}}
 
 		src, e := sut.Create(&Config{})
 		switch {
@@ -97,7 +97,7 @@ func Test_AggregateSourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *AggregateSource:
-				if !reflect.DeepEqual(s.partial, expected) {
+				if !reflect.DeepEqual(s.config, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:

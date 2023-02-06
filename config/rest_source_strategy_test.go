@@ -93,7 +93,7 @@ func Test_RestSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewRestSourceStrategy(NewMockDecoderFactory(ctrl))
 
-		if sut.Accept(&Config{"type": SourceUnknown}) {
+		if sut.Accept(&Config{"type": SourceStrategyUnknown}) {
 			t.Error("returned true")
 		}
 	})
@@ -104,7 +104,7 @@ func Test_RestSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewRestSourceStrategy(NewMockDecoderFactory(ctrl))
 
-		if !sut.Accept(&Config{"type": SourceRest}) {
+		if !sut.Accept(&Config{"type": SourceStrategyRest}) {
 			t.Error("returned false")
 		}
 	})
@@ -218,7 +218,7 @@ func Test_RestSourceStrategy_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		uri := "uri"
-		format := FormatJSON
+		format := DecoderFormatJSON
 		path := "path"
 		field := "field"
 		value := "value"
@@ -228,7 +228,7 @@ func Test_RestSourceStrategy_Create(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(FormatJSON, gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(DecoderFormatJSON, gomock.Any()).Return(decoder, nil).Times(1)
 
 		sut, _ := NewRestSourceStrategy(decoderFactory)
 		response := http.Response{}
@@ -246,7 +246,7 @@ func Test_RestSourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *RestSource:
-				if !reflect.DeepEqual(s.partial, expected) {
+				if !reflect.DeepEqual(s.config, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
@@ -269,7 +269,7 @@ func Test_RestSourceStrategy_Create(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(FormatJSON, gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(DecoderFormatJSON, gomock.Any()).Return(decoder, nil).Times(1)
 
 		sut, _ := NewRestSourceStrategy(decoderFactory)
 		response := http.Response{}
@@ -287,7 +287,7 @@ func Test_RestSourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *RestSource:
-				if !reflect.DeepEqual(s.partial, expected) {
+				if !reflect.DeepEqual(s.config, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:

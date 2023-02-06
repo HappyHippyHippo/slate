@@ -127,14 +127,14 @@ func (Provider) Register(
 	_ = container[0].Service(AggregateSourceStrategyID, func() *AggregateSourceStrategy {
 		// get all the registered config partials
 		tagged, _ := container[0].Tag(AggregateSourceTag)
-		var partials []IConfig
+		var configs []IConfig
 		for _, t := range tagged {
 			if p, ok := t.(IConfig); ok {
-				partials = append(partials, p)
+				configs = append(configs, p)
 			}
 		}
 		// allocate the new source strategy with all retrieved partials
-		return &AggregateSourceStrategy{partials: partials}
+		return &AggregateSourceStrategy{configs: configs}
 	}, SourceStrategyTag)
 	// add source factory
 	_ = container[0].Service(SourceFactoryID, func() ISourceFactory {

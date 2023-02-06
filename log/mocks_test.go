@@ -881,7 +881,7 @@ func (mr *MockConfigSourceRecorder) Has(path interface{}) *gomock.Call {
 // Get mocks base method
 func (m *MockConfigSource) Get(path string, def ...interface{}) (interface{}, error) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
+	var varargs []interface{}
 	varargs = append(varargs, path)
 	for _, a := range def {
 		varargs = append(varargs, a)
@@ -895,7 +895,7 @@ func (m *MockConfigSource) Get(path string, def ...interface{}) (interface{}, er
 // Get indicates an expected call of Get
 func (mr *MockConfigSourceRecorder) Get(path interface{}, def ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := []interface{}{}
+	var varargs []interface{}
 	varargs = append(varargs, path)
 	for _, a := range def {
 		varargs = append(varargs, a)
@@ -1276,17 +1276,22 @@ func (m *MockFormatter) EXPECT() *MockFormatterRecorder {
 }
 
 // Format mocks base method
-func (m *MockFormatter) Format(level Level, message string, fields map[string]interface{}) string {
+func (m *MockFormatter) Format(level Level, message string, ctx ...Context) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Format", level, message, fields)
+	varargs := []interface{}{level, message}
+	for _, a := range ctx {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Format", varargs...)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
 // Format indicates an expected call of Format
-func (mr *MockFormatterRecorder) Format(level, message, fields interface{}) *gomock.Call {
+func (mr *MockFormatterRecorder) Format(level, message interface{}, ctx ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Format", reflect.TypeOf((*MockFormatter)(nil).Format), level, message, fields)
+	varargs := append([]interface{}{level, message}, ctx...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Format", reflect.TypeOf((*MockFormatter)(nil).Format), varargs...)
 }
 
 //------------------------------------------------------------------------------
@@ -1335,7 +1340,7 @@ func (mr *MockFormatterStrategyRecorder) Accept(format interface{}) *gomock.Call
 // Create mocks base method
 func (m *MockFormatterStrategy) Create(args ...interface{}) (IFormatter, error) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
+	var varargs []interface{}
 	for _, a := range args {
 		varargs = append(varargs, a)
 	}
@@ -1472,31 +1477,41 @@ func (mr *MockStreamRecorder) Level() *gomock.Call {
 }
 
 // Signal mocks base method
-func (m *MockStream) Signal(channel string, level Level, message string, fields map[string]interface{}) error {
+func (m *MockStream) Signal(channel string, level Level, message string, ctx ...Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Signal", channel, level, message, fields)
+	varargs := []interface{}{channel, level, message}
+	for _, a := range ctx {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Signal", varargs...)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Signal indicates an expected call of Signal
-func (mr *MockStreamRecorder) Signal(channel, level, message, fields interface{}) *gomock.Call {
+func (mr *MockStreamRecorder) Signal(channel, level, message interface{}, ctx ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Signal", reflect.TypeOf((*MockStream)(nil).Signal), channel, level, message, fields)
+	varargs := append([]interface{}{channel, level, message}, ctx...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Signal", reflect.TypeOf((*MockStream)(nil).Signal), varargs...)
 }
 
 // Broadcast mocks base method
-func (m *MockStream) Broadcast(level Level, message string, fields map[string]interface{}) error {
+func (m *MockStream) Broadcast(level Level, message string, fields ...Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Broadcast", level, message, fields)
+	varargs := []interface{}{level, message}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Broadcast", varargs...)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Broadcast indicates an expected call of Broadcast
-func (mr *MockStreamRecorder) Broadcast(level, message, fields interface{}) *gomock.Call {
+func (mr *MockStreamRecorder) Broadcast(level, message interface{}, fields ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Broadcast", reflect.TypeOf((*MockStream)(nil).Broadcast), level, message, fields)
+	varargs := append([]interface{}{level, message}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Broadcast", reflect.TypeOf((*MockStream)(nil).Broadcast), varargs...)
 }
 
 // HasChannel mocks base method
@@ -1711,17 +1726,22 @@ func (mr *MockLogRecorder) AddStream(id, stream interface{}) *gomock.Call {
 }
 
 // Broadcast mocks base method.
-func (m *MockLog) Broadcast(level Level, msg string, ctx map[string]interface{}) error {
+func (m *MockLog) Broadcast(level Level, msg string, ctx ...Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Broadcast", level, msg, ctx)
+	varargs := []interface{}{level, msg}
+	for _, a := range ctx {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Broadcast", varargs...)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Broadcast indicates an expected call of Broadcast.
-func (mr *MockLogRecorder) Broadcast(level, msg, ctx interface{}) *gomock.Call {
+func (mr *MockLogRecorder) Broadcast(level, msg interface{}, ctx ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Broadcast", reflect.TypeOf((*MockLog)(nil).Broadcast), level, msg, ctx)
+	varargs := append([]interface{}{level, msg}, ctx...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Broadcast", reflect.TypeOf((*MockLog)(nil).Broadcast), varargs...)
 }
 
 // Close mocks base method.
@@ -1791,17 +1811,22 @@ func (mr *MockLogRecorder) RemoveStream(id interface{}) *gomock.Call {
 }
 
 // Signal mocks base method.
-func (m *MockLog) Signal(channel string, level Level, msg string, ctx map[string]interface{}) error {
+func (m *MockLog) Signal(channel string, level Level, msg string, ctx ...Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Signal", channel, level, msg, ctx)
+	varargs := []interface{}{channel, level, msg}
+	for _, a := range ctx {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Signal", varargs...)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Signal indicates an expected call of Signal.
-func (mr *MockLogRecorder) Signal(channel, level, msg, ctx interface{}) *gomock.Call {
+func (mr *MockLogRecorder) Signal(channel, level, msg interface{}, ctx ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Signal", reflect.TypeOf((*MockLog)(nil).Signal), channel, level, msg, ctx)
+	varargs := append([]interface{}{channel, level, msg}, ctx...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Signal", reflect.TypeOf((*MockLog)(nil).Signal), varargs...)
 }
 
 // Stream mocks base method.

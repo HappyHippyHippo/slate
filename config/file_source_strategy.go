@@ -4,29 +4,35 @@ import (
 	"github.com/spf13/afero"
 )
 
-// FileSourceStrategy defines a strategy used to instantiate a
-// file config source creation strategy.
-type FileSourceStrategy struct {
-	fs             afero.Fs
-	decoderFactory IDecoderFactory
-}
-
-var _ ISourceStrategy = &FileSourceStrategy{}
+const (
+	// SourceStrategyFile defines the value to be used to declare a
+	// simple file config source type.
+	SourceStrategyFile = "file"
+)
 
 type fileSourceConfig struct {
 	Path   string
 	Format string
 }
 
+// FileSourceStrategy defines a strategy used to instantiate a
+// file config source creation strategy.
+type FileSourceStrategy struct {
+	fileSystem     afero.Fs
+	decoderFactory IDecoderFactory
+}
+
+var _ ISourceStrategy = &FileSourceStrategy{}
+
 // NewFileSourceStrategy instantiates a new file config source
 // creation strategy.
 func NewFileSourceStrategy(
-	fs afero.Fs,
+	fileSystem afero.Fs,
 	decoderFactory IDecoderFactory,
 ) (*FileSourceStrategy, error) {
 	// check the file system argument reference
-	if fs == nil {
-		return nil, errNilPointer("fs")
+	if fileSystem == nil {
+		return nil, errNilPointer("fileSystem")
 	}
 	// check the decoder factory argument reference
 	if decoderFactory == nil {
@@ -34,7 +40,7 @@ func NewFileSourceStrategy(
 	}
 	// instantiate the strategy
 	return &FileSourceStrategy{
-		fs:             fs,
+		fileSystem:     fileSystem,
 		decoderFactory: decoderFactory,
 	}, nil
 }
@@ -54,7 +60,7 @@ func (s FileSourceStrategy) Accept(
 	_, e := config.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == SourceFile
+		return sc.Type == SourceStrategyFile
 	}
 	return false
 }
@@ -79,5 +85,5 @@ func (s FileSourceStrategy) Create(
 		return nil, errPathNotFound("path")
 	}
 	// return acceptance for the read config type
-	return NewFileSource(sc.Path, sc.Format, s.fs, s.decoderFactory)
+	return NewFileSource(sc.Path, sc.Format, s.fileSystem, s.decoderFactory)
 }

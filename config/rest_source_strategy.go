@@ -4,14 +4,11 @@ import (
 	"net/http"
 )
 
-// RestSourceStrategy defines a strategy used to instantiate
-// a REST service config source creation strategy.
-type RestSourceStrategy struct {
-	clientFactory  func() httpClient
-	decoderFactory IDecoderFactory
-}
-
-var _ ISourceStrategy = &RestSourceStrategy{}
+const (
+	// SourceStrategyRest defines the value to be used to declare a
+	// rest config source type.
+	SourceStrategyRest = "rest"
+)
 
 type restSourceConfig struct {
 	URI    string
@@ -20,6 +17,15 @@ type restSourceConfig struct {
 		Config string
 	}
 }
+
+// RestSourceStrategy defines a strategy used to instantiate
+// a REST service config source creation strategy.
+type RestSourceStrategy struct {
+	clientFactory  func() httpClient
+	decoderFactory IDecoderFactory
+}
+
+var _ ISourceStrategy = &RestSourceStrategy{}
 
 // NewRestSourceStrategy instantiates a new REST service config
 // source creation strategy.
@@ -52,7 +58,7 @@ func (s RestSourceStrategy) Accept(
 	_, e := config.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == SourceRest
+		return sc.Type == SourceStrategyRest
 	}
 	return false
 }

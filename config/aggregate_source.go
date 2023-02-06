@@ -25,8 +25,8 @@ func NewAggregateSource(
 	// instantiates the config source
 	s := &AggregateSource{
 		Source: Source{
-			mutex:   &sync.Mutex{},
-			partial: Config{},
+			mutex:  &sync.Mutex{},
+			config: Config{},
 		},
 		configs: configs,
 	}
@@ -44,7 +44,7 @@ func (s *AggregateSource) load() error {
 		if e != nil {
 			return e
 		}
-		s.partial.merge(*partial.(*Config))
+		s.config.merge(*partial.(*Config))
 	}
 	return nil
 }

@@ -9,10 +9,11 @@ import (
 	"gorm.io/gorm"
 )
 
-// MySQLDialectStrategy define a MySQL dialect generation strategy instance.
-type MySQLDialectStrategy struct{}
-
-var _ IDialectStrategy = &MySQLDialectStrategy{}
+const (
+	// DialectStrategyMySQL defines the value to be used to identify a
+	// MySQL dialect.
+	DialectStrategyMySQL = "mysql"
+)
 
 type mysqlDialectConfig struct {
 	Username string
@@ -23,6 +24,11 @@ type mysqlDialectConfig struct {
 	Schema   string
 	Params   config.Config
 }
+
+// MySQLDialectStrategy define a MySQL dialect generation strategy instance.
+type MySQLDialectStrategy struct{}
+
+var _ IDialectStrategy = &MySQLDialectStrategy{}
 
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
@@ -40,7 +46,7 @@ func (MySQLDialectStrategy) Accept(
 		return false
 	}
 	// only accepts a mysql dialect request
-	return strings.EqualFold(strings.ToLower(dc.Dialect), DialectMySQL)
+	return strings.EqualFold(strings.ToLower(dc.Dialect), DialectStrategyMySQL)
 }
 
 // Get instantiates the requested mysql connection dialect.

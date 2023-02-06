@@ -15,11 +15,11 @@ func Test_YAMLDecoderStrategy_Accept(t *testing.T) {
 			expected bool
 		}{
 			{ // _test yaml format
-				format:   FormatYAML,
+				format:   DecoderFormatYAML,
 				expected: true,
 			},
 			{ // _test non-yaml format
-				format:   FormatUnknown,
+				format:   DecoderFormatUnknown,
 				expected: false,
 			},
 		}

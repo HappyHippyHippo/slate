@@ -61,7 +61,7 @@ func (s FileStream) Signal(
 	channel string,
 	level Level,
 	msg string,
-	ctx map[string]interface{},
+	ctx ...Context,
 ) error {
 	// search if the requested channel is in the stream channel list
 	i := sort.SearchStrings(s.channels, channel)
@@ -69,7 +69,7 @@ func (s FileStream) Signal(
 		return nil
 	}
 	// write the message to the stream
-	return s.Broadcast(level, msg, ctx)
+	return s.Broadcast(level, msg, ctx...)
 }
 
 // Broadcast will process the logging signal request and store the logging
@@ -77,13 +77,13 @@ func (s FileStream) Signal(
 func (s FileStream) Broadcast(
 	level Level,
 	msg string,
-	ctx map[string]interface{},
+	ctx ...Context,
 ) error {
 	// check if the request level is higher than the associated stream level
 	if s.level < level {
 		return nil
 	}
 	// write the message after formatting to the defined stream writer
-	_, e := fmt.Fprintln(s.writer, s.format(level, msg, ctx))
+	_, e := fmt.Fprintln(s.writer, s.format(level, msg, ctx...))
 	return e
 }

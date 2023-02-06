@@ -308,7 +308,7 @@ func Test_NewObservableRestSource(t *testing.T) {
 			t.Errorf("returned the unexpected e : %v", e)
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
-		case !reflect.DeepEqual(sut.partial, expected):
+		case !reflect.DeepEqual(sut.config, expected):
 			t.Error("didn't correctly stored the decoded Partial")
 		}
 	})
@@ -334,7 +334,7 @@ func Test_NewObservableRestSource(t *testing.T) {
 			t.Errorf("returned the unexpected e : %v", e)
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
-		case !reflect.DeepEqual(sut.partial, expected):
+		case !reflect.DeepEqual(sut.config, expected):
 			t.Error("didn't correctly stored the decoded Partial")
 		}
 	})
@@ -375,7 +375,7 @@ func Test_ObservableRestSource_Reload(t *testing.T) {
 			t.Error("unexpectedly reload the source config")
 		case e != nil:
 			t.Errorf("returned the eunexpected e : %v", e)
-		case !reflect.DeepEqual(sut.partial, expected):
+		case !reflect.DeepEqual(sut.config, expected):
 			t.Error("didn't correctly stored the decoded Partial")
 		}
 	})
@@ -414,7 +414,7 @@ func Test_ObservableRestSource_Reload(t *testing.T) {
 			t.Error("didn't reload the source config")
 		case e != nil:
 			t.Errorf("returned the eunexpected e : %v", e)
-		case !reflect.DeepEqual(sut.partial, expected):
+		case !reflect.DeepEqual(sut.config, expected):
 			t.Error("didn't correctly stored the decoded Partial")
 		}
 	})

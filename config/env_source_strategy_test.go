@@ -29,7 +29,7 @@ func Test_EnvSourceStrategy_Accept(t *testing.T) {
 	})
 
 	t.Run("don't accept if type is not env", func(t *testing.T) {
-		if (&EnvSourceStrategy{}).Accept(&Config{"type": SourceUnknown}) {
+		if (&EnvSourceStrategy{}).Accept(&Config{"type": SourceStrategyUnknown}) {
 			t.Error("returned true")
 		}
 	})
@@ -102,7 +102,7 @@ func Test_EnvSourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *EnvSource:
-				if !reflect.DeepEqual(s.partial, expected) {
+				if !reflect.DeepEqual(s.config, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
@@ -123,7 +123,7 @@ func Test_EnvSourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *EnvSource:
-				if !reflect.DeepEqual(s.partial, expected) {
+				if !reflect.DeepEqual(s.config, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:

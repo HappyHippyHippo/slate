@@ -15,11 +15,11 @@ func Test_JSONDecoderStrategy_Accept(t *testing.T) {
 			expected bool
 		}{
 			{ // _test json format
-				format:   FormatJSON,
+				format:   DecoderFormatJSON,
 				expected: true,
 			},
 			{ // _test non-json format
-				format:   FormatUnknown,
+				format:   DecoderFormatUnknown,
 				expected: false,
 			},
 		}

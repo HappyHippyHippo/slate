@@ -12,6 +12,9 @@
   - [x] rdb
   - [x] migration
   - [x] watchdog
+  - [x] rest
+    - [x] envelope
+    - [x] envelopemw
 
 ### err
 
@@ -46,5 +49,17 @@ TBD
 TBD
 
 ### watchdog
+
+TBD
+
+### rest
+
+TBD
+
+#### envelope
+
+TBD
+
+#### envelopemw
 
 TBD

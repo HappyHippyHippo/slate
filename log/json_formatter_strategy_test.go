@@ -11,11 +11,11 @@ func Test_JSONFormatterStrategy_Accept(t *testing.T) {
 			expected bool
 		}{
 			{ // _test json format
-				format:   FormatJSON,
+				format:   FormatterFormatJSON,
 				expected: true,
 			},
 			{ // _test non-json format
-				format:   FormatUnknown,
+				format:   FormatterFormatUnknown,
 				expected: false,
 			},
 		}

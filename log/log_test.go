@@ -52,21 +52,21 @@ func Test_Log_Signal(t *testing.T) {
 		channel := "channel"
 		level := WARNING
 		message := "message"
-		fields := map[string]interface{}{"field": "value"}
+		ctx := Context{"field": "value"}
 		id1 := "stream.1"
 		id2 := "stream.2"
 		stream1 := NewMockStream(ctrl)
-		stream1.EXPECT().Signal(channel, level, message, fields).Return(nil).Times(1)
+		stream1.EXPECT().Signal(channel, level, message, ctx).Return(nil).Times(1)
 		stream1.EXPECT().Close().Return(nil).Times(1)
 		stream2 := NewMockStream(ctrl)
-		stream2.EXPECT().Signal(channel, level, message, fields).Return(nil).Times(1)
+		stream2.EXPECT().Signal(channel, level, message, ctx).Return(nil).Times(1)
 		stream2.EXPECT().Close().Return(nil).Times(1)
 		sut := NewLog()
 		defer func() { _ = sut.Close() }()
 		_ = sut.AddStream(id1, stream1)
 		_ = sut.AddStream(id2, stream2)
 
-		if e := sut.Signal(channel, level, message, fields); e != nil {
+		if e := sut.Signal(channel, level, message, ctx); e != nil {
 			t.Errorf("returned the (%v) error", e)
 		}
 	})
@@ -78,22 +78,22 @@ func Test_Log_Signal(t *testing.T) {
 		channel := "channel"
 		level := WARNING
 		message := "message"
-		fields := map[string]interface{}{"field": "value"}
+		ctx := Context{"field": "value"}
 		expected := fmt.Errorf("error message")
 		id1 := "stream.1"
 		id2 := "stream.2"
 		stream1 := NewMockStream(ctrl)
-		stream1.EXPECT().Signal(channel, level, message, fields).Return(expected).AnyTimes()
+		stream1.EXPECT().Signal(channel, level, message, ctx).Return(expected).AnyTimes()
 		stream1.EXPECT().Close().Return(nil).Times(1)
 		stream2 := NewMockStream(ctrl)
-		stream2.EXPECT().Signal(channel, level, message, fields).Return(nil).AnyTimes()
+		stream2.EXPECT().Signal(channel, level, message, ctx).Return(nil).AnyTimes()
 		stream2.EXPECT().Close().Return(nil).Times(1)
 		sut := NewLog()
 		defer func() { _ = sut.Close() }()
 		_ = sut.AddStream(id1, stream1)
 		_ = sut.AddStream(id2, stream2)
 
-		if e := sut.Signal(channel, level, message, fields); e == nil {
+		if e := sut.Signal(channel, level, message, ctx); e == nil {
 			t.Error("didn't returned the expected  error")
 		} else if e.Error() != expected.Error() {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
@@ -108,21 +108,21 @@ func Test_Log_Broadcast(t *testing.T) {
 
 		level := WARNING
 		message := "message"
-		fields := map[string]interface{}{"field": "value"}
+		ctx := Context{"field": "value"}
 		id1 := "stream.1"
 		id2 := "stream.2"
 		stream1 := NewMockStream(ctrl)
-		stream1.EXPECT().Broadcast(level, message, fields).Return(nil).Times(1)
+		stream1.EXPECT().Broadcast(level, message, ctx).Return(nil).Times(1)
 		stream1.EXPECT().Close().Return(nil).Times(1)
 		stream2 := NewMockStream(ctrl)
-		stream2.EXPECT().Broadcast(level, message, fields).Return(nil).Times(1)
+		stream2.EXPECT().Broadcast(level, message, ctx).Return(nil).Times(1)
 		stream2.EXPECT().Close().Return(nil).Times(1)
 		sut := NewLog()
 		defer func() { _ = sut.Close() }()
 		_ = sut.AddStream(id1, stream1)
 		_ = sut.AddStream(id2, stream2)
 
-		if e := sut.Broadcast(level, message, fields); e != nil {
+		if e := sut.Broadcast(level, message, ctx); e != nil {
 			t.Errorf("returned the (%v) error", e)
 		}
 	})
@@ -132,23 +132,23 @@ func Test_Log_Broadcast(t *testing.T) {
 		defer ctrl.Finish()
 
 		level := WARNING
-		fields := map[string]interface{}{"field": "value"}
+		ctx := Context{"field": "value"}
 		message := "message"
 		expected := fmt.Errorf("error")
 		id1 := "stream.1"
 		id2 := "stream.2"
 		stream1 := NewMockStream(ctrl)
-		stream1.EXPECT().Broadcast(level, message, fields).Return(expected).AnyTimes()
+		stream1.EXPECT().Broadcast(level, message, ctx).Return(expected).AnyTimes()
 		stream1.EXPECT().Close().Return(nil).Times(1)
 		stream2 := NewMockStream(ctrl)
-		stream2.EXPECT().Broadcast(level, message, fields).Return(nil).AnyTimes()
+		stream2.EXPECT().Broadcast(level, message, ctx).Return(nil).AnyTimes()
 		stream2.EXPECT().Close().Return(nil).Times(1)
 		sut := NewLog()
 		defer func() { _ = sut.Close() }()
 		_ = sut.AddStream(id1, stream1)
 		_ = sut.AddStream(id2, stream2)
 
-		if e := sut.Broadcast(level, message, fields); e == nil {
+		if e := sut.Broadcast(level, message, ctx); e == nil {
 			t.Error("didn't returned the expected  error")
 		} else if e.Error() != expected.Error() {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)

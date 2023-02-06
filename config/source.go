@@ -4,40 +4,6 @@ import (
 	"sync"
 )
 
-const (
-	// SourceUnknown defines the value to be used to declare an
-	// unknown config source type.
-	SourceUnknown = "unknown"
-
-	// SourceEnv defines the value to be used to declare an
-	// environment config source type.
-	SourceEnv = "env"
-
-	// SourceFile defines the value to be used to declare a
-	// simple file config source type.
-	SourceFile = "file"
-
-	// SourceObservableFile defines the value to be used to
-	// declare an observable file config source type.
-	SourceObservableFile = "observable-file"
-
-	// SourceDirectory defines the value to be used to declare a
-	// simple dir config source type.
-	SourceDirectory = "dir"
-
-	// SourceRest defines the value to be used to declare a
-	// rest config source type.
-	SourceRest = "rest"
-
-	// SourceObservableRest defines the value to be used to
-	// declare an observable rest config source type.
-	SourceObservableRest = "observable-rest"
-
-	// SourceAggregate defines the value to be used to declare a
-	// container loading configs source type.
-	SourceAggregate = "aggregate"
-)
-
 // ISource defines the base interface of a config source.
 type ISource interface {
 	Has(path string) bool
@@ -56,8 +22,8 @@ type IObservableSource interface {
 // Source defines a base structure and functionalities of a
 // configuration source.
 type Source struct {
-	mutex   sync.Locker
-	partial Config
+	mutex  sync.Locker
+	config Config
 }
 
 var _ ISource = &Source{}
@@ -71,7 +37,7 @@ func (s *Source) Has(
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	// check if the source stored config has the requested path
-	return s.partial.Has(path)
+	return s.config.Has(path)
 }
 
 // Get will retrieve the value stored in the requested path present in the
@@ -88,5 +54,5 @@ func (s *Source) Get(
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	// retrieve the source stored config path stored value
-	return s.partial.Get(path, def...)
+	return s.config.Get(path, def...)
 }

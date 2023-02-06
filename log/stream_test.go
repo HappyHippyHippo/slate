@@ -183,17 +183,33 @@ func Test_Stream_Format(t *testing.T) {
 		level := WARNING
 		sut := &Stream{nil, []string{}, level}
 
-		if check := sut.format(level, msg, map[string]interface{}{"field": "value"}); check != msg {
+		if check := sut.format(level, msg, Context{"field": "value"}); check != msg {
 			t.Errorf("returned the (%v) formatted message", check)
 		}
 	})
 
-	t.Run("return formatter response if formatter is present", func(t *testing.T) {
+	t.Run("return formatter response if formatter is present without context", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		msg := "message"
-		ctx := map[string]interface{}{"field": "value"}
+		expected := "formatted message"
+		level := WARNING
+		formatter := NewMockFormatter(ctrl)
+		formatter.EXPECT().Format(level, msg).Return(expected).Times(1)
+		sut := &Stream{formatter, []string{}, level}
+
+		if check := sut.format(level, msg); check != expected {
+			t.Errorf("returned the (%v) formatted message", check)
+		}
+	})
+
+	t.Run("return formatter response if formatter is present with context", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		msg := "message"
+		ctx := Context{"field": "value"}
 		expected := "formatted message"
 		level := WARNING
 		formatter := NewMockFormatter(ctrl)

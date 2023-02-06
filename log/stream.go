@@ -4,30 +4,12 @@ import (
 	"sort"
 )
 
-const (
-	// StreamUnknown defines the value to be used to declare an unknown
-	// Log stream type.
-	StreamUnknown = "unknown"
-
-	// StreamConsole defines the value to be used to declare a console
-	// Log stream type.
-	StreamConsole = "console"
-
-	// StreamFile defines the value to be used to declare a file
-	// Log stream type.
-	StreamFile = "file"
-
-	// StreamRotatingFile defines the value to be used to declare a file
-	// Log stream type that rotates regarding the current date.
-	StreamRotatingFile = "rotating-file"
-)
-
 // IStream interface defines the interaction methods with a logging stream.
 type IStream interface {
 	Level() Level
 
-	Signal(channel string, level Level, message string, ctx map[string]interface{}) error
-	Broadcast(level Level, message string, ctx map[string]interface{}) error
+	Signal(channel string, level Level, message string, ctx ...Context) error
+	Broadcast(level Level, message string, ctx ...Context) error
 
 	HasChannel(channel string) bool
 	ListChannels() []string
@@ -95,12 +77,12 @@ func (s *Stream) RemoveChannel(
 func (s *Stream) format(
 	level Level,
 	message string,
-	ctx map[string]interface{},
+	ctx ...Context,
 ) string {
 	// check if a valid formatter reference is present, if so, return
 	// the formatter response of the message content
 	if s.formatter != nil {
-		message = s.formatter.Format(level, message, ctx)
+		message = s.formatter.Format(level, message, ctx...)
 	}
 	// return just the message if no formatter is present
 	return message

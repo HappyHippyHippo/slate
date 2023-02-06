@@ -4,13 +4,11 @@ import (
 	"net/http"
 )
 
-// ObservableRestSourceStrategy defines a strategy used to instantiate
-// an observable REST service config source creation strategy.
-type ObservableRestSourceStrategy struct {
-	RestSourceStrategy
-}
-
-var _ ISourceStrategy = &ObservableRestSourceStrategy{}
+const (
+	// SourceStrategyObservableRest defines the value to be used to
+	// declare an observable rest config source type.
+	SourceStrategyObservableRest = "observable-rest"
+)
 
 type observableRestSourceConfig struct {
 	URI    string
@@ -20,6 +18,14 @@ type observableRestSourceConfig struct {
 		Timestamp string
 	}
 }
+
+// ObservableRestSourceStrategy defines a strategy used to instantiate
+// an observable REST service config source creation strategy.
+type ObservableRestSourceStrategy struct {
+	RestSourceStrategy
+}
+
+var _ ISourceStrategy = &ObservableRestSourceStrategy{}
 
 // NewObservableRestSourceStrategy instantiates a new observable REST
 // service config source creation strategy.
@@ -54,7 +60,7 @@ func (s ObservableRestSourceStrategy) Accept(
 	_, e := config.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == SourceObservableRest
+		return sc.Type == SourceStrategyObservableRest
 	}
 	return false
 }

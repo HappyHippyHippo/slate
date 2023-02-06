@@ -17,19 +17,24 @@ var _ IFormatter = &JSONFormatter{}
 func (f JSONFormatter) Format(
 	level Level,
 	message string,
-	ctx map[string]interface{},
+	ctx ...Context,
 ) string {
 	// guarantee that the content context is a valid map reference,
 	// so it can be used to compose the final formatted message
-	if ctx == nil {
-		ctx = map[string]interface{}{}
+	// for that initialize an empty context map, and merge all the
+	// given extra contexts
+	data := Context{}
+	for _, c := range ctx {
+		for k, v := range c {
+			data[k] = v
+		}
 	}
 	// store the extra time, level and message in the request context
-	ctx["time"] = time.Now().Format("2006-01-02T15:04:05.000-0700")
-	ctx["level"] = strings.ToUpper(LevelMapName[level])
-	ctx["message"] = message
+	data["time"] = time.Now().Format("2006-01-02T15:04:05.000-0700")
+	data["level"] = strings.ToUpper(LevelMapName[level])
+	data["message"] = message
 	// compose the response JSON formatted string with the populated
 	// context instance
-	bytes, _ := json.Marshal(ctx)
+	bytes, _ := json.Marshal(data)
 	return string(bytes)
 }

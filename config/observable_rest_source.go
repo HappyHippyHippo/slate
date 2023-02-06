@@ -39,8 +39,8 @@ func NewObservableRestSource(
 	s := &ObservableRestSource{
 		RestSource: RestSource{
 			Source: Source{
-				mutex:   &sync.Mutex{},
-				partial: Config{},
+				mutex:  &sync.Mutex{},
+				config: Config{},
 			},
 			client:         client,
 			uri:            uri,
@@ -81,7 +81,7 @@ func (s *ObservableRestSource) Reload() (bool, error) {
 		}
 		// store the loaded config information and response timestamp
 		s.mutex.Lock()
-		s.partial = *p
+		s.config = *p
 		s.timestamp = t
 		s.mutex.Unlock()
 		return true, nil

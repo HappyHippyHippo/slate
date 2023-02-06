@@ -599,17 +599,22 @@ func (mr *MockLogRecorder) AddStream(id, stream interface{}) *gomock.Call {
 }
 
 // Broadcast mocks base method.
-func (m *MockLog) Broadcast(level log.Level, msg string, ctx map[string]interface{}) error {
+func (m *MockLog) Broadcast(level log.Level, msg string, ctx ...log.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Broadcast", level, msg, ctx)
+	varargs := []interface{}{level, msg}
+	for _, a := range ctx {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Broadcast", varargs...)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Broadcast indicates an expected call of Broadcast.
-func (mr *MockLogRecorder) Broadcast(level, msg, ctx interface{}) *gomock.Call {
+func (mr *MockLogRecorder) Broadcast(level, msg interface{}, ctx ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Broadcast", reflect.TypeOf((*MockLog)(nil).Broadcast), level, msg, ctx)
+	varargs := append([]interface{}{level, msg}, ctx...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Broadcast", reflect.TypeOf((*MockLog)(nil).Broadcast), varargs...)
 }
 
 // Close mocks base method.
@@ -679,17 +684,22 @@ func (mr *MockLogRecorder) RemoveStream(id interface{}) *gomock.Call {
 }
 
 // Signal mocks base method.
-func (m *MockLog) Signal(channel string, level log.Level, msg string, ctx map[string]interface{}) error {
+func (m *MockLog) Signal(channel string, level log.Level, msg string, ctx ...log.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Signal", channel, level, msg, ctx)
+	varargs := []interface{}{channel, level, msg}
+	for _, a := range ctx {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Signal", varargs...)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Signal indicates an expected call of Signal.
-func (mr *MockLogRecorder) Signal(channel, level, msg, ctx interface{}) *gomock.Call {
+func (mr *MockLogRecorder) Signal(channel, level, msg interface{}, ctx ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Signal", reflect.TypeOf((*MockLog)(nil).Signal), channel, level, msg, ctx)
+	varargs := append([]interface{}{channel, level, msg}, ctx...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Signal", reflect.TypeOf((*MockLog)(nil).Signal), varargs...)
 }
 
 // Stream mocks base method.

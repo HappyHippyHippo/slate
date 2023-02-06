@@ -74,7 +74,7 @@ func Test_FileStream_Close(t *testing.T) {
 }
 
 func Test_FileStream_Signal(t *testing.T) {
-	t.Run("signal message to the writer", func(t *testing.T) {
+	t.Run("signal message to the writer with context", func(t *testing.T) {
 		scenarios := []struct {
 			state struct {
 				channels []string
@@ -83,7 +83,6 @@ func Test_FileStream_Signal(t *testing.T) {
 			call struct {
 				level   Level
 				channel string
-				fields  map[string]interface{}
 				message string
 			}
 			callTimes int
@@ -100,12 +99,10 @@ func Test_FileStream_Signal(t *testing.T) {
 				call: struct {
 					level   Level
 					channel string
-					fields  map[string]interface{}
 					message string
 				}{
 					level:   FATAL,
 					channel: "dummy_channel",
-					fields:  map[string]interface{}{},
 					message: "dummy_message",
 				},
 				callTimes: 1,
@@ -122,12 +119,10 @@ func Test_FileStream_Signal(t *testing.T) {
 				call: struct {
 					level   Level
 					channel string
-					fields  map[string]interface{}
 					message string
 				}{
 					level:   DEBUG,
 					channel: "dummy_channel",
-					fields:  map[string]interface{}{},
 					message: "dummy_message",
 				},
 				callTimes: 0,
@@ -144,12 +139,10 @@ func Test_FileStream_Signal(t *testing.T) {
 				call: struct {
 					level   Level
 					channel string
-					fields  map[string]interface{}
 					message string
 				}{
 					level:   FATAL,
 					channel: "not_a_valid_dummy_channel",
-					fields:  map[string]interface{}{},
 					message: "dummy_message",
 				},
 				callTimes: 0,
@@ -165,7 +158,7 @@ func Test_FileStream_Signal(t *testing.T) {
 				writer.EXPECT().Close().Times(1)
 				writer.EXPECT().Write([]byte(scenario.expected + "\n")).Times(scenario.callTimes)
 				formatter := NewMockFormatter(ctrl)
-				formatter.EXPECT().Format(scenario.call.level, scenario.call.message, scenario.call.fields).Return(scenario.expected).Times(scenario.callTimes)
+				formatter.EXPECT().Format(scenario.call.level, scenario.call.message).Return(scenario.expected).Times(scenario.callTimes)
 
 				sut, _ := NewFileStream(writer, formatter, scenario.state.channels, scenario.state.level)
 				defer func() {
@@ -173,7 +166,114 @@ func Test_FileStream_Signal(t *testing.T) {
 					ctrl.Finish()
 				}()
 
-				if e := sut.Signal(scenario.call.channel, scenario.call.level, scenario.call.message, scenario.call.fields); e != nil {
+				if e := sut.Signal(scenario.call.channel, scenario.call.level, scenario.call.message); e != nil {
+					t.Errorf("returned the (%v) error", e)
+				}
+			}
+			test()
+		}
+	})
+
+	t.Run("signal message to the writer with context", func(t *testing.T) {
+		scenarios := []struct {
+			state struct {
+				channels []string
+				level    Level
+			}
+			call struct {
+				level   Level
+				channel string
+				ctx     Context
+				message string
+			}
+			callTimes int
+			expected  string
+		}{
+			{ // signal through a valid channel with a not filtered level
+				state: struct {
+					channels []string
+					level    Level
+				}{
+					channels: []string{"dummy_channel"},
+					level:    WARNING,
+				},
+				call: struct {
+					level   Level
+					channel string
+					ctx     Context
+					message string
+				}{
+					level:   FATAL,
+					channel: "dummy_channel",
+					ctx:     Context{},
+					message: "dummy_message",
+				},
+				callTimes: 1,
+				expected:  `{"message" : "dummy_message"}`,
+			},
+			{ // signal through a valid channel with a filtered level
+				state: struct {
+					channels []string
+					level    Level
+				}{
+					channels: []string{"dummy_channel"},
+					level:    WARNING,
+				},
+				call: struct {
+					level   Level
+					channel string
+					ctx     Context
+					message string
+				}{
+					level:   DEBUG,
+					channel: "dummy_channel",
+					ctx:     Context{},
+					message: "dummy_message",
+				},
+				callTimes: 0,
+				expected:  `{"message" : "dummy_message"}`,
+			},
+			{ // signal through a valid channel with an unregistered channel
+				state: struct {
+					channels []string
+					level    Level
+				}{
+					channels: []string{"dummy_channel"},
+					level:    WARNING,
+				},
+				call: struct {
+					level   Level
+					channel string
+					ctx     Context
+					message string
+				}{
+					level:   FATAL,
+					channel: "not_a_valid_dummy_channel",
+					ctx:     Context{},
+					message: "dummy_message",
+				},
+				callTimes: 0,
+				expected:  `{"message" : "dummy_message"}`,
+			},
+		}
+
+		for _, scenario := range scenarios {
+			test := func() {
+				ctrl := gomock.NewController(t)
+
+				writer := NewMockWriter(ctrl)
+				writer.EXPECT().Close().Times(1)
+				writer.EXPECT().Write([]byte(scenario.expected + "\n")).Times(scenario.callTimes)
+				formatter := NewMockFormatter(ctrl)
+				formatter.EXPECT().Format(scenario.call.level, scenario.call.message, scenario.call.ctx).Return(scenario.expected).Times(scenario.callTimes)
+
+				sut, _ := NewFileStream(writer, formatter, scenario.state.channels, scenario.state.level)
+				defer func() {
+					_ = sut.(io.Closer).Close()
+					ctrl.Finish()
+				}()
+
+				if e := sut.Signal(scenario.call.channel, scenario.call.level, scenario.call.message, scenario.call.ctx); e != nil {
 					t.Errorf("returned the (%v) error", e)
 				}
 			}
@@ -183,7 +283,7 @@ func Test_FileStream_Signal(t *testing.T) {
 }
 
 func Test_FileStream_Broadcast(t *testing.T) {
-	t.Run("broadcast message to the writer", func(t *testing.T) {
+	t.Run("broadcast message to the writer without context", func(t *testing.T) {
 		scenarios := []struct {
 			state struct {
 				channels []string
@@ -191,7 +291,6 @@ func Test_FileStream_Broadcast(t *testing.T) {
 			}
 			call struct {
 				level   Level
-				fields  map[string]interface{}
 				message string
 			}
 			callTimes int
@@ -207,11 +306,9 @@ func Test_FileStream_Broadcast(t *testing.T) {
 				},
 				call: struct {
 					level   Level
-					fields  map[string]interface{}
 					message string
 				}{
 					level:   FATAL,
-					fields:  map[string]interface{}{},
 					message: "dummy_message",
 				},
 				callTimes: 1,
@@ -227,11 +324,9 @@ func Test_FileStream_Broadcast(t *testing.T) {
 				},
 				call: struct {
 					level   Level
-					fields  map[string]interface{}
 					message string
 				}{
 					level:   DEBUG,
-					fields:  map[string]interface{}{},
 					message: "dummy_message",
 				},
 				callTimes: 0,
@@ -247,7 +342,7 @@ func Test_FileStream_Broadcast(t *testing.T) {
 				writer.EXPECT().Close().Times(1)
 				writer.EXPECT().Write([]byte(scenario.expected + "\n")).Times(scenario.callTimes)
 				formatter := NewMockFormatter(ctrl)
-				formatter.EXPECT().Format(scenario.call.level, scenario.call.message, scenario.call.fields).Return(scenario.expected).Times(scenario.callTimes)
+				formatter.EXPECT().Format(scenario.call.level, scenario.call.message).Return(scenario.expected).Times(scenario.callTimes)
 
 				sut, _ := NewFileStream(writer, formatter, scenario.state.channels, scenario.state.level)
 				defer func() {
@@ -255,7 +350,87 @@ func Test_FileStream_Broadcast(t *testing.T) {
 					ctrl.Finish()
 				}()
 
-				if e := sut.Broadcast(scenario.call.level, scenario.call.message, scenario.call.fields); e != nil {
+				if e := sut.Broadcast(scenario.call.level, scenario.call.message); e != nil {
+					t.Errorf("returned the (%v) error", e)
+				}
+			}
+			test()
+		}
+	})
+
+	t.Run("broadcast message to the writer with context", func(t *testing.T) {
+		scenarios := []struct {
+			state struct {
+				channels []string
+				level    Level
+			}
+			call struct {
+				level   Level
+				ctx     Context
+				message string
+			}
+			callTimes int
+			expected  string
+		}{
+			{ // broadcast through a valid channel with a not filtered level
+				state: struct {
+					channels []string
+					level    Level
+				}{
+					channels: []string{"dummy_channel"},
+					level:    WARNING,
+				},
+				call: struct {
+					level   Level
+					ctx     Context
+					message string
+				}{
+					level:   FATAL,
+					ctx:     Context{},
+					message: "dummy_message",
+				},
+				callTimes: 1,
+				expected:  `{"message" : "dummy_message"}`,
+			},
+			{ // broadcast through a valid channel with a filtered level
+				state: struct {
+					channels []string
+					level    Level
+				}{
+					channels: []string{"dummy_channel"},
+					level:    WARNING,
+				},
+				call: struct {
+					level   Level
+					ctx     Context
+					message string
+				}{
+					level:   DEBUG,
+					ctx:     Context{},
+					message: "dummy_message",
+				},
+				callTimes: 0,
+				expected:  `{"message" : "dummy_message"}`,
+			},
+		}
+
+		for _, scenario := range scenarios {
+			test := func() {
+				ctrl := gomock.NewController(t)
+
+				writer := NewMockWriter(ctrl)
+				writer.EXPECT().Close().Times(1)
+				writer.EXPECT().Write([]byte(scenario.expected + "\n")).Times(scenario.callTimes)
+				formatter := NewMockFormatter(ctrl)
+				formatter.EXPECT().Format(scenario.call.level, scenario.call.message, scenario.call.ctx).Return(scenario.expected).Times(scenario.callTimes)
+
+				sut, _ := NewFileStream(writer, formatter, scenario.state.channels, scenario.state.level)
+				defer func() {
+					_ = sut.(io.Closer).Close()
+					ctrl.Finish()
+				}()
+
+				if e := sut.Broadcast(scenario.call.level, scenario.call.message, scenario.call.ctx); e != nil {
 					t.Errorf("returned the (%v) error", e)
 				}
 			}

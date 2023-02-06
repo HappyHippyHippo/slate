@@ -71,7 +71,7 @@ func Test_ConsoleStreamStrategy_Accept(t *testing.T) {
 		config := NewMockConfig(ctrl)
 		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&struct{ Type string }{})).DoAndReturn(
 			func(_ string, data *struct{ Type string }, _ ...bool) (interface{}, error) {
-				data.Type = StreamUnknown
+				data.Type = StreamStrategyUnknown
 				return data, nil
 			},
 		).Times(1)
@@ -90,7 +90,7 @@ func Test_ConsoleStreamStrategy_Accept(t *testing.T) {
 		config := NewMockConfig(ctrl)
 		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&struct{ Type string }{})).DoAndReturn(
 			func(_ string, data *struct{ Type string }, _ ...bool) (interface{}, error) {
-				data.Type = StreamConsole
+				data.Type = StreamStrategyConsole
 				return data, nil
 			},
 		).Times(1)
@@ -153,7 +153,7 @@ func Test_ConsoleStreamStrategy_Create(t *testing.T) {
 		config := NewMockConfig(ctrl)
 		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&consoleStreamConfig{})).DoAndReturn(
 			func(_ string, data *consoleStreamConfig, _ ...bool) (interface{}, error) {
-				data.Format = FormatJSON
+				data.Format = FormatterFormatJSON
 				data.Level = "invalid"
 				return data, nil
 			},
@@ -180,13 +180,13 @@ func Test_ConsoleStreamStrategy_Create(t *testing.T) {
 		config := NewMockConfig(ctrl)
 		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&consoleStreamConfig{})).DoAndReturn(
 			func(_ string, data *consoleStreamConfig, _ ...bool) (interface{}, error) {
-				data.Format = FormatJSON
+				data.Format = FormatterFormatJSON
 				data.Level = "fatal"
 				return data, nil
 			},
 		).Times(1)
 		formatterFactory := NewMockFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(FormatJSON).Return(nil, expected).Times(1)
+		formatterFactory.EXPECT().Create(FormatterFormatJSON).Return(nil, expected).Times(1)
 
 		sut, _ := NewConsoleStreamStrategy(formatterFactory)
 
@@ -208,7 +208,7 @@ func Test_ConsoleStreamStrategy_Create(t *testing.T) {
 		config := NewMockConfig(ctrl)
 		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&consoleStreamConfig{})).DoAndReturn(
 			func(_ string, data *consoleStreamConfig, _ ...bool) (interface{}, error) {
-				data.Format = FormatJSON
+				data.Format = FormatterFormatJSON
 				data.Level = "fatal"
 				data.Channels = []interface{}{"channel1", "channel2"}
 				return data, nil
@@ -216,7 +216,7 @@ func Test_ConsoleStreamStrategy_Create(t *testing.T) {
 		).Times(1)
 		formatter := NewMockFormatter(ctrl)
 		formatterFactory := NewMockFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(FormatJSON).Return(formatter, nil).Times(1)
+		formatterFactory.EXPECT().Create(FormatterFormatJSON).Return(formatter, nil).Times(1)
 
 		sut, _ := NewConsoleStreamStrategy(formatterFactory)
 

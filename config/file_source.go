@@ -13,7 +13,7 @@ type FileSource struct {
 	Source
 	path           string
 	format         string
-	fs             afero.Fs
+	fileSystem     afero.Fs
 	decoderFactory IDecoderFactory
 }
 
@@ -24,12 +24,12 @@ var _ ISource = &FileSource{}
 func NewFileSource(
 	path,
 	format string,
-	fs afero.Fs,
+	fileSystem afero.Fs,
 	decoderFactory IDecoderFactory,
 ) (*FileSource, error) {
 	// check file system argument reference
-	if fs == nil {
-		return nil, errNilPointer("fs")
+	if fileSystem == nil {
+		return nil, errNilPointer("fileSystem")
 	}
 	// check decoder factory argument reference
 	if decoderFactory == nil {
@@ -38,12 +38,12 @@ func NewFileSource(
 	// instantiates the config source
 	s := &FileSource{
 		Source: Source{
-			mutex:   &sync.Mutex{},
-			partial: Config{},
+			mutex:  &sync.Mutex{},
+			config: Config{},
 		},
 		path:           path,
 		format:         format,
-		fs:             fs,
+		fileSystem:     fileSystem,
 		decoderFactory: decoderFactory,
 	}
 	// load the file config content
@@ -55,7 +55,7 @@ func NewFileSource(
 
 func (s *FileSource) load() error {
 	// open the source target file
-	f, e := s.fs.OpenFile(s.path, os.O_RDONLY, 0o644)
+	f, e := s.fileSystem.OpenFile(s.path, os.O_RDONLY, 0o644)
 	if e != nil {
 		return e
 	}
@@ -73,7 +73,7 @@ func (s *FileSource) load() error {
 	}
 	// store the parsed content into the source local config
 	s.mutex.Lock()
-	s.partial = *p.(*Config)
+	s.config = *p.(*Config)
 	s.mutex.Unlock()
 	return nil
 }

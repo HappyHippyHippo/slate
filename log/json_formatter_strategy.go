@@ -1,5 +1,11 @@
 package log
 
+const (
+	// FormatterFormatJSON defines the value to be used to declare a
+	// JSON Log formatter format.
+	FormatterFormatJSON = "json"
+)
+
 // JSONFormatterStrategy defines a log message JSON formatter
 // generation strategy.
 type JSONFormatterStrategy struct{}
@@ -12,7 +18,7 @@ func (JSONFormatterStrategy) Accept(
 	format string,
 ) bool {
 	// only accept to create a JSON format formatter
-	return format == FormatJSON
+	return format == FormatterFormatJSON
 }
 
 // Create will instantiate the desired formatter instance.

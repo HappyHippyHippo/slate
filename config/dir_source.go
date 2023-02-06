@@ -32,7 +32,7 @@ func NewDirSource(
 ) (*DirSource, error) {
 	// check file system argument reference
 	if fs == nil {
-		return nil, errNilPointer("fs")
+		return nil, errNilPointer("fileSystem")
 	}
 	// check decoder factory argument reference
 	if decoderFactory == nil {
@@ -41,8 +41,8 @@ func NewDirSource(
 	// instantiates the config source
 	s := &DirSource{
 		Source: Source{
-			mutex:   &sync.Mutex{},
-			partial: Config{},
+			mutex:  &sync.Mutex{},
+			config: Config{},
 		},
 		path:           path,
 		format:         format,
@@ -65,7 +65,7 @@ func (s *DirSource) load() error {
 	}
 	// store the parsed content into the source local config
 	s.mutex.Lock()
-	s.partial = *p
+	s.config = *p
 	s.mutex.Unlock()
 	return nil
 }

@@ -24,12 +24,12 @@ var _ IObservableSource = &ObservableFileSource{}
 func NewObservableFileSource(
 	path,
 	format string,
-	fs afero.Fs,
+	fileSystem afero.Fs,
 	decoderFactory IDecoderFactory,
 ) (*ObservableFileSource, error) {
 	// check file system argument reference
-	if fs == nil {
-		return nil, errNilPointer("fs")
+	if fileSystem == nil {
+		return nil, errNilPointer("fileSystem")
 	}
 	// check decoder factory argument reference
 	if decoderFactory == nil {
@@ -39,12 +39,12 @@ func NewObservableFileSource(
 	s := &ObservableFileSource{
 		FileSource: FileSource{
 			Source: Source{
-				mutex:   &sync.RWMutex{},
-				partial: Config{},
+				mutex:  &sync.RWMutex{},
+				config: Config{},
 			},
 			path:           path,
 			format:         format,
-			fs:             fs,
+			fileSystem:     fileSystem,
 			decoderFactory: decoderFactory,
 		},
 		timestamp: time.Unix(0, 0),
@@ -60,7 +60,7 @@ func NewObservableFileSource(
 // source configuration config content.
 func (s *ObservableFileSource) Reload() (bool, error) {
 	// get the file stats, so we can store the modification time
-	fi, e := s.fs.Stat(s.path)
+	fi, e := s.fileSystem.Stat(s.path)
 	if e != nil {
 		return false, e
 	}

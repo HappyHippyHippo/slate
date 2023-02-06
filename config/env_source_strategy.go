@@ -1,14 +1,20 @@
 package config
 
+const (
+	// SourceStrategyEnvironment defines the value to be used to declare an
+	// environment config source type.
+	SourceStrategyEnvironment = "env"
+)
+
+type envSourceConfig struct {
+	Mappings Config
+}
+
 // EnvSourceStrategy defines a strategy used to instantiate an
 // environment variable mapped config source creation strategy.
 type EnvSourceStrategy struct{}
 
 var _ ISourceStrategy = &EnvSourceStrategy{}
-
-type envSourceConfig struct {
-	Mappings Config
-}
 
 // Accept will check if the source factory strategy can instantiate
 // a source where the data to check comes from a configuration
@@ -25,7 +31,7 @@ func (s EnvSourceStrategy) Accept(
 	_, e := config.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == SourceEnv
+		return sc.Type == SourceStrategyEnvironment
 	}
 	return false
 }

@@ -7,6 +7,19 @@ import (
 	"github.com/spf13/afero"
 )
 
+const (
+	// StreamStrategyFile defines the value to be used to declare a
+	// file Log stream type.
+	StreamStrategyFile = "file"
+)
+
+type fileStreamConfig struct {
+	Path     string
+	Format   string
+	Channels []interface{}
+	Level    string
+}
+
 // FileStreamStrategy defines a file log stream generation strategy.
 type FileStreamStrategy struct {
 	StreamStrategy
@@ -15,13 +28,6 @@ type FileStreamStrategy struct {
 }
 
 var _ IStreamStrategy = &FileStreamStrategy{}
-
-type fileStreamConfig struct {
-	Path     string
-	Format   string
-	Channels []interface{}
-	Level    string
-}
 
 // NewFileStreamStrategy generates a new file log stream
 // generation strategy instance.
@@ -59,7 +65,7 @@ func (s FileStreamStrategy) Accept(
 	_, e := cfg.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == StreamFile
+		return sc.Type == StreamStrategyFile
 	}
 	return false
 }

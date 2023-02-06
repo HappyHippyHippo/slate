@@ -55,7 +55,7 @@ func Test_NewObservableFileSourceStrategy(t *testing.T) {
 			t.Errorf("returned the (%v) error", e)
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
-		case sut.fs != fs:
+		case sut.fileSystem != fs:
 			t.Error("didn't stored the file system adapter reference")
 		case sut.decoderFactory != decoderFactory:
 			t.Error("didn't stored the decoder factory reference")
@@ -103,7 +103,7 @@ func Test_ObservableFileSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewObservableFileSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
 
-		if sut.Accept(&Config{"type": SourceUnknown}) {
+		if sut.Accept(&Config{"type": SourceStrategyUnknown}) {
 			t.Error("returned true")
 		}
 	})
@@ -114,7 +114,7 @@ func Test_ObservableFileSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewObservableFileSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
 
-		if !sut.Accept(&Config{"type": SourceObservableFile}) {
+		if !sut.Accept(&Config{"type": SourceStrategyObservableFile}) {
 			t.Error("returned false")
 		}
 	})
@@ -207,11 +207,11 @@ func Test_ObservableFileSourceStrategy_Create(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(FormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
 
 		sut, _ := NewObservableFileSourceStrategy(fs, decoderFactory)
 
-		src, e := sut.Create(&Config{"path": path, "format": FormatYAML})
+		src, e := sut.Create(&Config{"path": path, "format": DecoderFormatYAML})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -220,7 +220,7 @@ func Test_ObservableFileSourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *ObservableFileSource:
-				if !reflect.DeepEqual(s.partial, expected) {
+				if !reflect.DeepEqual(s.config, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
@@ -247,7 +247,7 @@ func Test_ObservableFileSourceStrategy_Create(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(FormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
 
 		sut, _ := NewObservableFileSourceStrategy(fs, decoderFactory)
 
@@ -260,7 +260,7 @@ func Test_ObservableFileSourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *ObservableFileSource:
-				if !reflect.DeepEqual(s.partial, expected) {
+				if !reflect.DeepEqual(s.config, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:

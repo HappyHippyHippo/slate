@@ -13,11 +13,11 @@ const (
 var (
 	// DefaultFileFormat defines the file base config source default
 	// format if the format is not present in the config.
-	DefaultFileFormat = env.String(EnvID+"_DEFAULT_FILE_FORMAT", FormatYAML)
+	DefaultFileFormat = env.String(EnvID+"_DEFAULT_FILE_FORMAT", DecoderFormatYAML)
 
 	// DefaultRestFormat defines the rest base config source default
 	// format if the format is not present in the config.
-	DefaultRestFormat = env.String(EnvID+"_DEFAULT_REST_FORMAT", FormatJSON)
+	DefaultRestFormat = env.String(EnvID+"_DEFAULT_REST_FORMAT", DecoderFormatJSON)
 
 	// PathSeparator defines the element(s) that will be used to split
 	// a config path string into path elements.
@@ -37,7 +37,7 @@ var (
 
 	// LoaderSourceFormat defines the entry config source format
 	// to be used as the loader entry.
-	LoaderSourceFormat = env.String(EnvID+"_LOADER_SOURCE_FORMAT", FormatYAML)
+	LoaderSourceFormat = env.String(EnvID+"_LOADER_SOURCE_FORMAT", DecoderFormatYAML)
 
 	// LoaderSourceListPath defines the entry config source path of
 	// loading sources.

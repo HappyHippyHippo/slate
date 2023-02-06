@@ -54,7 +54,7 @@ func Test_NewDirSourceStrategy(t *testing.T) {
 			t.Errorf("returned the (%v) error", e)
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
-		case sut.fs != fs:
+		case sut.fileSystem != fs:
 			t.Error("didn't stored the file system adapter reference")
 		case sut.decoderFactory != decoderFactory:
 			t.Error("didn't stored the decoder factory reference")
@@ -102,7 +102,7 @@ func Test_DirSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewDirSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
 
-		if sut.Accept(&Config{"type": SourceUnknown}) {
+		if sut.Accept(&Config{"type": SourceStrategyUnknown}) {
 			t.Error("returned true")
 		}
 	})
@@ -113,7 +113,7 @@ func Test_DirSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewDirSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
 
-		if !sut.Accept(&Config{"type": SourceDirectory}) {
+		if !sut.Accept(&Config{"type": SourceStrategyDirectory}) {
 			t.Error("returned false")
 		}
 	})
@@ -243,11 +243,11 @@ func Test_DirSourceStrategy_Create(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(FormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
 
 		sut, _ := NewDirSourceStrategy(fs, decoderFactory)
 
-		src, e := sut.Create(&Config{"path": path, "format": FormatYAML, "recursive": true})
+		src, e := sut.Create(&Config{"path": path, "format": DecoderFormatYAML, "recursive": true})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -256,7 +256,7 @@ func Test_DirSourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *DirSource:
-				if !reflect.DeepEqual(s.partial, expected) {
+				if !reflect.DeepEqual(s.config, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
@@ -286,7 +286,7 @@ func Test_DirSourceStrategy_Create(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(FormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
 
 		sut, _ := NewDirSourceStrategy(fs, decoderFactory)
 
@@ -299,7 +299,7 @@ func Test_DirSourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *DirSource:
-				if !reflect.DeepEqual(s.partial, expected) {
+				if !reflect.DeepEqual(s.config, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:

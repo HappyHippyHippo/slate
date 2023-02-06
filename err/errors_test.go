@@ -179,3 +179,11 @@ func Test_DuplicateWatchdogService(t *testing.T) {
 		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
 	}
 }
+
+func Test_TranslatorNotFound(t *testing.T) {
+	expected := "translator not found"
+
+	if chk := TranslatorNotFound.Error(); chk != expected {
+		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
+	}
+}
