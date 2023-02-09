@@ -886,6 +886,20 @@ func (mr *MockConfigRecorder) Config(path interface{}, def ...interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Config", reflect.TypeOf((*MockConfig)(nil).Config), varargs...)
 }
 
+// Entries mocks base method.
+func (m *MockConfig) Entries() []string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Entries")
+	ret0, _ := ret[0].([]string)
+	return ret0
+}
+
+// Entries indicates an expected call of Entries.
+func (mr *MockConfigRecorder) Entries() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Entries", reflect.TypeOf((*MockConfig)(nil).Entries))
+}
+
 // Float mocks base method.
 func (m *MockConfig) Float(path string, def ...float64) (float64, error) {
 	m.ctrl.T.Helper()
@@ -1169,7 +1183,7 @@ func (mr *MockDecoderStrategyRecorder) Accept(format interface{}, args ...interf
 // Create mocks base method
 func (m *MockDecoderStrategy) Create(args ...interface{}) (IDecoder, error) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
+	var varargs []interface{}
 	for _, a := range args {
 		varargs = append(varargs, a)
 	}
@@ -1308,7 +1322,7 @@ func (mr *MockSourceRecorder) Has(path interface{}) *gomock.Call {
 // Get mocks base method
 func (m *MockSource) Get(path string, def ...interface{}) (interface{}, error) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
+	var varargs []interface{}
 	varargs = append(varargs, path)
 	for _, a := range def {
 		varargs = append(varargs, a)
@@ -1322,7 +1336,7 @@ func (m *MockSource) Get(path string, def ...interface{}) (interface{}, error) {
 // Get indicates an expected call of Get
 func (mr *MockSourceRecorder) Get(path interface{}, def ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := []interface{}{}
+	var varargs []interface{}
 	varargs = append(varargs, path)
 	for _, a := range def {
 		varargs = append(varargs, a)
@@ -1390,7 +1404,7 @@ func (mr *MockObservableSourceRecorder) Has(path interface{}) *gomock.Call {
 // Get mocks base method
 func (m *MockObservableSource) Get(path string, def ...interface{}) (interface{}, error) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
+	var varargs []interface{}
 	varargs = append(varargs, path)
 	for _, a := range def {
 		varargs = append(varargs, a)
@@ -1404,7 +1418,7 @@ func (m *MockObservableSource) Get(path string, def ...interface{}) (interface{}
 // Get indicates an expected call of Get
 func (mr *MockObservableSourceRecorder) Get(path interface{}, def ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := []interface{}{}
+	var varargs []interface{}
 	varargs = append(varargs, path)
 	for _, a := range def {
 		varargs = append(varargs, a)
@@ -1654,6 +1668,14 @@ func (mr *MockManagerRecorder) Config(path interface{}, def ...interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Config", reflect.TypeOf((*MockManager)(nil).Config), varargs...)
 }
 
+// Entries mocks base method.
+func (m *MockManager) Entries() []string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Entries")
+	ret0, _ := ret[0].([]string)
+	return ret0
+}
+
 // Float mocks base method.
 func (m *MockManager) Float(path string, def ...float64) (float64, error) {
 	m.ctrl.T.Helper()
@@ -1665,6 +1687,12 @@ func (m *MockManager) Float(path string, def ...float64) (float64, error) {
 	ret0, _ := ret[0].(float64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
+}
+
+// Entries indicates an expected call of Entries.
+func (mr *MockManagerRecorder) Entries() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Entries", reflect.TypeOf((*MockManager)(nil).Entries))
 }
 
 // Float indicates an expected call of Float.

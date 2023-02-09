@@ -8,6 +8,7 @@ import (
 // IConfig defined an interface to an instance that holds
 // configuration values
 type IConfig interface {
+	Entries() []string
 	Has(path string) bool
 	Get(path string, def ...interface{}) (interface{}, error)
 	Bool(path string, def ...bool) (bool, error)
@@ -52,6 +53,18 @@ func (c Config) Clone() Config {
 		target[key] = cloner(value)
 	}
 	return target
+}
+
+// Entries will retrieve the list of stored entries in the configuration.
+func (c *Config) Entries() []string {
+	var entries []string
+	for k := range *c {
+		key, ok := k.(string)
+		if ok {
+			entries = append(entries, key)
+		}
+	}
+	return entries
 }
 
 // Has will check if a requested path exists in the config.

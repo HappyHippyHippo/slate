@@ -77,6 +77,29 @@ func Test_Config_Clone(t *testing.T) {
 	})
 }
 
+func Test_Config_Entries(t *testing.T) {
+	t.Run("empty config", func(t *testing.T) {
+		if (&Config{}).Entries() != nil {
+			t.Errorf("didn't returned the expected empty list")
+		}
+	})
+
+	t.Run("single entry config", func(t *testing.T) {
+		if !reflect.DeepEqual((&Config{"field": "value"}).Entries(), []string{"field"}) {
+			t.Errorf("didn't returned the expected single entry list")
+		}
+	})
+
+	t.Run("multi entry config", func(t *testing.T) {
+		if !reflect.DeepEqual((&Config{
+			"field1": "value 1",
+			"field2": "value 2",
+		}).Entries(), []string{"field1", "field2"}) {
+			t.Errorf("didn't returned the expected single entry list")
+		}
+	})
+}
+
 func Test_Config_Has(t *testing.T) {
 	t.Run("check if a valid path exists", func(t *testing.T) {
 		scenarios := []struct {

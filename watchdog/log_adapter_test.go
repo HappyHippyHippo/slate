@@ -58,8 +58,8 @@ func Test_NewLogAdapter(t *testing.T) {
 			t.Errorf("returned the (%v) error", e)
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
-		case sut.service != "service":
-			t.Errorf("didn't store the given service name : %v", sut.service)
+		case sut.name != "service":
+			t.Errorf("didn't store the given service name : %v", sut.name)
 		case sut.channel != "channel":
 			t.Errorf("didn't store the given channel name : %v", sut.channel)
 		case sut.startLevel != log.FATAL:

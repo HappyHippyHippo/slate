@@ -13,7 +13,7 @@ const (
 var (
 	// ConfigPathPrefix defines the configuration path of the watchdog
 	// entries of the application.
-	ConfigPathPrefix = env.String(EnvID+"_CONFIG_PATH", "slate.watchdog")
+	ConfigPathPrefix = env.String(EnvID+"_CONFIG_PATH", "slate.watchdog.services")
 
 	// LogChannel defines the logging signal channel of the watchdogs.
 	LogChannel = env.String(EnvID+"_LOG_CHANNEL", "watchdog")

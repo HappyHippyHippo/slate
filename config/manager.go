@@ -126,6 +126,15 @@ func (m *Manager) Close() error {
 	return nil
 }
 
+// Entries will retrieve the list of stored entries any registered source.
+func (m *Manager) Entries() []string {
+	// lock the manager for handling
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	// retrieve the stored entries list
+	return m.config.Entries()
+}
+
 // Has will check if a path has been loaded.
 // This means that if the values has been loaded by any registered source.
 func (m *Manager) Has(

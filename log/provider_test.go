@@ -516,7 +516,7 @@ func Test_Provider_Boot(t *testing.T) {
 		sut := &Provider{}
 		_ = sut.Register(container)
 		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().List("slate.log.streams", []interface{}{}).Return(nil, expected).Times(1)
+		cfg.EXPECT().Config("slate.log.streams", config.Config{}).Return(nil, expected).Times(1)
 		_ = container.Service(config.ID, func() (config.IManager, error) { return cfg, nil })
 
 		if e := sut.Boot(container); e == nil {
@@ -535,7 +535,7 @@ func Test_Provider_Boot(t *testing.T) {
 		provider := &Provider{}
 		_ = provider.Register(container)
 		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().List("slate.log.streams", []interface{}{}).Return([]interface{}{}, nil).Times(1)
+		cfg.EXPECT().Config("slate.log.streams", config.Config{}).Return(&config.Config{}, nil).Times(1)
 		cfg.EXPECT().AddObserver("slate.log.streams", gomock.Any()).Return(nil).Times(1)
 		_ = container.Service(config.ID, func() (config.IManager, error) { return cfg, nil })
 

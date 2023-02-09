@@ -106,6 +106,47 @@ func Test_Manager_Close(t *testing.T) {
 	})
 }
 
+func Test_Manager_Entries(t *testing.T) {
+	t.Run("return config entries", func(t *testing.T) {
+		scenarios := []struct {
+			config   Config
+			expected []string
+		}{
+			{ // _test the empty config
+				config:   Config{},
+				expected: nil,
+			},
+			{ // _test the single entry config
+				config:   Config{"field": "value"},
+				expected: []string{"field"},
+			},
+			{ // _test the multi entry config
+				config:   Config{"field1": "value 1", "field2": "value 2"},
+				expected: []string{"field1", "field2"},
+			},
+		}
+
+		for _, scenario := range scenarios {
+			test := func() {
+				ctrl := gomock.NewController(t)
+
+				sut := NewManager(60 * time.Second)
+				src := NewMockSource(ctrl)
+				src.EXPECT().Close().Times(1)
+				src.EXPECT().Get("").Return(scenario.config, nil).Times(1)
+				_ = sut.AddSource("src", 0, src)
+
+				defer func() { _ = sut.Close(); ctrl.Finish() }()
+
+				if check := sut.Entries(); !reflect.DeepEqual(check, scenario.expected) {
+					t.Errorf("returned (%v) when expecting (%v)", check, scenario.expected)
+				}
+			}
+			test()
+		}
+	})
+}
+
 func Test_Manager_Has(t *testing.T) {
 	t.Run("return the existence of the path", func(t *testing.T) {
 		scenarios := []struct {

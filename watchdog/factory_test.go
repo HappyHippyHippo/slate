@@ -96,9 +96,9 @@ func Test_Factory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		service := "service"
+		service := "test"
 		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("slate.watchdog.service", gomock.Any()).Return(nil, expected).Times(1)
+		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(nil, expected).Times(1)
 		l := NewMockLog(ctrl)
 		formatterFactory := NewMockLogFormatterFactory(ctrl)
 		sut, _ := NewFactory(cfgManager, l, formatterFactory)
@@ -119,13 +119,13 @@ func Test_Factory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		prev := ConfigPathPrefix
-		ConfigPathPrefix = "test"
+		ConfigPathPrefix = "path"
 		defer func() { ConfigPathPrefix = prev }()
 
 		expected := fmt.Errorf("error message")
-		service := "service"
+		service := "test"
 		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("test.service", gomock.Any()).Return(nil, expected).Times(1)
+		cfgManager.EXPECT().Config("path.test", gomock.Any()).Return(nil, expected).Times(1)
 		l := NewMockLog(ctrl)
 		formatterFactory := NewMockLogFormatterFactory(ctrl)
 		sut, _ := NewFactory(cfgManager, l, formatterFactory)
@@ -145,16 +145,12 @@ func Test_Factory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		prev := ConfigPathPrefix
-		ConfigPathPrefix = "test"
-		defer func() { ConfigPathPrefix = prev }()
-
 		expected := fmt.Errorf("error message")
-		service := "service"
+		service := "test"
 		cfg := NewMockConfig(ctrl)
 		cfg.EXPECT().Populate("", gomock.Any()).Return(nil, expected).Times(1)
 		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("test.service", gomock.Any()).Return(cfg, nil).Times(1)
+		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
 		l := NewMockLog(ctrl)
 		formatterFactory := NewMockLogFormatterFactory(ctrl)
 		sut, _ := NewFactory(cfgManager, l, formatterFactory)
@@ -174,18 +170,14 @@ func Test_Factory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		prev := ConfigPathPrefix
-		ConfigPathPrefix = "test"
-		defer func() { ConfigPathPrefix = prev }()
-
-		service := "service"
+		service := "test"
 		cfg := NewMockConfig(ctrl)
 		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
 			c.Level.Start = "invalid"
 			return nil, nil
 		}).Times(1)
 		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("test.service", gomock.Any()).Return(cfg, nil).Times(1)
+		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
 		l := NewMockLog(ctrl)
 		formatterFactory := NewMockLogFormatterFactory(ctrl)
 		sut, _ := NewFactory(cfgManager, l, formatterFactory)
@@ -205,18 +197,14 @@ func Test_Factory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		prev := ConfigPathPrefix
-		ConfigPathPrefix = "test"
-		defer func() { ConfigPathPrefix = prev }()
-
-		service := "service"
+		service := "test"
 		cfg := NewMockConfig(ctrl)
 		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
 			c.Level.Error = "invalid"
 			return nil, nil
 		}).Times(1)
 		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("test.service", gomock.Any()).Return(cfg, nil).Times(1)
+		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
 		l := NewMockLog(ctrl)
 		formatterFactory := NewMockLogFormatterFactory(ctrl)
 		sut, _ := NewFactory(cfgManager, l, formatterFactory)
@@ -236,18 +224,14 @@ func Test_Factory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		prev := ConfigPathPrefix
-		ConfigPathPrefix = "test"
-		defer func() { ConfigPathPrefix = prev }()
-
-		service := "service"
+		service := "test"
 		cfg := NewMockConfig(ctrl)
 		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
 			c.Level.Done = "invalid"
 			return nil, nil
 		}).Times(1)
 		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("test.service", gomock.Any()).Return(cfg, nil).Times(1)
+		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
 		l := NewMockLog(ctrl)
 		formatterFactory := NewMockLogFormatterFactory(ctrl)
 		sut, _ := NewFactory(cfgManager, l, formatterFactory)
@@ -267,16 +251,12 @@ func Test_Factory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		prev := ConfigPathPrefix
-		ConfigPathPrefix = "test"
-		defer func() { ConfigPathPrefix = prev }()
-
 		expected := fmt.Errorf("error message")
-		service := "service"
+		service := "test"
 		cfg := NewMockConfig(ctrl)
 		cfg.EXPECT().Populate("", gomock.Any()).Return(nil, nil).Times(1)
 		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("test.service", gomock.Any()).Return(cfg, nil).Times(1)
+		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
 		l := NewMockLog(ctrl)
 		formatterFactory := NewMockLogFormatterFactory(ctrl)
 		formatterFactory.EXPECT().Create(&config.Config{"type": FormatterDefault}).Return(nil, expected).Times(1)
@@ -297,19 +277,15 @@ func Test_Factory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		prev := ConfigPathPrefix
-		ConfigPathPrefix = "test"
-		defer func() { ConfigPathPrefix = prev }()
-
 		expected := fmt.Errorf("error message")
-		service := "service"
+		service := "test"
 		cfg := NewMockConfig(ctrl)
 		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
 			c.Formatter = "my_formatter"
 			return nil, nil
 		}).Times(1)
 		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("test.service", gomock.Any()).Return(cfg, nil).Times(1)
+		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
 		l := NewMockLog(ctrl)
 		formatterFactory := NewMockLogFormatterFactory(ctrl)
 		formatterFactory.EXPECT().Create(&config.Config{"type": "my_formatter"}).Return(nil, expected).Times(1)
@@ -330,18 +306,14 @@ func Test_Factory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		prev := ConfigPathPrefix
-		ConfigPathPrefix = "test"
-		defer func() { ConfigPathPrefix = prev }()
-
-		service := "service"
+		service := "test"
 		cfg := NewMockConfig(ctrl)
 		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
-			c.Service = service
+			c.Name = service
 			return nil, nil
 		}).Times(1)
 		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("test.service", gomock.Any()).Return(cfg, nil).Times(1)
+		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
 		l := NewMockLog(ctrl)
 		formatter := NewMockLogFormatter(ctrl)
 		formatterFactory := NewMockLogFormatterFactory(ctrl)
@@ -354,7 +326,7 @@ func Test_Factory_Create(t *testing.T) {
 			t.Errorf("returned the unexpected error : %v", e)
 		case wd == nil:
 			t.Errorf("didn't returned the expected watchdog reference")
-		case wd.(*Watchdog).log.(*LogAdapter).service != service:
+		case wd.(*Watchdog).log.(*LogAdapter).name != service:
 			t.Errorf("didn't stored the expected service name")
 		case wd.(*Watchdog).log.(*LogAdapter).channel != LogChannel:
 			t.Errorf("didn't stored the expected channel name")

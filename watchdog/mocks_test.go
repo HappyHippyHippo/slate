@@ -77,6 +77,20 @@ func (mr *MockConfigRecorder) Config(path interface{}, def ...interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Config", reflect.TypeOf((*MockConfig)(nil).Config), varargs...)
 }
 
+// Entries mocks base method.
+func (m *MockConfig) Entries() []string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Entries")
+	ret0, _ := ret[0].([]string)
+	return ret0
+}
+
+// Entries indicates an expected call of Entries.
+func (mr *MockConfigRecorder) Entries() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Entries", reflect.TypeOf((*MockConfigManager)(nil).Entries))
+}
+
 // Float mocks base method.
 func (m *MockConfig) Float(path string, def ...float64) (float64, error) {
 	m.ctrl.T.Helper()
@@ -321,6 +335,20 @@ func (mr *MockConfigManagerRecorder) Config(path interface{}, def ...interface{}
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{path}, def...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Config", reflect.TypeOf((*MockConfigManager)(nil).Config), varargs...)
+}
+
+// Entries mocks base method.
+func (m *MockConfigManager) Entries() []string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Entries")
+	ret0, _ := ret[0].([]string)
+	return ret0
+}
+
+// Entries indicates an expected call of Entries.
+func (mr *MockConfigManagerRecorder) Entries() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Entries", reflect.TypeOf((*MockConfigManager)(nil).Entries))
 }
 
 // Float mocks base method.
@@ -849,7 +877,7 @@ func (mr *MockLogFormatterStrategyRecorder) Create(cfg interface{}) *gomock.Call
 // Log Formatter Factory
 //------------------------------------------------------------------------------
 
-// MockLogFormatterFactory is a mock of ILogFormatterFactory interface.
+// MockLogFormatterFactory is a mocked instance of ILogFormatterFactory interface.
 type MockLogFormatterFactory struct {
 	ctrl     *gomock.Controller
 	recorder *MockLogFormatterFactoryRecorder
@@ -974,7 +1002,7 @@ func (mr *MockLogAdapterRecorder) Start() *gomock.Call {
 // Watchdog
 //------------------------------------------------------------------------------
 
-// MockWatchdog is a mock of IWatchdog interface.
+// MockWatchdog is a mocked instance of IWatchdog interface.
 type MockWatchdog struct {
 	ctrl     *gomock.Controller
 	recorder *MockWatchdogRecorder
@@ -1015,7 +1043,7 @@ func (mr *MockWatchdogRecorder) Run(process interface{}) *gomock.Call {
 // Factory
 //------------------------------------------------------------------------------
 
-// MockFactory is a mock of IFactory interface.
+// MockFactory is a mocked instance of IFactory interface.
 type MockFactory struct {
 	ctrl     *gomock.Controller
 	recorder *MockFactoryRecorder

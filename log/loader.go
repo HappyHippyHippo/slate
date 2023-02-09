@@ -19,10 +19,6 @@ type Loader struct {
 
 var _ ILoader = &Loader{}
 
-type streamConfig struct {
-	ID string
-}
-
 // NewLoader generates a new log initialization instance.
 func NewLoader(
 	cfg config.IManager,
@@ -53,7 +49,7 @@ func NewLoader(
 // depending the data on the configuration.
 func (l Loader) Load() error {
 	// retrieve the log entries from the config instance
-	entries, e := l.entries()
+	entries, e := l.cfg.Config(LoaderConfigPath, config.Config{})
 	if e != nil {
 		return e
 	}
@@ -66,34 +62,19 @@ func (l Loader) Load() error {
 		// add the observer to the given config
 		_ = l.cfg.AddObserver(
 			LoaderConfigPath,
-			func(_ interface{}, newEntries interface{}) {
-				defer func() {
-					if e := recover(); e != nil {
-						// log the error
-						_ = l.log.Signal(
-							LoaderErrorChannel,
-							ERROR,
-							"reloading log streams error",
-							Context{"error": e},
-						)
-					}
-				}()
-				// generate the stream entry list from the
-				// observer new value parameter
-				var entries []config.Config
-				for _, entry := range newEntries.([]interface{}) {
-					entries = append(entries, entry.(config.Config))
+			func(_ interface{}, newConfig interface{}) {
+				// type check the new log config with the logging streams
+				cfg, ok := newConfig.(config.Config)
+				if !ok {
+					// log the input value error
+					_ = l.log.Signal(LoaderErrorChannel, ERROR, "reloading log streams error", Context{"error": e})
+					return
 				}
 				// remove all the current registered streams
 				l.log.RemoveAllStreams()
 				// load the new stream entries
-				if e := l.load(entries); e != nil {
-					_ = l.log.Signal(
-						LoaderErrorChannel,
-						ERROR,
-						"reloading log streams error",
-						Context{"error": e},
-					)
+				if e := l.load(&cfg); e != nil {
+					_ = l.log.Signal(LoaderErrorChannel, ERROR, "reloading log streams error", Context{"error": e})
 				}
 			},
 		)
@@ -101,48 +82,23 @@ func (l Loader) Load() error {
 	return nil
 }
 
-func (l Loader) entries() ([]config.Config, error) {
-	// retrieve the stream entry list from the config
-	list, e := l.cfg.List(LoaderConfigPath, []interface{}{})
-	if e != nil {
-		return nil, e
-	}
-	// iterate through the obtained list
-	var entries []config.Config
-	for _, item := range list {
-		// validate the entry type
-		entry, ok := item.(config.Config)
-		if !ok {
-			return nil, errConversion(item, "config.Config")
-		}
-		// add the iterated entry to the final list result
-		entries = append(entries, entry)
-	}
-	return entries, nil
-}
-
 func (l Loader) load(
-	entries []config.Config,
+	cfg config.IConfig,
 ) error {
-	// iterate through the given stream config list
-	for _, entry := range entries {
-		// parse the configuration
-		sc := streamConfig{}
-		_, e := entry.Populate("", &sc)
+	// iterate through the given log config stream list
+	for _, id := range cfg.Entries() {
+		// get the configuration
+		entry, e := cfg.Config(id)
 		if e != nil {
 			return e
 		}
-		// validate configuration
-		if sc.ID == "" {
-			return errInvalidConfig(&entry)
-		}
 		// generate the new stream
-		stream, e := l.streamFactory.Create(&entry)
+		stream, e := l.streamFactory.Create(entry)
 		if e != nil {
 			return e
 		}
 		// add the stream to the log stream pool
-		e = l.log.AddStream(sc.ID, stream)
+		e = l.log.AddStream(id, stream)
 		if e != nil {
 			return e
 		}

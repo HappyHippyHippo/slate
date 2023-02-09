@@ -15,7 +15,7 @@ type ILogAdapter interface {
 
 // LogAdapter define an instance a watchdog logging adapter.
 type LogAdapter struct {
-	service    string
+	name       string
 	channel    string
 	startLevel log.Level
 	errorLevel log.Level
@@ -28,7 +28,7 @@ var _ ILogAdapter = &LogAdapter{}
 
 // NewLogAdapter will create a new watchdog logging adapter.
 func NewLogAdapter(
-	service,
+	name,
 	channel string,
 	startLevel,
 	errorLevel,
@@ -46,7 +46,7 @@ func NewLogAdapter(
 	}
 	// return the created log adapter instance
 	return &LogAdapter{
-		service:    service,
+		name:       name,
 		channel:    channel,
 		startLevel: startLevel,
 		errorLevel: errorLevel,
@@ -60,7 +60,7 @@ func NewLogAdapter(
 // the application logger.
 func (a *LogAdapter) Start() error {
 	// propagate the logging signal to the adapter stored log instance
-	return a.logger.Signal(a.channel, a.startLevel, a.formatter.Start(a.service), nil)
+	return a.logger.Signal(a.channel, a.startLevel, a.formatter.Start(a.name), nil)
 }
 
 // Error will format and redirect the error logging message to
@@ -69,12 +69,12 @@ func (a *LogAdapter) Error(
 	e error,
 ) error {
 	// propagate the logging signal to the adapter stored log instance
-	return a.logger.Signal(a.channel, a.errorLevel, a.formatter.Error(a.service, e), nil)
+	return a.logger.Signal(a.channel, a.errorLevel, a.formatter.Error(a.name, e), nil)
 }
 
 // Done will format and redirect the termination logging message to
 // the application logger.
 func (a *LogAdapter) Done() error {
 	// propagate the logging signal to the adapter stored log instance
-	return a.logger.Signal(a.channel, a.doneLevel, a.formatter.Done(a.service), nil)
+	return a.logger.Signal(a.channel, a.doneLevel, a.formatter.Done(a.name), nil)
 }

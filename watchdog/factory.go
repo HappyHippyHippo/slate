@@ -23,7 +23,7 @@ type Factory struct {
 var _ IFactory = &Factory{}
 
 type watchdogConfig struct {
-	Service string
+	Name    string
 	Channel string
 	Level   struct {
 		Start string
@@ -106,7 +106,7 @@ func (f *Factory) Create(
 		return nil, e
 	}
 	// generate the watchdog log adapter
-	la, _ := NewLogAdapter(wc.Service, wc.Channel, startLevel, errorLevel, doneLevel, f.log, formatter)
+	la, _ := NewLogAdapter(wc.Name, wc.Channel, startLevel, errorLevel, doneLevel, f.log, formatter)
 	// return the generated watchdog
 	return NewWatchdog(la)
 }
