@@ -28,11 +28,11 @@ var (
 	LogLevel = env.String(EnvID+"_LOG_LEVEL", "info")
 
 	// LogStartMessage defines the default service start logging message.
-	LogStartMessage = env.String(EnvID+"_LOG_START_MESSAGE", "REST service starting ...")
+	LogStartMessage = env.String(EnvID+"_LOG_START_MESSAGE", "[service:rest] service starting ...")
 
 	// LogErrorMessage defines the default service error logging message.
-	LogErrorMessage = env.String(EnvID+"_LOG_ERROR_MESSAGE", "REST service error")
+	LogErrorMessage = env.String(EnvID+"_LOG_ERROR_MESSAGE", "[service:rest] service error")
 
 	// LogEndMessage defines the default service end logging message.
-	LogEndMessage = env.String(EnvID+"_LOG_END_MESSAGE", "REST service terminated")
+	LogEndMessage = env.String(EnvID+"_LOG_END_MESSAGE", "[service:rest] service terminated")
 )

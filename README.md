@@ -1,22 +1,24 @@
 # slate
 
-### Opinionated golang application scafolding
+## Opinionated golang application scaffolding
 
 - [x] slate
-  - [x] err
-  - [x] env
-  - [x] trigger
-  - [x] fs
   - [x] config
+  - [x] env
+  - [x] err
+  - [x] fs
   - [x] log
-  - [x] rdb
   - [x] migration
-  - [x] watchdog
+  - [x] rdb
   - [x] rest
     - [x] envelope
     - [x] envelopemw
+    - [x] validation
+    - [x] logmw
+  - [x] trigger
+  - [x] watchdog
 
-### err
+### config
 
 TBD
 
@@ -24,7 +26,7 @@ TBD
 
 TBD
 
-### trigger
+### err
 
 TBD
 
@@ -32,15 +34,7 @@ TBD
 
 TBD
 
-### config
-
-TBD
-
 ### log
-
-TBD
-
-### rdb
 
 TBD
 
@@ -48,7 +42,7 @@ TBD
 
 TBD
 
-### watchdog
+### rdb
 
 TBD
 
@@ -56,10 +50,26 @@ TBD
 
 TBD
 
-#### envelope
+#### rest.envelope
 
 TBD
 
-#### envelopemw
+#### rest.envelopemw
+
+TBD
+
+#### rest.logmw
+
+TBD
+
+#### rest.validation
+
+TBD
+
+### trigger
+
+TBD
+
+### watchdog
 
 TBD

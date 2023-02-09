@@ -23,14 +23,14 @@ var (
 	LogStartLevel = env.String(EnvID+"_LOG_START_LEVEL", "notice")
 
 	// LogStartMessage defines the watchdog starting logging signal message.
-	LogStartMessage = env.String(EnvID+"_LOG_START_MESSAGE", "watchdog [%s] start execution")
+	LogStartMessage = env.String(EnvID+"_LOG_START_MESSAGE", "[watchdog:%s] start execution")
 
 	// LogErrorLevel defines the watchdog error logging signal
 	// message level.
 	LogErrorLevel = env.String(EnvID+"_LOG_ERROR_LEVEL", "error")
 
 	// LogErrorMessage defines the watchdog error logging signal message.
-	LogErrorMessage = env.String(EnvID+"_LOG_ERROR_MESSAGE", "watchdog [%s] execution error (%v)")
+	LogErrorMessage = env.String(EnvID+"_LOG_ERROR_MESSAGE", "[watchdog:%s] execution error (%v)")
 
 	// LogDoneLevel defines the watchdog termination logging
 	// signal message level.
@@ -38,5 +38,5 @@ var (
 
 	// LogDoneMessage defines the watchdog termination logging
 	// signal message.
-	LogDoneMessage = env.String(EnvID+"_LOG_DONE_MESSAGE", "watchdog [%s] execution terminated")
+	LogDoneMessage = env.String(EnvID+"_LOG_DONE_MESSAGE", "[watchdog:%s] execution terminated")
 )
