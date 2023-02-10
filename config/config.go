@@ -115,7 +115,7 @@ func (c *Config) Bool(
 	} else {
 		val, e = c.Get(path)
 	}
-	// err retrieving the path value
+	// error retrieving the path value
 	if e != nil {
 		return false, e
 	}
@@ -141,7 +141,7 @@ func (c *Config) Int(
 	} else {
 		val, e = c.Get(path)
 	}
-	// err retrieving the path value
+	// error retrieving the path value
 	if e != nil {
 		return 0, e
 	}
@@ -167,7 +167,7 @@ func (c *Config) Float(
 	} else {
 		val, e = c.Get(path)
 	}
-	// err retrieving the path value
+	// error retrieving the path value
 	if e != nil {
 		return 0, e
 	}
@@ -193,7 +193,7 @@ func (c *Config) String(
 	} else {
 		val, e = c.Get(path)
 	}
-	// err retrieving the path value
+	// error retrieving the path value
 	if e != nil {
 		return "", e
 	}
@@ -219,7 +219,7 @@ func (c *Config) List(
 	} else {
 		val, e = c.Get(path)
 	}
-	// err retrieving the path value
+	// error retrieving the path value
 	if e != nil {
 		return nil, e
 	}
@@ -245,7 +245,7 @@ func (c *Config) Config(
 	} else {
 		val, e = c.Get(path)
 	}
-	// err retrieving the path value
+	// error retrieving the path value
 	if e != nil {
 		return nil, e
 	}
@@ -272,7 +272,7 @@ func (c *Config) Populate(
 	}
 	// retrieve the config value
 	v, e := c.Get(path)
-	// err retrieving the path value
+	// error retrieving the path value
 	if e != nil {
 		return nil, e
 	}

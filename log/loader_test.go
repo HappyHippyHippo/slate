@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
-	"github.com/happyhippyhippo/slate/err"
 )
 
 func Test_NewLoader(t *testing.T) {
@@ -21,8 +21,8 @@ func Test_NewLoader(t *testing.T) {
 			t.Errorf("return a valid reference")
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -36,8 +36,8 @@ func Test_NewLoader(t *testing.T) {
 			t.Errorf("return a valid reference")
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -51,8 +51,8 @@ func Test_NewLoader(t *testing.T) {
 			t.Errorf("return a valid reference")
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -131,8 +131,8 @@ func Test_Loader_Load(t *testing.T) {
 
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
-		} else if !errors.Is(e, err.Conversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Conversion)
+		} else if !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 

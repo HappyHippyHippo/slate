@@ -4,7 +4,7 @@ package envelope
 // response status information structure.
 type Status struct {
 	Success bool            `json:"success" xml:"success"`
-	Errors  StatusErrorList `json:"errors" xml:"errors"`
+	Errors  StatusErrorList `json:"error" xml:"error"`
 }
 
 // NewStatus instantiates a new request result status structure.
@@ -24,7 +24,7 @@ func (s *Status) AddError(
 	return s
 }
 
-// SetService assign a service code to all stored errors.
+// SetService assign a service code to all stored error.
 func (s *Status) SetService(
 	val int,
 ) *Status {
@@ -34,7 +34,7 @@ func (s *Status) SetService(
 	return s
 }
 
-// SetEndpoint assign an endpoint code to all stored errors.
+// SetEndpoint assign an endpoint code to all stored error.
 func (s *Status) SetEndpoint(
 	val int,
 ) *Status {

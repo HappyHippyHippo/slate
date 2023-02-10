@@ -17,6 +17,11 @@ type LogFormatterFactory []ILogFormatterStrategy
 
 var _ ILogFormatterFactory = &LogFormatterFactory{}
 
+// NewLogFormatterFactory @todo doc
+func NewLogFormatterFactory() ILogFormatterFactory {
+	return &LogFormatterFactory{}
+}
+
 // Register will register a new watchdog log formatter factory
 // strategy to be used on creation request.
 func (f *LogFormatterFactory) Register(
@@ -48,5 +53,5 @@ func (f LogFormatterFactory) Create(
 			return strategy.Create(cfg)
 		}
 	}
-	return nil, errInvalidConfig(cfg)
+	return nil, errInvalidWatchdog(cfg)
 }

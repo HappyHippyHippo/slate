@@ -5,15 +5,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate"
 )
 
 func Test_NewPulse(t *testing.T) {
 	t.Run("nil callback", func(t *testing.T) {
 		if _, e := NewPulse(20*time.Millisecond, nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) err when expected (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -21,7 +21,7 @@ func Test_NewPulse(t *testing.T) {
 		if _, e := NewPulse(20*time.Millisecond, func() error {
 			return nil
 		}); e != nil {
-			t.Errorf("returned the unexpected err : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		}
 	})
 }

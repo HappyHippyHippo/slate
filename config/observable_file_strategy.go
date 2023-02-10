@@ -49,40 +49,39 @@ func NewObservableFileSourceStrategy(
 // Accept will check if the source factory strategy can instantiate
 // a source where the data to check comes from a configuration instance.
 func (s ObservableFileSourceStrategy) Accept(
-	config IConfig,
+	cfg IConfig,
 ) bool {
 	// check the config argument reference
-	if config == nil {
+	if cfg == nil {
 		return false
 	}
 	// retrieve the data from the configuration
 	sc := struct{ Type string }{}
-	_, e := config.Populate("", &sc)
-	if e == nil {
-		// return acceptance for the read config type
-		return sc.Type == ObservableFileSourceType
+	if _, e := cfg.Populate("", &sc); e != nil {
+		return false
 	}
-	return false
+	// return acceptance for the read config type
+	return sc.Type == ObservableFileSourceType
 }
 
 // Create will instantiate the desired file source instance where
 // the initialization data comes from a configuration instance.
 func (s ObservableFileSourceStrategy) Create(
-	config IConfig,
+	cfg IConfig,
 ) (ISource, error) {
 	// check the config argument reference
-	if config == nil {
+	if cfg == nil {
 		return nil, errNilPointer("config")
 	}
 	// retrieve the data from the configuration
 	sc := observableFileSourceConfig{Format: DefaultFileFormat}
-	_, e := config.Populate("", &sc)
+	_, e := cfg.Populate("", &sc)
 	if e != nil {
 		return nil, e
 	}
 	// validate configuration
 	if sc.Path == "" {
-		return nil, errPathNotFound("path")
+		return nil, errInvalidSource(cfg, map[string]interface{}{"description": "missing path"})
 	}
 	// return acceptance for the read config type
 	return NewObservableFileSource(sc.Path, sc.Format, s.fileSystem, s.decoderFactory)

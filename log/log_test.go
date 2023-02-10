@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate"
 )
 
 func Test_NewLog(t *testing.T) {
@@ -236,8 +236,8 @@ func Test_Log_AddStream(t *testing.T) {
 
 		if e := sut.AddStream("id", nil); e == nil {
 			t.Errorf("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -255,8 +255,8 @@ func Test_Log_AddStream(t *testing.T) {
 
 		if e := sut.AddStream(id, stream2); e == nil {
 			t.Errorf("didn't returned the expected error")
-		} else if !errors.Is(e, err.DuplicateLogStream) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.DuplicateLogStream)
+		} else if !errors.Is(e, ErrDuplicateStream) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrDuplicateStream)
 		}
 	})
 
@@ -272,8 +272,10 @@ func Test_Log_AddStream(t *testing.T) {
 
 		if e := sut.AddStream(id, stream1); e != nil {
 			t.Errorf("resulted the (%v) error", e)
-		} else if check := sut.Stream(id); !reflect.DeepEqual(check, stream1) {
+		} else if check, e := sut.Stream(id); !reflect.DeepEqual(check, stream1) {
 			t.Errorf("didn't stored the stream")
+		} else if e != nil {
+			t.Errorf("returned the unexpected error : %v", e)
 		}
 	})
 }
@@ -325,12 +327,18 @@ func Test_Log_RemoveAllStreams(t *testing.T) {
 }
 
 func Test_Log_Stream(t *testing.T) {
-	t.Run("nil on a non-existing stream", func(t *testing.T) {
+	t.Run("non-existing stream", func(t *testing.T) {
 		sut := NewLog()
 		defer func() { _ = sut.Close() }()
 
-		if result := sut.Stream("invalid id"); result != nil {
+		result, e := sut.Stream("invalid id")
+		switch {
+		case result != nil:
 			t.Errorf("returned a valid stream")
+		case e == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(e, ErrStreamNotFound):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrStreamNotFound)
 		}
 	})
 
@@ -345,8 +353,10 @@ func Test_Log_Stream(t *testing.T) {
 		defer func() { _ = sut.Close() }()
 		_ = sut.AddStream(id, stream1)
 
-		if check := sut.Stream(id); !reflect.DeepEqual(check, stream1) {
+		if check, e := sut.Stream(id); !reflect.DeepEqual(check, stream1) {
 			t.Errorf("didn0t retrieved the stored stream")
+		} else if e != nil {
+			t.Errorf("returned the unexpected error : %v", e)
 		}
 	})
 }

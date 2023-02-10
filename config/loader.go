@@ -15,7 +15,6 @@ type Loader struct {
 var _ ILoader = &Loader{}
 
 type sourceConfig struct {
-	ID       string
 	Priority int
 }
 
@@ -53,16 +52,20 @@ func (l Loader) Load() error {
 		return e
 	}
 	// retrieve from the loaded info the config entries list
-	sources, e := l.manager.List(LoaderSourceListPath)
+	sources, e := l.manager.Config(LoaderSourceListPath)
 	if e != nil {
 		return nil
 	}
 	// iterate through the sources list
-	for _, src := range sources {
-		if s, ok := src.(Config); ok {
-			// load the source
-			if e := l.loadSource(&s); e != nil {
-				return e
+	for _, id := range sources.Entries() {
+		// retrieve the source list entry
+		if entry, e := sources.Get(id); e == nil {
+			// check if the entry is a valid config
+			if cfg, ok := entry.(Config); ok {
+				// load the source
+				if e := l.loadSource(id, &cfg); e != nil {
+					return e
+				}
 			}
 		}
 	}
@@ -70,6 +73,7 @@ func (l Loader) Load() error {
 }
 
 func (l Loader) loadSource(
+	id string,
 	cfg IConfig,
 ) error {
 	// parse the configuration
@@ -78,15 +82,11 @@ func (l Loader) loadSource(
 	if e != nil {
 		return e
 	}
-	// validate configuration
-	if sc.ID == "" {
-		return errPathNotFound("id")
-	}
 	// create the config source
 	src, e := l.sourceFactory.Create(cfg)
 	if e != nil {
 		return e
 	}
 	// add the loaded source to the manager
-	return l.manager.AddSource(sc.ID, sc.Priority, src)
+	return l.manager.AddSource(id, sc.Priority, src)
 }

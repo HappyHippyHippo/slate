@@ -15,6 +15,11 @@ type DefaultLogFormatterStrategy struct{}
 
 var _ ILogFormatterStrategy = &DefaultLogFormatterStrategy{}
 
+// NewDefaultLogFormatterStrategy @todo doc
+func NewDefaultLogFormatterStrategy() *DefaultLogFormatterStrategy {
+	return &DefaultLogFormatterStrategy{}
+}
+
 // Accept will check if the strategy will accept the configuration
 // used to create a new log formatter.
 func (s DefaultLogFormatterStrategy) Accept(

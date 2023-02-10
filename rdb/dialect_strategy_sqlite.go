@@ -25,6 +25,11 @@ type SqliteDialectStrategy struct{}
 
 var _ IDialectStrategy = &SqliteDialectStrategy{}
 
+// NewSqliteDialectStrategy @todo doc
+func NewSqliteDialectStrategy() *SqliteDialectStrategy {
+	return &SqliteDialectStrategy{}
+}
+
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
 func (SqliteDialectStrategy) Accept(

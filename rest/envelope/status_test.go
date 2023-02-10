@@ -31,7 +31,7 @@ func Test_Status_AddError(t *testing.T) {
 		}
 	})
 
-	t.Run("add multiple errors", func(t *testing.T) {
+	t.Run("add multiple error", func(t *testing.T) {
 		err1 := NewStatusError(123, "error message 1")
 		err2 := NewStatusError(456, "error message 2")
 		err3 := NewStatusError(789, "error message 3")
@@ -52,7 +52,7 @@ func Test_Status_AddError(t *testing.T) {
 }
 
 func Test_Status_SetService(t *testing.T) {
-	t.Run("assign to all stored errors", func(t *testing.T) {
+	t.Run("assign to all stored error", func(t *testing.T) {
 		service := 147
 		err1 := NewStatusError(123, "error message 1")
 		err2 := NewStatusError(456, "error message 2")
@@ -71,7 +71,7 @@ func Test_Status_SetService(t *testing.T) {
 }
 
 func Test_Status_SetEndpoint(t *testing.T) {
-	t.Run("assign to all stored errors", func(t *testing.T) {
+	t.Run("assign to all stored error", func(t *testing.T) {
 		endpoint := 147
 		err1 := NewStatusError(123, "error message 1")
 		err2 := NewStatusError(456, "error message 2")

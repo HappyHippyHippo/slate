@@ -18,6 +18,11 @@ type DialectFactory []IDialectStrategy
 
 var _ IDialectFactory = &DialectFactory{}
 
+// NewDialectFactory @todo doc
+func NewDialectFactory() IDialectFactory {
+	return &DialectFactory{}
+}
+
 // Register will register a new dialect factory strategy to be used
 // on requesting to create a dialect.
 func (f *DialectFactory) Register(
@@ -50,5 +55,5 @@ func (f DialectFactory) Get(
 			return strategy.Get(cfg)
 		}
 	}
-	return nil, errUnknownDialect("")
+	return nil, errUnknownDialect(cfg)
 }

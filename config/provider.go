@@ -97,33 +97,17 @@ func (Provider) Register(
 	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
-	// add YAML decoder strategy
-	_ = container[0].Service(YAMLDecoderStrategyID, func() *YAMLDecoderStrategy {
-		return &YAMLDecoderStrategy{}
-	}, DecoderStrategyTag)
-	// add JSON decoder strategy
-	_ = container[0].Service(JSONDecoderStrategyID, func() *JSONDecoderStrategy {
-		return &JSONDecoderStrategy{}
-	}, DecoderStrategyTag)
-	// add decoder factory
-	_ = container[0].Service(DecoderFactoryID, func() IDecoderFactory {
-		return &DecoderFactory{}
-	})
-	// add environment source strategy
-	_ = container[0].Service(EnvSourceStrategyID, func() *EnvSourceStrategy {
-		return &EnvSourceStrategy{}
-	}, SourceStrategyTag)
-	// add file source strategy
+	// add decoder strategies abd factory
+	_ = container[0].Service(YAMLDecoderStrategyID, NewYAMLDecoderStrategy, DecoderStrategyTag)
+	_ = container[0].Service(JSONDecoderStrategyID, NewJSONDecoderStrategy, DecoderStrategyTag)
+	_ = container[0].Service(DecoderFactoryID, NewDecoderFactory)
+	// add source strategies and factory
+	_ = container[0].Service(EnvSourceStrategyID, NewEnvSourceStrategy, SourceStrategyTag)
 	_ = container[0].Service(FileSourceStrategyID, NewFileSourceStrategy, SourceStrategyTag)
-	// add observable file source strategy
 	_ = container[0].Service(ObservableFileSourceStrategyID, NewObservableFileSourceStrategy, SourceStrategyTag)
-	// add directory source strategy
 	_ = container[0].Service(DirSourceStrategyID, NewDirSourceStrategy, SourceStrategyTag)
-	// add rest source strategy
 	_ = container[0].Service(RestSourceStrategyID, NewRestSourceStrategy, SourceStrategyTag)
-	// add observable rest source strategy
 	_ = container[0].Service(ObservableRestSourceStrategyID, NewObservableRestSourceStrategy, SourceStrategyTag)
-	// add aggregate source strategy
 	_ = container[0].Service(AggregateSourceStrategyID, func() *AggregateSourceStrategy {
 		// get all the registered config partials
 		tagged, _ := container[0].Tag(AggregateSourceTag)
@@ -136,15 +120,11 @@ func (Provider) Register(
 		// allocate the new source strategy with all retrieved partials
 		return &AggregateSourceStrategy{configs: configs}
 	}, SourceStrategyTag)
-	// add source factory
-	_ = container[0].Service(SourceFactoryID, func() ISourceFactory {
-		return &SourceFactory{}
-	})
-	// add config manager
+	_ = container[0].Service(SourceFactoryID, NewSourceFactory)
+	// add manager and loader
 	_ = container[0].Service(ID, func() IManager {
 		return NewManager(time.Duration(ObserveFrequency) * time.Second)
 	})
-	// add loader
 	_ = container[0].Service(LoaderID, NewLoader)
 	return nil
 }

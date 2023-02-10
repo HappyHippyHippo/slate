@@ -38,10 +38,10 @@ func (p Provider) Register(
 		return errNilPointer("container")
 	}
 	// add the migration DAO
-	_ = container[0].Service(DaoID, func(connectionFactory rdb.IConnectionFactory, cfg *gorm.Config) (IDao, error) {
+	_ = container[0].Service(DaoID, func(connPool rdb.IConnectionPool, cfg *gorm.Config) (IDao, error) {
 		// retrieve the connection instance to be given to the
 		// version control DAO instance
-		conn, e := connectionFactory.Get(Database, cfg)
+		conn, e := connPool.Get(Database, cfg)
 		if e != nil {
 			return nil, e
 		}

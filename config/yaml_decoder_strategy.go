@@ -16,6 +16,11 @@ type YAMLDecoderStrategy struct{}
 
 var _ IDecoderStrategy = &YAMLDecoderStrategy{}
 
+// NewYAMLDecoderStrategy @todo doc
+func NewYAMLDecoderStrategy() *YAMLDecoderStrategy {
+	return &YAMLDecoderStrategy{}
+}
+
 // Accept will check if the decoder factory strategy can instantiate a
 // decoder giving the format and the creation request parameters.
 func (YAMLDecoderStrategy) Accept(

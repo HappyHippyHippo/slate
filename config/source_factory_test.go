@@ -6,15 +6,26 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate"
 )
+
+func Test_NewSourceFactory_Register(t *testing.T) {
+	t.Run("creation", func(t *testing.T) {
+		sut := NewSourceFactory()
+		if sut == nil {
+			t.Error("didn't returned the expected reference")
+		} else if _, ok := sut.(*SourceFactory); !ok {
+			t.Error("didn't returned a valid source factory instance")
+		}
+	})
+}
 
 func Test_SourceFactory_Register(t *testing.T) {
 	t.Run("nil strategy", func(t *testing.T) {
 		if e := (&SourceFactory{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -42,8 +53,8 @@ func Test_SourceFactory_Create(t *testing.T) {
 			t.Error("returned an unexpected source")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -66,8 +77,8 @@ func Test_SourceFactory_Create(t *testing.T) {
 			t.Error("returned an unexpected source")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.InvalidConfigSourceData):
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.InvalidConfigSourceData)
+		case !errors.Is(e, ErrInvalidSource):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrInvalidSource)
 		}
 	})
 

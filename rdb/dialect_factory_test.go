@@ -6,16 +6,16 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
-	"github.com/happyhippyhippo/slate/err"
 )
 
 func Test_DialectFactory_Register(t *testing.T) {
 	t.Run("missing strategy", func(t *testing.T) {
 		if e := (&DialectFactory{}).Register(nil); e == nil {
 			t.Error("didn't return the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -44,8 +44,8 @@ func Test_DialectFactory_Get(t *testing.T) {
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
 			t.Error("didn't return the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -66,8 +66,8 @@ func Test_DialectFactory_Get(t *testing.T) {
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
 			t.Error("didn't return the expected error")
-		case !errors.Is(e, err.UnknownDatabaseDialect):
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.UnknownDatabaseDialect)
+		case !errors.Is(e, ErrUnknownDialect):
+			t.Errorf("returned the (%v) error when expected (%v)", e, ErrUnknownDialect)
 		}
 	})
 

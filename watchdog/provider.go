@@ -47,17 +47,11 @@ func (p Provider) Register(
 	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
-	// add the default log formatter strategy
-	_ = container[0].Service(DefaultLogFormatterStrategyID, func() *DefaultLogFormatterStrategy {
-		return &DefaultLogFormatterStrategy{}
-	}, LogFormatterStrategyTag)
-	// add the watchdog log formatter factory
-	_ = container[0].Service(LogFormatterFactoryID, func() ILogFormatterFactory {
-		return &LogFormatterFactory{}
-	})
-	// add the watchdog factory
+	// add log formatter strategies and factory
+	_ = container[0].Service(DefaultLogFormatterStrategyID, NewDefaultLogFormatterStrategy, LogFormatterStrategyTag)
+	_ = container[0].Service(LogFormatterFactoryID, NewLogFormatterFactory)
+	// add the watchdog factory and kennel
 	_ = container[0].Service(FactoryID, NewFactory)
-	// add the watchdog kennel
 	_ = container[0].Service(ID, NewKennel)
 	return nil
 }

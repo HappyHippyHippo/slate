@@ -3,49 +3,79 @@ package log
 import (
 	"fmt"
 
+	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
-	"github.com/happyhippyhippo/slate/err"
+)
+
+var (
+	// ErrInvalidFormat defines an error that signal an invalid
+	// log format.
+	ErrInvalidFormat = fmt.Errorf("invalid output log format")
+
+	// ErrInvalidLevel defines an error that signal an invalid
+	// log level.
+	ErrInvalidLevel = fmt.Errorf("invalid log level")
+
+	// ErrInvalidStream defines an error that signal that the
+	// given log stream configuration was unable to be parsed correctly
+	// enabling the log stream generation.
+	ErrInvalidStream = fmt.Errorf("invalid log stream")
+
+	// ErrStreamNotFound @todo doc
+	ErrStreamNotFound = fmt.Errorf("stream not found")
+
+	// ErrDuplicateStream defines an error that signal that the
+	// requested log stream to be registered have an id of an already
+	// registered log stream.
+	ErrDuplicateStream = fmt.Errorf("stream already registered")
 )
 
 func errNilPointer(
 	arg string,
+	ctx ...map[string]interface{},
 ) error {
-	return fmt.Errorf("%w : %v", err.NilPointer, arg)
+	return slate.NewErrorFrom(slate.ErrNilPointer, arg, ctx...)
 }
 
 func errConversion(
 	val interface{},
 	t string,
+	ctx ...map[string]interface{},
 ) error {
-	return fmt.Errorf("%w : %v to %v", err.Conversion, val, t)
+	return slate.NewErrorFrom(slate.ErrConversion, fmt.Sprintf("%v to %s", val, t), ctx...)
 }
 
 func errInvalidFormat(
 	format string,
+	ctx ...map[string]interface{},
 ) error {
-	return fmt.Errorf("%w : %v", err.InvalidLogFormat, format)
+	return slate.NewErrorFrom(ErrInvalidFormat, format, ctx...)
 }
 
 func errInvalidLevel(
 	level string,
+	ctx ...map[string]interface{},
 ) error {
-	return fmt.Errorf("%w : %v", err.InvalidLogLevel, level)
+	return slate.NewErrorFrom(ErrInvalidLevel, level, ctx...)
 }
 
-func errInvalidType(
-	streamType string,
-) error {
-	return fmt.Errorf("%w : %v", err.InvalidLogStream, streamType)
-}
-
-func errInvalidConfig(
+func errInvalidStream(
 	cfg config.IConfig,
+	ctx ...map[string]interface{},
 ) error {
-	return fmt.Errorf("%w : %v", err.InvalidLogConfig, cfg)
+	return slate.NewErrorFrom(ErrInvalidStream, fmt.Sprintf("%v", cfg), ctx...)
+}
+
+func errStreamNotFound(
+	id string,
+	ctx ...map[string]interface{},
+) error {
+	return slate.NewErrorFrom(ErrStreamNotFound, id, ctx...)
 }
 
 func errDuplicateStream(
 	id string,
+	ctx ...map[string]interface{},
 ) error {
-	return fmt.Errorf("%w : %v", err.DuplicateLogStream, id)
+	return slate.NewErrorFrom(ErrDuplicateStream, id, ctx...)
 }

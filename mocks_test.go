@@ -54,7 +54,7 @@ func (mr *MockCloserRecorder) Close() *gomock.Call {
 // Provide
 //------------------------------------------------------------------------------
 
-// MockProvider is a mock of IProvider interface.
+// MockProvider is a mocked instance of IProvider interface.
 type MockProvider struct {
 	ctrl     *gomock.Controller
 	recorder *MockProviderRecorder
@@ -80,7 +80,7 @@ func (m *MockProvider) EXPECT() *MockProviderRecorder {
 // Boot mocks base method.
 func (m *MockProvider) Boot(arg0 ...IContainer) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
+	var varargs []interface{}
 	for _, a := range arg0 {
 		varargs = append(varargs, a)
 	}
@@ -98,7 +98,7 @@ func (mr *MockProviderRecorder) Boot(arg0 ...interface{}) *gomock.Call {
 // Register mocks base method.
 func (m *MockProvider) Register(arg0 ...IContainer) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
+	var varargs []interface{}
 	for _, a := range arg0 {
 		varargs = append(varargs, a)
 	}

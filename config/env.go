@@ -33,7 +33,7 @@ var (
 
 	// LoaderSourcePath defines the entry config source path
 	// to be used as the loader entry.
-	LoaderSourcePath = env.String(EnvID+"_LOADER_SOURCE_PATH", "config/config.yaml")
+	LoaderSourcePath = env.String(EnvID+"_LOADER_SOURCE_PATH", "config/sources.yaml")
 
 	// LoaderSourceFormat defines the entry config source format
 	// to be used as the loader entry.
@@ -41,7 +41,7 @@ var (
 
 	// LoaderSourceListPath defines the entry config source path of
 	// loading sources.
-	LoaderSourceListPath = env.String(EnvID+"_LOADER_SOURCE_LIST_PATH", "slate.config.list")
+	LoaderSourceListPath = env.String(EnvID+"_LOADER_SOURCE_LIST_PATH", "slate.config.sources")
 
 	// ObserveFrequency defines the id to be used as the default of a
 	// config observable source frequency time in seconds.

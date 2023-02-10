@@ -15,7 +15,7 @@ func (s StatusErrorList) MarshalXML(
 ) error {
 	// encode the list starting tag
 	_ = e.EncodeToken(start)
-	// iterate through all the stored errors
+	// iterate through all the stored error
 	for _, v := range s {
 		// create the iterated error starting tag name
 		name := xml.Name{Space: "", Local: "error"}

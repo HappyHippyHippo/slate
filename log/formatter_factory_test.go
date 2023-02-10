@@ -6,15 +6,26 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate"
 )
+
+func Test_NewFormatterFactory(t *testing.T) {
+	t.Run("creation", func(t *testing.T) {
+		sut := NewFormatterFactory()
+		if sut == nil {
+			t.Error("didn't returned the expected reference")
+		} else if _, ok := sut.(*FormatterFactory); !ok {
+			t.Error("didn't returned a valid formatter factory instance")
+		}
+	})
+}
 
 func Test_FormatterFactory_Register(t *testing.T) {
 	t.Run("nil strategy", func(t *testing.T) {
 		if e := (&FormatterFactory{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -51,8 +62,8 @@ func Test_FormatterFactory_Create(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.InvalidLogFormat):
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.InvalidLogFormat)
+		case !errors.Is(e, ErrInvalidFormat):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrInvalidFormat)
 		}
 	})
 

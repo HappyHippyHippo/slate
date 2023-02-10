@@ -8,7 +8,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
-	"github.com/happyhippyhippo/slate/err"
 	"github.com/happyhippyhippo/slate/fs"
 	"github.com/happyhippyhippo/slate/log"
 )
@@ -17,16 +16,16 @@ func Test_Provider_Register(t *testing.T) {
 	t.Run("no argument", func(t *testing.T) {
 		if e := (&Provider{}).Register(); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
 	t.Run("nil container", func(t *testing.T) {
 		if e := (&Provider{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -79,8 +78,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(ProcessID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -96,8 +95,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(ProcessID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -113,8 +112,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(ProcessID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -152,8 +151,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -164,8 +163,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -182,8 +181,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -199,8 +198,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Conversion) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Conversion)
+		} else if !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -217,8 +216,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -257,7 +256,7 @@ func Test_Provider_Boot(t *testing.T) {
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, expected)
+			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
 		}
 	})
 

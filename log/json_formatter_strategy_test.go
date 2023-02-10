@@ -4,6 +4,14 @@ import (
 	"testing"
 )
 
+func Test_NewJSONFormatterStrategy(t *testing.T) {
+	t.Run("creation", func(t *testing.T) {
+		if NewJSONFormatterStrategy() == nil {
+			t.Error("didn't returned the expected reference")
+		}
+	})
+}
+
 func Test_JSONFormatterStrategy_Accept(t *testing.T) {
 	t.Run("accept only json format", func(t *testing.T) {
 		scenarios := []struct {

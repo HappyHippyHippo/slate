@@ -9,7 +9,6 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
-	"github.com/happyhippyhippo/slate/err"
 	"github.com/happyhippyhippo/slate/fs"
 	"github.com/spf13/afero"
 )
@@ -21,8 +20,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if e := sut.Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) err when expected (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -32,8 +31,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if e := sut.Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) err when expected (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -81,7 +80,7 @@ func Test_Provider_Register(t *testing.T) {
 		strategy, e := container.Get(YAMLDecoderStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected err (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -100,7 +99,7 @@ func Test_Provider_Register(t *testing.T) {
 		strategy, e := container.Get(JSONDecoderStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected err (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -119,7 +118,7 @@ func Test_Provider_Register(t *testing.T) {
 		factory, e := container.Get(DecoderFactoryID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected err (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case factory == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -138,7 +137,7 @@ func Test_Provider_Register(t *testing.T) {
 		strategy, e := container.Get(EnvSourceStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected err (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -158,8 +157,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(FileSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -171,8 +170,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(FileSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -184,7 +183,7 @@ func Test_Provider_Register(t *testing.T) {
 		strategy, e := container.Get(FileSourceStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected err (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -204,8 +203,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(ObservableFileSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -217,8 +216,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(ObservableFileSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -230,7 +229,7 @@ func Test_Provider_Register(t *testing.T) {
 		strategy, e := container.Get(ObservableFileSourceStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected err (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -250,8 +249,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(DirSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -263,8 +262,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(DirSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -276,7 +275,7 @@ func Test_Provider_Register(t *testing.T) {
 		strategy, e := container.Get(DirSourceStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected err (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -296,8 +295,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(RestSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -309,7 +308,7 @@ func Test_Provider_Register(t *testing.T) {
 		strategy, e := container.Get(RestSourceStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected err (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -329,8 +328,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(ObservableRestSourceStrategyID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -342,7 +341,7 @@ func Test_Provider_Register(t *testing.T) {
 		strategy, e := container.Get(ObservableRestSourceStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected err (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -362,7 +361,7 @@ func Test_Provider_Register(t *testing.T) {
 		strategy, e := container.Get(AggregateSourceStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected err (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -383,7 +382,7 @@ func Test_Provider_Register(t *testing.T) {
 		strategy, e := container.Get(AggregateSourceStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected err (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case strategy == nil:
 			t.Error("didn't return a valid strategy reference")
 		case len(strategy.(*AggregateSourceStrategy).configs) != 0:
@@ -400,7 +399,7 @@ func Test_Provider_Register(t *testing.T) {
 		strategy, e := container.Get(AggregateSourceStrategyID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected err (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		case strategy == nil:
 			t.Error("didn't return a valid strategy reference")
 		case len(strategy.(*AggregateSourceStrategy).configs) != 1:
@@ -456,8 +455,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(LoaderID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -469,8 +468,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(LoaderID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -499,21 +498,21 @@ func Test_Provider_Boot(t *testing.T) {
 	t.Run("no argument", func(t *testing.T) {
 		if e := (&Provider{}).Boot(); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) err when expected (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
 	t.Run("nil container", func(t *testing.T) {
 		if e := (&Provider{}).Boot(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) err when expected (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
 	t.Run("error retrieving config decoder factory", func(t *testing.T) {
-		expected := fmt.Errorf("err message")
+		expected := fmt.Errorf("error message")
 		sut := &Provider{}
 		container := slate.NewContainer()
 		_ = sut.Register(container)
@@ -521,8 +520,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -534,13 +533,13 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Conversion) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Conversion)
+		} else if !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
 	t.Run("error retrieving config decoder strategy", func(t *testing.T) {
-		expected := fmt.Errorf("err message")
+		expected := fmt.Errorf("error message")
 		sut := &Provider{}
 		container := slate.NewContainer()
 		_ = sut.Register(container)
@@ -548,13 +547,13 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
 	t.Run("error retrieving config source factory", func(t *testing.T) {
-		expected := fmt.Errorf("err message")
+		expected := fmt.Errorf("error message")
 		sut := &Provider{}
 		container := slate.NewContainer()
 		_ = sut.Register(container)
@@ -563,8 +562,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -576,13 +575,13 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Conversion) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Conversion)
+		} else if !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
 	t.Run("error retrieving config source strategy", func(t *testing.T) {
-		expected := fmt.Errorf("err message")
+		expected := fmt.Errorf("error message")
 		sut := &Provider{}
 		container := slate.NewContainer()
 		_ = sut.Register(container)
@@ -590,8 +589,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -599,7 +598,7 @@ func Test_Provider_Boot(t *testing.T) {
 		LoaderActive = false
 		defer func() { LoaderActive = true }()
 
-		expected := fmt.Errorf("err message")
+		expected := fmt.Errorf("error message")
 		container := slate.NewContainer()
 		_ = fs.Provider{}.Register(container)
 		sut := &Provider{}
@@ -612,7 +611,7 @@ func Test_Provider_Boot(t *testing.T) {
 	})
 
 	t.Run("error retrieving loader", func(t *testing.T) {
-		expected := fmt.Errorf("err message")
+		expected := fmt.Errorf("error message")
 		container := slate.NewContainer()
 		_ = fs.Provider{}.Register(container)
 		sut := &Provider{}
@@ -621,8 +620,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -635,8 +634,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Conversion) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Conversion)
+		} else if !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 

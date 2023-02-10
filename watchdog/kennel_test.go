@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate"
 )
 
 func Test_NewKennel(t *testing.T) {
@@ -21,8 +21,8 @@ func Test_NewKennel(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -61,8 +61,8 @@ func Test_Kennel_Add(t *testing.T) {
 		switch {
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.DuplicateWatchdogService):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.DuplicateWatchdogService)
+		case !errors.Is(e, ErrDuplicateService):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrDuplicateService)
 		}
 	})
 

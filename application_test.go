@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/err"
 )
 
 func assertPanic(
@@ -54,8 +53,8 @@ func Test_Application_Provide(t *testing.T) {
 
 		if e := NewApplication().Provide(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, ErrNilPointer)
 		}
 	})
 
@@ -153,7 +152,7 @@ func Test_Application_Boot(t *testing.T) {
 		_ = sut.Boot()
 	})
 
-	t.Run("erroron boot", func(t *testing.T) {
+	t.Run("error on boot", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

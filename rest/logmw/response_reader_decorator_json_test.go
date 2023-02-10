@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/log"
 	"github.com/pkg/errors"
 )
@@ -17,8 +17,8 @@ func Test_NewResponseReaderDecoratorJSON(t *testing.T) {
 	t.Run("nil reader", func(t *testing.T) {
 		if _, e := NewResponseReaderDecoratorJSON(nil, nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -34,8 +34,8 @@ func Test_NewResponseReaderDecoratorJSON(t *testing.T) {
 		switch {
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		case result != nil:
 			t.Errorf("returned the unexpeted context data : %v", result)
 		}
@@ -53,8 +53,8 @@ func Test_NewResponseReaderDecoratorJSON(t *testing.T) {
 		switch {
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		case result != nil:
 			t.Errorf("returned the unexpeted context data : %v", result)
 		}

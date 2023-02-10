@@ -159,7 +159,7 @@ func NewParser(
 	}, nil
 }
 
-// Parse method that will convert the list of validation errors into
+// Parse method that will convert the list of validation error into
 // an envelope struct to be used as the endpoint response.
 func (p parser) Parse(
 	val interface{},

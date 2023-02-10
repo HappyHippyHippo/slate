@@ -66,27 +66,16 @@ func (p Provider) Register(
 	if len(container) == 0 || container[0] == nil {
 		return errNilPointer("container")
 	}
-	// add JSON formatter strategy
-	_ = container[0].Service(JSONFormatterStrategyID, func() *JSONFormatterStrategy {
-		return &JSONFormatterStrategy{}
-	}, FormatterStrategyTag)
-	// add formatter factory
-	_ = container[0].Service(FormatterFactoryID, func() IFormatterFactory {
-		return &FormatterFactory{}
-	})
-	// add console stream strategy
+	// add formatter strategies and factory
+	_ = container[0].Service(JSONFormatterStrategyID, NewJSONFormatterStrategy, FormatterStrategyTag)
+	_ = container[0].Service(FormatterFactoryID, NewFormatterFactory)
+	// add stream strategies and factory
 	_ = container[0].Service(ConsoleStreamStrategyID, NewConsoleStreamStrategy, StreamStrategyTag)
-	// add file stream strategy
 	_ = container[0].Service(FileStreamStrategyID, NewFileStreamStrategy, StreamStrategyTag)
-	// add rotating file stream strategy
 	_ = container[0].Service(RotatingFileStreamStrategyID, NewRotatingFileStreamStrategy, StreamStrategyTag)
-	// add stream factory
-	_ = container[0].Service(StreamFactoryID, func() IStreamFactory {
-		return &StreamFactory{}
-	})
-	// add log
+	_ = container[0].Service(StreamFactoryID, NewStreamFactory)
+	// add log and loader
 	_ = container[0].Service(ID, NewLog)
-	// add loader
 	_ = container[0].Service(LoaderID, NewLoader)
 	return nil
 }

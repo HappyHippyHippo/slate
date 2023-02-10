@@ -16,6 +16,11 @@ type JSONDecoderStrategy struct{}
 
 var _ IDecoderStrategy = &JSONDecoderStrategy{}
 
+// NewJSONDecoderStrategy @todo doc
+func NewJSONDecoderStrategy() *JSONDecoderStrategy {
+	return &JSONDecoderStrategy{}
+}
+
 // Accept will check if the decoder factory strategy can instantiate a
 // decoder giving the format and the creation request parameters.
 func (JSONDecoderStrategy) Accept(

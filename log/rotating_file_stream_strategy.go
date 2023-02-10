@@ -61,12 +61,11 @@ func (s RotatingFileStreamStrategy) Accept(
 	}
 	// retrieve the data from the configuration
 	sc := struct{ Type string }{}
-	_, e := cfg.Populate("", &sc)
-	if e == nil {
-		// return acceptance for the read config type
-		return sc.Type == RotatingFileStreamType
+	if _, e := cfg.Populate("", &sc); e != nil {
+		return false
 	}
-	return false
+	// return acceptance for the read config type
+	return sc.Type == RotatingFileStreamType
 }
 
 // Create will instantiate the desired stream instance where

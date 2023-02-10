@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/rest/envelope"
 )
 
@@ -24,8 +24,8 @@ func Test_NewValidator(t *testing.T) {
 			t.Error("return an unexpected valid validator instance")
 		case e == nil:
 			t.Error("didn't return an expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -36,8 +36,8 @@ func Test_NewValidator(t *testing.T) {
 			t.Error("return an unexpected valid validator instance")
 		case e == nil:
 			t.Error("didn't return an expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -72,7 +72,7 @@ func Test_Validator_Call(t *testing.T) {
 		}
 	})
 
-	t.Run("no errors", func(t *testing.T) {
+	t.Run("no error", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -89,7 +89,7 @@ func Test_Validator_Call(t *testing.T) {
 		}
 	})
 
-	t.Run("error parsing errors", func(t *testing.T) {
+	t.Run("error parsing error", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -114,7 +114,7 @@ func Test_Validator_Call(t *testing.T) {
 		}
 	})
 
-	t.Run("parse errors", func(t *testing.T) {
+	t.Run("parse error", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

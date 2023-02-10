@@ -8,7 +8,7 @@ import (
 
 const (
 	// ID defines the id to be used as the container
-	// registration id of a relational database connection factory instance,
+	// registration id of a relational database connection pool instance,
 	// and as a base id of all other relational database package instances
 	// registered in the application container.
 	ID = slate.ID + ".rdb"
@@ -37,9 +37,13 @@ const (
 	// factory instance.
 	DialectFactoryID = ID + ".dialect.factory"
 
-	// PrimaryID defines the id to be used as the container
+	// ConnectionFactoryID defines the id to be used as the container
+	// registration id of the connection factory instance.
+	ConnectionFactoryID = ID + ".connection.factory"
+
+	// ConnectionPrimaryID defines the id to be used as the container
 	// registration id of primary relational database instance.
-	PrimaryID = ID + ".primary"
+	ConnectionPrimaryID = ID + ".connection.primary"
 )
 
 // Provider defines the slate.rdb module service provider to be used on
@@ -62,23 +66,16 @@ func (p Provider) Register(
 	_ = container[0].Service(ConfigID, func() *gorm.Config {
 		return &gorm.Config{Logger: logger.Discard}
 	})
-	// add mysql dialect strategy
-	_ = container[0].Service(MySQLDialectStrategyID, func() *MySQLDialectStrategy {
-		return &MySQLDialectStrategy{}
-	}, DialectStrategyTag)
-	// add sqlite dialect strategy
-	_ = container[0].Service(SqliteDialectStrategyID, func() *SqliteDialectStrategy {
-		return &SqliteDialectStrategy{}
-	}, DialectStrategyTag)
-	// add dialect factory
-	_ = container[0].Service(DialectFactoryID, func() IDialectFactory {
-		return &DialectFactory{}
-	})
-	// add connection factory
-	_ = container[0].Service(ID, NewConnectionFactory)
+	// add dialect strategies and factory
+	_ = container[0].Service(MySQLDialectStrategyID, NewMySQLDialectStrategy, DialectStrategyTag)
+	_ = container[0].Service(SqliteDialectStrategyID, NewSqliteDialectStrategy, DialectStrategyTag)
+	_ = container[0].Service(DialectFactoryID, NewDialectFactory)
+	// add the connection factory and pool
+	_ = container[0].Service(ConnectionFactoryID, NewConnectionFactory)
+	_ = container[0].Service(ID, NewConnectionPool)
 	// add the primary connection auxiliary service
-	_ = container[0].Service(PrimaryID, func(
-		connectionFactory IConnectionFactory,
+	_ = container[0].Service(ConnectionPrimaryID, func(
+		connectionFactory IConnectionPool,
 		cfg *gorm.Config,
 	) (*gorm.DB, error) {
 		return connectionFactory.Get(Primary, cfg)

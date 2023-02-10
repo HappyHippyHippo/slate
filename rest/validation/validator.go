@@ -7,7 +7,7 @@ import (
 
 // Validator is a function type used to define a calling interface of
 // function responsible to validate an instance of a structure and return
-// an initialized response envelope with the founded errors
+// an initialized response envelope with the founded error
 type Validator func(val interface{}) (*envelope.Envelope, error)
 
 // NewValidator instantiates a new validation function
@@ -31,7 +31,7 @@ func NewValidator(
 		}
 		// validate the given structure
 		if errs := validate.Struct(value); errs != nil {
-			// compose the response envelope with the parsed validation errors
+			// compose the response envelope with the parsed validation error
 			return parser.Parse(value, errs.(validator.ValidationErrors))
 		}
 		return nil, nil

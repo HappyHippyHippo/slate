@@ -110,7 +110,7 @@ func (s *RestSource) searchConfig(
 	var e error
 	// get the config from the response
 	if cfg, e = body.(*Config).path(s.configPath); e != nil {
-		return nil, errRestPathNotFound(s.configPath)
+		return nil, errRestConfigNotFound(s.configPath)
 	}
 	// check if the obtained data is a valid config
 	if p, ok := cfg.(Config); ok {

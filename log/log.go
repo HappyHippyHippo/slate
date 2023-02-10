@@ -17,7 +17,7 @@ type ILog interface {
 	AddStream(id string, stream IStream) error
 	RemoveStream(id string)
 	RemoveAllStreams()
-	Stream(id string) IStream
+	Stream(id string) (IStream, error)
 }
 
 // Log defines a new logging manager used to centralize the logging
@@ -170,13 +170,14 @@ func (l *Log) RemoveAllStreams() {
 // requested id.
 func (l *Log) Stream(
 	id string,
-) IStream {
+) (IStream, error) {
 	// lock the log for handling
 	l.mutex.Lock()
 	defer func() { l.mutex.Unlock() }()
 	// retrieve the requested stream
-	if s, ok := l.streams[id]; ok {
-		return s
+	s, ok := l.streams[id]
+	if !ok {
+		return nil, errStreamNotFound(id)
 	}
-	return nil
+	return s, nil
 }

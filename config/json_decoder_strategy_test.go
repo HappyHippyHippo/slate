@@ -5,8 +5,16 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate"
 )
+
+func Test_NewJSONDecoderStrategy(t *testing.T) {
+	t.Run("creation", func(t *testing.T) {
+		if NewJSONDecoderStrategy() == nil {
+			t.Error("didn't returned the expected reference")
+		}
+	})
+}
 
 func Test_JSONDecoderStrategy_Accept(t *testing.T) {
 	t.Run("accept only json format", func(t *testing.T) {
@@ -39,16 +47,16 @@ func Test_JSONDecoderStrategy_Create(t *testing.T) {
 	t.Run("nil reader", func(t *testing.T) {
 		if decoder, e := (JSONDecoderStrategy{}).Create(); decoder != nil {
 			t.Error("returned an unexpected valid decoder instance")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) err when expecting : %v", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expecting : %v", e, slate.ErrNilPointer)
 		}
 	})
 
 	t.Run("invalid reader instance", func(t *testing.T) {
 		if decoder, e := (JSONDecoderStrategy{}).Create("string"); decoder != nil {
 			t.Error("returned an unexpected valid decoder instance")
-		} else if !errors.Is(e, err.Conversion) {
-			t.Errorf("returned the (%v) err when expecting : %v", e, err.Conversion)
+		} else if !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("returned the (%v) error when expecting : %v", e, slate.ErrConversion)
 		}
 	})
 

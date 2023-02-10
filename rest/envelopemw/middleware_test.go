@@ -9,8 +9,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
+	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
-	"github.com/happyhippyhippo/slate/err"
 	"github.com/happyhippyhippo/slate/log"
 	"github.com/happyhippyhippo/slate/rest/envelope"
 )
@@ -28,8 +28,8 @@ func Test_NewMiddlewareGenerator(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -45,8 +45,8 @@ func Test_NewMiddlewareGenerator(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -529,7 +529,7 @@ func Test_NewMiddlewareGenerator(t *testing.T) {
 		ctx.Request = &http.Request{}
 		handler(ctx)
 
-		expected := `{"status":{"success":true,"errors":[]},"data":["data1","data2"]}`
+		expected := `{"status":{"success":true,"error":[]},"data":["data1","data2"]}`
 
 		if check := writer.Body.String(); check != expected {
 			t.Errorf("parsed (%v) response data when expecting : %v", check, expected)
@@ -567,7 +567,7 @@ func Test_NewMiddlewareGenerator(t *testing.T) {
 		ctx.Request = &http.Request{}
 		handler(ctx)
 
-		expected := `{"status":{"success":false,"errors":[{"code":"s:1.e:2.c:0","message":"error message"}]}}`
+		expected := `{"status":{"success":false,"error":[{"code":"s:1.e:2.c:0","message":"error message"}]}}`
 
 		if check := writer.Body.String(); check != expected {
 			t.Errorf("parsed (%v) response data when expecting : %v", check, expected)
@@ -605,7 +605,7 @@ func Test_NewMiddlewareGenerator(t *testing.T) {
 		ctx.Request = &http.Request{}
 		handler(ctx)
 
-		expected := `{"status":{"success":false,"errors":[{"code":"s:1.e:2.c:0","message":"internal server error"}]}}`
+		expected := `{"status":{"success":false,"error":[{"code":"s:1.e:2.c:0","message":"internal server error"}]}}`
 
 		if check := writer.Body.String(); check != expected {
 			t.Errorf("parsed (%v) response data when expecting : %v", check, expected)
@@ -643,7 +643,7 @@ func Test_NewMiddlewareGenerator(t *testing.T) {
 		ctx.Request = &http.Request{}
 		handler(ctx)
 
-		expected := `{"status":{"success":false,"errors":[{"code":"s:1.e:2.c:0","message":"error message"}]}}`
+		expected := `{"status":{"success":false,"error":[{"code":"s:1.e:2.c:0","message":"error message"}]}}`
 
 		if check := writer.Body.String(); check != expected {
 			t.Errorf("parsed (%v) response data when expecting : %v", check, expected)
@@ -681,7 +681,7 @@ func Test_NewMiddlewareGenerator(t *testing.T) {
 		ctx.Request = &http.Request{}
 		handler(ctx)
 
-		expected := `{"status":{"success":false,"errors":[{"code":"s:1.e:2.c:0","message":"internal server error"}]}}`
+		expected := `{"status":{"success":false,"error":[{"code":"s:1.e:2.c:0","message":"internal server error"}]}}`
 
 		if check := writer.Body.String(); check != expected {
 			t.Errorf("parsed (%v) response data when expecting : %v", check, expected)
@@ -729,7 +729,7 @@ func Test_NewMiddlewareGenerator(t *testing.T) {
 		ctx.Request = &http.Request{}
 		handler(ctx)
 
-		expected := `{"status":{"success":false,"errors":[{"code":"s:2.e:2.c:0","message":"error message"}]}}`
+		expected := `{"status":{"success":false,"error":[{"code":"s:2.e:2.c:0","message":"error message"}]}}`
 
 		if check := writer.Body.String(); check != expected {
 			t.Errorf("parsed (%v) response data when expecting : %v", check, expected)
@@ -925,7 +925,7 @@ func Test_NewMiddlewareGenerator(t *testing.T) {
 		ctx.Request = &http.Request{}
 		handler(ctx)
 
-		expected := `{"status":{"success":false,"errors":[{"code":"s:1.e:2.c:0","message":"error message"}]}}`
+		expected := `{"status":{"success":false,"error":[{"code":"s:1.e:2.c:0","message":"error message"}]}}`
 
 		if check := writer.Body.String(); check != expected {
 			t.Errorf("parsed (%v) response data when expecting : %v", check, expected)
@@ -1274,7 +1274,7 @@ func Test_NewMiddlewareGenerator(t *testing.T) {
 		ctx.Request = &http.Request{}
 		handler(ctx)
 
-		expected := `{"status":{"success":false,"errors":[{"code":"s:1.e:10.c:0","message":"error message"}]}}`
+		expected := `{"status":{"success":false,"error":[{"code":"s:1.e:10.c:0","message":"error message"}]}}`
 
 		if check := writer.Body.String(); check != expected {
 			t.Errorf("parsed (%v) response data when expecting : %v", check, expected)

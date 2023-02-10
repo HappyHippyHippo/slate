@@ -16,12 +16,17 @@ type StreamFactory []IStreamStrategy
 
 var _ IStreamFactory = &StreamFactory{}
 
+// NewStreamFactory @todo doc
+func NewStreamFactory() IStreamFactory {
+	return &StreamFactory{}
+}
+
 // Register will register a new stream factory strategy to be used
 // on creation requests.
 func (f *StreamFactory) Register(
 	strategy IStreamStrategy,
 ) error {
-	// check stream factory argument reference
+	// check the strategy argument reference
 	if strategy == nil {
 		return errNilPointer("strategy")
 	}
@@ -48,5 +53,5 @@ func (f StreamFactory) Create(
 			return s.Create(cfg)
 		}
 	}
-	return nil, errInvalidConfig(cfg)
+	return nil, errInvalidStream(cfg)
 }

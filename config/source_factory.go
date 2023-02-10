@@ -13,6 +13,11 @@ type SourceFactory []ISourceStrategy
 
 var _ ISourceFactory = &SourceFactory{}
 
+// NewSourceFactory @todo doc
+func NewSourceFactory() ISourceFactory {
+	return &SourceFactory{}
+}
+
 // Register will register a new source factory strategy to be used
 // on creation request.
 func (f *SourceFactory) Register(
@@ -44,5 +49,5 @@ func (f SourceFactory) Create(
 			return strategy.Create(config)
 		}
 	}
-	return nil, errInvalidSourceData(config)
+	return nil, errInvalidSource(config)
 }

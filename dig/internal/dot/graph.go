@@ -138,7 +138,7 @@ type Graph struct {
 type FailedNodes struct {
 	// RootCauses is a list of the point of failures. They are the root causes
 	// of failed invokes and can be either missing types (not provided) or
-	// err types (err providing).
+	// error types (error providing).
 	RootCauses []*Result
 
 	// TransitiveFailures is the list of nodes that failed to build due to
@@ -146,11 +146,11 @@ type FailedNodes struct {
 	TransitiveFailures []*Result
 
 	// ctors is a collection of failed constructors IDs that are populated as the graph is
-	// traversed for err.
+	// traversed for error.
 	ctors map[CtorID]struct{}
 
 	// Groups is a collection of failed groupKeys that is populated as the graph is traversed
-	// for err.
+	// for error.
 	groups map[nodeKey]struct{}
 }
 

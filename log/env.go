@@ -24,6 +24,6 @@ var (
 	// config entries list, so it can reload the Log streams.
 	LoaderObserveConfig = env.Bool(EnvID+"_LOADER_OBSERVE_CONFIG", true)
 
-	// LoaderErrorChannel defines the loader err logging channel.
+	// LoaderErrorChannel defines the loader error logging channel.
 	LoaderErrorChannel = env.String(EnvID+"_LOADER_ERROR_CHANNEL", "exec")
 )

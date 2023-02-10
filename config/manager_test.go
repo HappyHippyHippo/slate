@@ -4,11 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"sort"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate"
 )
 
 func Test_NewManager(t *testing.T) {
@@ -50,7 +51,7 @@ func Test_Manager_Close(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("err message")
+		expected := fmt.Errorf("error message")
 		sut := NewManager(60 * time.Second)
 		src := NewMockSource(ctrl)
 		src.EXPECT().Get("").Return(Config{}, nil).AnyTimes()
@@ -60,14 +61,14 @@ func Test_Manager_Close(t *testing.T) {
 		if e := sut.Close(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, expected)
+			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
 		}
 	})
 	t.Run("error while closing loader", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("err message")
+		expected := fmt.Errorf("error message")
 		sut := NewManager(60 * time.Second)
 		src := NewMockSource(ctrl)
 		src.EXPECT().Get("").Return(Config{}, nil).AnyTimes()
@@ -80,7 +81,7 @@ func Test_Manager_Close(t *testing.T) {
 		if e := sut.Close(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, expected)
+			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
 		}
 	})
 
@@ -138,7 +139,11 @@ func Test_Manager_Entries(t *testing.T) {
 
 				defer func() { _ = sut.Close(); ctrl.Finish() }()
 
-				if check := sut.Entries(); !reflect.DeepEqual(check, scenario.expected) {
+				check := sut.Entries()
+
+				sort.Strings(scenario.expected)
+				sort.Strings(check)
+				if !reflect.DeepEqual(check, scenario.expected) {
 					t.Errorf("returned (%v) when expecting (%v)", check, scenario.expected)
 				}
 			}
@@ -204,7 +209,7 @@ func Test_Manager_Get(t *testing.T) {
 		defer func() { _ = sut.Close(); ctrl.Finish() }()
 
 		if check, e := sut.Get(search); e != nil {
-			t.Errorf("returned the unexpected err : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if check != expected {
 			t.Errorf("returned (%v) when expecting (%v)", check, expected)
 		}
@@ -229,8 +234,8 @@ func Test_Manager_Get(t *testing.T) {
 			t.Errorf("returned the unexpected valid value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.ConfigPathNotFound):
-			t.Errorf("returned (%v) err when expecting (%v)", e, err.ConfigPathNotFound)
+		case !errors.Is(e, ErrPathNotFound):
+			t.Errorf("returned (%v) error when expecting (%v)", e, ErrPathNotFound)
 		}
 	})
 
@@ -249,7 +254,7 @@ func Test_Manager_Get(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.Get(path, val); e != nil {
-			t.Errorf("returned the unexpected err : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if check != val {
 			t.Errorf("returned (%v) when expecting (%v)", check, val)
 		}
@@ -270,7 +275,7 @@ func Test_Manager_Bool(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.Bool(path); e != nil {
-			t.Errorf("returned the unexpected err : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if !check {
 			t.Errorf("returned (%v)", check)
 		}
@@ -292,7 +297,7 @@ func Test_Manager_Int(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.Int(path); e != nil {
-			t.Errorf("returned the unexpected err : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if check != value {
 			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
@@ -314,7 +319,7 @@ func Test_Manager_Float(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.Float(path); e != nil {
-			t.Errorf("returned the unexpected err : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if check != value {
 			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
@@ -336,7 +341,7 @@ func Test_Manager_String(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.String(path); e != nil {
-			t.Errorf("returned the unexpected err : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if check != value {
 			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
@@ -358,7 +363,7 @@ func Test_Manager_List(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.List(path); e != nil {
-			t.Errorf("returned the unexpected err : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if !reflect.DeepEqual(check, value) {
 			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
@@ -380,7 +385,7 @@ func Test_Manager_Config(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.Config(path); e != nil {
-			t.Errorf("returned the unexpected err : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if !reflect.DeepEqual(*check.(*Config), value) {
 			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
@@ -404,7 +409,7 @@ func Test_Manager_Populate(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.Populate(path+"."+"field", target); e != nil {
-			t.Errorf("returned the unexpected err : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if !reflect.DeepEqual(check, expected) {
 			t.Errorf("returned (%v) when expecting : %v", check, expected)
 		}
@@ -452,8 +457,8 @@ func Test_Manager_AddSource(t *testing.T) {
 
 		if e := sut.AddSource("src", 0, nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned (%v) err when expecting (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -487,8 +492,8 @@ func Test_Manager_AddSource(t *testing.T) {
 
 		if e := sut.AddSource("src", 0, src); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.DuplicateConfigSource) {
-			t.Errorf("returned (%v) err when expecting (%v)", e, err.DuplicateConfigSource)
+		} else if !errors.Is(e, ErrDuplicateSource) {
+			t.Errorf("returned (%v) error when expecting (%v)", e, ErrDuplicateSource)
 		}
 	})
 
@@ -562,7 +567,7 @@ func Test_Manager_RemoveSource(t *testing.T) {
 		defer func() { _ = sut.Close() }()
 
 		if e := sut.RemoveSource("src"); e != nil {
-			t.Errorf("returned the unexpected err (%v)", e)
+			t.Errorf("returned the unexpected error (%v)", e)
 		}
 	})
 
@@ -570,7 +575,7 @@ func Test_Manager_RemoveSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("err message")
+		expected := fmt.Errorf("error message")
 		sut := NewManager(60 * time.Second)
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
@@ -581,7 +586,7 @@ func Test_Manager_RemoveSource(t *testing.T) {
 		if e := sut.RemoveSource("src"); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the err (%v) when was expecting (%v)", e, expected)
+			t.Errorf("returned the error (%v) when was expecting (%v)", e, expected)
 		}
 	})
 
@@ -644,7 +649,7 @@ func Test_Manager_RemoveAllSources(t *testing.T) {
 		sut := NewManager(60 * time.Second)
 		defer func() { _ = sut.Close() }()
 
-		expected := fmt.Errorf("err string")
+		expected := fmt.Errorf("error string")
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Close().MinTimes(1)
 		src1.EXPECT().Get("").Return(Config{"node": "value.1"}, nil).AnyTimes()
@@ -661,7 +666,7 @@ func Test_Manager_RemoveAllSources(t *testing.T) {
 		if e := sut.RemoveAllSources(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the err (%v) when was expecting (%v)", e, expected)
+			t.Errorf("returned the error (%v) when was expecting (%v)", e, expected)
 		}
 	})
 
@@ -706,8 +711,8 @@ func Test_Manager_Source(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.ConfigSourceNotFound):
-			t.Errorf("returned (%v) err when expecting (%v)", e, err.ConfigSourceNotFound)
+		case !errors.Is(e, ErrSourceNotFound):
+			t.Errorf("returned (%v) error when expecting (%v)", e, ErrSourceNotFound)
 		}
 	})
 
@@ -741,8 +746,8 @@ func Test_Manager_SourcePriority(t *testing.T) {
 
 		if e := sut.SourcePriority("invalid id", 0); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.ConfigSourceNotFound) {
-			t.Errorf("returned (%v) err when expecting (%v)", e, err.ConfigSourceNotFound)
+		} else if !errors.Is(e, ErrSourceNotFound) {
+			t.Errorf("returned (%v) error when expecting (%v)", e, ErrSourceNotFound)
 		}
 	})
 
@@ -765,7 +770,7 @@ func Test_Manager_SourcePriority(t *testing.T) {
 			t.Errorf("returned the (%v) value prior the change, when expecting (value.2)", check)
 		}
 		if e := sut.SourcePriority("src.2", 0); e != nil {
-			t.Errorf("returned the unexpeced err : (%v)", e)
+			t.Errorf("returned the unexpeced error : (%v)", e)
 		}
 		if check, _ := sut.Get("node"); check != "value.1" {
 			t.Errorf("returned the (%v) value after the change, when expecting (value.1)", check)
@@ -829,8 +834,8 @@ func Test_Manager_AddObserver(t *testing.T) {
 
 		if e := sut.AddObserver("path", nil); e == nil {
 			t.Errorf("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned (%v) err when expecting (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -840,8 +845,8 @@ func Test_Manager_AddObserver(t *testing.T) {
 
 		if e := sut.AddObserver("path", func(interface{}, interface{}) {}); e == nil {
 			t.Errorf("didn't returned the expected error")
-		} else if !errors.Is(e, err.ConfigPathNotFound) {
-			t.Errorf("returned (%v) err when expecting (%v)", e, err.ConfigPathNotFound)
+		} else if !errors.Is(e, ErrPathNotFound) {
+			t.Errorf("returned (%v) error when expecting (%v)", e, ErrPathNotFound)
 		}
 	})
 

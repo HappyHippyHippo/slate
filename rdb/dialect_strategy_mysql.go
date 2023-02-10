@@ -30,6 +30,11 @@ type MySQLDialectStrategy struct{}
 
 var _ IDialectStrategy = &MySQLDialectStrategy{}
 
+// NewMySQLDialectStrategy @todo doc
+func NewMySQLDialectStrategy() *MySQLDialectStrategy {
+	return &MySQLDialectStrategy{}
+}
+
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
 func (MySQLDialectStrategy) Accept(

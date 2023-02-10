@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate"
 )
 
 func Test_NewRestSourceStrategy(t *testing.T) {
@@ -23,8 +23,8 @@ func Test_NewRestSourceStrategy(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -123,8 +123,8 @@ func Test_RestSourceStrategy_Create(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -140,12 +140,12 @@ func Test_RestSourceStrategy_Create(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.ConfigPathNotFound):
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.ConfigPathNotFound)
+		case !errors.Is(e, ErrInvalidSource):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrInvalidSource)
 		}
 	})
 
-	t.Run("missing path", func(t *testing.T) {
+	t.Run("missing config path", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -157,8 +157,8 @@ func Test_RestSourceStrategy_Create(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.ConfigPathNotFound):
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.ConfigPathNotFound)
+		case !errors.Is(e, ErrInvalidSource):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrInvalidSource)
 		}
 	})
 
@@ -174,8 +174,8 @@ func Test_RestSourceStrategy_Create(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.Conversion):
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Conversion)
+		case !errors.Is(e, slate.ErrConversion):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -191,8 +191,8 @@ func Test_RestSourceStrategy_Create(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.Conversion):
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Conversion)
+		case !errors.Is(e, slate.ErrConversion):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -208,8 +208,8 @@ func Test_RestSourceStrategy_Create(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.Conversion):
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Conversion)
+		case !errors.Is(e, slate.ErrConversion):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 

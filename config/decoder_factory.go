@@ -12,6 +12,11 @@ type DecoderFactory []IDecoderStrategy
 
 var _ IDecoderFactory = &DecoderFactory{}
 
+// NewDecoderFactory £todo doc
+func NewDecoderFactory() IDecoderFactory {
+	return &DecoderFactory{}
+}
+
 // Register will store a new decoder factory strategy to be used
 // to evaluate a request of an instance capable to parse a specific format.
 // If the strategy accepts the format, then it will be used to instantiate the

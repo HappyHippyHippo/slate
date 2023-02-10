@@ -423,11 +423,12 @@ func (mr *MockLogRecorder) Signal(channel, level, msg interface{}, ctx ...interf
 }
 
 // Stream mocks base method.
-func (m *MockLog) Stream(id string) log.IStream {
+func (m *MockLog) Stream(id string) (log.IStream, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Stream", id)
 	ret0, _ := ret[0].(log.IStream)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Stream indicates an expected call of Stream.

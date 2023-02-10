@@ -6,15 +6,26 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate"
 )
+
+func Test_NewStreamFactory(t *testing.T) {
+	t.Run("creation", func(t *testing.T) {
+		sut := NewStreamFactory()
+		if sut == nil {
+			t.Error("didn't returned the expected reference")
+		} else if _, ok := sut.(*StreamFactory); !ok {
+			t.Error("didn't returned a valid stream factory instance")
+		}
+	})
+}
 
 func Test_StreamFactory_Register(t *testing.T) {
 	t.Run("nil strategy", func(t *testing.T) {
 		if e := (&StreamFactory{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -41,8 +52,8 @@ func Test_StreamFactory_Create(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -63,8 +74,8 @@ func Test_StreamFactory_Create(t *testing.T) {
 			t.Error("returned a config stream")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.InvalidLogConfig):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.InvalidLogConfig)
+		case !errors.Is(e, ErrInvalidStream):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrInvalidStream)
 		}
 	})
 

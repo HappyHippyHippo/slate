@@ -3,31 +3,45 @@ package watchdog
 import (
 	"fmt"
 
+	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
-	"github.com/happyhippyhippo/slate/err"
+)
+
+var (
+	// ErrInvalidWatchdog defines an error that signal that the
+	// given watchdog configuration was unable to be parsed correctly.
+	ErrInvalidWatchdog = fmt.Errorf("invalid watchdog config")
+
+	// ErrDuplicateService defines an error that signal that the
+	// given watchdog service is already registered.
+	ErrDuplicateService = fmt.Errorf("duplicate watchdog service")
 )
 
 func errNilPointer(
 	arg string,
+	ctx ...map[string]interface{},
 ) error {
-	return fmt.Errorf("%w : %v", err.NilPointer, arg)
+	return slate.NewErrorFrom(slate.ErrNilPointer, arg, ctx...)
 }
 
 func errConversion(
 	val interface{},
 	t string,
+	ctx ...map[string]interface{},
 ) error {
-	return fmt.Errorf("%w : %v to %v", err.Conversion, val, t)
+	return slate.NewErrorFrom(slate.ErrConversion, fmt.Sprintf("%v to %s", val, t), ctx...)
 }
 
-func errInvalidConfig(
+func errInvalidWatchdog(
 	cfg config.IConfig,
+	ctx ...map[string]interface{},
 ) error {
-	return fmt.Errorf("%w : %v", err.InvalidWatchdogConfig, cfg)
+	return slate.NewErrorFrom(ErrInvalidWatchdog, fmt.Sprintf("%v", cfg), ctx...)
 }
 
 func errDuplicateService(
 	service string,
+	ctx ...map[string]interface{},
 ) error {
-	return fmt.Errorf("%w : %v", err.DuplicateWatchdogService, service)
+	return slate.NewErrorFrom(ErrDuplicateService, service, ctx...)
 }

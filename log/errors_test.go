@@ -2,84 +2,220 @@ package log
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 
+	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
-	"github.com/happyhippyhippo/slate/err"
 )
 
 func Test_errNilPointer(t *testing.T) {
-	t.Run("creation", func(t *testing.T) {
-		arg := "dummy argument"
-		expected := "invalid nil pointer : dummy argument"
+	arg := "dummy argument"
+	context := map[string]interface{}{"field": "value"}
+	message := "dummy argument : invalid nil pointer"
 
-		if e := errNilPointer(arg); !errors.Is(e, err.NilPointer) {
-			t.Errorf("error not a instance of err.NilPointer")
-		} else if e.Error() != expected {
-			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
+	t.Run("creation without context", func(t *testing.T) {
+		if e := errNilPointer(arg); !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("error not a instance of slate.ErrNilPointer")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(slate.IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if te.Context() != nil {
+			t.Errorf("didn't stored a nil value context")
+		}
+	})
+
+	t.Run("creation with context", func(t *testing.T) {
+		if e := errNilPointer(arg, context); !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("error not a instance of slate.ErrNilPointer")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(slate.IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
+			t.Errorf("context (%v) not same as expected (%v)", check, context)
 		}
 	})
 }
 
 func Test_errConversion(t *testing.T) {
-	t.Run("creation", func(t *testing.T) {
-		arg := "dummy value"
-		typ := "dummy type"
-		expected := "invalid type conversion : dummy value to dummy type"
+	arg := "dummy value"
+	typ := "dummy type"
+	context := map[string]interface{}{"field": "value"}
+	message := "dummy value to dummy type : invalid type conversion"
 
-		if e := errConversion(arg, typ); !errors.Is(e, err.Conversion) {
-			t.Errorf("error not a instance of err.Conversion")
-		} else if e.Error() != expected {
-			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
+	t.Run("creation without context", func(t *testing.T) {
+		if e := errConversion(arg, typ); !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("error not a instance of slate.ErrConversion")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(slate.IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if te.Context() != nil {
+			t.Errorf("didn't stored a nil value context")
+		}
+	})
+
+	t.Run("creation with context", func(t *testing.T) {
+		if e := errConversion(arg, typ, context); !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("error not a instance of slate.ErrConversion")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(slate.IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
+			t.Errorf("context (%v) not same as expected (%v)", check, context)
 		}
 	})
 }
 
 func Test_errInvalidFormat(t *testing.T) {
-	t.Run("creation", func(t *testing.T) {
-		arg := "dummy argument"
-		expected := "invalid output log format : dummy argument"
+	arg := "dummy argument"
+	context := map[string]interface{}{"field": "value"}
+	message := "dummy argument : invalid output log format"
 
-		if e := errInvalidFormat(arg); !errors.Is(e, err.InvalidLogFormat) {
-			t.Errorf("err not a instance of err.InvalidFormat")
-		} else if e.Error() != expected {
-			t.Errorf("err message (%v) not same as expected (%v)", e, expected)
+	t.Run("creation without context", func(t *testing.T) {
+		if e := errInvalidFormat(arg); !errors.Is(e, ErrInvalidFormat) {
+			t.Errorf("error not a instance of ErrInvalidFormat")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(slate.IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if te.Context() != nil {
+			t.Errorf("didn't stored a nil value context")
+		}
+	})
+
+	t.Run("creation with context", func(t *testing.T) {
+		if e := errInvalidFormat(arg, context); !errors.Is(e, ErrInvalidFormat) {
+			t.Errorf("error not a instance of ErrInvalidFormat")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(slate.IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
+			t.Errorf("context (%v) not same as expected (%v)", check, context)
 		}
 	})
 }
 
 func Test_errInvalidLevel(t *testing.T) {
-	t.Run("creation", func(t *testing.T) {
-		arg := "dummy argument"
-		expected := "invalid log level : dummy argument"
+	arg := "dummy argument"
+	context := map[string]interface{}{"field": "value"}
+	message := "dummy argument : invalid log level"
 
-		if e := errInvalidLevel(arg); !errors.Is(e, err.InvalidLogLevel) {
-			t.Errorf("error not a instance of err.InvalidLogLevel")
-		} else if e.Error() != expected {
-			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
+	t.Run("creation without context", func(t *testing.T) {
+		if e := errInvalidLevel(arg); !errors.Is(e, ErrInvalidLevel) {
+			t.Errorf("error not a instance of ErrInvalidLevel")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(slate.IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if te.Context() != nil {
+			t.Errorf("didn't stored a nil value context")
+		}
+	})
+
+	t.Run("creation with context", func(t *testing.T) {
+		if e := errInvalidLevel(arg, context); !errors.Is(e, ErrInvalidLevel) {
+			t.Errorf("error not a instance of ErrInvalidLevel")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(slate.IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
+			t.Errorf("context (%v) not same as expected (%v)", check, context)
 		}
 	})
 }
 
-func Test_errInvalidType(t *testing.T) {
-	t.Run("creation", func(t *testing.T) {
-		arg := "dummy argument"
-		expected := "invalid log stream type : dummy argument"
+func Test_errInvalidStream(t *testing.T) {
+	arg := &config.Config{"field": "value"}
+	context := map[string]interface{}{"field": "value"}
+	message := "&map[field:value] : invalid log stream"
 
-		if e := errInvalidType(arg); !errors.Is(e, err.InvalidLogStream) {
-			t.Errorf("error not a instance of err.InvalidLogStream")
-		} else if e.Error() != expected {
-			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
+	t.Run("creation without context", func(t *testing.T) {
+		if e := errInvalidStream(arg); !errors.Is(e, ErrInvalidStream) {
+			t.Errorf("error not a instance of ErrInvalidStream")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(slate.IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if te.Context() != nil {
+			t.Errorf("didn't stored a nil value context")
+		}
+	})
+
+	t.Run("creation with context", func(t *testing.T) {
+		if e := errInvalidStream(arg, context); !errors.Is(e, ErrInvalidStream) {
+			t.Errorf("error not a instance of ErrInvalidStream")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(slate.IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
+			t.Errorf("context (%v) not same as expected (%v)", check, context)
 		}
 	})
 }
 
-func Test_errInvalidConfig(t *testing.T) {
-	t.Run("creation", func(t *testing.T) {
-		arg := &config.Config{}
+func Test_errStreamNotFound(t *testing.T) {
+	arg := "dummy argument"
+	context := map[string]interface{}{"field": "value"}
+	message := "dummy argument : stream not found"
 
-		if e := errInvalidConfig(arg); !errors.Is(e, err.InvalidLogConfig) {
-			t.Errorf("error not a instance of err.InvalidLogConfig")
+	t.Run("creation without context", func(t *testing.T) {
+		if e := errStreamNotFound(arg); !errors.Is(e, ErrStreamNotFound) {
+			t.Errorf("error not a instance of ErrStreamNotFound")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(slate.IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if te.Context() != nil {
+			t.Errorf("didn't stored a nil value context")
+		}
+	})
+
+	t.Run("creation with context", func(t *testing.T) {
+		if e := errStreamNotFound(arg, context); !errors.Is(e, ErrStreamNotFound) {
+			t.Errorf("error not a instance of ErrStreamNotFound")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(slate.IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
+			t.Errorf("context (%v) not same as expected (%v)", check, context)
+		}
+	})
+}
+
+func Test_errDuplicateStream(t *testing.T) {
+	arg := "dummy argument"
+	context := map[string]interface{}{"field": "value"}
+	message := "dummy argument : stream already registered"
+
+	t.Run("creation without context", func(t *testing.T) {
+		if e := errDuplicateStream(arg); !errors.Is(e, ErrDuplicateStream) {
+			t.Errorf("error not a instance of ErrDuplicateStream")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(slate.IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if te.Context() != nil {
+			t.Errorf("didn't stored a nil value context")
+		}
+	})
+
+	t.Run("creation with context", func(t *testing.T) {
+		if e := errDuplicateStream(arg, context); !errors.Is(e, ErrDuplicateStream) {
+			t.Errorf("error not a instance of ErrDuplicateStream")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(slate.IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
+			t.Errorf("context (%v) not same as expected (%v)", check, context)
 		}
 	})
 }

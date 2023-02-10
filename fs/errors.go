@@ -1,13 +1,12 @@
 package fs
 
 import (
-	"fmt"
-
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate"
 )
 
 func errNilPointer(
 	arg string,
+	ctx ...map[string]interface{},
 ) error {
-	return fmt.Errorf("%w : %v", err.NilPointer, arg)
+	return slate.NewErrorFrom(slate.ErrNilPointer, arg, ctx...)
 }

@@ -12,6 +12,11 @@ type JSONFormatterStrategy struct{}
 
 var _ IFormatterStrategy = &JSONFormatterStrategy{}
 
+// NewJSONFormatterStrategy @todo doc
+func NewJSONFormatterStrategy() *JSONFormatterStrategy {
+	return &JSONFormatterStrategy{}
+}
+
 // Accept will check if the formatter factory strategy can instantiate a
 // formatter of the requested format.
 func (JSONFormatterStrategy) Accept(

@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/log"
 )
 
@@ -16,8 +16,8 @@ func Test_NewMiddlewareGenerator(t *testing.T) {
 		switch {
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		case generator != nil:
 			t.Error("returned an unexpected valid middleware generator reference")
 		}
@@ -33,8 +33,8 @@ func Test_NewMiddlewareGenerator(t *testing.T) {
 		switch {
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		case generator != nil:
 			t.Error("returned an unexpected valid middleware generator reference")
 		}
@@ -50,8 +50,8 @@ func Test_NewMiddlewareGenerator(t *testing.T) {
 		switch {
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		case generator != nil:
 			t.Error("returned an unexpected valid middleware generator reference")
 		}

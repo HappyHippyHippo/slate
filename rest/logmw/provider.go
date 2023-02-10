@@ -17,7 +17,7 @@ const (
 	ResponseReaderID = ID + ".reader.response"
 )
 
-// Provider defines the gapp-rest-log module service provider to be used on
+// Provider defines the slate.rest.log module service provider to be used on
 // the application initialization to register the logging middleware service.
 type Provider struct{}
 

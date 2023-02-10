@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
-	"github.com/happyhippyhippo/slate/err"
 	"gorm.io/driver/mysql"
 )
 
@@ -44,8 +44,8 @@ func Test_MySQLDialectStrategy_Get(t *testing.T) {
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
 			t.Error("didn't return the expected error")
-		case !errors.Is(e, err.NilPointer):
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -61,8 +61,8 @@ func Test_MySQLDialectStrategy_Get(t *testing.T) {
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
 			t.Error("didn't return the expected error")
-		case !errors.Is(e, err.Conversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.Conversion)
+		case !errors.Is(e, slate.ErrConversion):
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -79,8 +79,8 @@ func Test_MySQLDialectStrategy_Get(t *testing.T) {
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
 			t.Error("didn't return the expected error")
-		case !errors.Is(e, err.Conversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.Conversion)
+		case !errors.Is(e, slate.ErrConversion):
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -98,8 +98,8 @@ func Test_MySQLDialectStrategy_Get(t *testing.T) {
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
 			t.Error("didn't return the expected error")
-		case !errors.Is(e, err.Conversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.Conversion)
+		case !errors.Is(e, slate.ErrConversion):
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -118,8 +118,8 @@ func Test_MySQLDialectStrategy_Get(t *testing.T) {
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
 			t.Error("didn't return the expected error")
-		case !errors.Is(e, err.Conversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.Conversion)
+		case !errors.Is(e, slate.ErrConversion):
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -139,8 +139,8 @@ func Test_MySQLDialectStrategy_Get(t *testing.T) {
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
 			t.Error("didn't return the expected error")
-		case !errors.Is(e, err.Conversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.Conversion)
+		case !errors.Is(e, slate.ErrConversion):
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -161,8 +161,8 @@ func Test_MySQLDialectStrategy_Get(t *testing.T) {
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
 			t.Error("didn't return the expected error")
-		case !errors.Is(e, err.Conversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.Conversion)
+		case !errors.Is(e, slate.ErrConversion):
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -184,8 +184,8 @@ func Test_MySQLDialectStrategy_Get(t *testing.T) {
 			t.Error("return an unexpected valid dialect instance")
 		case e == nil:
 			t.Error("didn't return the expected error")
-		case !errors.Is(e, err.Conversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.Conversion)
+		case !errors.Is(e, slate.ErrConversion):
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrConversion)
 		}
 	})
 

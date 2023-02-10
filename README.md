@@ -3,9 +3,9 @@
 ## Opinionated golang application scaffolding
 
 - [x] slate
+  - [ ] cache
   - [x] config
   - [x] env
-  - [x] err
   - [x] fs
   - [x] log
   - [x] migration
@@ -13,20 +13,20 @@
   - [x] rest
     - [x] envelope
     - [x] envelopemw
-    - [x] validation
     - [x] logmw
+    - [x] validation
   - [x] trigger
   - [x] watchdog
+
+### cache
+
+TBD
 
 ### config
 
 TBD
 
 ### env
-
-TBD
-
-### err
 
 TBD
 

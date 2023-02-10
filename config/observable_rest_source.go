@@ -96,7 +96,7 @@ func (s *ObservableRestSource) searchTimestamp(
 	// retrieve the timestamp information from the parsed response data
 	var ts interface{}
 	if ts, e = body.(*Config).path(s.timestampPath); e != nil {
-		return time.Now(), errRestPathNotFound(s.timestampPath)
+		return time.Now(), errRestTimestampNotFound(s.timestampPath)
 	}
 	// check if the timestamp information is a valid string to be parsed
 	switch ts.(type) {

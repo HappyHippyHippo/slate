@@ -3,9 +3,10 @@ package config
 import (
 	"errors"
 	"reflect"
+	"sort"
 	"testing"
 
-	"github.com/happyhippyhippo/slate/err"
+	"github.com/happyhippyhippo/slate"
 )
 
 func Test_Config_Clone(t *testing.T) {
@@ -91,10 +92,15 @@ func Test_Config_Entries(t *testing.T) {
 	})
 
 	t.Run("multi entry config", func(t *testing.T) {
-		if !reflect.DeepEqual((&Config{
+		check := (&Config{
 			"field1": "value 1",
 			"field2": "value 2",
-		}).Entries(), []string{"field1", "field2"}) {
+		}).Entries()
+		expected := []string{"field1", "field2"}
+
+		sort.Strings(check)
+		sort.Strings(expected)
+		if !reflect.DeepEqual(check, expected) {
 			t.Errorf("didn't returned the expected single entry list")
 		}
 	})
@@ -242,7 +248,7 @@ func Test_Config_Get(t *testing.T) {
 
 		for _, scenario := range scenarios {
 			if check, e := scenario.partial.Get(scenario.search); e != nil {
-				t.Errorf("returned the unexpected err (%v) when retrieving (%v)", e, scenario.search)
+				t.Errorf("returned the unexpected error (%v) when retrieving (%v)", e, scenario.search)
 			} else if !reflect.DeepEqual(check, scenario.expected) {
 				t.Errorf("returned (%v) when retrieving (%v), expected (%v)", check, scenario.search, scenario.expected)
 			}
@@ -285,8 +291,8 @@ func Test_Config_Get(t *testing.T) {
 			switch {
 			case e == nil:
 				t.Error("didn't returned the expected error")
-			case !errors.Is(e, err.ConfigPathNotFound):
-				t.Errorf("returned err was not a config path not found err : %v", e)
+			case !errors.Is(e, ErrPathNotFound):
+				t.Errorf("returned error was not a config path not found error : %v", e)
 			case check != nil:
 				t.Error("unexpectedly returned a valid reference to a stored config value")
 			}
@@ -297,7 +303,7 @@ func Test_Config_Get(t *testing.T) {
 		sut := Config{"node1": nil, "node2": "value2"}
 
 		if check, e := sut.Get("node1", "default_value"); e != nil {
-			t.Errorf("returned the unexpected err : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if check != nil {
 			t.Errorf("returned the (%v) check", check)
 		}
@@ -337,7 +343,7 @@ func Test_Config_Get(t *testing.T) {
 		def := "default_value"
 		for _, scenario := range scenarios {
 			if check, e := scenario.partial.Get(scenario.search, def); e != nil {
-				t.Errorf("returned the unexpected err : %v", e)
+				t.Errorf("returned the unexpected error : %v", e)
 			} else if check != def {
 				t.Errorf("returned (%v) when retrieving (%v)", check, scenario.search)
 			}
@@ -351,13 +357,13 @@ func Test_Config_Bool(t *testing.T) {
 		sut := Config{path: true}
 
 		if check, e := sut.Bool(path, false); e != nil {
-			t.Errorf("returned the unexpected err : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if !check {
 			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, true)
 		}
 	})
 
-	t.Run("return conversion err if not storing a bool", func(t *testing.T) {
+	t.Run("return conversion error if not storing a bool", func(t *testing.T) {
 		path := "node"
 		value := "123"
 		sut := Config{path: value}
@@ -368,12 +374,12 @@ func Test_Config_Bool(t *testing.T) {
 			t.Errorf("returned the unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.Conversion):
-			t.Errorf("the returned err is the expected err convertion err : %v", e)
+		case !errors.Is(e, slate.ErrConversion):
+			t.Errorf("the returned error is the expected error convertion error : %v", e)
 		}
 	})
 
-	t.Run("return path not found err if no default value is given", func(t *testing.T) {
+	t.Run("return path not found error if no default value is given", func(t *testing.T) {
 		sut := Config{}
 
 		check, e := sut.Bool("node")
@@ -382,8 +388,8 @@ func Test_Config_Bool(t *testing.T) {
 			t.Errorf("returned the unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.ConfigPathNotFound):
-			t.Errorf("the returned err is the expected err convertion err : %v", e)
+		case !errors.Is(e, ErrPathNotFound):
+			t.Errorf("the returned error is the expected error convertion error : %v", e)
 		}
 	})
 
@@ -393,7 +399,7 @@ func Test_Config_Bool(t *testing.T) {
 		check, e := sut.Bool("node", true)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected err : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		case !check:
 			t.Errorf("returned the unexpected value (%v) when expecting : %v", check, true)
 		}
@@ -407,13 +413,13 @@ func Test_Config_Int(t *testing.T) {
 		sut := Config{path: value}
 
 		if check, e := sut.Int(path, 456); e != nil {
-			t.Errorf("returned the unexpected err : %v", e)
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if check != value {
 			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
 		}
 	})
 
-	t.Run("return conversion err if not storing an int", func(t *testing.T) {
+	t.Run("return conversion error if not storing an int", func(t *testing.T) {
 		path := "node"
 		value := "123"
 		sut := Config{path: value}
@@ -424,12 +430,12 @@ func Test_Config_Int(t *testing.T) {
 			t.Errorf("returned the unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.Conversion):
-			t.Errorf("the returned err is the expected err convertion err : %v", e)
+		case !errors.Is(e, slate.ErrConversion):
+			t.Errorf("the returned error is the expected error convertion error : %v", e)
 		}
 	})
 
-	t.Run("return path not found err if no default value is given", func(t *testing.T) {
+	t.Run("return path not found error if no default value is given", func(t *testing.T) {
 		sut := Config{}
 
 		check, e := sut.Int("node")
@@ -438,7 +444,7 @@ func Test_Config_Int(t *testing.T) {
 			t.Errorf("returned the unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.ConfigPathNotFound):
+		case !errors.Is(e, ErrPathNotFound):
 			t.Errorf("the returned e is the expected e convertion e : %v", e)
 		}
 	})
@@ -481,7 +487,7 @@ func Test_Config_Float(t *testing.T) {
 			t.Errorf("returned the unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.Conversion):
+		case !errors.Is(e, slate.ErrConversion):
 			t.Errorf("the returned e is the expected e convertion e : %v", e)
 		}
 	})
@@ -495,7 +501,7 @@ func Test_Config_Float(t *testing.T) {
 			t.Errorf("returned the unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.ConfigPathNotFound):
+		case !errors.Is(e, ErrPathNotFound):
 			t.Errorf("the returned e is the expected e convertion e : %v", e)
 		}
 	})
@@ -538,7 +544,7 @@ func Test_Config_String(t *testing.T) {
 			t.Errorf("returned the unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.Conversion):
+		case !errors.Is(e, slate.ErrConversion):
 			t.Errorf("the returned e is the expected e convertion e : %v", e)
 		}
 	})
@@ -552,7 +558,7 @@ func Test_Config_String(t *testing.T) {
 			t.Errorf("returned the unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.ConfigPathNotFound):
+		case !errors.Is(e, ErrPathNotFound):
 			t.Errorf("the returned e is the expected e convertion e : %v", e)
 		}
 	})
@@ -595,7 +601,7 @@ func Test_Config_List(t *testing.T) {
 			t.Errorf("returned the unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.Conversion):
+		case !errors.Is(e, slate.ErrConversion):
 			t.Errorf("the returned e is the expected e convertion e : %v", e)
 		}
 	})
@@ -609,7 +615,7 @@ func Test_Config_List(t *testing.T) {
 			t.Errorf("returned the unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.ConfigPathNotFound):
+		case !errors.Is(e, ErrPathNotFound):
 			t.Errorf("the returned e is the expected e convertion e : %v", e)
 		}
 	})
@@ -652,7 +658,7 @@ func Test_Config_Config(t *testing.T) {
 			t.Errorf("returned the unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.Conversion):
+		case !errors.Is(e, slate.ErrConversion):
 			t.Errorf("the returned e is the expected e convertion e : %v", e)
 		}
 	})
@@ -666,7 +672,7 @@ func Test_Config_Config(t *testing.T) {
 			t.Errorf("returned the unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.ConfigPathNotFound):
+		case !errors.Is(e, ErrPathNotFound):
 			t.Errorf("the returned e is the expected e convertion e : %v", e)
 		}
 	})
@@ -945,7 +951,7 @@ func Test_Config_Populate(t *testing.T) {
 			t.Error("returned an unexpected valid reference to a data")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.ConfigPathNotFound):
+		case !errors.Is(e, ErrPathNotFound):
 			t.Errorf("returned the unexpected error : %v", e)
 		}
 	})
@@ -961,7 +967,7 @@ func Test_Config_Populate(t *testing.T) {
 			t.Error("returned an unexpected valid reference to a data")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.Conversion):
+		case !errors.Is(e, slate.ErrConversion):
 			t.Errorf("returned the unexpected error : %v", e)
 		}
 	})
@@ -977,7 +983,7 @@ func Test_Config_Populate(t *testing.T) {
 			t.Error("returned an unexpected valid reference to a data")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.Conversion):
+		case !errors.Is(e, slate.ErrConversion):
 			t.Errorf("returned the unexpected error : %v", e)
 		}
 	})
@@ -993,7 +999,7 @@ func Test_Config_Populate(t *testing.T) {
 			t.Error("returned an unexpected valid reference to a data")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, err.Conversion):
+		case !errors.Is(e, slate.ErrConversion):
 			t.Errorf("returned the unexpected error : %v", e)
 		}
 	})

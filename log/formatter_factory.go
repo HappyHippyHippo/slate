@@ -13,6 +13,11 @@ type FormatterFactory []IFormatterStrategy
 
 var _ IFormatterFactory = &FormatterFactory{}
 
+// NewFormatterFactory @todo doc
+func NewFormatterFactory() IFormatterFactory {
+	return &FormatterFactory{}
+}
+
 // Register will register a new formatter factory strategy to be used
 // on requesting to create a formatter for a defined format.
 func (f *FormatterFactory) Register(

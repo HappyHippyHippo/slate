@@ -8,7 +8,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
-	"github.com/happyhippyhippo/slate/err"
 	"github.com/happyhippyhippo/slate/fs"
 	"gorm.io/gorm"
 )
@@ -17,16 +16,16 @@ func Test_Provider_Register(t *testing.T) {
 	t.Run("no argument", func(t *testing.T) {
 		if e := (&Provider{}).Register(); e == nil {
 			t.Error("didn't return the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
 	t.Run("nil container", func(t *testing.T) {
 		if e := (&Provider{}).Register(nil); e == nil {
 			t.Error("didn't return the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -48,7 +47,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("didn't register the dialect factory : %v", sut)
 		case !container.Has(ID):
 			t.Errorf("didn't register the connection factory : %v", sut)
-		case !container.Has(PrimaryID):
+		case !container.Has(ConnectionPrimaryID):
 			t.Errorf("didn't register the primary connection handler : %v", sut)
 		}
 	})
@@ -113,8 +112,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(ID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -127,8 +126,8 @@ func Test_Provider_Register(t *testing.T) {
 
 		if _, e := container.Get(ID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -153,12 +152,12 @@ func Test_Provider_Register(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.NewContainer()
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(ID, func() (IConnectionFactory, error) { return nil, expected })
+		_ = container.Service(ID, func() (IConnectionPool, error) { return nil, expected })
 
-		if _, e := container.Get(PrimaryID); e == nil {
+		if _, e := container.Get(ConnectionPrimaryID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -172,10 +171,10 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&config.Provider{}).Register(container)
 		_ = container.Service(ConfigID, func() (*gorm.Config, error) { return nil, expected })
 
-		if _, e := container.Get(PrimaryID); e == nil {
+		if _, e := container.Get(ConnectionPrimaryID); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -198,7 +197,7 @@ func Test_Provider_Register(t *testing.T) {
 		cfgManager.EXPECT().Config("slate.rdb.connections.primary").Return(&cfg, nil).Times(1)
 		_ = container.Service(config.ID, func() config.IManager { return cfgManager })
 
-		if check, e := container.Get(PrimaryID); e != nil {
+		if check, e := container.Get(ConnectionPrimaryID); e != nil {
 			t.Errorf("returned the unexpected error (%v)", e)
 		} else if check == nil {
 			t.Error("didn't return a valid reference")
@@ -228,7 +227,7 @@ func Test_Provider_Register(t *testing.T) {
 		cfgManager.EXPECT().Config("slate.rdb.connections.other_primary").Return(&cfg, nil).Times(1)
 		_ = container.Service(config.ID, func() config.IManager { return cfgManager })
 
-		if check, e := container.Get(PrimaryID); e != nil {
+		if check, e := container.Get(ConnectionPrimaryID); e != nil {
 			t.Errorf("returned the unexpected error (%v)", e)
 		} else if check == nil {
 			t.Error("didn't return a valid reference")
@@ -240,16 +239,16 @@ func Test_Provider_Boot(t *testing.T) {
 	t.Run("no argument", func(t *testing.T) {
 		if e := (&Provider{}).Boot(); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
 	t.Run("nil container", func(t *testing.T) {
 		if e := (&Provider{}).Boot(nil); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.NilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.NilPointer)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -262,8 +261,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := provider.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -275,8 +274,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := provider.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Conversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Conversion)
+		} else if !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -290,8 +289,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Container) {
-			t.Errorf("returned the (%v) err when expecting (%v)", e, err.Container)
+		} else if !errors.Is(e, slate.ErrContainer) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -304,8 +303,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, err.Conversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, err.Conversion)
+		} else if !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
