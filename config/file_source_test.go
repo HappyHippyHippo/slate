@@ -16,7 +16,7 @@ func Test_NewFileSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, e := NewFileSource("path", DecoderFormatYAML, nil, NewMockDecoderFactory(ctrl))
+		sut, e := NewFileSource("path", YAMLDecoderFormat, nil, NewMockDecoderFactory(ctrl))
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -31,7 +31,7 @@ func Test_NewFileSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, e := NewFileSource("path", DecoderFormatYAML, NewMockFs(ctrl), nil)
+		sut, e := NewFileSource("path", YAMLDecoderFormat, NewMockFs(ctrl), nil)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -51,7 +51,7 @@ func Test_NewFileSource(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 
-		sut, e := NewFileSource(path, DecoderFormatYAML, fs, NewMockDecoderFactory(ctrl))
+		sut, e := NewFileSource(path, YAMLDecoderFormat, fs, NewMockDecoderFactory(ctrl))
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -73,9 +73,9 @@ func Test_NewFileSource(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatUnknown, file).Return(nil, expected).Times(1)
+		decoderFactory.EXPECT().Create(UnknownDecoderFormat, file).Return(nil, expected).Times(1)
 
-		sut, e := NewFileSource(path, DecoderFormatUnknown, fs, decoderFactory)
+		sut, e := NewFileSource(path, UnknownDecoderFormat, fs, decoderFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -99,9 +99,9 @@ func Test_NewFileSource(t *testing.T) {
 		decoder.EXPECT().Decode().Return(nil, expected).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, file).Return(decoder, nil).Times(1)
 
-		sut, e := NewFileSource(path, DecoderFormatYAML, fs, decoderFactory)
+		sut, e := NewFileSource(path, YAMLDecoderFormat, fs, decoderFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -125,9 +125,9 @@ func Test_NewFileSource(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&partial, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, file).Return(decoder, nil).Times(1)
 
-		sut, e := NewFileSource(path, DecoderFormatYAML, fs, decoderFactory)
+		sut, e := NewFileSource(path, YAMLDecoderFormat, fs, decoderFactory)
 		switch {
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
@@ -139,7 +139,7 @@ func Test_NewFileSource(t *testing.T) {
 				t.Error("didn't created the access mutex")
 			case sut.path != path:
 				t.Error("didn't stored the file path")
-			case sut.format != DecoderFormatYAML:
+			case sut.format != YAMLDecoderFormat:
 				t.Error("didn't stored the file content format")
 			case sut.fileSystem != fs:
 				t.Error("didn't stored the file system adapter reference")

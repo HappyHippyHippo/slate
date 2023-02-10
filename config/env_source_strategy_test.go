@@ -29,7 +29,7 @@ func Test_EnvSourceStrategy_Accept(t *testing.T) {
 	})
 
 	t.Run("don't accept if type is not env", func(t *testing.T) {
-		if (&EnvSourceStrategy{}).Accept(&Config{"type": SourceStrategyUnknown}) {
+		if (&EnvSourceStrategy{}).Accept(&Config{"type": UnknownSourceType}) {
 			t.Error("returned true")
 		}
 	})

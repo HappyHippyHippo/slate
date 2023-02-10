@@ -1,9 +1,9 @@
 package config
 
 const (
-	// SourceStrategyAggregate defines the value to be used to declare a
+	// AggregateSourceType defines the value to be used to declare a
 	// container loading configs source type.
-	SourceStrategyAggregate = "aggregate"
+	AggregateSourceType = "aggregate"
 )
 
 // AggregateSourceStrategy defines a strategy used to instantiate
@@ -29,7 +29,7 @@ func (s AggregateSourceStrategy) Accept(
 	_, e := config.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == SourceStrategyAggregate
+		return sc.Type == AggregateSourceType
 	}
 	return false
 }

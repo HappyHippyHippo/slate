@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	// SourceStrategyFile defines the value to be used to declare a
+	// FileSourceType defines the value to be used to declare a
 	// simple file config source type.
-	SourceStrategyFile = "file"
+	FileSourceType = "file"
 )
 
 type fileSourceConfig struct {
@@ -60,7 +60,7 @@ func (s FileSourceStrategy) Accept(
 	_, e := config.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == SourceStrategyFile
+		return sc.Type == FileSourceType
 	}
 	return false
 }

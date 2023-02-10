@@ -93,7 +93,7 @@ func Test_RestSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewRestSourceStrategy(NewMockDecoderFactory(ctrl))
 
-		if sut.Accept(&Config{"type": SourceStrategyUnknown}) {
+		if sut.Accept(&Config{"type": UnknownSourceType}) {
 			t.Error("returned true")
 		}
 	})
@@ -104,7 +104,7 @@ func Test_RestSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewRestSourceStrategy(NewMockDecoderFactory(ctrl))
 
-		if !sut.Accept(&Config{"type": SourceStrategyRest}) {
+		if !sut.Accept(&Config{"type": RestSourceType}) {
 			t.Error("returned false")
 		}
 	})
@@ -218,7 +218,7 @@ func Test_RestSourceStrategy_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		uri := "uri"
-		format := DecoderFormatJSON
+		format := JSONDecoderFormat
 		path := "path"
 		field := "field"
 		value := "value"
@@ -228,7 +228,7 @@ func Test_RestSourceStrategy_Create(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatJSON, gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(JSONDecoderFormat, gomock.Any()).Return(decoder, nil).Times(1)
 
 		sut, _ := NewRestSourceStrategy(decoderFactory)
 		response := http.Response{}
@@ -269,7 +269,7 @@ func Test_RestSourceStrategy_Create(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatJSON, gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(JSONDecoderFormat, gomock.Any()).Return(decoder, nil).Times(1)
 
 		sut, _ := NewRestSourceStrategy(decoderFactory)
 		response := http.Response{}

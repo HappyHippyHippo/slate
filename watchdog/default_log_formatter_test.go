@@ -5,12 +5,12 @@ import (
 	"testing"
 )
 
-func Test_LogFormatter_Start(t *testing.T) {
+func Test_LogFormatterDefault_Start(t *testing.T) {
 	t.Run("format message", func(t *testing.T) {
 		service := "service name"
 		expected := fmt.Sprintf(LogStartMessage, service)
 
-		if check := (&LogFormatter{}).Start(service); check != expected {
+		if check := (&DefaultLogFormatter{}).Start(service); check != expected {
 			t.Errorf("returned the (%v) message when expecting (%v)", check, expected)
 		}
 	})
@@ -24,19 +24,19 @@ func Test_LogFormatter_Start(t *testing.T) {
 		service := "service name"
 		expected := fmt.Sprintf(LogStartMessage, service)
 
-		if check := (&LogFormatter{}).Start(service); check != expected {
+		if check := (&DefaultLogFormatter{}).Start(service); check != expected {
 			t.Errorf("returned the (%v) message when expecting (%v)", check, expected)
 		}
 	})
 }
 
-func Test_LogFormatter_Error(t *testing.T) {
+func Test_LogFormatterDefault_Error(t *testing.T) {
 	t.Run("format message", func(t *testing.T) {
 		service := "service name"
 		err := fmt.Errorf("error message")
 		expected := fmt.Sprintf(LogErrorMessage, service, err)
 
-		if check := (&LogFormatter{}).Error(service, err); check != expected {
+		if check := (&DefaultLogFormatter{}).Error(service, err); check != expected {
 			t.Errorf("returned the (%v) message when expecting (%v)", check, expected)
 		}
 	})
@@ -51,18 +51,18 @@ func Test_LogFormatter_Error(t *testing.T) {
 		err := fmt.Errorf("error message")
 		expected := fmt.Sprintf(LogErrorMessage, service, err)
 
-		if check := (&LogFormatter{}).Error(service, err); check != expected {
+		if check := (&DefaultLogFormatter{}).Error(service, err); check != expected {
 			t.Errorf("returned the (%v) message when expecting (%v)", check, expected)
 		}
 	})
 }
 
-func Test_LogFormatter_Done(t *testing.T) {
+func Test_LogFormatterDefault_Done(t *testing.T) {
 	t.Run("format message", func(t *testing.T) {
 		service := "service name"
 		expected := fmt.Sprintf(LogDoneMessage, service)
 
-		if check := (&LogFormatter{}).Done(service); check != expected {
+		if check := (&DefaultLogFormatter{}).Done(service); check != expected {
 			t.Errorf("returned the (%v) message when expecting (%v)", check, expected)
 		}
 	})
@@ -76,7 +76,7 @@ func Test_LogFormatter_Done(t *testing.T) {
 		service := "service name"
 		expected := fmt.Sprintf(LogDoneMessage, service)
 
-		if check := (&LogFormatter{}).Done(service); check != expected {
+		if check := (&DefaultLogFormatter{}).Done(service); check != expected {
 			t.Errorf("returned the (%v) message when expecting (%v)", check, expected)
 		}
 	})

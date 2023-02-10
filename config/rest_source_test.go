@@ -20,7 +20,7 @@ func Test_NewRestSource(t *testing.T) {
 
 		decoderFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := NewRestSource(nil, "uri", DecoderFormatUnknown, decoderFactory, "path")
+		sut, e := NewRestSource(nil, "uri", UnknownDecoderFormat, decoderFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -37,7 +37,7 @@ func Test_NewRestSource(t *testing.T) {
 
 		client := NewMockHTTPClient(ctrl)
 
-		sut, e := NewRestSource(client, "uri", DecoderFormatUnknown, nil, "path")
+		sut, e := NewRestSource(client, "uri", UnknownDecoderFormat, nil, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -56,7 +56,7 @@ func Test_NewRestSource(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		decoderFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := NewRestSource(client, "\n", DecoderFormatUnknown, decoderFactory, "path")
+		sut, e := NewRestSource(client, "\n", UnknownDecoderFormat, decoderFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -76,7 +76,7 @@ func Test_NewRestSource(t *testing.T) {
 		client.EXPECT().Do(gomock.Any()).Return(nil, expected).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := NewRestSource(client, "uri", DecoderFormatUnknown, decoderFactory, "path")
+		sut, e := NewRestSource(client, "uri", UnknownDecoderFormat, decoderFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -97,9 +97,9 @@ func Test_NewRestSource(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatUnknown, gomock.Any()).Return(nil, expected).Times(1)
+		decoderFactory.EXPECT().Create(UnknownDecoderFormat, gomock.Any()).Return(nil, expected).Times(1)
 
-		sut, e := NewRestSource(client, "uri", DecoderFormatUnknown, decoderFactory, "path")
+		sut, e := NewRestSource(client, "uri", UnknownDecoderFormat, decoderFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -123,9 +123,9 @@ func Test_NewRestSource(t *testing.T) {
 		decoder.EXPECT().Decode().Return(nil, expected).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := NewRestSource(client, "uri", DecoderFormatYAML, decoderFactory, "path")
+		sut, e := NewRestSource(client, "uri", YAMLDecoderFormat, decoderFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -148,9 +148,9 @@ func Test_NewRestSource(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&Config{}, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := NewRestSource(client, "uri", DecoderFormatYAML, decoderFactory, "path")
+		sut, e := NewRestSource(client, "uri", YAMLDecoderFormat, decoderFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -173,9 +173,9 @@ func Test_NewRestSource(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&Config{"path": 123}, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := NewRestSource(client, "uri", DecoderFormatYAML, decoderFactory, "path.node")
+		sut, e := NewRestSource(client, "uri", YAMLDecoderFormat, decoderFactory, "path.node")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -198,9 +198,9 @@ func Test_NewRestSource(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&Config{"path": 123}, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := NewRestSource(client, "uri", DecoderFormatYAML, decoderFactory, "path")
+		sut, e := NewRestSource(client, "uri", YAMLDecoderFormat, decoderFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -224,9 +224,9 @@ func Test_NewRestSource(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&Config{"path": expected}, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := NewRestSource(client, "uri", DecoderFormatYAML, decoderFactory, "path")
+		sut, e := NewRestSource(client, "uri", YAMLDecoderFormat, decoderFactory, "path")
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e : %v", e)
@@ -250,9 +250,9 @@ func Test_NewRestSource(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&Config{"node": Config{"inner_node": expected}}, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, gomock.Any()).Return(decoder, nil).Times(1)
 
-		sut, e := NewRestSource(client, "uri", DecoderFormatYAML, decoderFactory, "node..inner_node")
+		sut, e := NewRestSource(client, "uri", YAMLDecoderFormat, decoderFactory, "node..inner_node")
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e : %v", e)

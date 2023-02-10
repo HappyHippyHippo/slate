@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	// StreamStrategyConsole defines the value to be used to declare a
+	// ConsoleStreamType defines the value to be used to declare a
 	// console Log stream type.
-	StreamStrategyConsole = "console"
+	ConsoleStreamType = "console"
 )
 
 type consoleStreamConfig struct {
@@ -54,7 +54,7 @@ func (s ConsoleStreamStrategy) Accept(
 	_, e := cfg.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == StreamStrategyConsole
+		return sc.Type == ConsoleStreamType
 	}
 	return false
 }

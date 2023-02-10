@@ -43,7 +43,7 @@ func NewLoader(
 // path and format.
 func (l Loader) Load() error {
 	// retrieve the loader entry file config content
-	sc := &Config{"type": SourceStrategyFile, "path": LoaderSourcePath, "format": LoaderSourceFormat}
+	sc := &Config{"type": FileSourceType, "path": LoaderSourcePath, "format": LoaderSourceFormat}
 	src, e := l.sourceFactory.Create(sc)
 	if e != nil {
 		return e

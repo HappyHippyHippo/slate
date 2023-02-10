@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	// StreamStrategyRotatingFile defines the value to be used to declare a
+	// RotatingFileStreamType defines the value to be used to declare a
 	// file Log stream type that rotates regarding the current date.
-	StreamStrategyRotatingFile = "rotating-file"
+	RotatingFileStreamType = "rotating-file"
 )
 
 type rotatingFileStreamConfig struct {
@@ -64,7 +64,7 @@ func (s RotatingFileStreamStrategy) Accept(
 	_, e := cfg.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == StreamStrategyRotatingFile
+		return sc.Type == RotatingFileStreamType
 	}
 	return false
 }

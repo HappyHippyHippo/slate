@@ -48,8 +48,8 @@ func (p Provider) Register(
 		return errNilPointer("container")
 	}
 	// add the default log formatter strategy
-	_ = container[0].Service(DefaultLogFormatterStrategyID, func() *LogFormatterStrategy {
-		return &LogFormatterStrategy{}
+	_ = container[0].Service(DefaultLogFormatterStrategyID, func() *DefaultLogFormatterStrategy {
+		return &DefaultLogFormatterStrategy{}
 	}, LogFormatterStrategyTag)
 	// add the watchdog log formatter factory
 	_ = container[0].Service(LogFormatterFactoryID, func() ILogFormatterFactory {

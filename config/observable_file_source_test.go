@@ -17,7 +17,7 @@ func Test_NewObservableFileSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, e := NewObservableFileSource("path", DecoderFormatYAML, nil, NewMockDecoderFactory(ctrl))
+		sut, e := NewObservableFileSource("path", YAMLDecoderFormat, nil, NewMockDecoderFactory(ctrl))
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -32,7 +32,7 @@ func Test_NewObservableFileSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, e := NewObservableFileSource("path", DecoderFormatYAML, NewMockFs(ctrl), nil)
+		sut, e := NewObservableFileSource("path", YAMLDecoderFormat, NewMockFs(ctrl), nil)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -53,7 +53,7 @@ func Test_NewObservableFileSource(t *testing.T) {
 		fs.EXPECT().Stat(path).Return(nil, expected).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := NewObservableFileSource(path, DecoderFormatYAML, fs, decoderFactory)
+		sut, e := NewObservableFileSource(path, YAMLDecoderFormat, fs, decoderFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -77,7 +77,7 @@ func Test_NewObservableFileSource(t *testing.T) {
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
 
-		sut, e := NewObservableFileSource(path, DecoderFormatYAML, fs, decoderFactory)
+		sut, e := NewObservableFileSource(path, YAMLDecoderFormat, fs, decoderFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -102,9 +102,9 @@ func Test_NewObservableFileSource(t *testing.T) {
 		fs.EXPECT().Stat(path).Return(fileInfo, nil).Times(1)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatUnknown, file).Return(nil, expected).Times(1)
+		decoderFactory.EXPECT().Create(UnknownDecoderFormat, file).Return(nil, expected).Times(1)
 
-		sut, e := NewObservableFileSource(path, DecoderFormatUnknown, fs, decoderFactory)
+		sut, e := NewObservableFileSource(path, UnknownDecoderFormat, fs, decoderFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -131,9 +131,9 @@ func Test_NewObservableFileSource(t *testing.T) {
 		decoder.EXPECT().Decode().Return(nil, expected).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, file).Return(decoder, nil).Times(1)
 
-		sut, e := NewObservableFileSource(path, DecoderFormatYAML, fs, decoderFactory)
+		sut, e := NewObservableFileSource(path, YAMLDecoderFormat, fs, decoderFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -162,9 +162,9 @@ func Test_NewObservableFileSource(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, file).Return(decoder, nil).Times(1)
 
-		sut, e := NewObservableFileSource(path, DecoderFormatYAML, fs, decoderFactory)
+		sut, e := NewObservableFileSource(path, YAMLDecoderFormat, fs, decoderFactory)
 		switch {
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
@@ -176,7 +176,7 @@ func Test_NewObservableFileSource(t *testing.T) {
 				t.Error("didn't created the access mutex")
 			case sut.path != path:
 				t.Error("didn't stored the file path")
-			case sut.format != DecoderFormatYAML:
+			case sut.format != YAMLDecoderFormat:
 				t.Error("didn't stored the file content format")
 			case sut.fileSystem != fs:
 				t.Error("didn't stored the file system adapter reference")
@@ -211,9 +211,9 @@ func Test_ObservableFileSource_Reload(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&Config{field: value}, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, file).Return(decoder, nil).Times(1)
 
-		sut, _ := NewObservableFileSource(path, DecoderFormatYAML, fs, decoderFactory)
+		sut, _ := NewObservableFileSource(path, YAMLDecoderFormat, fs, decoderFactory)
 
 		reloaded, e := sut.Reload()
 		switch {
@@ -253,9 +253,9 @@ func Test_ObservableFileSource_Reload(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&Config{field: value}, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, file).Return(decoder, nil).Times(1)
 
-		sut, _ := NewObservableFileSource(path, DecoderFormatYAML, fs, decoderFactory)
+		sut, _ := NewObservableFileSource(path, YAMLDecoderFormat, fs, decoderFactory)
 
 		reloaded, e := sut.Reload()
 		switch {
@@ -285,9 +285,9 @@ func Test_ObservableFileSource_Reload(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&Config{field: value}, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, file).Return(decoder, nil).Times(1)
 
-		sut, _ := NewObservableFileSource(path, DecoderFormatYAML, fs, decoderFactory)
+		sut, _ := NewObservableFileSource(path, YAMLDecoderFormat, fs, decoderFactory)
 
 		if reloaded, e := sut.Reload(); reloaded {
 			t.Error("flagged that was reloaded")
@@ -326,11 +326,11 @@ func Test_ObservableFileSource_Reload(t *testing.T) {
 		decoder2.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
 		gomock.InOrder(
-			decoderFactory.EXPECT().Create(DecoderFormatYAML, file1).Return(decoder1, nil).Times(1),
-			decoderFactory.EXPECT().Create(DecoderFormatYAML, file2).Return(decoder2, nil).Times(1),
+			decoderFactory.EXPECT().Create(YAMLDecoderFormat, file1).Return(decoder1, nil).Times(1),
+			decoderFactory.EXPECT().Create(YAMLDecoderFormat, file2).Return(decoder2, nil).Times(1),
 		)
 
-		sut, _ := NewObservableFileSource(path, DecoderFormatYAML, fs, decoderFactory)
+		sut, _ := NewObservableFileSource(path, YAMLDecoderFormat, fs, decoderFactory)
 
 		reloaded, e := sut.Reload()
 		switch {

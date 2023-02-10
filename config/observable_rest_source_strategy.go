@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	// SourceStrategyObservableRest defines the value to be used to
+	// ObservableRestSourceType defines the value to be used to
 	// declare an observable rest config source type.
-	SourceStrategyObservableRest = "observable-rest"
+	ObservableRestSourceType = "observable-rest"
 )
 
 type observableRestSourceConfig struct {
@@ -60,7 +60,7 @@ func (s ObservableRestSourceStrategy) Accept(
 	_, e := config.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == SourceStrategyObservableRest
+		return sc.Type == ObservableRestSourceType
 	}
 	return false
 }

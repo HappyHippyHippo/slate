@@ -1,9 +1,9 @@
 package config
 
 const (
-	// SourceStrategyEnvironment defines the value to be used to declare an
-	// environment config source type.
-	SourceStrategyEnvironment = "env"
+	// EnvironmentSourceType defines the value to be used to
+	// declare an environment config source type.
+	EnvironmentSourceType = "env"
 )
 
 type envSourceConfig struct {
@@ -31,7 +31,7 @@ func (s EnvSourceStrategy) Accept(
 	_, e := config.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == SourceStrategyEnvironment
+		return sc.Type == EnvironmentSourceType
 	}
 	return false
 }

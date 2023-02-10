@@ -41,10 +41,10 @@ func (f LogFormatterFactory) Create(
 	if cfg == nil {
 		return nil, errNilPointer("cfg")
 	}
-	// find a strategy that accepts the requested LogFormatter type
+	// find a strategy that accepts the requested DefaultLogFormatter type
 	for _, strategy := range f {
 		if strategy.Accept(cfg) {
-			// create the requested config LogFormatter
+			// create the requested config DefaultLogFormatter
 			return strategy.Create(cfg)
 		}
 	}

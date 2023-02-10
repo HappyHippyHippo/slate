@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	// SourceStrategyDirectory defines the value to be used to declare a
+	// DirectorySourceType defines the value to be used to declare a
 	// simple dir config source type.
-	SourceStrategyDirectory = "dir"
+	DirectorySourceType = "dir"
 )
 
 type dirSourceConfig struct {
@@ -61,7 +61,7 @@ func (s DirSourceStrategy) Accept(
 	_, e := config.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == SourceStrategyDirectory
+		return sc.Type == DirectorySourceType
 	}
 	return false
 }

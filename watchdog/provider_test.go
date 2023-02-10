@@ -64,7 +64,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a reference to the default log formatter strategy")
 		default:
 			switch sut.(type) {
-			case *LogFormatterStrategy:
+			case *DefaultLogFormatterStrategy:
 			default:
 				t.Error("didn't returned the default log formatter strategy")
 			}

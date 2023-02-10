@@ -105,4 +105,15 @@ var (
 	TranslatorNotFound = fmt.Errorf("translator not found")
 )
 
+var (
+	// CacheMiss @todo doc
+	CacheMiss = fmt.Errorf("cache key not found")
+
+	// CacheNotStored @todo doc
+	CacheNotStored = fmt.Errorf("cache element not found")
+
+	// CacheNotSupported @todo doc
+	CacheNotSupported = fmt.Errorf("cache functionality not supported")
+)
+
 //revive:enable:error-naming

@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	// DecoderFormatJSON defines the value to be used to declare
+	// JSONDecoderFormat defines the value to be used to declare
 	// a JSON config source format.
-	DecoderFormatJSON = "json"
+	JSONDecoderFormat = "json"
 )
 
 // JSONDecoderStrategy defines a JSON config decoder
@@ -22,7 +22,7 @@ func (JSONDecoderStrategy) Accept(
 	format string,
 ) bool {
 	// only accepts JSON format
-	return format == DecoderFormatJSON
+	return format == JSONDecoderFormat
 }
 
 // Create will instantiate the desired decoder instance with the given reader

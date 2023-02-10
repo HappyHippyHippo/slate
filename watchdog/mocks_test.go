@@ -748,7 +748,7 @@ func (mr *MockLogRecorder) Stream(id interface{}) *gomock.Call {
 // Log Formatter
 //------------------------------------------------------------------------------
 
-// MockLogFormatter is a mock an instance of LogFormatter interface.
+// MockLogFormatter is a mock an instance of DefaultLogFormatter interface.
 type MockLogFormatter struct {
 	ctrl     *gomock.Controller
 	recorder *MockLogFormatterRecorder

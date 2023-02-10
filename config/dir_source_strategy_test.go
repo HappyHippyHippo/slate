@@ -102,7 +102,7 @@ func Test_DirSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewDirSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
 
-		if sut.Accept(&Config{"type": SourceStrategyUnknown}) {
+		if sut.Accept(&Config{"type": UnknownSourceType}) {
 			t.Error("returned true")
 		}
 	})
@@ -113,7 +113,7 @@ func Test_DirSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewDirSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
 
-		if !sut.Accept(&Config{"type": SourceStrategyDirectory}) {
+		if !sut.Accept(&Config{"type": DirectorySourceType}) {
 			t.Error("returned false")
 		}
 	})
@@ -243,11 +243,11 @@ func Test_DirSourceStrategy_Create(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, file).Return(decoder, nil).Times(1)
 
 		sut, _ := NewDirSourceStrategy(fs, decoderFactory)
 
-		src, e := sut.Create(&Config{"path": path, "format": DecoderFormatYAML, "recursive": true})
+		src, e := sut.Create(&Config{"path": path, "format": YAMLDecoderFormat, "recursive": true})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -286,7 +286,7 @@ func Test_DirSourceStrategy_Create(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, file).Return(decoder, nil).Times(1)
 
 		sut, _ := NewDirSourceStrategy(fs, decoderFactory)
 

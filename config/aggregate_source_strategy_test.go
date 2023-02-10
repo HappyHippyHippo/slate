@@ -33,7 +33,7 @@ func Test_SourceStrategyAggregate_Accept(t *testing.T) {
 	t.Run("don't accept if type is not env", func(t *testing.T) {
 		if (&AggregateSourceStrategy{
 			configs: []IConfig{},
-		}).Accept(&Config{"type": SourceStrategyUnknown}) {
+		}).Accept(&Config{"type": UnknownSourceType}) {
 			t.Error("returned true")
 		}
 	})

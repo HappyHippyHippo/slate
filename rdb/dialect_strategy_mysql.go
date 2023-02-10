@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	// DialectStrategyMySQL defines the value to be used to identify a
+	// MySQLDialectType defines the value to be used to identify a
 	// MySQL dialect.
-	DialectStrategyMySQL = "mysql"
+	MySQLDialectType = "mysql"
 )
 
 type mysqlDialectConfig struct {
@@ -46,7 +46,7 @@ func (MySQLDialectStrategy) Accept(
 		return false
 	}
 	// only accepts a mysql dialect request
-	return strings.EqualFold(strings.ToLower(dc.Dialect), DialectStrategyMySQL)
+	return strings.EqualFold(strings.ToLower(dc.Dialect), MySQLDialectType)
 }
 
 // Get instantiates the requested mysql connection dialect.

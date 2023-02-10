@@ -94,7 +94,7 @@ func Test_RotatingFileStreamStrategy_Accept(t *testing.T) {
 		config := NewMockConfig(ctrl)
 		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&struct{ Type string }{})).DoAndReturn(
 			func(_ string, data *struct{ Type string }, _ ...bool) (interface{}, error) {
-				data.Type = StreamStrategyUnknown
+				data.Type = UnknownStream
 				return data, nil
 			},
 		).Times(1)
@@ -113,7 +113,7 @@ func Test_RotatingFileStreamStrategy_Accept(t *testing.T) {
 		config := NewMockConfig(ctrl)
 		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&struct{ Type string }{})).DoAndReturn(
 			func(_ string, data *struct{ Type string }, _ ...bool) (interface{}, error) {
-				data.Type = StreamStrategyRotatingFile
+				data.Type = RotatingFileStreamType
 				return data, nil
 			},
 		).Times(1)
@@ -177,7 +177,7 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&rotatingFileStreamConfig{})).DoAndReturn(
 			func(_ string, data *rotatingFileStreamConfig, _ ...bool) (interface{}, error) {
 				data.Path = "path"
-				data.Format = FormatterFormatJSON
+				data.Format = JSONFormatterFormat
 				data.Level = "invalid"
 				return data, nil
 			},
@@ -206,14 +206,14 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&rotatingFileStreamConfig{})).DoAndReturn(
 			func(_ string, data *rotatingFileStreamConfig, _ ...bool) (interface{}, error) {
 				data.Path = "path"
-				data.Format = FormatterFormatUnknown
+				data.Format = UnknownFormatterFormat
 				data.Level = "fatal"
 				return data, nil
 			},
 		).Times(1)
 
 		formatterFactory := NewMockFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(FormatterFormatUnknown).Return(nil, expected).Times(1)
+		formatterFactory.EXPECT().Create(UnknownFormatterFormat).Return(nil, expected).Times(1)
 
 		sut, _ := NewRotatingFileStreamStrategy(NewMockFs(ctrl), formatterFactory)
 
@@ -241,7 +241,7 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&rotatingFileStreamConfig{})).DoAndReturn(
 			func(_ string, data *rotatingFileStreamConfig, _ ...bool) (interface{}, error) {
 				data.Path = path
-				data.Format = FormatterFormatJSON
+				data.Format = JSONFormatterFormat
 				data.Level = "fatal"
 				return data, nil
 			},
@@ -251,7 +251,7 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 		formatter := NewMockFormatter(ctrl)
 		formatterFactory := NewMockFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(FormatterFormatJSON).Return(formatter, nil).Times(1)
+		formatterFactory.EXPECT().Create(JSONFormatterFormat).Return(formatter, nil).Times(1)
 
 		sut, _ := NewRotatingFileStreamStrategy(fileSystem, formatterFactory)
 
@@ -278,7 +278,7 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&rotatingFileStreamConfig{})).DoAndReturn(
 			func(_ string, data *rotatingFileStreamConfig, _ ...bool) (interface{}, error) {
 				data.Path = path
-				data.Format = FormatterFormatJSON
+				data.Format = JSONFormatterFormat
 				data.Level = "fatal"
 				data.Channels = []interface{}{"channel1", "channel2"}
 				return data, nil
@@ -291,7 +291,7 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		formatter := NewMockFormatter(ctrl)
 		formatterFactory := NewMockFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(FormatterFormatJSON).Return(formatter, nil).Times(1)
+		formatterFactory.EXPECT().Create(JSONFormatterFormat).Return(formatter, nil).Times(1)
 
 		sut, _ := NewRotatingFileStreamStrategy(fileSystem, formatterFactory)
 

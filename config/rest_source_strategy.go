@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	// SourceStrategyRest defines the value to be used to declare a
+	// RestSourceType defines the value to be used to declare a
 	// rest config source type.
-	SourceStrategyRest = "rest"
+	RestSourceType = "rest"
 )
 
 type restSourceConfig struct {
@@ -58,7 +58,7 @@ func (s RestSourceStrategy) Accept(
 	_, e := config.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == SourceStrategyRest
+		return sc.Type == RestSourceType
 	}
 	return false
 }

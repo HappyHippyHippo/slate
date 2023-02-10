@@ -187,3 +187,27 @@ func Test_TranslatorNotFound(t *testing.T) {
 		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
 	}
 }
+
+func Test_CacheMiss(t *testing.T) {
+	expected := "cache key not found"
+
+	if chk := CacheMiss.Error(); chk != expected {
+		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
+	}
+}
+
+func Test_CacheNotStored(t *testing.T) {
+	expected := "cache element not found"
+
+	if chk := CacheNotStored.Error(); chk != expected {
+		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
+	}
+}
+
+func Test_CacheNotSupported(t *testing.T) {
+	expected := "cache functionality not supported"
+
+	if chk := CacheNotSupported.Error(); chk != expected {
+		t.Errorf("error with '%s' message when expecting '%s'", chk, expected)
+	}
+}

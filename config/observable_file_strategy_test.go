@@ -103,7 +103,7 @@ func Test_ObservableFileSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewObservableFileSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
 
-		if sut.Accept(&Config{"type": SourceStrategyUnknown}) {
+		if sut.Accept(&Config{"type": UnknownSourceType}) {
 			t.Error("returned true")
 		}
 	})
@@ -114,7 +114,7 @@ func Test_ObservableFileSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewObservableFileSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
 
-		if !sut.Accept(&Config{"type": SourceStrategyObservableFile}) {
+		if !sut.Accept(&Config{"type": ObservableFileSourceType}) {
 			t.Error("returned false")
 		}
 	})
@@ -207,11 +207,11 @@ func Test_ObservableFileSourceStrategy_Create(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, file).Return(decoder, nil).Times(1)
 
 		sut, _ := NewObservableFileSourceStrategy(fs, decoderFactory)
 
-		src, e := sut.Create(&Config{"path": path, "format": DecoderFormatYAML})
+		src, e := sut.Create(&Config{"path": path, "format": YAMLDecoderFormat})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -247,7 +247,7 @@ func Test_ObservableFileSourceStrategy_Create(t *testing.T) {
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(DecoderFormatYAML, file).Return(decoder, nil).Times(1)
+		decoderFactory.EXPECT().Create(YAMLDecoderFormat, file).Return(decoder, nil).Times(1)
 
 		sut, _ := NewObservableFileSourceStrategy(fs, decoderFactory)
 

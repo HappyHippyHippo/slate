@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	// SourceStrategyObservableFile defines the value to be used to
+	// ObservableFileSourceType defines the value to be used to
 	// declare an observable file config source type.
-	SourceStrategyObservableFile = "observable-file"
+	ObservableFileSourceType = "observable-file"
 )
 
 type observableFileSourceConfig struct {
@@ -60,7 +60,7 @@ func (s ObservableFileSourceStrategy) Accept(
 	_, e := config.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == SourceStrategyObservableFile
+		return sc.Type == ObservableFileSourceType
 	}
 	return false
 }

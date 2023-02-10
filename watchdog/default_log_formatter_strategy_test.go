@@ -7,9 +7,9 @@ import (
 	"github.com/golang/mock/gomock"
 )
 
-func Test_LogFormatterStrategy_Accept(t *testing.T) {
+func Test_DefaultLogFormatterStrategy_Accept(t *testing.T) {
 	t.Run("don't accept if config is a nil pointer", func(t *testing.T) {
-		if (&LogFormatterStrategy{}).Accept(nil) {
+		if (&DefaultLogFormatterStrategy{}).Accept(nil) {
 			t.Error("returned true")
 		}
 	})
@@ -25,7 +25,7 @@ func Test_LogFormatterStrategy_Accept(t *testing.T) {
 			},
 		).Times(1)
 
-		if (&LogFormatterStrategy{}).Accept(config) {
+		if (&DefaultLogFormatterStrategy{}).Accept(config) {
 			t.Error("returned true")
 		}
 	})
@@ -37,12 +37,12 @@ func Test_LogFormatterStrategy_Accept(t *testing.T) {
 		config := NewMockConfig(ctrl)
 		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&struct{ Type string }{})).DoAndReturn(
 			func(_ string, data *struct{ Type string }, _ ...bool) (interface{}, error) {
-				data.Type = FormatterUnknown
+				data.Type = UnknownLogFormatterType
 				return data, nil
 			},
 		).Times(1)
 
-		if (&LogFormatterStrategy{}).Accept(config) {
+		if (&DefaultLogFormatterStrategy{}).Accept(config) {
 			t.Error("returned true")
 		}
 	})
@@ -54,25 +54,25 @@ func Test_LogFormatterStrategy_Accept(t *testing.T) {
 		config := NewMockConfig(ctrl)
 		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&struct{ Type string }{})).DoAndReturn(
 			func(_ string, data *struct{ Type string }, _ ...bool) (interface{}, error) {
-				data.Type = FormatterDefault
+				data.Type = DefaultLogFormatterType
 				return data, nil
 			},
 		).Times(1)
 
-		if !(&LogFormatterStrategy{}).Accept(config) {
+		if !(&DefaultLogFormatterStrategy{}).Accept(config) {
 			t.Error("returned false")
 		}
 	})
 }
 
-func Test_LogFormatterStrategy_Create(t *testing.T) {
+func Test_DefaultLogFormatterStrategy_Create(t *testing.T) {
 	t.Run("new formatter", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		config := NewMockConfig(ctrl)
 
-		stream, e := (&LogFormatterStrategy{}).Create(config)
+		stream, e := (&DefaultLogFormatterStrategy{}).Create(config)
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -80,7 +80,7 @@ func Test_LogFormatterStrategy_Create(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch stream.(type) {
-			case *LogFormatter:
+			case *DefaultLogFormatter:
 			default:
 				t.Error("didn't returned a log formatter")
 			}

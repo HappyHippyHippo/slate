@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	// StreamStrategyFile defines the value to be used to declare a
+	// FileStreamType defines the value to be used to declare a
 	// file Log stream type.
-	StreamStrategyFile = "file"
+	FileStreamType = "file"
 )
 
 type fileStreamConfig struct {
@@ -65,7 +65,7 @@ func (s FileStreamStrategy) Accept(
 	_, e := cfg.Populate("", &sc)
 	if e == nil {
 		// return acceptance for the read config type
-		return sc.Type == StreamStrategyFile
+		return sc.Type == FileStreamType
 	}
 	return false
 }

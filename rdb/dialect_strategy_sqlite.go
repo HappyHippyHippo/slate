@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	// DialectStrategySqlite defines the value to be used to identify a
+	// SqliteDialectType defines the value to be used to identify a
 	// Sqlite dialect.
-	DialectStrategySqlite = "sqlite"
+	SqliteDialectType = "sqlite"
 )
 
 type sqliteDialectConfig struct {
@@ -41,7 +41,7 @@ func (SqliteDialectStrategy) Accept(
 		return false
 	}
 	// only accepts a mysql dialect request
-	return strings.EqualFold(strings.ToLower(dc.Dialect), DialectStrategySqlite)
+	return strings.EqualFold(strings.ToLower(dc.Dialect), SqliteDialectType)
 }
 
 // Get instantiates the requested mysql connection dialect.

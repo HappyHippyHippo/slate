@@ -1,11 +1,5 @@
 package log
 
-const (
-	// FormatterFormatUnknown defines the value to be used to declare an
-	// unknown Log formatter format.
-	FormatterFormatUnknown = "unknown"
-)
-
 // IFormatterFactory defined the interface of a log formatter
 // factory instance.
 type IFormatterFactory interface {

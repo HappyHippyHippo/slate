@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	// DecoderFormatYAML defines the value to be used to declare
+	// YAMLDecoderFormat defines the value to be used to declare
 	// a YAML config source format.
-	DecoderFormatYAML = "yaml"
+	YAMLDecoderFormat = "yaml"
 )
 
 // YAMLDecoderStrategy defines a YAML config decoder
@@ -22,7 +22,7 @@ func (YAMLDecoderStrategy) Accept(
 	format string,
 ) bool {
 	// only accepts YAML format
-	return format == DecoderFormatYAML
+	return format == YAMLDecoderFormat
 }
 
 // Create will instantiate the desired decoder instance with the given reader

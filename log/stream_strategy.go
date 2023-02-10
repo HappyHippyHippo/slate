@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	// StreamStrategyUnknown defines the value to be used to declare an
+	// UnknownStream defines the value to be used to declare an
 	// unknown Log stream type.
-	StreamStrategyUnknown = "unknown"
+	UnknownStream = "unknown"
 )
 
 // IStreamStrategy interface defines the methods of the stream
