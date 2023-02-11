@@ -98,40 +98,10 @@ func Test_errContainer(t *testing.T) {
 	})
 }
 
-func Test_errFactoryWithoutResult(t *testing.T) {
-	arg := "dummy argument"
-	context := map[string]interface{}{"field": "value"}
-	message := "dummy argument : factory without result"
-
-	t.Run("creation without context", func(t *testing.T) {
-		if e := errFactoryWithoutResult(arg); !errors.Is(e, ErrFactoryWithoutResult) {
-			t.Errorf("error not a instance of ErrFactoryWithoutResult")
-		} else if e.Error() != message {
-			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(IError); !ok {
-			t.Errorf("didn't returned a slate error instance")
-		} else if te.Context() != nil {
-			t.Errorf("didn't stored a nil value context")
-		}
-	})
-
-	t.Run("creation with context", func(t *testing.T) {
-		if e := errFactoryWithoutResult(arg, context); !errors.Is(e, ErrFactoryWithoutResult) {
-			t.Errorf("error not a instance of ErrFactoryWithoutResult")
-		} else if e.Error() != message {
-			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(IError); !ok {
-			t.Errorf("didn't returned a slate error instance")
-		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
-			t.Errorf("context (%v) not same as expected (%v)", check, context)
-		}
-	})
-}
-
 func Test_errNonFunctionFactory(t *testing.T) {
 	arg := "dummy argument"
 	context := map[string]interface{}{"field": "value"}
-	message := "dummy argument : non-function factory"
+	message := "dummy argument : non-function service factory"
 
 	t.Run("creation without context", func(t *testing.T) {
 		if e := errNonFunctionFactory(arg); !errors.Is(e, ErrNonFunctionFactory) {
@@ -148,6 +118,36 @@ func Test_errNonFunctionFactory(t *testing.T) {
 	t.Run("creation with context", func(t *testing.T) {
 		if e := errNonFunctionFactory(arg, context); !errors.Is(e, ErrNonFunctionFactory) {
 			t.Errorf("error not a instance of ErrNonFunctionFactory")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
+			t.Errorf("context (%v) not same as expected (%v)", check, context)
+		}
+	})
+}
+
+func Test_errFactoryWithoutResult(t *testing.T) {
+	arg := "dummy argument"
+	context := map[string]interface{}{"field": "value"}
+	message := "dummy argument : service factory without result"
+
+	t.Run("creation without context", func(t *testing.T) {
+		if e := errFactoryWithoutResult(arg); !errors.Is(e, ErrFactoryWithoutResult) {
+			t.Errorf("error not a instance of ErrFactoryWithoutResult")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(IError); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if te.Context() != nil {
+			t.Errorf("didn't stored a nil value context")
+		}
+	})
+
+	t.Run("creation with context", func(t *testing.T) {
+		if e := errFactoryWithoutResult(arg, context); !errors.Is(e, ErrFactoryWithoutResult) {
+			t.Errorf("error not a instance of ErrFactoryWithoutResult")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
 		} else if te, ok := e.(IError); !ok {

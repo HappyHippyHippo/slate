@@ -20,11 +20,11 @@ var (
 
 	// ErrRestConfigNotFound defines a rest response
 	// config not found error.
-	ErrRestConfigNotFound = fmt.Errorf("rest config not found")
+	ErrRestConfigNotFound = fmt.Errorf("rest config source config not found")
 
 	// ErrRestTimestampNotFound defines a rest response
 	// timestamp not found error.
-	ErrRestTimestampNotFound = fmt.Errorf("rest timestamp not found")
+	ErrRestTimestampNotFound = fmt.Errorf("rest config source timestamp not found")
 
 	// ErrSourceNotFound defines a source config source not found error.
 	ErrSourceNotFound = fmt.Errorf("config source not found")

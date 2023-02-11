@@ -162,7 +162,7 @@ func Test_errInvalidSource(t *testing.T) {
 func Test_errRestConfigNotFound(t *testing.T) {
 	arg := "dummy argument"
 	context := map[string]interface{}{"field": "value"}
-	message := "dummy argument : rest config not found"
+	message := "dummy argument : rest config source config not found"
 
 	t.Run("creation without context", func(t *testing.T) {
 		if e := errRestConfigNotFound(arg); !errors.Is(e, ErrRestConfigNotFound) {
@@ -192,7 +192,7 @@ func Test_errRestConfigNotFound(t *testing.T) {
 func Test_errRestTimestampNotFound(t *testing.T) {
 	arg := "dummy argument"
 	context := map[string]interface{}{"field": "value"}
-	message := "dummy argument : rest timestamp not found"
+	message := "dummy argument : rest config source timestamp not found"
 
 	t.Run("creation without context", func(t *testing.T) {
 		if e := errRestTimestampNotFound(arg); !errors.Is(e, ErrRestTimestampNotFound) {

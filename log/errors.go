@@ -22,12 +22,12 @@ var (
 	ErrInvalidStream = fmt.Errorf("invalid log stream")
 
 	// ErrStreamNotFound @todo doc
-	ErrStreamNotFound = fmt.Errorf("stream not found")
+	ErrStreamNotFound = fmt.Errorf("log stream not found")
 
 	// ErrDuplicateStream defines an error that signal that the
 	// requested log stream to be registered have an id of an already
 	// registered log stream.
-	ErrDuplicateStream = fmt.Errorf("stream already registered")
+	ErrDuplicateStream = fmt.Errorf("log stream already registered")
 )
 
 func errNilPointer(

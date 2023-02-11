@@ -17,12 +17,12 @@ var (
 	// ErrNonFunctionFactory defines a service container registration error
 	// that signals that the registration request was made with a
 	// non-function service factory.
-	ErrNonFunctionFactory = NewError("non-function factory")
+	ErrNonFunctionFactory = NewError("non-function service factory")
 
 	// ErrFactoryWithoutResult defines a service container registration error
 	// that signals that the registration request was made with a
 	// function service factory that don't return a service.
-	ErrFactoryWithoutResult = NewError("factory without result")
+	ErrFactoryWithoutResult = NewError("service factory without result")
 
 	// ErrServiceNotFound defines a service not found on the container.
 	ErrServiceNotFound = NewError("service not found")
@@ -50,18 +50,18 @@ func errContainer(
 	return NewErrorFrom(ErrContainer, fmt.Errorf("%w", e).Error(), ctx...)
 }
 
-func errFactoryWithoutResult(
-	arg string,
-	ctx ...map[string]interface{},
-) error {
-	return NewErrorFrom(ErrFactoryWithoutResult, arg, ctx...)
-}
-
 func errNonFunctionFactory(
 	arg string,
 	ctx ...map[string]interface{},
 ) error {
 	return NewErrorFrom(ErrNonFunctionFactory, arg, ctx...)
+}
+
+func errFactoryWithoutResult(
+	arg string,
+	ctx ...map[string]interface{},
+) error {
+	return NewErrorFrom(ErrFactoryWithoutResult, arg, ctx...)
 }
 
 func errServiceNotFound(

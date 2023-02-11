@@ -163,7 +163,7 @@ func Test_errInvalidStream(t *testing.T) {
 func Test_errStreamNotFound(t *testing.T) {
 	arg := "dummy argument"
 	context := map[string]interface{}{"field": "value"}
-	message := "dummy argument : stream not found"
+	message := "dummy argument : log stream not found"
 
 	t.Run("creation without context", func(t *testing.T) {
 		if e := errStreamNotFound(arg); !errors.Is(e, ErrStreamNotFound) {
@@ -193,7 +193,7 @@ func Test_errStreamNotFound(t *testing.T) {
 func Test_errDuplicateStream(t *testing.T) {
 	arg := "dummy argument"
 	context := map[string]interface{}{"field": "value"}
-	message := "dummy argument : stream already registered"
+	message := "dummy argument : log stream already registered"
 
 	t.Run("creation without context", func(t *testing.T) {
 		if e := errDuplicateStream(arg); !errors.Is(e, ErrDuplicateStream) {
