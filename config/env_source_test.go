@@ -95,4 +95,28 @@ func Test_NewEnvSource(t *testing.T) {
 			}
 		}
 	})
+
+	t.Run("with multi-level mapping (deeper)", func(t *testing.T) {
+		_ = os.Setenv("env1", "value")
+		defer func() {
+			_ = os.Setenv("env1", "")
+		}()
+
+		expected := Config{"root": Config{"node1": Config{"node2": "value"}}}
+
+		sut, e := NewEnvSource(map[string]string{"env1": "root.node1.node2"})
+		switch {
+		case sut == nil:
+			t.Errorf("didn't returned a valid reference")
+		case e != nil:
+			t.Errorf("returned the (%v) error", e)
+		default:
+			switch {
+			case sut.mutex == nil:
+				t.Error("didn't created the access mutex")
+			case !reflect.DeepEqual(sut.config, expected):
+				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.config, expected)
+			}
+		}
+	})
 }

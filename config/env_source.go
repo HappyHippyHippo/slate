@@ -48,13 +48,9 @@ func (s *EnvSource) load() error {
 					if _, ok := step[section]; ok == false {
 						step[section] = Config{}
 					}
-					switch step[section].(type) {
-					case IConfig:
-					default:
-						// create the section if not present
-						step[section] = Config{}
-					}
-					// iterate to the section
+					// create the section if not present
+					// and iterate to the section
+					step[section] = Config{}
 					step = step[section].(Config)
 				} else {
 					// store the value in the target section
