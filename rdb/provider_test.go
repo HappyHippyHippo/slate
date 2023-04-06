@@ -13,14 +13,6 @@ import (
 )
 
 func Test_Provider_Register(t *testing.T) {
-	t.Run("no argument", func(t *testing.T) {
-		if e := (&Provider{}).Register(); e == nil {
-			t.Error("didn't return the expected error")
-		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
-		}
-	})
-
 	t.Run("nil container", func(t *testing.T) {
 		if e := (&Provider{}).Register(nil); e == nil {
 			t.Error("didn't return the expected error")
@@ -39,10 +31,6 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("returned the (%v) error", e)
 		case !container.Has(ConfigID):
 			t.Errorf("didn't register the connection configuration : %v", sut)
-		case !container.Has(MySQLDialectStrategyID):
-			t.Errorf("didn't register the mysql dialect strategy : %v", sut)
-		case !container.Has(SqliteDialectStrategyID):
-			t.Errorf("didn't register the slite dialect strategy : %v", sut)
 		case !container.Has(DialectFactoryID):
 			t.Errorf("didn't register the dialect factory : %v", sut)
 		case !container.Has(ID):
@@ -61,32 +49,6 @@ func Test_Provider_Register(t *testing.T) {
 		case e != nil:
 			t.Errorf("returned the unexpected error (%v)", e)
 		case cfg == nil:
-			t.Error("didn't returned a valid reference")
-		}
-	})
-
-	t.Run("retrieving mysql dialect strategy", func(t *testing.T) {
-		container := slate.NewContainer()
-		_ = (&Provider{}).Register(container)
-
-		service, e := container.Get(MySQLDialectStrategyID)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
-		case service == nil:
-			t.Error("didn't returned a valid reference")
-		}
-	})
-
-	t.Run("retrieving sqlite dialect strategy", func(t *testing.T) {
-		container := slate.NewContainer()
-		_ = (&Provider{}).Register(container)
-
-		service, e := container.Get(SqliteDialectStrategyID)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
-		case service == nil:
 			t.Error("didn't returned a valid reference")
 		}
 	})
@@ -236,14 +198,6 @@ func Test_Provider_Register(t *testing.T) {
 }
 
 func Test_Provider_Boot(t *testing.T) {
-	t.Run("no argument", func(t *testing.T) {
-		if e := (&Provider{}).Boot(); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
-		}
-	})
-
 	t.Run("nil container", func(t *testing.T) {
 		if e := (&Provider{}).Boot(nil); e == nil {
 			t.Error("didn't returned the expected error")
@@ -309,9 +263,15 @@ func Test_Provider_Boot(t *testing.T) {
 	})
 
 	t.Run("run boot", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
 		container := slate.NewContainer()
+
+		dialectStrategy := NewMockDialectStrategy(ctrl)
 		sut := &Provider{}
 		_ = sut.Register(container)
+		_ = container.Service("id", func() (interface{}, error) { return dialectStrategy, nil }, DialectStrategyTag)
 
 		if e := sut.Boot(container); e != nil {
 			t.Errorf("returned the (%v) error", e)

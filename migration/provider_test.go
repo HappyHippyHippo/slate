@@ -9,18 +9,11 @@ import (
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/rdb"
+	"github.com/happyhippyhippo/slate/rdb/sqlite"
 	"gorm.io/gorm"
 )
 
 func Test_Provider_Register(t *testing.T) {
-	t.Run("no argument", func(t *testing.T) {
-		if e := (&Provider{}).Register(); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
-		}
-	})
-
 	t.Run("nil container", func(t *testing.T) {
 		if e := (&Provider{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
@@ -99,8 +92,10 @@ func Test_Provider_Register(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
-		_ = (&rdb.Provider{}).Boot(container)
+		_ = (&sqlite.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
+
+		_ = (&rdb.Provider{}).Boot(container)
 
 		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
 		cfgManager := NewMockConfigManager(ctrl)
@@ -134,8 +129,11 @@ func Test_Provider_Register(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
-		_ = (&rdb.Provider{}).Boot(container)
+		_ = (&rdb.Provider{}).Register(container)
+		_ = (&sqlite.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
+
+		_ = (&rdb.Provider{}).Boot(container)
 
 		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
 		cfgManager := NewMockConfigManager(ctrl)
@@ -202,8 +200,11 @@ func Test_Provider_Register(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
-		_ = (&rdb.Provider{}).Boot(container)
+		_ = (&rdb.Provider{}).Register(container)
+		_ = (&sqlite.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
+
+		_ = (&rdb.Provider{}).Boot(container)
 
 		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
 		cfgManager := NewMockConfigManager(ctrl)
@@ -229,14 +230,6 @@ func Test_Provider_Register(t *testing.T) {
 }
 
 func Test_Provider_Boot(t *testing.T) {
-	t.Run("no argument", func(t *testing.T) {
-		if e := (&Provider{}).Boot(); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
-		}
-	})
-
 	t.Run("nil container", func(t *testing.T) {
 		if e := (&Provider{}).Boot(nil); e == nil {
 			t.Error("didn't returned the expected error")
@@ -310,6 +303,9 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Register(container)
+		_ = (&sqlite.Provider{}).Register(container)
+
 		_ = (&rdb.Provider{}).Boot(container)
 
 		expected := fmt.Errorf("error message")
@@ -338,6 +334,9 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
+		_ = (&rdb.Provider{}).Register(container)
+		_ = (&sqlite.Provider{}).Register(container)
+
 		_ = (&rdb.Provider{}).Boot(container)
 
 		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
@@ -365,6 +364,8 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
+		_ = (&sqlite.Provider{}).Register(container)
+
 		_ = (&rdb.Provider{}).Boot(container)
 
 		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}

@@ -1,21 +1,24 @@
-package rdb
+//go:build mysql
+
+package mysql
 
 import (
 	"fmt"
 	"strings"
 
 	"github.com/happyhippyhippo/slate/config"
+	"github.com/happyhippyhippo/slate/rdb"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 const (
-	// MySQLDialectType defines the value to be used to identify a
+	// DialectType defines the value to be used to identify a
 	// MySQL dialect.
-	MySQLDialectType = "mysql"
+	DialectType = "mysql"
 )
 
-type mysqlDialectConfig struct {
+type dialectConfig struct {
 	Username string
 	Password string
 	Protocol string
@@ -25,19 +28,19 @@ type mysqlDialectConfig struct {
 	Params   config.Config
 }
 
-// MySQLDialectStrategy define a MySQL dialect generation strategy instance.
-type MySQLDialectStrategy struct{}
+// DialectStrategy define a MySQL dialect generation strategy instance.
+type DialectStrategy struct{}
 
-var _ IDialectStrategy = &MySQLDialectStrategy{}
+var _ rdb.IDialectStrategy = &DialectStrategy{}
 
 // NewMySQLDialectStrategy @todo doc
-func NewMySQLDialectStrategy() *MySQLDialectStrategy {
-	return &MySQLDialectStrategy{}
+func NewMySQLDialectStrategy() *DialectStrategy {
+	return &DialectStrategy{}
 }
 
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
-func (MySQLDialectStrategy) Accept(
+func (DialectStrategy) Accept(
 	cfg config.IConfig,
 ) bool {
 	// check config argument reference
@@ -51,11 +54,11 @@ func (MySQLDialectStrategy) Accept(
 		return false
 	}
 	// only accepts a mysql dialect request
-	return strings.EqualFold(strings.ToLower(dc.Dialect), MySQLDialectType)
+	return strings.EqualFold(strings.ToLower(dc.Dialect), DialectType)
 }
 
 // Get instantiates the requested mysql connection dialect.
-func (MySQLDialectStrategy) Get(
+func (DialectStrategy) Get(
 	cfg config.IConfig,
 ) (gorm.Dialector, error) {
 	// check config argument reference
@@ -63,7 +66,7 @@ func (MySQLDialectStrategy) Get(
 		return nil, errNilPointer("cfg")
 	}
 	// retrieve the data from the configuration
-	dc := mysqlDialectConfig{Protocol: "tcp", Port: 3306}
+	dc := dialectConfig{Protocol: "tcp", Port: 3306}
 	_, e := cfg.Populate("", &dc)
 	if e != nil {
 		return nil, e

@@ -3,7 +3,8 @@ DATE    ?= $(shell date +%FT%T%z)
 VERSION ?= $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || \
 			cat $(CURDIR)/.version 2> /dev/null || echo v0)
 PKGS     = $(or $(PKG),$(shell env GO111MODULE=on $(GO) list ./... | grep -v dig))
-TESTPKGS = $(shell env GO111MODULE=on $(GO) list ./... | grep -v dig)
+TAGS	 = -tags="sqlite mysql"
+TESTPKGS = $(shell env GO111MODULE=on $(GO) list $(TAGS) ./... | grep -v dig)
 BIN      = $(CURDIR)/_bin
 
 GO      = go
@@ -53,11 +54,11 @@ test-race:    ARGS=-race         ## Run tests with race detector
 $(TEST_TARGETS): NAME=$(MAKECMDGOALS:test-%=%)
 $(TEST_TARGETS): test
 check test tests: fmt lint critic ; $(info $(M) running $(NAME:%=% )tests…) @ ## Run tests
-	$Q $(GO) test -timeout $(TIMEOUT)s $(ARGS) $(TESTPKGS)
+	$Q $(GO) test $(TAGS) -timeout $(TIMEOUT)s $(ARGS) $(TESTPKGS)
 
 test-xml: fmt lint critic | $(GO2XUNIT) ; $(info $(M) running xUnit tests…) @ ## Run tests with xUnit output
 	$Q mkdir -p test
-	$Q 2>&1 $(GO) test -timeout $(TIMEOUT)s -v $(TESTPKGS) | tee test/tests.output
+	$Q 2>&1 $(GO) test $(TAGS) -timeout $(TIMEOUT)s -v $(TESTPKGS) | tee test/tests.output
 	$(GO2XUNIT) -fail -input _test/tests.output -output _test/tests.xml
 
 COVERAGE_MODE    = atomic
@@ -69,7 +70,7 @@ test-coverage-tools: | $(GOCOV) $(GOCOVXML)
 test-coverage: COVERAGE_DIR := $(CURDIR)/_test/coverage.$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 test-coverage: fmt lint critic test-coverage-tools ; $(info $(M) running coverage tests…) @ ## Run coverage tests
 	$Q mkdir -p $(COVERAGE_DIR)
-	$Q $(GO) test \
+	$Q $(GO) test $(TAGS) \
 		-coverpkg=$($(GO) list $(TESTPKGS)) \
 		-covermode=$(COVERAGE_MODE) \
 		-coverprofile="$(COVERAGE_PROFILE)" $(TESTPKGS)

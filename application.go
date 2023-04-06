@@ -3,9 +3,9 @@ package slate
 // IApplication defines the interface of a slate application instance.
 type IApplication interface {
 	IContainer
-	IProvider
 
 	Provide(provider IProvider) error
+	Boot() error
 }
 
 // Application defines the structure that controls the application
@@ -47,18 +47,11 @@ func (a *Application) Provide(
 	return nil
 }
 
-// Register is a no-op method, is present just to provide the application
-// instance the interface of a provider, making it easy to define an
-// application as a main provider instance.
-func (a *Application) Register(_ ...IContainer) error {
-	return nil
-}
-
 // Boot initializes the application if not initialized yet.
 // The initialization of an application is the calling of the register method
 // on all providers, after the registration of all objects in the container,
 // the boot method of all providers will be executed.
-func (a *Application) Boot(_ ...IContainer) (e error) {
+func (a *Application) Boot() (e error) {
 	// boot panic fallback
 	defer func() {
 		if r := recover(); r != nil {

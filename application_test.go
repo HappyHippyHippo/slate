@@ -94,30 +94,6 @@ func Test_Application_Provide(t *testing.T) {
 	})
 }
 
-func Test_Application_Register(t *testing.T) {
-	t.Run("no-op", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		sut := NewApplication()
-
-		if e := sut.Register(); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
-		}
-	})
-
-	t.Run("no-op even with a container", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		sut := NewApplication()
-
-		if e := sut.Register(sut); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
-		}
-	})
-}
-
 func Test_Application_Boot(t *testing.T) {
 	t.Run("panic error on boot", func(t *testing.T) {
 		ctrl := gomock.NewController(t)

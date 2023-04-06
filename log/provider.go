@@ -60,42 +60,42 @@ var _ slate.IProvider = &Provider{}
 // Register will register the logger package instances in the
 // application container.
 func (p Provider) Register(
-	container ...slate.IContainer,
+	container slate.IContainer,
 ) error {
 	// check container argument reference
-	if len(container) == 0 || container[0] == nil {
+	if container == nil {
 		return errNilPointer("container")
 	}
 	// add formatter strategies and factory
-	_ = container[0].Service(JSONFormatterStrategyID, NewJSONFormatterStrategy, FormatterStrategyTag)
-	_ = container[0].Service(FormatterFactoryID, NewFormatterFactory)
+	_ = container.Service(JSONFormatterStrategyID, NewJSONFormatterStrategy, FormatterStrategyTag)
+	_ = container.Service(FormatterFactoryID, NewFormatterFactory)
 	// add stream strategies and factory
-	_ = container[0].Service(ConsoleStreamStrategyID, NewConsoleStreamStrategy, StreamStrategyTag)
-	_ = container[0].Service(FileStreamStrategyID, NewFileStreamStrategy, StreamStrategyTag)
-	_ = container[0].Service(RotatingFileStreamStrategyID, NewRotatingFileStreamStrategy, StreamStrategyTag)
-	_ = container[0].Service(StreamFactoryID, NewStreamFactory)
+	_ = container.Service(ConsoleStreamStrategyID, NewConsoleStreamStrategy, StreamStrategyTag)
+	_ = container.Service(FileStreamStrategyID, NewFileStreamStrategy, StreamStrategyTag)
+	_ = container.Service(RotatingFileStreamStrategyID, NewRotatingFileStreamStrategy, StreamStrategyTag)
+	_ = container.Service(StreamFactoryID, NewStreamFactory)
 	// add log and loader
-	_ = container[0].Service(ID, NewLog)
-	_ = container[0].Service(LoaderID, NewLoader)
+	_ = container.Service(ID, NewLog)
+	_ = container.Service(LoaderID, NewLoader)
 	return nil
 }
 
 // Boot will start the logger package config instance by calling the
 // logger loader with the defined provider base entry information.
 func (p Provider) Boot(
-	container ...slate.IContainer,
+	container slate.IContainer,
 ) error {
 	// check container argument reference
-	if len(container) == 0 || container[0] == nil {
+	if container == nil {
 		return errNilPointer("container")
 	}
 	// populate the container formatter factory with
 	// all registered formatter strategies
-	formatterFactory, e := p.getFormatterFactory(container[0])
+	formatterFactory, e := p.getFormatterFactory(container)
 	if e != nil {
 		return e
 	}
-	formatterStrategies, e := p.getFormatterStrategies(container[0])
+	formatterStrategies, e := p.getFormatterStrategies(container)
 	if e != nil {
 		return e
 	}
@@ -104,11 +104,11 @@ func (p Provider) Boot(
 	}
 	// populate the container stream factory with all
 	// registered stream strategies
-	streamFactory, e := p.getStreamFactory(container[0])
+	streamFactory, e := p.getStreamFactory(container)
 	if e != nil {
 		return e
 	}
-	streamStrategies, e := p.getStreamStrategies(container[0])
+	streamStrategies, e := p.getStreamStrategies(container)
 	if e != nil {
 		return e
 	}
@@ -120,7 +120,7 @@ func (p Provider) Boot(
 		return nil
 	}
 	// get the container registered loader
-	loader, e := p.getLoader(container[0])
+	loader, e := p.getLoader(container)
 	if e != nil {
 		return e
 	}

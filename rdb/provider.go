@@ -22,16 +22,6 @@ const (
 	// container relational database dialect strategies.
 	DialectStrategyTag = ID + ".dialect.strategy"
 
-	// MySQLDialectStrategyID defines the id to be used
-	// as the container registration id of the relational database connection
-	// MySQL dialect instance.
-	MySQLDialectStrategyID = ID + ".dialect.strategy.mysql"
-
-	// SqliteDialectStrategyID defines the id to be used
-	// as the container registration id of the relational database connection
-	// sqlite dialect instance.
-	SqliteDialectStrategyID = ID + ".dialect.strategy.sqlite"
-
 	// DialectFactoryID defines the id to be used as the
 	// container registration id of the relational database connection dialect
 	// factory instance.
@@ -56,25 +46,23 @@ var _ slate.IProvider = &Provider{}
 // Register will register the rdb package instances in the
 // application container
 func (p Provider) Register(
-	container ...slate.IContainer,
+	container slate.IContainer,
 ) error {
 	// check container argument reference
-	if len(container) == 0 || container[0] == nil {
+	if container == nil {
 		return errNilPointer("container")
 	}
 	// add the connection configuration service
-	_ = container[0].Service(ConfigID, func() *gorm.Config {
+	_ = container.Service(ConfigID, func() *gorm.Config {
 		return &gorm.Config{Logger: logger.Discard}
 	})
 	// add dialect strategies and factory
-	_ = container[0].Service(MySQLDialectStrategyID, NewMySQLDialectStrategy, DialectStrategyTag)
-	_ = container[0].Service(SqliteDialectStrategyID, NewSqliteDialectStrategy, DialectStrategyTag)
-	_ = container[0].Service(DialectFactoryID, NewDialectFactory)
+	_ = container.Service(DialectFactoryID, NewDialectFactory)
 	// add the connection factory and pool
-	_ = container[0].Service(ConnectionFactoryID, NewConnectionFactory)
-	_ = container[0].Service(ID, NewConnectionPool)
+	_ = container.Service(ConnectionFactoryID, NewConnectionFactory)
+	_ = container.Service(ID, NewConnectionPool)
 	// add the primary connection auxiliary service
-	_ = container[0].Service(ConnectionPrimaryID, func(
+	_ = container.Service(ConnectionPrimaryID, func(
 		connectionFactory IConnectionPool,
 		cfg *gorm.Config,
 	) (*gorm.DB, error) {
@@ -85,19 +73,19 @@ func (p Provider) Register(
 
 // Boot will start the rdb package
 func (p Provider) Boot(
-	container ...slate.IContainer,
+	container slate.IContainer,
 ) error {
 	// check container argument reference
-	if len(container) == 0 || container[0] == nil {
+	if container == nil {
 		return errNilPointer("container")
 	}
 	// populate the container dialect factory with all
 	// registered dialect strategies
-	dialectFactory, e := p.getDialectFactory(container[0])
+	dialectFactory, e := p.getDialectFactory(container)
 	if e != nil {
 		return e
 	}
-	strategies, e := p.getDialectStrategies(container[0])
+	strategies, e := p.getDialectStrategies(container)
 	if e != nil {
 		return e
 	}

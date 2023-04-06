@@ -1,6 +1,8 @@
 package rdb
 
 import (
+	"context"
+	"database/sql"
 	"reflect"
 
 	"github.com/golang/mock/gomock"
@@ -705,4 +707,105 @@ func (m *MockDialectFactory) Register(strategy IDialectStrategy) error {
 func (mr *MockDialectFactoryRecorder) Register(strategy interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Register", reflect.TypeOf((*MockDialectFactory)(nil).Register), strategy)
+}
+
+//------------------------------------------------------------------------------
+// Conn Pool
+//------------------------------------------------------------------------------
+
+// MockConnPool is a mock of an instance of ConnPool interface.
+type MockConnPool struct {
+	ctrl     *gomock.Controller
+	recorder *MockConnPoolRecorder
+}
+
+// MockConnPoolRecorder is the mock recorder for MockConnPool.
+type MockConnPoolRecorder struct {
+	mock *MockConnPool
+}
+
+// NewMockConnPool creates a new mock instance.
+func NewMockConnPool(ctrl *gomock.Controller) *MockConnPool {
+	mock := &MockConnPool{ctrl: ctrl}
+	mock.recorder = &MockConnPoolRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockConnPool) EXPECT() *MockConnPoolRecorder {
+	return m.recorder
+}
+
+// ExecContext mocks base method.
+func (m *MockConnPool) ExecContext(arg0 context.Context, arg1 string, arg2 ...interface{}) (sql.Result, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecContext", varargs...)
+	ret0, _ := ret[0].(sql.Result)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecContext indicates an expected call of ExecContext.
+func (mr *MockConnPoolRecorder) ExecContext(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecContext", reflect.TypeOf((*MockConnPool)(nil).ExecContext), varargs...)
+}
+
+// PrepareContext mocks base method.
+func (m *MockConnPool) PrepareContext(arg0 context.Context, arg1 string) (*sql.Stmt, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PrepareContext", arg0, arg1)
+	ret0, _ := ret[0].(*sql.Stmt)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PrepareContext indicates an expected call of PrepareContext.
+func (mr *MockConnPoolRecorder) PrepareContext(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PrepareContext", reflect.TypeOf((*MockConnPool)(nil).PrepareContext), arg0, arg1)
+}
+
+// QueryContext mocks base method.
+func (m *MockConnPool) QueryContext(arg0 context.Context, arg1 string, arg2 ...interface{}) (*sql.Rows, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "QueryContext", varargs...)
+	ret0, _ := ret[0].(*sql.Rows)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// QueryContext indicates an expected call of QueryContext.
+func (mr *MockConnPoolRecorder) QueryContext(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryContext", reflect.TypeOf((*MockConnPool)(nil).QueryContext), varargs...)
+}
+
+// QueryRowContext mocks base method.
+func (m *MockConnPool) QueryRowContext(arg0 context.Context, arg1 string, arg2 ...interface{}) *sql.Row {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "QueryRowContext", varargs...)
+	ret0, _ := ret[0].(*sql.Row)
+	return ret0
+}
+
+// QueryRowContext indicates an expected call of QueryRowContext.
+func (mr *MockConnPoolRecorder) QueryRowContext(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryRowContext", reflect.TypeOf((*MockConnPool)(nil).QueryRowContext), varargs...)
 }

@@ -41,18 +41,18 @@ var _ slate.IProvider = &Provider{}
 // Register will register the migration package instances in the
 // application container
 func (p Provider) Register(
-	container ...slate.IContainer,
+	container slate.IContainer,
 ) error {
 	// check container argument reference
-	if len(container) == 0 || container[0] == nil {
+	if container == nil {
 		return errNilPointer("container")
 	}
 	// add log formatter strategies and factory
-	_ = container[0].Service(DefaultLogFormatterStrategyID, NewDefaultLogFormatterStrategy, LogFormatterStrategyTag)
-	_ = container[0].Service(LogFormatterFactoryID, NewLogFormatterFactory)
+	_ = container.Service(DefaultLogFormatterStrategyID, NewDefaultLogFormatterStrategy, LogFormatterStrategyTag)
+	_ = container.Service(LogFormatterFactoryID, NewLogFormatterFactory)
 	// add the watchdog factory and kennel
-	_ = container[0].Service(FactoryID, NewFactory)
-	_ = container[0].Service(ID, NewKennel)
+	_ = container.Service(FactoryID, NewFactory)
+	_ = container.Service(ID, NewKennel)
 	return nil
 }
 
@@ -61,19 +61,19 @@ func (p Provider) Register(
 // by environment variable, the migrator will automatically try to migrate
 // to the last registered migration
 func (p Provider) Boot(
-	container ...slate.IContainer,
+	container slate.IContainer,
 ) error {
 	// check container argument reference
-	if len(container) == 0 || container[0] == nil {
+	if container == nil {
 		return errNilPointer("container")
 	}
 	// populate the container log formatter factory with
 	// all registered log formatter strategies
-	formatterFactory, e := p.getLogFormatterFactory(container[0])
+	formatterFactory, e := p.getLogFormatterFactory(container)
 	if e != nil {
 		return e
 	}
-	formatterStrategies, e := p.getLogFormatterStrategies(container[0])
+	formatterStrategies, e := p.getLogFormatterStrategies(container)
 	if e != nil {
 		return e
 	}
@@ -82,11 +82,11 @@ func (p Provider) Boot(
 	}
 	// populate the watchdog kennel with all the processes
 	// registered in the container
-	kennel, e := p.getKennel(container[0])
+	kennel, e := p.getKennel(container)
 	if e != nil {
 		return e
 	}
-	procs, e := p.getProcesses(container[0])
+	procs, e := p.getProcesses(container)
 	if e != nil {
 		return e
 	}

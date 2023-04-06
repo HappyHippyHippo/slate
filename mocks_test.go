@@ -78,37 +78,29 @@ func (m *MockProvider) EXPECT() *MockProviderRecorder {
 }
 
 // Boot mocks base method.
-func (m *MockProvider) Boot(arg0 ...IContainer) error {
+func (m *MockProvider) Boot(arg0 IContainer) error {
 	m.ctrl.T.Helper()
-	var varargs []interface{}
-	for _, a := range arg0 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Boot", varargs...)
+	ret := m.ctrl.Call(m, "Boot", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Boot indicates an expected call of Boot.
-func (mr *MockProviderRecorder) Boot(arg0 ...interface{}) *gomock.Call {
+func (mr *MockProviderRecorder) Boot(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Boot", reflect.TypeOf((*MockProvider)(nil).Boot), arg0...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Boot", reflect.TypeOf((*MockProvider)(nil).Boot), arg0)
 }
 
 // Register mocks base method.
-func (m *MockProvider) Register(arg0 ...IContainer) error {
+func (m *MockProvider) Register(arg0 IContainer) error {
 	m.ctrl.T.Helper()
-	var varargs []interface{}
-	for _, a := range arg0 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Register", varargs...)
+	ret := m.ctrl.Call(m, "Register", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Register indicates an expected call of Register.
-func (mr *MockProviderRecorder) Register(arg0 ...interface{}) *gomock.Call {
+func (mr *MockProviderRecorder) Register(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Register", reflect.TypeOf((*MockProvider)(nil).Register), arg0...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Register", reflect.TypeOf((*MockProvider)(nil).Register), arg0)
 }

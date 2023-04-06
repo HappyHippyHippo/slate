@@ -1,6 +1,7 @@
 package rdb
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"testing"
@@ -50,23 +51,31 @@ func Test_NewConnectionPool(t *testing.T) {
 		defer ctrl.Finish()
 
 		name := "primary"
-		cfg1 := config.Config{"dialect": "sqlite", "host": ":memory:"}
-		cfg2 := config.Config{"dialect": "sqlite", "host": ":memory:"}
+		cfg1 := config.Config{"dialect": "sqlite", "host": ":memory1:"}
+		cfg2 := config.Config{"dialect": "sqlite", "host": ":memory2:"}
 		config1 := config.Config{"slate": config.Config{"rdb": config.Config{"connections": config.Config{name: cfg1}}}}
 		config2 := config.Config{"slate": config.Config{"rdb": config.Config{"connections": config.Config{name + "salt": cfg2}}}}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(config1, nil).MinTimes(1)
 		source2 := NewMockConfigSource(ctrl)
 		source2.EXPECT().Get("").Return(config2, nil).MinTimes(1)
+		dialect := NewMockDialect(ctrl)
+		dialect.EXPECT().Initialize(gomock.Any()).DoAndReturn(func(db *gorm.DB) error {
+			db.ConnPool = sql.OpenDB(nil)
+			return nil
+		})
+		dialectStrategy := NewMockDialectStrategy(ctrl)
+		dialectStrategy.EXPECT().Accept(&cfg1).Return(true)
+		dialectStrategy.EXPECT().Get(&cfg1).Return(dialect, nil)
 		dialectFactory := NewDialectFactory()
-		_ = dialectFactory.Register(NewSqliteDialectStrategy())
+		_ = dialectFactory.Register(dialectStrategy)
 		connectionFactory, _ := NewConnectionFactory(dialectFactory)
 		cfgManager := config.NewManager(0)
 		_ = cfgManager.AddSource("id1", 0, source1)
 
 		sut, _ := NewConnectionPool(cfgManager, connectionFactory)
 
-		_, _ = sut.Get(name, &gorm.Config{Logger: logger.Discard})
+		_, _ = sut.Get(name, &gorm.Config{Logger: logger.Discard, DisableAutomaticPing: true})
 		if len(sut.(*connectionPool).instances) != 1 {
 			t.Error("didn't store the requested connection instance")
 		}

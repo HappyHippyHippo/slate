@@ -1,38 +1,41 @@
-package rdb
+//go:build sqlite
+
+package sqlite
 
 import (
 	"fmt"
 	"strings"
 
 	"github.com/happyhippyhippo/slate/config"
+	"github.com/happyhippyhippo/slate/rdb"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 const (
-	// SqliteDialectType defines the value to be used to identify a
+	// DialectType defines the value to be used to identify a
 	// Sqlite dialect.
-	SqliteDialectType = "sqlite"
+	DialectType = "sqlite"
 )
 
-type sqliteDialectConfig struct {
+type dialectConfig struct {
 	Host   string
 	Params config.Config
 }
 
-// SqliteDialectStrategy define a Sqlite dialect generation strategy instance.
-type SqliteDialectStrategy struct{}
+// DialectStrategy define a Sqlite dialect generation strategy instance.
+type DialectStrategy struct{}
 
-var _ IDialectStrategy = &SqliteDialectStrategy{}
+var _ rdb.IDialectStrategy = &DialectStrategy{}
 
-// NewSqliteDialectStrategy @todo doc
-func NewSqliteDialectStrategy() *SqliteDialectStrategy {
-	return &SqliteDialectStrategy{}
+// NewDialectStrategy @todo doc
+func NewDialectStrategy() *DialectStrategy {
+	return &DialectStrategy{}
 }
 
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
-func (SqliteDialectStrategy) Accept(
+func (DialectStrategy) Accept(
 	cfg config.IConfig,
 ) bool {
 	// check config argument reference
@@ -46,11 +49,11 @@ func (SqliteDialectStrategy) Accept(
 		return false
 	}
 	// only accepts a mysql dialect request
-	return strings.EqualFold(strings.ToLower(dc.Dialect), SqliteDialectType)
+	return strings.EqualFold(strings.ToLower(dc.Dialect), DialectType)
 }
 
 // Get instantiates the requested mysql connection dialect.
-func (SqliteDialectStrategy) Get(
+func (DialectStrategy) Get(
 	cfg config.IConfig,
 ) (gorm.Dialector, error) {
 	// check config argument reference
@@ -58,7 +61,7 @@ func (SqliteDialectStrategy) Get(
 		return nil, errNilPointer("cfg")
 	}
 	// retrieve the data from the configuration
-	dc := sqliteDialectConfig{}
+	dc := dialectConfig{}
 	_, e := cfg.Populate("", &dc)
 	if e != nil {
 		return nil, e
