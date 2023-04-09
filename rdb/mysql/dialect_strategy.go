@@ -33,8 +33,8 @@ type DialectStrategy struct{}
 
 var _ rdb.IDialectStrategy = &DialectStrategy{}
 
-// NewMySQLDialectStrategy @todo doc
-func NewMySQLDialectStrategy() *DialectStrategy {
+// NewDialectStrategy @todo doc
+func NewDialectStrategy() *DialectStrategy {
 	return &DialectStrategy{}
 }
 

@@ -36,7 +36,7 @@ func (p Provider) Register(
 	if container == nil {
 		return errNilPointer("container")
 	}
-	_ = container.Service(DialectStrategyID, NewMySQLDialectStrategy, rdb.DialectStrategyTag)
+	_ = container.Service(DialectStrategyID, NewDialectStrategy, rdb.DialectStrategyTag)
 	return nil
 }
 
