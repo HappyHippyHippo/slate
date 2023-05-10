@@ -18,7 +18,8 @@ type DialectFactory []IDialectStrategy
 
 var _ IDialectFactory = &DialectFactory{}
 
-// NewDialectFactory @todo doc
+// NewDialectFactory will instantiate a new relational database
+// dialect factory instance.
 func NewDialectFactory() IDialectFactory {
 	return &DialectFactory{}
 }

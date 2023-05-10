@@ -103,7 +103,7 @@ func Test_errInvalidFormat(t *testing.T) {
 func Test_errInvalidLevel(t *testing.T) {
 	arg := "dummy argument"
 	context := map[string]interface{}{"field": "value"}
-	message := "dummy argument : invalid log level"
+	message := "dummy argument : invalid log Level"
 
 	t.Run("creation without context", func(t *testing.T) {
 		if e := errInvalidLevel(arg); !errors.Is(e, ErrInvalidLevel) {

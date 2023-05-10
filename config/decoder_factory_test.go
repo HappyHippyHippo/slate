@@ -29,7 +29,7 @@ func Test_DecoderFactory_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("register the decoder factory strategy", func(t *testing.T) {
+	t.Run("register the strategy", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

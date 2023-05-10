@@ -12,7 +12,7 @@ type DecoderFactory []IDecoderStrategy
 
 var _ IDecoderFactory = &DecoderFactory{}
 
-// NewDecoderFactory £todo doc
+// NewDecoderFactory will instantiate a new decoder factory instance.
 func NewDecoderFactory() IDecoderFactory {
 	return &DecoderFactory{}
 }
@@ -35,12 +35,12 @@ func (f *DecoderFactory) Register(
 
 // Create will instantiate the requested new decoder capable to
 // parse the formatted content into a usable configuration.
-func (f DecoderFactory) Create(
+func (f *DecoderFactory) Create(
 	format string,
 	args ...interface{},
 ) (IDecoder, error) {
 	// find a stored strategy that will accept the requested format
-	for _, s := range f {
+	for _, s := range *f {
 		if s.Accept(format) {
 			// return the decoder instantiation
 			return s.Create(args...)

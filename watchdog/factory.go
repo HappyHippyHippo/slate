@@ -81,7 +81,7 @@ func (f *Factory) Create(
 			Error: LogErrorLevel,
 			Done:  LogDoneLevel,
 		},
-		Formatter: DefaultLogFormatterType,
+		Formatter: DefaultFormatter,
 	}
 	_, e = cfg.Populate("", &wc)
 	if e != nil {

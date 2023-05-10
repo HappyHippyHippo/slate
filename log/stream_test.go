@@ -7,20 +7,6 @@ import (
 	"github.com/golang/mock/gomock"
 )
 
-func Test_Stream_Level(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	level := WARNING
-	sut := &Stream{NewMockFormatter(ctrl), []string{}, level}
-
-	t.Run("retrieve the filtering level", func(t *testing.T) {
-		if check := sut.Level(); check != level {
-			t.Errorf("returned the (%v) level", check)
-		}
-	})
-}
-
 func Test_Stream_HasChannel(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -46,9 +32,9 @@ func Test_Stream_ListChannels(t *testing.T) {
 	channels := []string{"channel.1", "channel.2"}
 	sut := &Stream{NewMockFormatter(ctrl), channels, WARNING}
 
-	t.Run("list the registered channels", func(t *testing.T) {
+	t.Run("list the registered Channels", func(t *testing.T) {
 		if check := sut.ListChannels(); !reflect.DeepEqual(check, channels) {
-			t.Errorf("returned the (%v) list of channels", check)
+			t.Errorf("returned the (%v) list of Channels", check)
 		}
 	})
 }
@@ -107,7 +93,7 @@ func Test_Stream_AddChannel(t *testing.T) {
 				sut.AddChannel(scn.channel)
 
 				if check := sut.ListChannels(); !reflect.DeepEqual(check, scn.expected) {
-					t.Errorf("returned the (%v) list of channels", check)
+					t.Errorf("returned the (%v) list of Channels", check)
 				}
 			}
 			test()
@@ -169,7 +155,7 @@ func Test_Stream_RemoveChannel(t *testing.T) {
 				sut.RemoveChannel(scn.channel)
 
 				if check := sut.ListChannels(); !reflect.DeepEqual(check, scn.expected) {
-					t.Errorf("returned the (%v) list of channels", check)
+					t.Errorf("returned the (%v) list of Channels", check)
 				}
 			}
 			test()
@@ -183,7 +169,7 @@ func Test_Stream_Format(t *testing.T) {
 		level := WARNING
 		sut := &Stream{nil, []string{}, level}
 
-		if check := sut.format(level, msg, Context{"field": "value"}); check != msg {
+		if check := sut.Format(level, msg, Context{"field": "value"}); check != msg {
 			t.Errorf("returned the (%v) formatted message", check)
 		}
 	})
@@ -199,7 +185,7 @@ func Test_Stream_Format(t *testing.T) {
 		formatter.EXPECT().Format(level, msg).Return(expected).Times(1)
 		sut := &Stream{formatter, []string{}, level}
 
-		if check := sut.format(level, msg); check != expected {
+		if check := sut.Format(level, msg); check != expected {
 			t.Errorf("returned the (%v) formatted message", check)
 		}
 	})
@@ -216,7 +202,7 @@ func Test_Stream_Format(t *testing.T) {
 		formatter.EXPECT().Format(level, msg, ctx).Return(expected).Times(1)
 		sut := &Stream{formatter, []string{}, level}
 
-		if check := sut.format(level, msg, ctx); check != expected {
+		if check := sut.Format(level, msg, ctx); check != expected {
 			t.Errorf("returned the (%v) formatted message", check)
 		}
 	})

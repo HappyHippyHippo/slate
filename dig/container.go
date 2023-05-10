@@ -155,7 +155,7 @@ func New(opts ...Option) *Container {
 	return c
 }
 
-// DeferAcyclicVerification is an Option to override the default behavior
+// DeferAcyclicVerification is an Option to override the def behavior
 // of container.Provide, deferring the dependency graph validation to no longer
 // run after each call to container.Provide. The container will instead verify
 // the graph on first `Invoke`.

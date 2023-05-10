@@ -29,7 +29,7 @@ import (
 	"time"
 )
 
-// A ScopeOption modifies the default behavior of Scope; currently,
+// A ScopeOption modifies the def behavior of Scope; currently,
 // there are no implementations.
 type ScopeOption interface {
 	noScopeOption()
@@ -66,7 +66,7 @@ type Scope struct {
 	// Values groups that generated via decoraters in the Scope.
 	decoratedGroups map[key]reflect.Value
 
-	// Source of randomness.
+	// BaseSource of randomness.
 	rand *rand.Rand
 
 	// Flag indicating whether the graph has been checked for cycles.

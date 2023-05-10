@@ -309,7 +309,7 @@ func Test_Config_Get(t *testing.T) {
 		}
 	})
 
-	t.Run("return the default value if a path don't exists", func(t *testing.T) {
+	t.Run("return the def value if a path don't exists", func(t *testing.T) {
 		scenarios := []struct {
 			partial Config
 			search  string
@@ -379,7 +379,7 @@ func Test_Config_Bool(t *testing.T) {
 		}
 	})
 
-	t.Run("return path not found error if no default value is given", func(t *testing.T) {
+	t.Run("return path not found error if no def value is given", func(t *testing.T) {
 		sut := Config{}
 
 		check, e := sut.Bool("node")
@@ -393,7 +393,7 @@ func Test_Config_Bool(t *testing.T) {
 		}
 	})
 
-	t.Run("return default value if the path don't exists", func(t *testing.T) {
+	t.Run("return def value if the path don't exists", func(t *testing.T) {
 		sut := Config{}
 
 		check, e := sut.Bool("node", true)
@@ -435,7 +435,7 @@ func Test_Config_Int(t *testing.T) {
 		}
 	})
 
-	t.Run("return path not found error if no default value is given", func(t *testing.T) {
+	t.Run("return path not found error if no def value is given", func(t *testing.T) {
 		sut := Config{}
 
 		check, e := sut.Int("node")
@@ -449,7 +449,7 @@ func Test_Config_Int(t *testing.T) {
 		}
 	})
 
-	t.Run("return default value if the path don't exists", func(t *testing.T) {
+	t.Run("return def value if the path don't exists", func(t *testing.T) {
 		value := 123
 		sut := Config{}
 
@@ -492,7 +492,7 @@ func Test_Config_Float(t *testing.T) {
 		}
 	})
 
-	t.Run("return path not found e if no default value is given", func(t *testing.T) {
+	t.Run("return path not found e if no def value is given", func(t *testing.T) {
 		sut := Config{}
 
 		check, e := sut.Float("node")
@@ -506,7 +506,7 @@ func Test_Config_Float(t *testing.T) {
 		}
 	})
 
-	t.Run("return default value if the path don't exists", func(t *testing.T) {
+	t.Run("return def value if the path don't exists", func(t *testing.T) {
 		value := 123.456
 		sut := Config{}
 
@@ -526,7 +526,7 @@ func Test_Config_String(t *testing.T) {
 		value := "value"
 		sut := Config{path: value}
 
-		if check, e := sut.String(path, "default value"); e != nil {
+		if check, e := sut.String(path, "def value"); e != nil {
 			t.Errorf("returned the unexpected e : %v", e)
 		} else if check != value {
 			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
@@ -538,7 +538,7 @@ func Test_Config_String(t *testing.T) {
 		value := 123
 		sut := Config{path: value}
 
-		check, e := sut.String(path, "default value")
+		check, e := sut.String(path, "def value")
 		switch {
 		case check != "":
 			t.Errorf("returned the unexpected value : %v", check)
@@ -549,7 +549,7 @@ func Test_Config_String(t *testing.T) {
 		}
 	})
 
-	t.Run("return path not found e if no default value is given", func(t *testing.T) {
+	t.Run("return path not found e if no def value is given", func(t *testing.T) {
 		sut := Config{}
 
 		check, e := sut.String("node")
@@ -563,8 +563,8 @@ func Test_Config_String(t *testing.T) {
 		}
 	})
 
-	t.Run("return default value if the path don't exists", func(t *testing.T) {
-		value := "default value"
+	t.Run("return def value if the path don't exists", func(t *testing.T) {
+		value := "def value"
 		sut := Config{}
 
 		check, e := sut.String("node", value)
@@ -583,7 +583,7 @@ func Test_Config_List(t *testing.T) {
 		value := []interface{}{"value"}
 		sut := Config{path: value}
 
-		if check, e := sut.List(path, []interface{}{"default value"}); e != nil {
+		if check, e := sut.List(path, []interface{}{"def value"}); e != nil {
 			t.Errorf("returned the unexpected e : %v", e)
 		} else if !reflect.DeepEqual(check, value) {
 			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
@@ -595,7 +595,7 @@ func Test_Config_List(t *testing.T) {
 		value := 123
 		sut := Config{path: value}
 
-		check, e := sut.List(path, []interface{}{"default value"})
+		check, e := sut.List(path, []interface{}{"def value"})
 		switch {
 		case check != nil:
 			t.Errorf("returned the unexpected value : %v", check)
@@ -606,7 +606,7 @@ func Test_Config_List(t *testing.T) {
 		}
 	})
 
-	t.Run("return path not found e if no default value is given", func(t *testing.T) {
+	t.Run("return path not found e if no def value is given", func(t *testing.T) {
 		sut := Config{}
 
 		check, e := sut.List("node")
@@ -620,8 +620,8 @@ func Test_Config_List(t *testing.T) {
 		}
 	})
 
-	t.Run("return default value if the path don't exists", func(t *testing.T) {
-		value := []interface{}{"default value"}
+	t.Run("return def value if the path don't exists", func(t *testing.T) {
+		value := []interface{}{"def value"}
 		sut := Config{}
 
 		check, e := sut.List("node", value)
@@ -640,7 +640,7 @@ func Test_Config_Config(t *testing.T) {
 		value := Config{"id": "value"}
 		sut := Config{path: value}
 
-		if check, e := sut.Config(path, Config{"id": "default value"}); e != nil {
+		if check, e := sut.Config(path, Config{"id": "def value"}); e != nil {
 			t.Errorf("returned the unexpected e : %v", e)
 		} else if !reflect.DeepEqual(*check.(*Config), value) {
 			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
@@ -652,7 +652,7 @@ func Test_Config_Config(t *testing.T) {
 		value := 123
 		sut := Config{path: value}
 
-		check, e := sut.Config(path, Config{"id": "default value"})
+		check, e := sut.Config(path, Config{"id": "def value"})
 		switch {
 		case check != nil:
 			t.Errorf("returned the unexpected value : %v", check)
@@ -663,7 +663,7 @@ func Test_Config_Config(t *testing.T) {
 		}
 	})
 
-	t.Run("return path not found e if no default value is given", func(t *testing.T) {
+	t.Run("return path not found e if no def value is given", func(t *testing.T) {
 		sut := Config{}
 
 		check, e := sut.Config("node")
@@ -677,8 +677,8 @@ func Test_Config_Config(t *testing.T) {
 		}
 	})
 
-	t.Run("return default value if the path don't exists", func(t *testing.T) {
-		value := Config{"id": "default value"}
+	t.Run("return def value if the path don't exists", func(t *testing.T) {
+		value := Config{"id": "def value"}
 		sut := Config{}
 
 		check, e := sut.Config("node", value)
@@ -752,7 +752,7 @@ func Test_Config_Merge(t *testing.T) {
 
 		for _, scenario := range scenarios {
 			check := scenario.partial1
-			check.merge(scenario.partial2)
+			check.Merge(scenario.partial2)
 
 			if !reflect.DeepEqual(check, scenario.expected) {
 				t.Errorf("resulted in (%s) when merging (%v) and (%v), expecting (%v)", check, scenario.partial1, scenario.partial2, scenario.expected)
@@ -766,175 +766,11 @@ func Test_Config_Merge(t *testing.T) {
 		expected := Config{"node1": Config{"node2": "value 2", "node3": Config{"node4": "value 4"}}}
 
 		check := Config{}
-		check.merge(data1)
-		check.merge(data2)
+		check.Merge(data1)
+		check.Merge(data2)
 
 		if !reflect.DeepEqual(check, expected) {
 			t.Errorf("resulted in (%s) when merging (%v) and (%v), expecting (%v)", check, data1, data2, expected)
-		}
-	})
-}
-
-func Test_Config_Convert(t *testing.T) {
-	t.Run("convert float32 into int", func(t *testing.T) {
-		data := float32(123)
-		expected := 123
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert float64 into int", func(t *testing.T) {
-		data := float64(123)
-		expected := 123
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert map", func(t *testing.T) {
-		data := map[string]interface{}{"node": "value"}
-		expected := Config{"node": "value"}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert config", func(t *testing.T) {
-		data := Config{"node": "value"}
-		expected := Config{"node": "value"}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert list", func(t *testing.T) {
-		data := []interface{}{1, 2, 3}
-		expected := []interface{}{1, 2, 3}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert map with a float32 into a map with a int", func(t *testing.T) {
-		data := map[string]interface{}{"node": float32(123)}
-		expected := Config{"node": 123}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert map with a float64 into a map with a int", func(t *testing.T) {
-		data := map[string]interface{}{"node": float64(123)}
-		expected := Config{"node": 123}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert map with another map", func(t *testing.T) {
-		data := map[string]interface{}{"node": map[string]interface{}{"node2": "value"}}
-		expected := Config{"node": Config{"node2": "value"}}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert map with a list", func(t *testing.T) {
-		data := map[string]interface{}{"node": []interface{}{1, 2, 3}}
-		expected := Config{"node": []interface{}{1, 2, 3}}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert config with a map", func(t *testing.T) {
-		data := Config{"node": map[string]interface{}{"node2": "value"}}
-		expected := Config{"node": Config{"node2": "value"}}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert map with a list of maps", func(t *testing.T) {
-		data := map[string]interface{}{"node": []interface{}{map[string]interface{}{"node2": "value"}}}
-		expected := Config{"node": []interface{}{Config{"node2": "value"}}}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert map with a list of configs", func(t *testing.T) {
-		data := map[string]interface{}{"NoDe": []interface{}{Config{"node2": "value"}}}
-		expected := Config{"node": []interface{}{Config{"node2": "value"}}}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert config with numeric fields", func(t *testing.T) {
-		data := Config{1: map[string]interface{}{"node2": "value"}}
-		expected := Config{1: Config{"node2": "value"}}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert config with a uppercase fields", func(t *testing.T) {
-		data := Config{"NoDE": map[string]interface{}{"nODE2": "value"}}
-		expected := Config{"node": Config{"node2": "value"}}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert map uppercase fields", func(t *testing.T) {
-		data := map[string]interface{}{"NoDe": []interface{}{map[string]interface{}{"NOde2": "value"}}}
-		expected := Config{"node": []interface{}{Config{"node2": "value"}}}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert config uppercase fields", func(t *testing.T) {
-		data := map[string]interface{}{"NoDe": []interface{}{Config{"NOde2": "value"}}}
-		expected := Config{"node": []interface{}{Config{"node2": "value"}}}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert map with numeric keys", func(t *testing.T) {
-		data := map[interface{}]interface{}{1: []interface{}{Config{2: "value"}}}
-		expected := Config{1: []interface{}{Config{2: "value"}}}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
-		}
-	})
-
-	t.Run("convert map with string keys", func(t *testing.T) {
-		data := map[interface{}]interface{}{"NoDE1": []interface{}{Config{2: "value"}}}
-		expected := Config{"node1": []interface{}{Config{2: "value"}}}
-
-		if check := (Config{}).convert(data); !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%v) when converting (%v), expecting (%v)", check, data, expected)
 		}
 	})
 }

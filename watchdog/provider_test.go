@@ -28,37 +28,12 @@ func Test_Provider_Register(t *testing.T) {
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
-		case !container.Has(DefaultLogFormatterStrategyID):
-			t.Errorf("didn't registered the default log formatter : %v", sut)
 		case !container.Has(LogFormatterFactoryID):
 			t.Errorf("didn't registered the log formatter factory : %v", sut)
 		case !container.Has(FactoryID):
 			t.Errorf("didn't registered the watchdog factory : %v", sut)
 		case !container.Has(ID):
 			t.Errorf("didn't registered the kannel : %v", sut)
-		}
-	})
-
-	t.Run("retrieving default log formatter strategy", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		container := slate.NewContainer()
-		_ = (&log.Provider{}).Register(container)
-		_ = (&Provider{}).Register(container)
-
-		sut, e := container.Get(DefaultLogFormatterStrategyID)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
-		case sut == nil:
-			t.Error("didn't returned a reference to the default log formatter strategy")
-		default:
-			switch sut.(type) {
-			case *DefaultLogFormatterStrategy:
-			default:
-				t.Error("didn't returned the default log formatter strategy")
-			}
 		}
 	})
 
@@ -195,6 +170,22 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
+	t.Run("invalid log formatter strategy", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		container := slate.NewContainer()
+		sut := &Provider{}
+		_ = sut.Register(container)
+		_ = container.Service("id", func() (interface{}, error) { return "invalid", nil }, LogFormatterStrategyTag)
+
+		if e := sut.Boot(container); e == nil {
+			t.Error("didn't returned the expected error")
+		} else if !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+		}
+	})
+
 	t.Run("error retrieving the kennel", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -253,6 +244,24 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
+	t.Run("invalid watchdog process", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		container := slate.NewContainer()
+		_ = (&config.Provider{}).Register(container)
+		_ = (&log.Provider{}).Register(container)
+		sut := &Provider{}
+		_ = sut.Register(container)
+		_ = container.Service("id", func() (interface{}, error) { return "invalid", nil }, ProcessTag)
+
+		if e := sut.Boot(container); e == nil {
+			t.Error("didn't returned the expected error")
+		} else if !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+		}
+	})
+
 	t.Run("duplicate watchdog process service name", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -261,10 +270,15 @@ func Test_Provider_Boot(t *testing.T) {
 		type Process2 struct{ Process }
 
 		container := slate.NewContainer()
+		formatter := NewMockLogFormatter(ctrl)
+		formatterStrategy := NewMockLogFormatterStrategy(ctrl)
+		formatterStrategy.EXPECT().Accept(&config.Config{"type": "def"}).Return(true)
+		formatterStrategy.EXPECT().Create(&config.Config{"type": "def"}).Return(formatter, nil)
 		_ = (&config.Provider{}).Register(container)
 		_ = (&log.Provider{}).Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
+		_ = container.Service("log.formatter", func() ILogFormatterStrategy { return formatterStrategy }, LogFormatterStrategyTag)
 		_ = container.Service(
 			"id1",
 			func() (*Process1, error) {
@@ -294,10 +308,15 @@ func Test_Provider_Boot(t *testing.T) {
 		defer ctrl.Finish()
 
 		container := slate.NewContainer()
+		formatter := NewMockLogFormatter(ctrl)
+		formatterStrategy := NewMockLogFormatterStrategy(ctrl)
+		formatterStrategy.EXPECT().Accept(&config.Config{"type": "def"}).Return(true)
+		formatterStrategy.EXPECT().Create(&config.Config{"type": "def"}).Return(formatter, nil)
 		_ = (&config.Provider{}).Register(container)
 		_ = (&log.Provider{}).Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
+		_ = container.Service("log.formatter", func() ILogFormatterStrategy { return formatterStrategy }, LogFormatterStrategyTag)
 		_ = container.Service(
 			"id",
 			func() (IProcess, error) { return NewProcess("service", func() error { return nil }) },

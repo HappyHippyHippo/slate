@@ -14,7 +14,8 @@ import (
 
 func Test_NewManager(t *testing.T) {
 	t.Run("new config without reload", func(t *testing.T) {
-		sut := NewManager(0 * time.Second)
+		ObserveFrequency = 0
+		sut := NewManager().(*Manager)
 		defer func() { _ = sut.Close() }()
 
 		switch {
@@ -30,7 +31,8 @@ func Test_NewManager(t *testing.T) {
 	})
 
 	t.Run("new config with reload", func(t *testing.T) {
-		sut := NewManager(10 * time.Second)
+		ObserveFrequency = 10
+		sut := NewManager().(*Manager)
 		defer func() { _ = sut.Close() }()
 
 		switch {
@@ -52,7 +54,9 @@ func Test_Manager_Close(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		sut := NewManager(60 * time.Second)
+
+		ObserveFrequency = 60
+		sut := NewManager()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Get("").Return(Config{}, nil).AnyTimes()
 		src.EXPECT().Close().Return(expected).Times(1)
@@ -69,7 +73,8 @@ func Test_Manager_Close(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager().(*Manager)
 		src := NewMockSource(ctrl)
 		src.EXPECT().Get("").Return(Config{}, nil).AnyTimes()
 		src.EXPECT().Close().Return(nil).Times(1)
@@ -89,7 +94,8 @@ func Test_Manager_Close(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		id1 := "src.1"
 		id2 := "src.2"
 		priority1 := 0
@@ -131,7 +137,8 @@ func Test_Manager_Entries(t *testing.T) {
 			test := func() {
 				ctrl := gomock.NewController(t)
 
-				sut := NewManager(60 * time.Second)
+				ObserveFrequency = 60
+				sut := NewManager()
 				src := NewMockSource(ctrl)
 				src.EXPECT().Close().Times(1)
 				src.EXPECT().Get("").Return(scenario.config, nil).Times(1)
@@ -175,7 +182,8 @@ func Test_Manager_Has(t *testing.T) {
 			test := func() {
 				ctrl := gomock.NewController(t)
 
-				sut := NewManager(60 * time.Second)
+				ObserveFrequency = 60
+				sut := NewManager()
 				src := NewMockSource(ctrl)
 				src.EXPECT().Close().Times(1)
 				src.EXPECT().Get("").Return(scenario.config, nil).Times(1)
@@ -200,7 +208,8 @@ func Test_Manager_Get(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
 		src.EXPECT().Get("").Return(config, nil).Times(1)
@@ -221,7 +230,8 @@ func Test_Manager_Get(t *testing.T) {
 
 		data := Config{"node1": Config{"node2": 101}}
 		path := "node3"
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -239,14 +249,15 @@ func Test_Manager_Get(t *testing.T) {
 		}
 	})
 
-	t.Run("return default if path was not found", func(t *testing.T) {
+	t.Run("return def if path was not found", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		data := Config{"node1": Config{"node2": 101}}
 		path := "node3"
 		val := 3
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -267,7 +278,8 @@ func Test_Manager_Bool(t *testing.T) {
 		defer ctrl.Finish()
 
 		path := "node"
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -289,7 +301,8 @@ func Test_Manager_Int(t *testing.T) {
 
 		value := 123
 		path := "node"
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -311,7 +324,8 @@ func Test_Manager_Float(t *testing.T) {
 
 		value := 123.4
 		path := "node"
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -333,7 +347,8 @@ func Test_Manager_String(t *testing.T) {
 
 		value := "value"
 		path := "node"
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -355,7 +370,8 @@ func Test_Manager_List(t *testing.T) {
 
 		value := []interface{}{1, 2, 3}
 		path := "node"
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -377,7 +393,8 @@ func Test_Manager_Config(t *testing.T) {
 
 		value := Config{"field": "value"}
 		path := "node"
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -401,7 +418,8 @@ func Test_Manager_Populate(t *testing.T) {
 		target := struct{ Field string }{}
 		expected := struct{ Field string }{Field: "value"}
 		path := "node"
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -421,7 +439,8 @@ func Test_Manager_HasSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -437,7 +456,8 @@ func Test_Manager_HasSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -452,7 +472,8 @@ func Test_Manager_HasSource(t *testing.T) {
 
 func Test_Manager_AddSource(t *testing.T) {
 	t.Run("nil source", func(t *testing.T) {
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 
 		if e := sut.AddSource("src", 0, nil); e == nil {
@@ -466,7 +487,8 @@ func Test_Manager_AddSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -483,7 +505,8 @@ func Test_Manager_AddSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -501,7 +524,8 @@ func Test_Manager_AddSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Close().Times(1)
@@ -521,7 +545,8 @@ func Test_Manager_AddSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Close().Times(1)
@@ -541,7 +566,8 @@ func Test_Manager_AddSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Close().Times(1)
@@ -563,7 +589,8 @@ func Test_Manager_RemoveSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 
 		if e := sut.RemoveSource("src"); e != nil {
@@ -576,7 +603,8 @@ func Test_Manager_RemoveSource(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Return(expected).Times(2)
@@ -594,7 +622,8 @@ func Test_Manager_RemoveSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Close().Times(1)
@@ -619,7 +648,8 @@ func Test_Manager_RemoveSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Close().Times(1)
@@ -646,7 +676,8 @@ func Test_Manager_RemoveAllSources(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 
 		expected := fmt.Errorf("error string")
@@ -674,7 +705,8 @@ func Test_Manager_RemoveAllSources(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager().(*Manager)
 		defer func() { _ = sut.Close() }()
 
 		src1 := NewMockSource(ctrl)
@@ -702,7 +734,8 @@ func Test_Manager_Source(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 
 		check, e := sut.Source("invalid id")
@@ -720,7 +753,8 @@ func Test_Manager_Source(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -741,7 +775,8 @@ func Test_Manager_Source(t *testing.T) {
 
 func Test_Manager_SourcePriority(t *testing.T) {
 	t.Run("error if the source was not found", func(t *testing.T) {
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 
 		if e := sut.SourcePriority("invalid id", 0); e == nil {
@@ -755,7 +790,8 @@ func Test_Manager_SourcePriority(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Close().Times(1)
@@ -807,7 +843,8 @@ func Test_Manager_HasObserver(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				defer ctrl.Finish()
 
-				sut := NewManager(0 * time.Second)
+				ObserveFrequency = 0
+				sut := NewManager()
 				defer func() { _ = sut.Close() }()
 				src := NewMockSource(ctrl)
 				src.EXPECT().Close().Times(1)
@@ -829,7 +866,8 @@ func Test_Manager_HasObserver(t *testing.T) {
 
 func Test_Manager_AddObserver(t *testing.T) {
 	t.Run("nil callback", func(t *testing.T) {
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 
 		if e := sut.AddObserver("path", nil); e == nil {
@@ -840,7 +878,8 @@ func Test_Manager_AddObserver(t *testing.T) {
 	})
 
 	t.Run("error if path not present", func(t *testing.T) {
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 
 		if e := sut.AddObserver("path", func(interface{}, interface{}) {}); e == nil {
@@ -854,7 +893,8 @@ func Test_Manager_AddObserver(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager().(*Manager)
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
@@ -874,7 +914,8 @@ func Test_Manager_RemoveObserver(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(60 * time.Second)
+		ObserveFrequency = 60
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 
 		src := NewMockSource(ctrl)
@@ -898,10 +939,11 @@ func Test_Manager(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(2 * time.Millisecond)
+		ObserveFrequency = 2
+		sut := NewManager()
 		defer func() { _ = sut.Close() }()
 
-		src := NewMockObservableSource(ctrl)
+		src := NewMockObsSource(ctrl)
 		src.EXPECT().Close().Times(1)
 		src.EXPECT().Get("").Return(Config{"node": "value"}, nil).Times(1)
 		src.EXPECT().Reload().Return(false, nil).MinTimes(1)
@@ -914,9 +956,10 @@ func Test_Manager(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut := NewManager(20 * time.Millisecond)
+		ObserveFrequency = 20
+		sut := NewManager()
 
-		src := NewMockObservableSource(ctrl)
+		src := NewMockObsSource(ctrl)
 		src.EXPECT().Get("").Return(Config{"node": "value"}, nil).MinTimes(2)
 		src.EXPECT().Reload().Return(true, nil).MinTimes(1)
 		_ = sut.AddSource("src", 0, src)
@@ -933,7 +976,8 @@ func Test_Manager(t *testing.T) {
 		defer ctrl.Finish()
 
 		check := false
-		sut := NewManager(20 * time.Millisecond)
+		ObserveFrequency = 20
+		sut := NewManager().(*Manager)
 
 		src1 := NewMockSource(ctrl)
 		src1.EXPECT().Get("").Return(Config{"node": "value1"}, nil).AnyTimes()
@@ -966,7 +1010,8 @@ func Test_Manager(t *testing.T) {
 		defer ctrl.Finish()
 
 		check := false
-		sut := NewManager(20 * time.Millisecond)
+		ObserveFrequency = 20
+		sut := NewManager().(*Manager)
 		initial := []interface{}{Config{"sub_node": "value1"}}
 		expected := []interface{}{Config{"sub_node": "value2"}}
 
@@ -1001,7 +1046,8 @@ func Test_Manager(t *testing.T) {
 		defer ctrl.Finish()
 
 		check := false
-		sut := NewManager(20 * time.Millisecond)
+		ObserveFrequency = 20
+		sut := NewManager().(*Manager)
 		initial := Config{"sub_node": "value1"}
 		expected := Config{"sub_node": "value2"}
 

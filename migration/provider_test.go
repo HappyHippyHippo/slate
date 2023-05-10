@@ -9,7 +9,7 @@ import (
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/rdb"
-	"github.com/happyhippyhippo/slate/rdb/sqlite"
+	"github.com/happyhippyhippo/slate/rdb/dialect/sqlite"
 	"gorm.io/gorm"
 )
 

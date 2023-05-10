@@ -26,7 +26,7 @@ type Config map[interface{}]interface{}
 var _ IConfig = &Config{}
 
 // Clone will instantiate an identical instance of the original Config
-func (c Config) Clone() Config {
+func (c *Config) Clone() Config {
 	// recursive clone function declaration
 	var cloner func(value interface{}) interface{}
 	cloner = func(value interface{}) interface{} {
@@ -41,7 +41,7 @@ func (c Config) Clone() Config {
 		// recursive config scenario
 		case Config:
 			return v.Clone()
-		// default scalar value
+		// def scalar value
 		default:
 			return value
 		}
@@ -49,7 +49,7 @@ func (c Config) Clone() Config {
 	// create the clone config
 	target := make(Config)
 	// clone the original config elements to the target config
-	for key, value := range c {
+	for key, value := range *c {
 		target[key] = cloner(value)
 	}
 	return target
@@ -77,7 +77,7 @@ func (c *Config) Has(
 
 // Get will retrieve the value stored in the requested path.
 // If the path does not exist, then the value nil will be returned. Or, if
-// a default value was given as the optional extra argument, then it will
+// a def value was given as the optional extra argument, then it will
 // be returned instead of the standard nil value.
 func (c *Config) Get(
 	path string,
@@ -89,13 +89,13 @@ func (c *Config) Get(
 	// check for non-nil value
 	case val != nil:
 		return val, nil
-	// check if is to return de default value or not
+	// check if is to return de def value or not
 	case e != nil:
 		if len(def) > 0 {
 			return def[0], nil
 		}
 		return nil, e
-	// default case : return nil
+	// def case : return nil
 	default:
 		return nil, nil
 	}
@@ -257,8 +257,8 @@ func (c *Config) Config(
 	return &v, nil
 }
 
-// Populate will try to populate the data argument with the data stored in the
-// path config location.
+// Populate will try to populate the data argument with the data stored
+// in the path config location.
 func (c *Config) Populate(
 	path string,
 	data interface{},
@@ -284,10 +284,12 @@ func (c *Config) Populate(
 	return c.populate(v, reflect.New(dataType).Elem(), ic)
 }
 
-func (c *Config) merge(
+// Merge will increment the current config instance with the
+// information stored in another config.
+func (c *Config) Merge(
 	src Config,
 ) {
-	// try to merge every source stored element into the target config
+	// try to Merge every source stored element into the target config
 	for key, value := range src {
 		// if the key does not exist in the target config, just store it
 		if local, ok := (*c)[key]; !ok {
@@ -297,8 +299,8 @@ func (c *Config) merge(
 			typedLocal, okLocal := local.(Config)
 			typedValue, okValue := value.(Config)
 			if okLocal && okValue {
-				// merge the both partials
-				typedLocal.merge(typedValue)
+				// Merge the both partials
+				typedLocal.Merge(typedValue)
 			} else {
 				// just override the target value
 				(*c)[key] = value
@@ -336,72 +338,7 @@ func (c *Config) path(
 	return it, nil
 }
 
-func (Config) convert(
-	val interface{},
-) interface{} {
-	// recursive conversion call
-	if v, ok := val.(Config); ok {
-		// return the recursive conversion of the config
-		p := Config{}
-		for k, v := range v {
-			// turn all string keys into lowercase
-			sk, ok := k.(string)
-			if ok {
-				p[strings.ToLower(sk)] = p.convert(v)
-			} else {
-				p[k] = p.convert(v)
-			}
-		}
-		return p
-	}
-	if v, ok := val.([]interface{}); ok {
-		var p []interface{}
-		for _, i := range v {
-			p = append(p, (Config{}).convert(i))
-		}
-		return p
-	}
-	// check if the value is a map that can be converted to a config
-	if v, ok := val.(map[string]interface{}); ok {
-		// return the recursive conversion of the config
-		p := Config{}
-		for k, i := range v {
-			// turn all string keys into lowercase
-			p[strings.ToLower(k)] = p.convert(i)
-		}
-		return p
-	}
-	// check if the value is a map that can be converted to a config
-	if v, ok := val.(map[interface{}]interface{}); ok {
-		// return the recursive conversion of the config
-		p := Config{}
-		for k, i := range v {
-			// turn all string keys into lowercase
-			sk, ok := k.(string)
-			if ok {
-				p[strings.ToLower(sk)] = p.convert(i)
-			} else {
-				p[k] = p.convert(i)
-			}
-		}
-		return p
-	}
-	// check if the value is a float64 but with an integer value
-	if v, ok := val.(float64); ok {
-		if float64(int(v)) == v {
-			return int(v)
-		}
-	}
-	// check if the value is a float32 but with an integer value
-	if v, ok := val.(float32); ok {
-		if float32(int(v)) == v {
-			return int(v)
-		}
-	}
-	return val
-}
-
-func (c Config) populate(
+func (c *Config) populate(
 	source interface{},
 	target reflect.Value,
 	icase bool,

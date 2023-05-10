@@ -74,9 +74,7 @@ var _ IManager = &Manager{}
 // This object will manage a series of sources, alongside of the ability of
 // registration of configuration path/values observer callbacks that will be
 // called whenever the value has changed.
-func NewManager(
-	period time.Duration,
-) *Manager {
+func NewManager() IManager {
 	// instantiate the config manager
 	c := &Manager{
 		mutex:     &sync.Mutex{},
@@ -87,6 +85,7 @@ func NewManager(
 	}
 	// check if there is a need to create the observable sources
 	// recurring trigger
+	period := time.Duration(ObserveFrequency) * time.Millisecond
 	if period != 0 {
 		// create the recurring trigger used to poll the
 		// observable sources
@@ -447,7 +446,7 @@ func (m *Manager) reload() error {
 	reloaded := false
 	for _, ref := range m.sources {
 		// check if the iterated source is an observable source
-		if s, ok := ref.source.(IObservableSource); ok {
+		if s, ok := ref.source.(IObsSource); ok {
 			// reload the source and update the reloaded flag if the request
 			// resulted in a source info update
 			updated, _ := s.Reload()
@@ -470,9 +469,9 @@ func (m *Manager) rebuild() {
 	updated := Config{}
 	for _, ref := range m.sources {
 		// retrieve the source stored config information
-		// and merge it with all parsed sources
+		// and Merge it with all parsed sources
 		cfg, _ := ref.source.Get("")
-		updated.merge(cfg.(Config))
+		updated.Merge(cfg.(Config))
 	}
 	// store locally the resulting config
 	m.config = &updated

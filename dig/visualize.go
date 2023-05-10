@@ -29,7 +29,7 @@ import (
 	"github.com/happyhippyhippo/slate/dig/internal/dot"
 )
 
-// A VisualizeOption modifies the default behavior of Visualize.
+// A VisualizeOption modifies the def behavior of Visualize.
 type VisualizeOption interface {
 	applyVisualizeOption(*visualizeOptions)
 }

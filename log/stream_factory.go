@@ -16,7 +16,7 @@ type StreamFactory []IStreamStrategy
 
 var _ IStreamFactory = &StreamFactory{}
 
-// NewStreamFactory @todo doc
+// NewStreamFactory will instantiate a new stream factory instance
 func NewStreamFactory() IStreamFactory {
 	return &StreamFactory{}
 }
@@ -37,7 +37,7 @@ func (f *StreamFactory) Register(
 
 // Create will instantiate and return a new config stream loaded
 // by a configuration instance.
-func (f StreamFactory) Create(
+func (f *StreamFactory) Create(
 	cfg config.IConfig,
 ) (IStream, error) {
 	// check config argument reference
@@ -47,7 +47,7 @@ func (f StreamFactory) Create(
 	// search in the factory strategy pool for one that would accept
 	// to generate the requested stream with the requested format defined
 	// in the given config
-	for _, s := range f {
+	for _, s := range *f {
 		if s.Accept(cfg) {
 			// return the creation of the requested stream
 			return s.Create(cfg)

@@ -15,6 +15,9 @@ var (
 	// entries of the application.
 	ConfigPathPrefix = env.String(EnvID+"_CONFIG_PATH", "slate.watchdog.services")
 
+	// DefaultFormatter defines the default logging formatter instance id.
+	DefaultFormatter = env.String(EnvID+"_DEFAULT_FORMATTER", "def")
+
 	// LogChannel defines the logging signal channel of the watchdogs.
 	LogChannel = env.String(EnvID+"_LOG_CHANNEL", "watchdog")
 

@@ -18,14 +18,6 @@ var (
 	// unexpected/unknown config source type.
 	ErrInvalidSource = fmt.Errorf("invalid config source")
 
-	// ErrRestConfigNotFound defines a rest response
-	// config not found error.
-	ErrRestConfigNotFound = fmt.Errorf("rest config source config not found")
-
-	// ErrRestTimestampNotFound defines a rest response
-	// timestamp not found error.
-	ErrRestTimestampNotFound = fmt.Errorf("rest config source timestamp not found")
-
 	// ErrSourceNotFound defines a source config source not found error.
 	ErrSourceNotFound = fmt.Errorf("config source not found")
 
@@ -68,20 +60,6 @@ func errInvalidSource(
 	ctx ...map[string]interface{},
 ) error {
 	return slate.NewErrorFrom(ErrInvalidSource, fmt.Sprintf("%v", cfg), ctx...)
-}
-
-func errRestConfigNotFound(
-	path string,
-	ctx ...map[string]interface{},
-) error {
-	return slate.NewErrorFrom(ErrRestConfigNotFound, path, ctx...)
-}
-
-func errRestTimestampNotFound(
-	path string,
-	ctx ...map[string]interface{},
-) error {
-	return slate.NewErrorFrom(ErrRestTimestampNotFound, path, ctx...)
 }
 
 func errSourceNotFound(

@@ -1,6 +1,8 @@
 package slate
 
-// IApplication defines the interface of a slate application instance.
+// IApplication defines the interface of a slate application instance
+// that implements a container and handles a series of service providers
+// so the application can properly initialize.
 type IApplication interface {
 	IContainer
 

@@ -259,7 +259,7 @@ func Test_Factory_Create(t *testing.T) {
 		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
 		l := NewMockLog(ctrl)
 		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(&config.Config{"type": DefaultLogFormatterType}).Return(nil, expected).Times(1)
+		formatterFactory.EXPECT().Create(&config.Config{"type": "def"}).Return(nil, expected).Times(1)
 		sut, _ := NewFactory(cfgManager, l, formatterFactory)
 
 		chk, e := sut.Create(service)
@@ -317,7 +317,7 @@ func Test_Factory_Create(t *testing.T) {
 		l := NewMockLog(ctrl)
 		formatter := NewMockLogFormatter(ctrl)
 		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(&config.Config{"type": DefaultLogFormatterType}).Return(formatter, nil).Times(1)
+		formatterFactory.EXPECT().Create(&config.Config{"type": "def"}).Return(formatter, nil).Times(1)
 		sut, _ := NewFactory(cfgManager, l, formatterFactory)
 
 		wd, e := sut.Create(service)

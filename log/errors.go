@@ -13,15 +13,16 @@ var (
 	ErrInvalidFormat = fmt.Errorf("invalid output log format")
 
 	// ErrInvalidLevel defines an error that signal an invalid
-	// log level.
-	ErrInvalidLevel = fmt.Errorf("invalid log level")
+	// log Level.
+	ErrInvalidLevel = fmt.Errorf("invalid log Level")
 
 	// ErrInvalidStream defines an error that signal that the
 	// given log stream configuration was unable to be parsed correctly
 	// enabling the log stream generation.
 	ErrInvalidStream = fmt.Errorf("invalid log stream")
 
-	// ErrStreamNotFound @todo doc
+	// ErrStreamNotFound defines an error that signal that the
+	// given stream was not found in the log manager.
 	ErrStreamNotFound = fmt.Errorf("log stream not found")
 
 	// ErrDuplicateStream defines an error that signal that the

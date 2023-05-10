@@ -74,59 +74,59 @@ func (p Provider) Register(
 // Boot will start the rdb package
 func (p Provider) Boot(
 	container slate.IContainer,
-) error {
+) (e error) {
 	// check container argument reference
 	if container == nil {
 		return errNilPointer("container")
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			e = r.(error)
+		}
+	}()
+
 	// populate the container dialect factory with all
 	// registered dialect strategies
-	dialectFactory, e := p.getDialectFactory(container)
-	if e != nil {
-		return e
-	}
-	strategies, e := p.getDialectStrategies(container)
-	if e != nil {
-		return e
-	}
-	for _, strategy := range strategies {
-		_ = dialectFactory.Register(strategy)
+	dialectFactory := p.getDialectFactory(container)
+	for _, s := range p.getDialectStrategies(container) {
+		_ = dialectFactory.Register(s)
 	}
 	return nil
 }
 
 func (Provider) getDialectFactory(
 	container slate.IContainer,
-) (IDialectFactory, error) {
+) IDialectFactory {
 	// retrieve the factory entry
 	instance, e := container.Get(DialectFactoryID)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// validate the retrieved entry type
 	i, ok := instance.(IDialectFactory)
 	if !ok {
-		return nil, errConversion(instance, "rdb.IDialectFactory")
+		panic(errConversion(instance, "rdb.IDialectFactory"))
 	}
-	return i, nil
+	return i
 }
 
 func (Provider) getDialectStrategies(
 	container slate.IContainer,
-) ([]IDialectStrategy, error) {
+) []IDialectStrategy {
 	// retrieve the strategies entries
 	tags, e := container.Tag(DialectStrategyTag)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// type check the retrieved strategies
 	var list []IDialectStrategy
 	for _, service := range tags {
 		s, ok := service.(IDialectStrategy)
 		if !ok {
-			return nil, errConversion(service, "rdb.IDialectStrategy")
+			panic(errConversion(service, "rdb.IDialectStrategy"))
 		}
 		list = append(list, s)
 	}
-	return list, nil
+	return list
 }

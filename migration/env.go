@@ -11,7 +11,7 @@ const (
 )
 
 var (
-	// Database defines the default migration manager rdb name.
+	// Database defines the def migration manager rdb name.
 	Database = env.String(EnvID+"_DATABASE", "primary")
 
 	// AutoMigrate defines the flag that will be used to enable

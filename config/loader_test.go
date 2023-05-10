@@ -55,11 +55,11 @@ func Test_NewLoader(t *testing.T) {
 func Test_Loader_Load(t *testing.T) {
 	LoaderSourceID = "base_source_id"
 	LoaderSourcePath = "base_source_path"
-	LoaderSourceFormat = YAMLDecoderFormat
+	LoaderSourceFormat = "format"
 	defer func() {
 		LoaderSourceID = "main"
 		LoaderSourcePath = "config/sources.yaml"
-		LoaderSourceFormat = YAMLDecoderFormat
+		LoaderSourceFormat = "format"
 	}()
 
 	t.Run("error getting the base source", func(t *testing.T) {
@@ -68,7 +68,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		sFactory := NewMockSourceFactory(ctrl)
-		sFactory.EXPECT().Create(&Config{"type": FileSourceType, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(nil, expected).Times(1)
+		sFactory.EXPECT().Create(&Config{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(nil, expected).Times(1)
 		sut, _ := NewLoader(NewMockManager(ctrl), sFactory)
 
 		if e := sut.Load(); e == nil {
@@ -85,7 +85,7 @@ func Test_Loader_Load(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		src := NewMockSource(ctrl)
 		sFactory := NewMockSourceFactory(ctrl)
-		sFactory.EXPECT().Create(&Config{"type": FileSourceType, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&Config{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(expected).Times(1)
 		sut, _ := NewLoader(mockManager, sFactory)
@@ -103,7 +103,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		src := NewMockSource(ctrl)
 		sFactory := NewMockSourceFactory(ctrl)
-		sFactory.EXPECT().Create(&Config{"type": FileSourceType, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&Config{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().Config(LoaderSourceListPath).Return(&Config{}, nil).Times(1)
@@ -121,7 +121,7 @@ func Test_Loader_Load(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		src := NewMockSource(ctrl)
 		sFactory := NewMockSourceFactory(ctrl)
-		sFactory.EXPECT().Create(&Config{"type": FileSourceType, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&Config{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().Config(LoaderSourceListPath).Return(nil, expected).Times(1)
@@ -138,7 +138,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		src := NewMockSource(ctrl)
 		sFactory := NewMockSourceFactory(ctrl)
-		sFactory.EXPECT().Create(&Config{"type": FileSourceType, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&Config{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().Config(LoaderSourceListPath).Return(&Config{"entry": 123}, nil).Times(1)
@@ -156,7 +156,7 @@ func Test_Loader_Load(t *testing.T) {
 		partials := &Config{"id": Config{"priority": "string"}}
 		src := NewMockSource(ctrl)
 		sFactory := NewMockSourceFactory(ctrl)
-		sFactory.EXPECT().Create(&Config{"type": FileSourceType, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&Config{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
 		mockManager.EXPECT().Config(LoaderSourceListPath).Return(partials, nil).Times(1)
@@ -178,7 +178,7 @@ func Test_Loader_Load(t *testing.T) {
 		partial := &Config{"id": srcPartial}
 		src := NewMockSource(ctrl)
 		sFactory := NewMockSourceFactory(ctrl)
-		sFactory.EXPECT().Create(&Config{"type": FileSourceType, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&Config{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		sFactory.EXPECT().Create(&srcPartial).Return(nil, expected).Times(1)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
@@ -202,7 +202,7 @@ func Test_Loader_Load(t *testing.T) {
 		src := NewMockSource(ctrl)
 		src1 := NewMockSource(ctrl)
 		sFactory := NewMockSourceFactory(ctrl)
-		sFactory.EXPECT().Create(&Config{"type": FileSourceType, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&Config{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		sFactory.EXPECT().Create(&srcPartial).Return(src1, nil)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
@@ -226,7 +226,7 @@ func Test_Loader_Load(t *testing.T) {
 		src := NewMockSource(ctrl)
 		src1 := NewMockSource(ctrl)
 		sFactory := NewMockSourceFactory(ctrl)
-		sFactory.EXPECT().Create(&Config{"type": FileSourceType, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&Config{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		sFactory.EXPECT().Create(&srcPartial).Return(src1, nil)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
@@ -251,7 +251,7 @@ func Test_Loader_Load(t *testing.T) {
 		src := NewMockSource(ctrl)
 		src1 := NewMockSource(ctrl)
 		sFactory := NewMockSourceFactory(ctrl)
-		sFactory.EXPECT().Create(&Config{"type": FileSourceType, "path": "config.yaml", "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&Config{"type": "file", "path": "config.yaml", "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		sFactory.EXPECT().Create(&srcPartial).Return(src1, nil)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
@@ -276,7 +276,7 @@ func Test_Loader_Load(t *testing.T) {
 		src := NewMockSource(ctrl)
 		src1 := NewMockSource(ctrl)
 		sFactory := NewMockSourceFactory(ctrl)
-		sFactory.EXPECT().Create(&Config{"type": FileSourceType, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&Config{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		sFactory.EXPECT().Create(&srcPartial).Return(src1, nil)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
@@ -301,7 +301,7 @@ func Test_Loader_Load(t *testing.T) {
 		src := NewMockSource(ctrl)
 		src1 := NewMockSource(ctrl)
 		sFactory := NewMockSourceFactory(ctrl)
-		sFactory.EXPECT().Create(&Config{"type": FileSourceType, "path": LoaderSourcePath, "format": "json"}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&Config{"type": "file", "path": LoaderSourcePath, "format": "json"}).Return(src, nil).Times(1)
 		sFactory.EXPECT().Create(&srcPartial).Return(src1, nil)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)
@@ -314,7 +314,7 @@ func Test_Loader_Load(t *testing.T) {
 		}
 	})
 
-	t.Run("register the loaded source with default priority if missing", func(t *testing.T) {
+	t.Run("register the loaded source with def priority if missing", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -323,7 +323,7 @@ func Test_Loader_Load(t *testing.T) {
 		src := NewMockSource(ctrl)
 		src1 := NewMockSource(ctrl)
 		sFactory := NewMockSourceFactory(ctrl)
-		sFactory.EXPECT().Create(&Config{"type": FileSourceType, "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
+		sFactory.EXPECT().Create(&Config{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}).Return(src, nil).Times(1)
 		sFactory.EXPECT().Create(&srcPartial).Return(src1, nil)
 		mockManager := NewMockManager(ctrl)
 		mockManager.EXPECT().AddSource(LoaderSourceID, 0, src).Return(nil).Times(1)

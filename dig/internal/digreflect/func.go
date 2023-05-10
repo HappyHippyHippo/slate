@@ -36,7 +36,7 @@ type Func struct {
 	// Name of the package in which this function is defined.
 	Package string
 
-	// Path to the file in which this function is defined.
+	// path to the file in which this function is defined.
 	File string
 
 	// Line number in the file at which this function is defined.

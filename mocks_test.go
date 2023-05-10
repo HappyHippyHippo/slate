@@ -51,7 +51,7 @@ func (mr *MockCloserRecorder) Close() *gomock.Call {
 }
 
 //------------------------------------------------------------------------------
-// Provide
+// Provider
 //------------------------------------------------------------------------------
 
 // MockProvider is a mocked instance of IProvider interface.

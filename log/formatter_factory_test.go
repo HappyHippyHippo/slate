@@ -15,7 +15,7 @@ func Test_NewFormatterFactory(t *testing.T) {
 		if sut == nil {
 			t.Error("didn't returned the expected reference")
 		} else if _, ok := sut.(*FormatterFactory); !ok {
-			t.Error("didn't returned a valid formatter factory instance")
+			t.Error("didn't returned a valid Formatter factory instance")
 		}
 	})
 }
@@ -29,7 +29,7 @@ func Test_FormatterFactory_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("register the formatter", func(t *testing.T) {
+	t.Run("register the Formatter", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -67,7 +67,7 @@ func Test_FormatterFactory_Create(t *testing.T) {
 		}
 	})
 
-	t.Run("create the formatter", func(t *testing.T) {
+	t.Run("create the Formatter", func(t *testing.T) {
 		format := "format"
 
 		ctrl := gomock.NewController(t)
@@ -83,7 +83,7 @@ func Test_FormatterFactory_Create(t *testing.T) {
 		if res, e := sut.Create(format); e != nil {
 			t.Errorf("returned the (%v) error", e)
 		} else if !reflect.DeepEqual(res, formatter) {
-			t.Errorf("didn't returned the formatter")
+			t.Errorf("didn't returned the Formatter")
 		}
 	})
 }

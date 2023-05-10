@@ -11,13 +11,9 @@ const (
 	// in the application container.
 	ID = slate.ID + ".watchdog"
 
-	// LogFormatterStrategyTag defines the default tag to be used
+	// LogFormatterStrategyTag defines the def tag to be used
 	// to identify a watchdog log formatter entry in the container.
 	LogFormatterStrategyTag = ID + ".formatter.strategy"
-
-	// DefaultLogFormatterStrategyID defines the id to be used as the
-	// container registration id of the default log formatter strategy.
-	DefaultLogFormatterStrategyID = ID + ".formatter.strategy.default"
 
 	// LogFormatterFactoryID defines the id to be used as the container
 	// registration id of the log formatter factory.
@@ -27,7 +23,7 @@ const (
 	// registration id of the watchdog factory.
 	FactoryID = ID + ".factory"
 
-	// ProcessTag defines the default tag to be used
+	// ProcessTag defines the def tag to be used
 	// to identify a watchdog process entry in the container.
 	ProcessTag = ID + ".process.tag"
 )
@@ -48,7 +44,6 @@ func (p Provider) Register(
 		return errNilPointer("container")
 	}
 	// add log formatter strategies and factory
-	_ = container.Service(DefaultLogFormatterStrategyID, NewDefaultLogFormatterStrategy, LogFormatterStrategyTag)
 	_ = container.Service(LogFormatterFactoryID, NewLogFormatterFactory)
 	// add the watchdog factory and kennel
 	_ = container.Service(FactoryID, NewFactory)
@@ -62,35 +57,28 @@ func (p Provider) Register(
 // to the last registered migration
 func (p Provider) Boot(
 	container slate.IContainer,
-) error {
+) (e error) {
 	// check container argument reference
 	if container == nil {
 		return errNilPointer("container")
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			e = r.(error)
+		}
+	}()
+
 	// populate the container log formatter factory with
 	// all registered log formatter strategies
-	formatterFactory, e := p.getLogFormatterFactory(container)
-	if e != nil {
-		return e
-	}
-	formatterStrategies, e := p.getLogFormatterStrategies(container)
-	if e != nil {
-		return e
-	}
-	for _, strategy := range formatterStrategies {
+	formatterFactory := p.getLogFormatterFactory(container)
+	for _, strategy := range p.getLogFormatterStrategies(container) {
 		_ = formatterFactory.Register(strategy)
 	}
 	// populate the watchdog kennel with all the processes
 	// registered in the container
-	kennel, e := p.getKennel(container)
-	if e != nil {
-		return e
-	}
-	procs, e := p.getProcesses(container)
-	if e != nil {
-		return e
-	}
-	for _, proc := range procs {
+	kennel := p.getKennel(container)
+	for _, proc := range p.getProcesses(container) {
 		if e := kennel.Add(proc); e != nil {
 			return e
 		}
@@ -100,68 +88,72 @@ func (p Provider) Boot(
 
 func (Provider) getLogFormatterFactory(
 	container slate.IContainer,
-) (ILogFormatterFactory, error) {
+) ILogFormatterFactory {
 	// retrieve the factory entry
 	entry, e := container.Get(LogFormatterFactoryID)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// validate the retrieved entry type
 	instance, ok := entry.(ILogFormatterFactory)
 	if !ok {
-		return nil, errConversion(entry, "watchdog.ILogFormatterFactory")
+		panic(errConversion(entry, "watchdog.ILogFormatterFactory"))
 	}
-	return instance, nil
+	return instance
 }
 
 func (Provider) getLogFormatterStrategies(
 	container slate.IContainer,
-) ([]ILogFormatterStrategy, error) {
+) []ILogFormatterStrategy {
 	// retrieve the strategies entries
 	entries, e := container.Tag(LogFormatterStrategyTag)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// type check the retrieved strategies
 	var strategies []ILogFormatterStrategy
 	for _, entry := range entries {
-		if instance, ok := entry.(ILogFormatterStrategy); ok {
-			strategies = append(strategies, instance)
+		s, ok := entry.(ILogFormatterStrategy)
+		if !ok {
+			panic(errConversion(entry, "watchdog.ILogFormatterStrategy"))
 		}
+		strategies = append(strategies, s)
 	}
-	return strategies, nil
+	return strategies
 }
 
 func (Provider) getKennel(
 	container slate.IContainer,
-) (IKennel, error) {
+) IKennel {
 	// retrieve the kennel instance
 	entry, e := container.Get(ID)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// validate the retrieved entry type
 	instance, ok := entry.(IKennel)
 	if !ok {
-		return nil, errConversion(entry, "watchdog.IKennel")
+		panic(errConversion(entry, "watchdog.IKennel"))
 	}
-	return instance, nil
+	return instance
 }
 
 func (p Provider) getProcesses(
 	container slate.IContainer,
-) ([]IProcess, error) {
+) []IProcess {
 	// retrieve the watchdog processes entries
 	tags, e := container.Tag(ProcessTag)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// type check the retrieved processes
 	var processes []IProcess
 	for _, service := range tags {
-		if process, ok := service.(IProcess); ok {
-			processes = append(processes, process)
+		p, ok := service.(IProcess)
+		if !ok {
+			panic(errConversion(service, "watchdog.IProcess"))
 		}
+		processes = append(processes, p)
 	}
-	return processes, nil
+	return processes
 }

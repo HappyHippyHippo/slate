@@ -159,66 +159,6 @@ func Test_errInvalidSource(t *testing.T) {
 	})
 }
 
-func Test_errRestConfigNotFound(t *testing.T) {
-	arg := "dummy argument"
-	context := map[string]interface{}{"field": "value"}
-	message := "dummy argument : rest config source config not found"
-
-	t.Run("creation without context", func(t *testing.T) {
-		if e := errRestConfigNotFound(arg); !errors.Is(e, ErrRestConfigNotFound) {
-			t.Errorf("error not a instance of ErrRestConfigNotFound")
-		} else if e.Error() != message {
-			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(slate.IError); !ok {
-			t.Errorf("didn't returned a slate error instance")
-		} else if te.Context() != nil {
-			t.Errorf("didn't stored a nil value context")
-		}
-	})
-
-	t.Run("creation with context", func(t *testing.T) {
-		if e := errRestConfigNotFound(arg, context); !errors.Is(e, ErrRestConfigNotFound) {
-			t.Errorf("error not a instance of ErrRestConfigNotFound")
-		} else if e.Error() != message {
-			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(slate.IError); !ok {
-			t.Errorf("didn't returned a slate error instance")
-		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
-			t.Errorf("context (%v) not same as expected (%v)", check, context)
-		}
-	})
-}
-
-func Test_errRestTimestampNotFound(t *testing.T) {
-	arg := "dummy argument"
-	context := map[string]interface{}{"field": "value"}
-	message := "dummy argument : rest config source timestamp not found"
-
-	t.Run("creation without context", func(t *testing.T) {
-		if e := errRestTimestampNotFound(arg); !errors.Is(e, ErrRestTimestampNotFound) {
-			t.Errorf("error not a instance of ErrRestTimestampNotFound")
-		} else if e.Error() != message {
-			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(slate.IError); !ok {
-			t.Errorf("didn't returned a slate error instance")
-		} else if te.Context() != nil {
-			t.Errorf("didn't stored a nil value context")
-		}
-	})
-
-	t.Run("creation with context", func(t *testing.T) {
-		if e := errRestTimestampNotFound(arg, context); !errors.Is(e, ErrRestTimestampNotFound) {
-			t.Errorf("error not a instance of ErrRestTimestampNotFound")
-		} else if e.Error() != message {
-			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(slate.IError); !ok {
-			t.Errorf("didn't returned a slate error instance")
-		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
-			t.Errorf("context (%v) not same as expected (%v)", check, context)
-		}
-	})
-}
-
 func Test_errSourceNotFound(t *testing.T) {
 	arg := "dummy argument"
 	context := map[string]interface{}{"field": "value"}

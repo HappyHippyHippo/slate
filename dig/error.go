@@ -53,7 +53,7 @@ type causer interface {
 
 // Implements fmt.Formatter for err that implement causer.
 //
-// This Format method supports %v and %+v. In the %v form, the err is
+// This format method supports %v and %+v. In the %v form, the err is
 // printed on one line. In the %+v form, the err is split across multiple
 // lines on each err in the err chain.
 func formatCauser(c causer, w fmt.State, v rune) {

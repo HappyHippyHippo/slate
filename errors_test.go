@@ -37,41 +37,10 @@ func Test_errNilPointer(t *testing.T) {
 	})
 }
 
-func Test_errConversion(t *testing.T) {
-	arg := "dummy value"
-	typ := "dummy type"
-	context := map[string]interface{}{"field": "value"}
-	message := "dummy value to dummy type : invalid type conversion"
-
-	t.Run("creation without context", func(t *testing.T) {
-		if e := errConversion(arg, typ); !errors.Is(e, ErrConversion) {
-			t.Errorf("error not a instance of ErrConversion")
-		} else if e.Error() != message {
-			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(IError); !ok {
-			t.Errorf("didn't returned a slate error instance")
-		} else if te.Context() != nil {
-			t.Errorf("didn't stored a nil value context")
-		}
-	})
-
-	t.Run("creation with context", func(t *testing.T) {
-		if e := errConversion(arg, typ, context); !errors.Is(e, ErrConversion) {
-			t.Errorf("error not a instance of ErrConversion")
-		} else if e.Error() != message {
-			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(IError); !ok {
-			t.Errorf("didn't returned a slate error instance")
-		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
-			t.Errorf("context (%v) not same as expected (%v)", check, context)
-		}
-	})
-}
-
 func Test_errContainer(t *testing.T) {
-	arg := fmt.Errorf("dummy argument 1")
+	arg := fmt.Errorf("dummy argument")
 	context := map[string]interface{}{"field": "value"}
-	message := "dummy argument 1 : service container error"
+	message := "dummy argument : service container error"
 
 	t.Run("creation without context", func(t *testing.T) {
 		if e := errContainer(arg); !errors.Is(e, ErrContainer) {

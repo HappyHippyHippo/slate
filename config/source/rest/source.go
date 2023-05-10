@@ -1,0 +1,111 @@
+package rest
+
+import (
+	"bytes"
+	"errors"
+	"io"
+	"net/http"
+	"sync"
+
+	"github.com/happyhippyhippo/slate/config"
+	"github.com/happyhippyhippo/slate/config/source"
+)
+
+// httpClient defines the interface of an instance capable to perform the
+// rest config obtain action
+type httpClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+// Source defines a config source that read a REST service and
+// store a section of the response as the stored config.
+type Source struct {
+	source.BaseSource
+	client         httpClient
+	uri            string
+	format         string
+	decoderFactory config.IDecoderFactory
+	configPath     string
+}
+
+var _ config.ISource = &Source{}
+
+// NewSource will instantiate a new configuration source
+// that will read a REST endpoint for configuration info.
+func NewSource(
+	client httpClient,
+	uri,
+	format string,
+	decoderFactory config.IDecoderFactory,
+	configPath string,
+) (*Source, error) {
+	// check client argument reference
+	if client == nil {
+		return nil, errNilPointer("client")
+	}
+	// check decoder factory argument reference
+	if decoderFactory == nil {
+		return nil, errNilPointer("decoderFactory")
+	}
+	// instantiates the config source
+	s := &Source{
+		BaseSource: source.BaseSource{
+			Mutex:  &sync.Mutex{},
+			Config: config.Config{},
+		},
+		client:         client,
+		uri:            uri,
+		format:         format,
+		decoderFactory: decoderFactory,
+		configPath:     configPath,
+	}
+	// load the config information from the REST service
+	if e := s.load(); e != nil {
+		return nil, e
+	}
+	return s, nil
+}
+
+func (s *Source) load() error {
+	// get the REST service information
+	rc, e := s.request()
+	if e != nil {
+		return e
+	}
+	// retrieve the config information from the service response data
+	c, e := rc.Config(s.configPath)
+	if e != nil {
+		if errors.Is(e, config.ErrPathNotFound) {
+			return errConfigNotFound(s.configPath)
+		}
+		return e
+	}
+	// store the retrieved config
+	s.Mutex.Lock()
+	s.Config = *c.(*config.Config)
+	s.Mutex.Unlock()
+	return nil
+}
+
+func (s *Source) request() (config.IConfig, error) {
+	var e error
+	// create the REST service config request
+	var req *http.Request
+	if req, e = http.NewRequest(http.MethodGet, s.uri, http.NoBody); e != nil {
+		return nil, e
+	}
+	// call the REST service for the configuration information
+	var res *http.Response
+	if res, e = s.client.Do(req); e != nil {
+		return nil, e
+	}
+	b, _ := io.ReadAll(res.Body)
+	// gat a decoder to parse the service data
+	d, e := s.decoderFactory.Create(s.format, bytes.NewReader(b))
+	if e != nil {
+		return nil, e
+	}
+	defer func() { _ = d.Close() }()
+	// decode the data into a config instance
+	return d.Decode()
+}

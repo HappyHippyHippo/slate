@@ -113,7 +113,7 @@ func Test_Application_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("panic something not an error on boot", func(t *testing.T) {
+	t.Run("panic something not an error on boot failure", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

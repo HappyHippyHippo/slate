@@ -17,7 +17,7 @@ const (
 	// registration id of the migrator DAO.
 	DaoID = ID + ".dao"
 
-	// MigrationTag defines the default tag to be used
+	// MigrationTag defines the def tag to be used
 	// to identify a migration entry in the container.
 	MigrationTag = ID + ".migration"
 )

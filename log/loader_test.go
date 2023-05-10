@@ -161,7 +161,7 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		partial := config.Config{"type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
+		partial := config.Config{"type": "console", "format": "json", "Channels": []interface{}{}, "Level": "fatal"}
 		manager := NewMockConfigManager(ctrl)
 		manager.EXPECT().Config("slate.log.streams", config.Config{}).Return(&config.Config{"id": partial}, nil).Times(1)
 		stream1 := NewMockStream(ctrl)
@@ -183,7 +183,7 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partial := config.Config{"type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
+		partial := config.Config{"type": "console", "format": "json", "Channels": []interface{}{}, "Level": "fatal"}
 		manager := NewMockConfigManager(ctrl)
 		manager.EXPECT().Config("slate.log.streams", config.Config{}).Return(&config.Config{"id": partial}, nil).Times(1)
 		manager.EXPECT().AddObserver("slate.log.streams", gomock.Any()).Return(nil).Times(1)
@@ -204,11 +204,11 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		config1 := config.Config{"type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
+		config1 := config.Config{"type": "console", "format": "json", "Channels": []interface{}{}, "Level": "fatal"}
 		partial := config.Config{"slate": config.Config{"log": config.Config{"streams": config.Config{"id": config1}}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).MinTimes(1)
-		manager := config.NewManager(0)
+		manager := config.NewManager()
 		_ = manager.AddSource("id", 0, source)
 		stream1 := NewMockStream(ctrl)
 		sFactory := NewMockStreamFactory(ctrl)
@@ -231,15 +231,15 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		config1 := config.Config{"type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
-		config2 := config.Config{"type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
+		config1 := config.Config{"type": "console", "format": "json", "Channels": []interface{}{}, "Level": "fatal"}
+		config2 := config.Config{"type": "console", "format": "json", "Channels": []interface{}{}, "Level": "fatal"}
 		partial1 := config.Config{"slate": config.Config{"log": config.Config{"streams": config.Config{"id": config1}}}}
 		partial2 := config.Config{"slate": config.Config{"log": config.Config{"streams": config.Config{"id": config2}}}}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
 		source2 := NewMockConfigSource(ctrl)
 		source2.EXPECT().Get("").Return(partial2, nil).MinTimes(1)
-		manager := config.NewManager(0)
+		manager := config.NewManager()
 		_ = manager.AddSource("id", 0, source1)
 		stream1 := NewMockStream(ctrl)
 		sFactory := NewMockStreamFactory(ctrl)
@@ -262,15 +262,15 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		config1 := config.Config{"type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
-		config2 := config.Config{"type": "console", "format": "json", "channels": []interface{}{}, "level": "fatal"}
+		config1 := config.Config{"type": "console", "format": "json", "Channels": []interface{}{}, "Level": "fatal"}
+		config2 := config.Config{"type": "console", "format": "json", "Channels": []interface{}{}, "Level": "fatal"}
 		partial1 := config.Config{"slate": config.Config{"log": config.Config{"streams": config.Config{"id": config1}}}}
 		partial2 := config.Config{"slate": config.Config{"log": config.Config{"streams": config.Config{"id": config2}}}}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).MinTimes(1)
 		source2 := NewMockConfigSource(ctrl)
 		source2.EXPECT().Get("").Return(partial2, nil).MinTimes(1)
-		manager := config.NewManager(0)
+		manager := config.NewManager()
 		_ = manager.AddSource("id", 0, source1)
 		stream1 := NewMockStream(ctrl)
 		stream2 := NewMockStream(ctrl)

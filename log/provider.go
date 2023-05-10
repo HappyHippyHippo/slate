@@ -11,36 +11,16 @@ const (
 	ID = slate.ID + ".log"
 
 	// FormatterStrategyTag defines the tag to be assigned to all
-	// container formatter strategies.
-	FormatterStrategyTag = ID + ".formatter.strategy"
-
-	// JSONFormatterStrategyID defines the id to be used as
-	// the container registration id of a logger json formatter factory
-	// strategy instance.
-	JSONFormatterStrategyID = ID + ".formatter.strategy.json"
+	// container Formatter strategies.
+	FormatterStrategyTag = ID + ".Formatter.strategy"
 
 	// FormatterFactoryID defines the id to be used as the
-	// container registration id of a logger formatter factory instance.
-	FormatterFactoryID = ID + ".formatter.factory"
+	// container registration id of a logger Formatter factory instance.
+	FormatterFactoryID = ID + ".Formatter.factory"
 
 	// StreamStrategyTag defines the tag to be assigned to all
 	// container stream strategies.
 	StreamStrategyTag = ID + ".stream.strategy"
-
-	// ConsoleStreamStrategyID defines the id to be used as the
-	// container registration id of a logger console stream factory strategy
-	// instance.
-	ConsoleStreamStrategyID = ID + ".stream.strategy.console"
-
-	// FileStreamStrategyID defines the id to be used as the
-	// container registration id of a logger file stream factory strategy
-	// instance.
-	FileStreamStrategyID = ID + ".stream.strategy.file"
-
-	// RotatingFileStreamStrategyID defines the id to be used as the
-	// container registration id of a logger rotating file stream factory
-	// strategy instance.
-	RotatingFileStreamStrategyID = ID + ".stream.strategy.rotating_file"
 
 	// StreamFactoryID defines the id to be used as the container
 	// registration id of a logger stream factory instance.
@@ -66,15 +46,8 @@ func (p Provider) Register(
 	if container == nil {
 		return errNilPointer("container")
 	}
-	// add formatter strategies and factory
-	_ = container.Service(JSONFormatterStrategyID, NewJSONFormatterStrategy, FormatterStrategyTag)
 	_ = container.Service(FormatterFactoryID, NewFormatterFactory)
-	// add stream strategies and factory
-	_ = container.Service(ConsoleStreamStrategyID, NewConsoleStreamStrategy, StreamStrategyTag)
-	_ = container.Service(FileStreamStrategyID, NewFileStreamStrategy, StreamStrategyTag)
-	_ = container.Service(RotatingFileStreamStrategyID, NewRotatingFileStreamStrategy, StreamStrategyTag)
 	_ = container.Service(StreamFactoryID, NewStreamFactory)
-	// add log and loader
 	_ = container.Service(ID, NewLog)
 	_ = container.Service(LoaderID, NewLoader)
 	return nil
@@ -84,130 +57,122 @@ func (p Provider) Register(
 // logger loader with the defined provider base entry information.
 func (p Provider) Boot(
 	container slate.IContainer,
-) error {
+) (e error) {
 	// check container argument reference
 	if container == nil {
 		return errNilPointer("container")
 	}
-	// populate the container formatter factory with
-	// all registered formatter strategies
-	formatterFactory, e := p.getFormatterFactory(container)
-	if e != nil {
-		return e
-	}
-	formatterStrategies, e := p.getFormatterStrategies(container)
-	if e != nil {
-		return e
-	}
-	for _, strategy := range formatterStrategies {
-		_ = formatterFactory.Register(strategy)
+
+	defer func() {
+		if r := recover(); r != nil {
+			e = r.(error)
+		}
+	}()
+
+	// populate the container Formatter factory with
+	// all registered Formatter strategies
+	formatterFactory := p.getFormatterFactory(container)
+	for _, s := range p.getFormatterStrategies(container) {
+		_ = formatterFactory.Register(s)
 	}
 	// populate the container stream factory with all
 	// registered stream strategies
-	streamFactory, e := p.getStreamFactory(container)
-	if e != nil {
-		return e
-	}
-	streamStrategies, e := p.getStreamStrategies(container)
-	if e != nil {
-		return e
-	}
-	for _, strategy := range streamStrategies {
-		_ = streamFactory.Register(strategy)
+	streamFactory := p.getStreamFactory(container)
+	for _, s := range p.getStreamStrategies(container) {
+		_ = streamFactory.Register(s)
 	}
 	// check if the log loader is active
 	if !LoaderActive {
 		return nil
 	}
-	// get the container registered loader
-	loader, e := p.getLoader(container)
-	if e != nil {
-		return e
-	}
 	// execute the loader action
-	return loader.Load()
+	return p.getLoader(container).Load()
 }
 
 func (Provider) getFormatterFactory(
 	container slate.IContainer,
-) (IFormatterFactory, error) {
+) IFormatterFactory {
 	// retrieve the factory entry
 	entry, e := container.Get(FormatterFactoryID)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// validate the retrieved entry type
 	instance, ok := entry.(IFormatterFactory)
 	if !ok {
-		return nil, errConversion(entry, "log.IFormatterFactory")
+		panic(errConversion(entry, "log.IFormatterFactory"))
 	}
-	return instance, nil
+	return instance
 }
 
 func (Provider) getFormatterStrategies(
 	container slate.IContainer,
-) ([]IFormatterStrategy, error) {
+) []IFormatterStrategy {
 	// retrieve the strategies entries
 	entries, e := container.Tag(FormatterStrategyTag)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// type check the retrieved strategies
 	var strategies []IFormatterStrategy
 	for _, entry := range entries {
-		if instance, ok := entry.(IFormatterStrategy); ok {
-			strategies = append(strategies, instance)
+		s, ok := entry.(IFormatterStrategy)
+		if !ok {
+			panic(errConversion(entry, "log.IFormatterStrategy"))
 		}
+		strategies = append(strategies, s)
 	}
-	return strategies, nil
+	return strategies
 }
 
 func (Provider) getStreamFactory(
 	container slate.IContainer,
-) (IStreamFactory, error) {
+) IStreamFactory {
 	// retrieve the factory entry
 	entry, e := container.Get(StreamFactoryID)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// validate the retrieved entry type
 	instance, ok := entry.(IStreamFactory)
 	if !ok {
-		return nil, errConversion(entry, "log.IStreamFactory")
+		panic(errConversion(entry, "log.IStreamFactory"))
 	}
-	return instance, nil
+	return instance
 }
 
 func (Provider) getStreamStrategies(
 	container slate.IContainer,
-) ([]IStreamStrategy, error) {
+) []IStreamStrategy {
 	// retrieve the strategies entries
 	entries, e := container.Tag(StreamStrategyTag)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// type check the retrieved strategies
 	var strategies []IStreamStrategy
 	for _, entry := range entries {
-		if instance, ok := entry.(IStreamStrategy); ok {
-			strategies = append(strategies, instance)
+		s, ok := entry.(IStreamStrategy)
+		if !ok {
+			panic(errConversion(entry, "log.IStreamStrategy"))
 		}
+		strategies = append(strategies, s)
 	}
-	return strategies, nil
+	return strategies
 }
 
 func (Provider) getLoader(
 	container slate.IContainer,
-) (ILoader, error) {
+) ILoader {
 	// retrieve the loader entry
 	entry, e := container.Get(LoaderID)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// validate the retrieved entry type
 	instance, ok := entry.(ILoader)
 	if !ok {
-		return nil, errConversion(entry, "log.ILoader")
+		panic(errConversion(entry, "log.ILoader"))
 	}
-	return instance, nil
+	return instance
 }

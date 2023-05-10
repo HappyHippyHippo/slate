@@ -2,7 +2,7 @@ package dig
 
 import "reflect"
 
-// An RemoveOption modifies the default behavior of Remove. It's included for
+// An RemoveOption modifies the def behavior of Remove. It's included for
 // future functionality; currently, there are no concrete implementations.
 type RemoveOption interface {
 	unimplemented()

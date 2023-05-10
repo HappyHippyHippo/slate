@@ -27,7 +27,7 @@ func Test_NewConnectionPool(t *testing.T) {
 	})
 
 	t.Run("missing connection factory", func(t *testing.T) {
-		sut, e := NewConnectionPool(config.NewManager(0), nil)
+		sut, e := NewConnectionPool(config.NewManager(), nil)
 		switch {
 		case sut != nil:
 			t.Error("return an unexpected valid connection factory instance")
@@ -39,7 +39,7 @@ func Test_NewConnectionPool(t *testing.T) {
 	})
 
 	t.Run("valid creation", func(t *testing.T) {
-		if sut, e := NewConnectionPool(config.NewManager(0), &ConnectionFactory{}); sut == nil {
+		if sut, e := NewConnectionPool(config.NewManager(), &ConnectionFactory{}); sut == nil {
 			t.Error("didn't returned the expected valid connection factory instance")
 		} else if e != nil {
 			t.Errorf("return the unexpected error : %v", e)
@@ -70,7 +70,7 @@ func Test_NewConnectionPool(t *testing.T) {
 		dialectFactory := NewDialectFactory()
 		_ = dialectFactory.Register(dialectStrategy)
 		connectionFactory, _ := NewConnectionFactory(dialectFactory)
-		cfgManager := config.NewManager(0)
+		cfgManager := config.NewManager()
 		_ = cfgManager.AddSource("id1", 0, source1)
 
 		sut, _ := NewConnectionPool(cfgManager, connectionFactory)

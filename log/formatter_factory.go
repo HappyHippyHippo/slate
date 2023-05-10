@@ -1,25 +1,25 @@
 package log
 
-// IFormatterFactory defined the interface of a log formatter
+// IFormatterFactory defined the interface of a log Formatter
 // factory instance.
 type IFormatterFactory interface {
 	Register(strategy IFormatterStrategy) error
 	Create(format string, args ...interface{}) (IFormatter, error)
 }
 
-// FormatterFactory defines the Log formatter factory structure used to
+// FormatterFactory defines the Log Formatter factory structure used to
 // instantiate Log formatters, based on registered instantiation strategies.
 type FormatterFactory []IFormatterStrategy
 
 var _ IFormatterFactory = &FormatterFactory{}
 
-// NewFormatterFactory @todo doc
+// NewFormatterFactory will instantiate a new formatter factory instance
 func NewFormatterFactory() IFormatterFactory {
 	return &FormatterFactory{}
 }
 
-// Register will register a new formatter factory strategy to be used
-// on requesting to create a formatter for a defined format.
+// Register will register a new Formatter factory strategy to be used
+// on requesting to create a Formatter for a defined format.
 func (f *FormatterFactory) Register(
 	strategy IFormatterStrategy,
 ) error {
@@ -32,16 +32,16 @@ func (f *FormatterFactory) Register(
 	return nil
 }
 
-// Create will instantiate and return a new content formatter.
+// Create will instantiate and return a new content Formatter.
 func (f FormatterFactory) Create(
 	format string,
 	args ...interface{},
 ) (IFormatter, error) {
 	// search in the factory strategy pool for one that would accept
-	// to generate the requested formatter with the requested format
+	// to generate the requested Formatter with the requested format
 	for _, s := range f {
 		if s.Accept(format) {
-			// return the creation of the requested formatter
+			// return the creation of the requested Formatter
 			return s.Create(args...)
 		}
 	}

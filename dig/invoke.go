@@ -28,7 +28,7 @@ import (
 	"github.com/happyhippyhippo/slate/dig/internal/graph"
 )
 
-// An InvokeOption modifies the default behavior of Invoke. It's included for
+// An InvokeOption modifies the def behavior of Invoke. It's included for
 // future functionality; currently, there are no concrete implementations.
 type InvokeOption interface {
 	unimplemented()

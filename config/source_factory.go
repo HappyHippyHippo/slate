@@ -13,7 +13,7 @@ type SourceFactory []ISourceStrategy
 
 var _ ISourceFactory = &SourceFactory{}
 
-// NewSourceFactory @todo doc
+// NewSourceFactory will instantiate a new source factory instance
 func NewSourceFactory() ISourceFactory {
 	return &SourceFactory{}
 }
@@ -35,7 +35,7 @@ func (f *SourceFactory) Register(
 // Create will instantiate and return a new config source where the
 // data used to decide the strategy to be used and also the initialization
 // data comes from a configuration storing Partial instance.
-func (f SourceFactory) Create(
+func (f *SourceFactory) Create(
 	config IConfig,
 ) (ISource, error) {
 	// check the config argument reference
@@ -43,7 +43,7 @@ func (f SourceFactory) Create(
 		return nil, errNilPointer("config")
 	}
 	// find a strategy that accepts the requested source type
-	for _, strategy := range f {
+	for _, strategy := range *f {
 		if strategy.Accept(config) {
 			// create the requested config source
 			return strategy.Create(config)

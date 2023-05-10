@@ -5,14 +5,14 @@ import (
 	"fmt"
 )
 
-// IError @todo doc {
+// IError defines an interface to a contextualized error instance
 type IError interface {
 	error
 	Unwrap() error
 	Context() map[string]interface{}
 }
 
-// Error @todo doc
+// Error defines a contextualized error
 type Error struct {
 	err     error
 	context map[string]interface{}
@@ -21,7 +21,7 @@ type Error struct {
 var _ error = &Error{}
 var _ IError = &Error{}
 
-// NewError @todo doc
+// NewError will instantiate a new error instance
 func NewError(
 	msg string,
 	ctx ...map[string]interface{},
@@ -33,7 +33,8 @@ func NewError(
 	return e
 }
 
-// NewErrorFrom @todo doc
+// NewErrorFrom create a new contextualized error instance
+// from an existing error
 func NewErrorFrom(
 	err error,
 	msg string,
@@ -44,17 +45,17 @@ func NewErrorFrom(
 	return e
 }
 
-// Error @todo doc
+// Error retrieve the error information from the error instance
 func (e *Error) Error() string {
 	return e.err.Error()
 }
 
-// Unwrap @todo doc
+// Unwrap will try to unwrap the error information
 func (e *Error) Unwrap() error {
 	return errors.Unwrap(e.err)
 }
 
-// Context @todo doc
+// Context will retrieve the error context information
 func (e *Error) Context() map[string]interface{} {
 	return e.context
 }

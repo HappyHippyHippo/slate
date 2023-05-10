@@ -9,7 +9,6 @@ import (
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/fs"
-	"github.com/spf13/afero"
 )
 
 func Test_Provider_Register(t *testing.T) {
@@ -31,16 +30,8 @@ func Test_Provider_Register(t *testing.T) {
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
-		case !container.Has(JSONFormatterStrategyID):
-			t.Error("didn't registered the log formatter strategy json", e)
 		case !container.Has(FormatterFactoryID):
-			t.Error("didn't registered the log formatter factory", e)
-		case !container.Has(ConsoleStreamStrategyID):
-			t.Error("didn't registered the log console stream strategy", e)
-		case !container.Has(FileStreamStrategyID):
-			t.Error("didn't registered the log file stream strategy", e)
-		case !container.Has(RotatingFileStreamStrategyID):
-			t.Error("didn't registered the log rotate file stream strategy", e)
+			t.Error("didn't registered the log Formatter factory", e)
 		case !container.Has(StreamFactoryID):
 			t.Error("didn't registered the log stream factory", e)
 		case !container.Has(ID):
@@ -50,26 +41,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving log formatter factory strategy json", func(t *testing.T) {
-		container := slate.NewContainer()
-		_ = (Provider{}).Register(container)
-
-		strategy, e := container.Get(JSONFormatterStrategyID)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
-		case strategy == nil:
-			t.Error("didn't returned a valid reference")
-		default:
-			switch strategy.(type) {
-			case *JSONFormatterStrategy:
-			default:
-				t.Error("didn't return a JSON formatter strategy reference")
-			}
-		}
-	})
-
-	t.Run("retrieving log formatter factory", func(t *testing.T) {
+	t.Run("retrieving log Formatter factory", func(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (Provider{}).Register(container)
 
@@ -83,136 +55,7 @@ func Test_Provider_Register(t *testing.T) {
 			switch factory.(type) {
 			case *FormatterFactory:
 			default:
-				t.Error("didn't return a formatter factory reference")
-			}
-		}
-	})
-
-	t.Run("error retrieving formatter factory on retrieving the stream factory strategy console", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.NewContainer()
-
-		_ = (fs.Provider{}).Register(container)
-		_ = (Provider{}).Register(container)
-		_ = container.Service(FormatterFactoryID, func() (*FormatterFactory, error) { return nil, expected })
-
-		if _, e := container.Get(ConsoleStreamStrategyID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
-		}
-	})
-
-	t.Run("retrieving log stream strategy console", func(t *testing.T) {
-		container := slate.NewContainer()
-		_ = (fs.Provider{}).Register(container)
-		_ = (Provider{}).Register(container)
-
-		strategy, e := container.Get(ConsoleStreamStrategyID)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
-		case strategy == nil:
-			t.Error("didn't returned a valid reference")
-		default:
-			switch strategy.(type) {
-			case *ConsoleStreamStrategy:
-			default:
-				t.Error("didn't return a console stream strategy reference")
-			}
-		}
-	})
-
-	t.Run("error retrieving file system on retrieving the stream factory strategy file", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.NewContainer()
-		_ = (Provider{}).Register(container)
-		_ = container.Service(fs.ID, func() (afero.Fs, error) { return nil, expected })
-
-		if _, e := container.Get(FileStreamStrategyID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
-		}
-	})
-
-	t.Run("error retrieving formatter factory on retrieving the stream factory strategy file", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.NewContainer()
-		_ = (fs.Provider{}).Register(container)
-		_ = (Provider{}).Register(container)
-		_ = container.Service(FormatterFactoryID, func() (*FormatterFactory, error) { return nil, expected })
-
-		if _, e := container.Get(FileStreamStrategyID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
-		}
-	})
-
-	t.Run("retrieving log stream strategy file", func(t *testing.T) {
-		container := slate.NewContainer()
-		_ = (fs.Provider{}).Register(container)
-		_ = (Provider{}).Register(container)
-
-		strategy, e := container.Get(FileStreamStrategyID)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
-		case strategy == nil:
-			t.Error("didn't returned a valid reference")
-		default:
-			switch strategy.(type) {
-			case *FileStreamStrategy:
-			default:
-				t.Error("didn't return a file stream strategy reference")
-			}
-		}
-	})
-
-	t.Run("error retrieving file system on retrieving the stream factory strategy rotate file", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.NewContainer()
-		_ = (Provider{}).Register(container)
-		_ = container.Service(fs.ID, func() (afero.Fs, error) { return nil, expected })
-
-		if _, e := container.Get(RotatingFileStreamStrategyID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
-		}
-	})
-
-	t.Run("error retrieving formatter factory on retrieving the stream factory strategy rotate file", func(t *testing.T) {
-		expected := fmt.Errorf("error message")
-		container := slate.NewContainer()
-		_ = (fs.Provider{}).Register(container)
-		_ = (Provider{}).Register(container)
-		_ = container.Service(FormatterFactoryID, func() (*FormatterFactory, error) { return nil, expected })
-
-		if _, e := container.Get(RotatingFileStreamStrategyID); e == nil {
-			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
-		}
-	})
-
-	t.Run("retrieving log stream strategy rotate file", func(t *testing.T) {
-		container := slate.NewContainer()
-		_ = (fs.Provider{}).Register(container)
-		_ = (Provider{}).Register(container)
-
-		strategy, e := container.Get(RotatingFileStreamStrategyID)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
-		case strategy == nil:
-			t.Error("didn't returned a valid reference")
-		default:
-			switch strategy.(type) {
-			case *RotatingFileStreamStrategy:
-			default:
-				t.Error("didn't return a rotating file stream strategy reference")
+				t.Error("didn't return a Formatter factory reference")
 			}
 		}
 	})
@@ -328,7 +171,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving formatter factory", func(t *testing.T) {
+	t.Run("error retrieving Formatter factory", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.NewContainer()
 		sut := &Provider{}
@@ -342,7 +185,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid formatter factory", func(t *testing.T) {
+	t.Run("invalid Formatter factory", func(t *testing.T) {
 		container := slate.NewContainer()
 		sut := &Provider{}
 		_ = sut.Register(container)
@@ -355,7 +198,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving formatter factory strategy", func(t *testing.T) {
+	t.Run("error retrieving Formatter factory strategy", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.NewContainer()
 		_ = (fs.Provider{}).Register(container)
@@ -370,7 +213,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid formatter factory strategy", func(t *testing.T) {
+	t.Run("invalid Formatter factory strategy", func(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (fs.Provider{}).Register(container)
 		sut := &Provider{}
@@ -379,8 +222,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
+		} else if !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -435,8 +278,31 @@ func Test_Provider_Boot(t *testing.T) {
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
-		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
+		} else if !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+		}
+	})
+
+	t.Run("valid simple boot with strategies (no loader)", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		LoaderActive = false
+		defer func() { LoaderActive = true }()
+
+		container := slate.NewContainer()
+		_ = fs.Provider{}.Register(container)
+		sut := &Provider{}
+		_ = sut.Register(container)
+
+		formatterStrategy := NewMockFormatterStrategy(ctrl)
+		streamStrategy := NewMockStreamStrategy(ctrl)
+
+		_ = container.Service("formatter.id", func() IFormatterStrategy { return formatterStrategy }, FormatterStrategyTag)
+		_ = container.Service("stream.id", func() IStreamStrategy { return streamStrategy }, StreamStrategyTag)
+
+		if e := sut.Boot(container); e != nil {
+			t.Errorf("returned the unexpected e (%v)", e)
 		}
 	})
 

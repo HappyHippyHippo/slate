@@ -1,0 +1,46 @@
+//go:build mysql
+
+package mysql
+
+import (
+	"github.com/happyhippyhippo/slate"
+	"github.com/happyhippyhippo/slate/rdb"
+	"github.com/happyhippyhippo/slate/rdb/dialect"
+)
+
+const (
+	// ID defines the application container registration string for the
+	// MySQL dialect strategy.
+	ID = dialect.ID + ".mysql"
+)
+
+// Provider defines the slate.rdb module service provider to be used on
+// the application initialization to register the relational
+// database services.
+type Provider struct{}
+
+var _ slate.IProvider = &Provider{}
+
+// Register will register the rdb package instances in the
+// application container
+func (p Provider) Register(
+	container slate.IContainer,
+) error {
+	// check container argument reference
+	if container == nil {
+		return errNilPointer("container")
+	}
+	_ = container.Service(ID, NewDialectStrategy, rdb.DialectStrategyTag)
+	return nil
+}
+
+// Boot will start the rdb package
+func (p Provider) Boot(
+	container slate.IContainer,
+) error {
+	// check container argument reference
+	if container == nil {
+		return errNilPointer("container")
+	}
+	return nil
+}

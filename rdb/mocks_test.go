@@ -13,7 +13,7 @@ import (
 )
 
 //------------------------------------------------------------------------------
-// Config Source
+// Config BaseSource
 //------------------------------------------------------------------------------
 
 // MockConfigSource is a mock an instance of ConfigSource interface
@@ -405,7 +405,7 @@ func (mr *MockConfigManagerRecorder) RemoveSource(id interface{}) *gomock.Call {
 // Source mocks base method.
 func (m *MockConfigManager) Source(id string) (config.ISource, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Source", id)
+	ret := m.ctrl.Call(m, "BaseSource", id)
 	ret0, _ := ret[0].(config.ISource)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -414,7 +414,7 @@ func (m *MockConfigManager) Source(id string) (config.ISource, error) {
 // Source indicates an expected call of Source.
 func (mr *MockConfigManagerRecorder) Source(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Source", reflect.TypeOf((*MockConfigManager)(nil).Source), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BaseSource", reflect.TypeOf((*MockConfigManager)(nil).Source), id)
 }
 
 // SourcePriority mocks base method.

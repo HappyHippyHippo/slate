@@ -1,10 +1,10 @@
 package slate
 
 const (
-	// ID defines the slate package container id base string.
+	// ID defines the slate package container service id base string.
 	ID = "slate"
 
-	// EnvID defines the slate package base environment variable name.
+	// EnvID defines the slate package environment variable base name.
 	EnvID = "SLATE"
 )
 

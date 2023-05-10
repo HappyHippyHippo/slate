@@ -6,19 +6,19 @@ import (
 )
 
 const (
-	// ID defines the application container package
-	// that provides the service's id base string.
+	// ID defines the application container registration string
+	// of the file system adapter.
 	ID = slate.ID + ".fs"
 )
 
-// Provider defines the fs module service provider to
+// Provider defines the slate.fs module service provider to
 // be used on the application initialization to register the file system
 // adapter service.
 type Provider struct{}
 
 var _ slate.IProvider = &Provider{}
 
-// Register will add to the container a new file system adapter instance.
+// Register will add to the application container the module services.
 func (Provider) Register(
 	container slate.IContainer,
 ) error {

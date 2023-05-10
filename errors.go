@@ -35,14 +35,6 @@ func errNilPointer(
 	return NewErrorFrom(ErrNilPointer, arg, ctx...)
 }
 
-func errConversion(
-	val interface{},
-	t string,
-	ctx ...map[string]interface{},
-) error {
-	return NewErrorFrom(ErrConversion, fmt.Sprintf("%v to %v", val, t), ctx...)
-}
-
 func errContainer(
 	e error,
 	ctx ...map[string]interface{},

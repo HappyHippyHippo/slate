@@ -11,13 +11,13 @@ const (
 )
 
 var (
-	// DefaultFileFormat defines the file base config source default
+	// DefaultFileFormat defines the file base config source def
 	// format if the format is not present in the config.
-	DefaultFileFormat = env.String(EnvID+"_DEFAULT_FILE_FORMAT", YAMLDecoderFormat)
+	DefaultFileFormat = env.String(EnvID+"_DEFAULT_FILE_FORMAT", "yaml")
 
-	// DefaultRestFormat defines the rest base config source default
+	// DefaultRestFormat defines the rest base config source def
 	// format if the format is not present in the config.
-	DefaultRestFormat = env.String(EnvID+"_DEFAULT_REST_FORMAT", JSONDecoderFormat)
+	DefaultRestFormat = env.String(EnvID+"_DEFAULT_REST_FORMAT", "json")
 
 	// PathSeparator defines the element(s) that will be used to split
 	// a config path string into path elements.
@@ -27,7 +27,7 @@ var (
 	// while the provider boot
 	LoaderActive = env.Bool(EnvID+"_LOADER_ACTIVE", true)
 
-	// LoaderSourceID defines the id to be used as the default of the
+	// LoaderSourceID defines the id to be used as the def of the
 	// entry config source id to be used as the loader entry.
 	LoaderSourceID = env.String(EnvID+"_LOADER_SOURCE_ID", "_sources")
 
@@ -37,13 +37,13 @@ var (
 
 	// LoaderSourceFormat defines the entry config source format
 	// to be used as the loader entry.
-	LoaderSourceFormat = env.String(EnvID+"_LOADER_SOURCE_FORMAT", YAMLDecoderFormat)
+	LoaderSourceFormat = env.String(EnvID+"_LOADER_SOURCE_FORMAT", "yaml")
 
 	// LoaderSourceListPath defines the entry config source path of
 	// loading sources.
 	LoaderSourceListPath = env.String(EnvID+"_LOADER_SOURCE_LIST_PATH", "slate.config.sources")
 
-	// ObserveFrequency defines the id to be used as the default of a
+	// ObserveFrequency defines the id to be used as the def of a
 	// config observable source frequency time in seconds.
 	ObserveFrequency = env.Int(EnvID+"_OBSERVE_FREQUENCY", 0)
 )

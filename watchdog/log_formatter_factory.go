@@ -17,7 +17,8 @@ type LogFormatterFactory []ILogFormatterStrategy
 
 var _ ILogFormatterFactory = &LogFormatterFactory{}
 
-// NewLogFormatterFactory @todo doc
+// NewLogFormatterFactory will instantiate a new logging formatter
+// factory instance.
 func NewLogFormatterFactory() ILogFormatterFactory {
 	return &LogFormatterFactory{}
 }
