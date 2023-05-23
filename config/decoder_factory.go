@@ -1,19 +1,10 @@
 package config
 
-// IDecoderFactory defined the interface of a config decoder
-// factory instance.
-type IDecoderFactory interface {
-	Register(strategy IDecoderStrategy) error
-	Create(format string, args ...interface{}) (IDecoder, error)
-}
-
 // DecoderFactory defines a decoder instantiation factory.
-type DecoderFactory []IDecoderStrategy
-
-var _ IDecoderFactory = &DecoderFactory{}
+type DecoderFactory []DecoderStrategy
 
 // NewDecoderFactory will instantiate a new decoder factory instance.
-func NewDecoderFactory() IDecoderFactory {
+func NewDecoderFactory() *DecoderFactory {
 	return &DecoderFactory{}
 }
 
@@ -22,7 +13,7 @@ func NewDecoderFactory() IDecoderFactory {
 // If the strategy accepts the format, then it will be used to instantiate the
 // appropriate decoder that will be used to decode the configuration content.
 func (f *DecoderFactory) Register(
-	strategy IDecoderStrategy,
+	strategy DecoderStrategy,
 ) error {
 	// check for a valid strategy reference
 	if strategy == nil {
@@ -38,7 +29,7 @@ func (f *DecoderFactory) Register(
 func (f *DecoderFactory) Create(
 	format string,
 	args ...interface{},
-) (IDecoder, error) {
+) (Decoder, error) {
 	// find a stored strategy that will accept the requested format
 	for _, s := range *f {
 		if s.Accept(format) {

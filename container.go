@@ -94,27 +94,12 @@ func (e *containerEntry) hasTag(
 	return found
 }
 
-// IContainer defines the interface of a slate
-// application service container instance.
-type IContainer interface {
-	io.Closer
-
-	Has(id string) bool
-	Service(id string, factory interface{}, tags ...string) error
-	Get(id string) (any, error)
-	Tag(tag string) ([]any, error)
-	Remove(id string) error
-	Clear() error
-}
-
 // Container defines the structure that hold the application service
 // factories and initialized services.
 type Container struct {
 	entries   map[string]containerEntry
 	container *dig.Container
 }
-
-var _ IContainer = &Container{}
 
 // NewContainer used to instantiate a new application service container.
 func NewContainer() *Container {

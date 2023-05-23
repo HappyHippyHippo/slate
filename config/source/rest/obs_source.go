@@ -18,7 +18,7 @@ type ObsSource struct {
 	timestamp     time.Time
 }
 
-var _ config.IObsSource = &ObsSource{}
+var _ config.ObsSource = &ObsSource{}
 
 // NewObsSource will instantiate a new configuration source
 // that will read a REST endpoint for configuration info, opening the
@@ -27,7 +27,7 @@ func NewObsSource(
 	client httpClient,
 	uri,
 	format string,
-	decoderFactory config.IDecoderFactory,
+	decoderFactory *config.DecoderFactory,
 	timestampPath,
 	configPath string,
 ) (*ObsSource, error) {
@@ -42,9 +42,9 @@ func NewObsSource(
 	// instantiates the config source
 	s := &ObsSource{
 		Source: Source{
-			BaseSource: source.BaseSource{
-				Mutex:  &sync.Mutex{},
-				Config: config.Config{},
+			Source: source.Source{
+				Mutex:   &sync.Mutex{},
+				Partial: config.Partial{},
 			},
 			client:         client,
 			uri:            uri,
@@ -79,7 +79,7 @@ func (s *ObsSource) Reload() (bool, error) {
 	// config information timestamp
 	if s.timestamp.Equal(time.Unix(0, 0)) || s.timestamp.Before(t) {
 		// get the response config information
-		c, e := rc.Config(s.configPath)
+		c, e := rc.Partial(s.configPath)
 		if e != nil {
 			if errors.Is(e, config.ErrPathNotFound) {
 				return false, errConfigNotFound(s.configPath)
@@ -88,7 +88,7 @@ func (s *ObsSource) Reload() (bool, error) {
 		}
 		// store the loaded config information and response timestamp
 		s.Mutex.Lock()
-		s.Config = *c.(*config.Config)
+		s.Partial = *c
 		s.timestamp = t
 		s.Mutex.Unlock()
 		return true, nil
@@ -97,7 +97,7 @@ func (s *ObsSource) Reload() (bool, error) {
 }
 
 func (s *ObsSource) searchTimestamp(
-	rc config.IConfig,
+	rc *config.Partial,
 ) (time.Time, error) {
 	// retrieve the timestamp information from the parsed response data
 	t, e := rc.String(s.timestampPath)

@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	// ErrPathNotFound defines a path in Config not found error.
+	// ErrPathNotFound defines a path in Partial not found error.
 	ErrPathNotFound = fmt.Errorf("config path not found")
 
 	// ErrInvalidFormat defines an error that signal an
@@ -56,7 +56,7 @@ func errInvalidFormat(
 }
 
 func errInvalidSource(
-	cfg IConfig,
+	cfg *Partial,
 	ctx ...map[string]interface{},
 ) error {
 	return slate.NewErrorFrom(ErrInvalidSource, fmt.Sprintf("%v", cfg), ctx...)

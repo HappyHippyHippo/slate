@@ -188,7 +188,7 @@ func (c *Container) Decorate(decorator interface{}, opts ...DecorateOption) erro
 //
 // A decorator can also take in multiple parameters and replace one of them:
 //
-//	s.Decorate(func(log *zap.Logger, cfg *Config) *zap.Logger {
+//	s.Decorate(func(log *zap.Logger, cfg *Partial) *zap.Logger {
 //	  return log.Named(cfg.Name)
 //	})
 //
@@ -196,7 +196,7 @@ func (c *Container) Decorate(decorator interface{}, opts ...DecorateOption) erro
 //
 //	s.Decorate(func(
 //	  log *zap.Logger,
-//	  cfg *Config,
+//	  cfg *Partial,
 //	  scope metrics.Scope
 //	) (*zap.Logger, metrics.Scope) {
 //	  log = log.Named(cfg.Name)

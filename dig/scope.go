@@ -66,7 +66,7 @@ type Scope struct {
 	// Values groups that generated via decoraters in the Scope.
 	decoratedGroups map[key]reflect.Value
 
-	// BaseSource of randomness.
+	// Source of randomness.
 	rand *rand.Rand
 
 	// Flag indicating whether the graph has been checked for cycles.

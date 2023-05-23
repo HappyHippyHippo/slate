@@ -1,410 +1,476 @@
 package config
 
 import (
+	"io"
 	"reflect"
-	"strings"
+	"sort"
+	"sync"
+	"time"
+
+	"github.com/happyhippyhippo/slate/trigger"
 )
 
-// IConfig defined an interface to an instance that holds
-// configuration values
-type IConfig interface {
-	Entries() []string
-	Has(path string) bool
-	Get(path string, def ...interface{}) (interface{}, error)
-	Bool(path string, def ...bool) (bool, error)
-	Int(path string, def ...int) (int, error)
-	Float(path string, def ...float64) (float64, error)
-	String(path string, def ...string) (string, error)
-	List(path string, def ...[]interface{}) ([]interface{}, error)
-	Config(path string, def ...Config) (IConfig, error)
-	Populate(path string, data any, icase ...bool) (any, error)
+type sourceRef struct {
+	id       string
+	priority int
+	source   Source
 }
 
-// Config defines a section of a configuration information
-type Config map[interface{}]interface{}
+type sourceRefSorter []sourceRef
 
-var _ IConfig = &Config{}
+func (sources sourceRefSorter) Len() int {
+	return len(sources)
+}
 
-// Clone will instantiate an identical instance of the original Config
-func (c *Config) Clone() Config {
-	// recursive clone function declaration
-	var cloner func(value interface{}) interface{}
-	cloner = func(value interface{}) interface{} {
-		switch v := value.(type) {
-		// recursive list scenario
-		case []interface{}:
-			var result []interface{}
-			for _, i := range v {
-				result = append(result, cloner(i))
+func (sources sourceRefSorter) Swap(i, j int) {
+	sources[i], sources[j] = sources[j], sources[i]
+}
+
+func (sources sourceRefSorter) Less(i, j int) bool {
+	return sources[i].priority < sources[j].priority
+}
+
+// Observer callback function used to be called when an observed
+// configuration path has changed.
+type Observer func(interface{}, interface{})
+
+type observerRef struct {
+	path     string
+	current  interface{}
+	callback Observer
+}
+
+type ticker interface {
+	io.Closer
+	Delay() time.Duration
+}
+
+// Config defines an object responsible to config the application
+// several defines sources and partial values observers.
+type Config struct {
+	mutex     sync.Locker
+	sources   []sourceRef
+	observers []observerRef
+	partial   *Partial
+	observer  ticker
+}
+
+// NewConfig instantiate a new configuration object.
+// This object will config a series of sources, alongside of the ability of
+// registration of configuration path/values observer callbacks that will be
+// called whenever the value has changed.
+func NewConfig() *Config {
+	// instantiate the config
+	c := &Config{
+		mutex:     &sync.Mutex{},
+		sources:   []sourceRef{},
+		observers: []observerRef{},
+		partial:   &Partial{},
+		observer:  nil,
+	}
+	// check if there is a need to create the observable sources
+	// ticker trigger
+	period := time.Duration(ObserveFrequency) * time.Millisecond
+	if period != 0 {
+		// create the ticker trigger used to poll the
+		// observable sources
+		c.observer, _ = trigger.NewRecurring(period, func() error {
+			return c.reload()
+		})
+	}
+	return c
+}
+
+// Close terminates the config instance.
+// This will stop the observer trigger and call close on
+// all registered sources.
+func (c *Config) Close() error {
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// iterate through all the config sources checking if we can close then
+	for _, ref := range c.sources {
+		// check if the iterated source implements the closer interface
+		if source, ok := ref.source.(io.Closer); ok {
+			// close the source
+			if e := source.Close(); e != nil {
+				return e
 			}
-			return result
-		// recursive config scenario
-		case Config:
-			return v.Clone()
-		// def scalar value
-		default:
-			return value
 		}
 	}
-	// create the clone config
-	target := make(Config)
-	// clone the original config elements to the target config
-	for key, value := range *c {
-		target[key] = cloner(value)
+	// check if a ticker trigger was generated on creation
+	// for observable sources polling
+	if c.observer != nil {
+		// terminate the ticker trigger
+		if e := c.observer.Close(); e != nil {
+			return e
+		}
+		c.observer = nil
 	}
-	return target
+	return nil
 }
 
-// Entries will retrieve the list of stored entries in the configuration.
+// Entries will retrieve the list of stored entries any registered source.
 func (c *Config) Entries() []string {
-	var entries []string
-	for k := range *c {
-		key, ok := k.(string)
-		if ok {
-			entries = append(entries, key)
-		}
-	}
-	return entries
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// retrieve the stored entries list
+	return c.partial.Entries()
 }
 
-// Has will check if a requested path exists in the config.
+// Has will check if a path has been loaded.
+// This means that if the values has been loaded by any registered source.
 func (c *Config) Has(
 	path string,
 ) bool {
-	_, e := c.path(path)
-	return e == nil
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// check if the requested path exists in the stored partial
+	return c.partial.Has(path)
 }
 
-// Get will retrieve the value stored in the requested path.
-// If the path does not exist, then the value nil will be returned. Or, if
-// a def value was given as the optional extra argument, then it will
-// be returned instead of the standard nil value.
+// Get will retrieve a configuration value loaded from a source.
 func (c *Config) Get(
 	path string,
 	def ...interface{},
 ) (interface{}, error) {
-	// retrieve the path element
-	val, e := c.path(path)
-	switch {
-	// check for non-nil value
-	case val != nil:
-		return val, nil
-	// check if is to return de def value or not
-	case e != nil:
-		if len(def) > 0 {
-			return def[0], nil
-		}
-		return nil, e
-	// def case : return nil
-	default:
-		return nil, nil
-	}
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// try to retrieve the requested value
+	return c.partial.Get(path, def...)
 }
 
-// Bool will retrieve a value stored in the quested path cast to bool
+// Bool will retrieve a bool configuration value loaded from a source.
 func (c *Config) Bool(
 	path string,
 	def ...bool,
 ) (bool, error) {
-	var val interface{}
-	var e error
-
-	// retrieve the config value
-	if len(def) > 0 {
-		val, e = c.Get(path, def[0])
-	} else {
-		val, e = c.Get(path)
-	}
-	// error retrieving the path value
-	if e != nil {
-		return false, e
-	}
-	// result conversion
-	v, ok := val.(bool)
-	if !ok {
-		return false, errConversion(val, "bool")
-	}
-	return v, nil
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// try to retrieve a boolean value from the local partial
+	return c.partial.Bool(path, def...)
 }
 
-// Int will retrieve a value stored in the quested path cast to int
+// Int will retrieve an integer configuration value loaded from a source.
 func (c *Config) Int(
 	path string,
 	def ...int,
 ) (int, error) {
-	var val interface{}
-	var e error
-
-	// retrieve the config value
-	if len(def) > 0 {
-		val, e = c.Get(path, def[0])
-	} else {
-		val, e = c.Get(path)
-	}
-	// error retrieving the path value
-	if e != nil {
-		return 0, e
-	}
-	// result conversion
-	v, ok := val.(int)
-	if !ok {
-		return 0, errConversion(val, "int")
-	}
-	return v, nil
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// try to retrieve an integer value from the local partial
+	return c.partial.Int(path, def...)
 }
 
-// Float will retrieve a value stored in the quested path cast to float
+// Float will retrieve a floating point configuration value loaded from a source.
 func (c *Config) Float(
 	path string,
 	def ...float64,
 ) (float64, error) {
-	var val interface{}
-	var e error
-
-	// retrieve the config value
-	if len(def) > 0 {
-		val, e = c.Get(path, def[0])
-	} else {
-		val, e = c.Get(path)
-	}
-	// error retrieving the path value
-	if e != nil {
-		return 0, e
-	}
-	// result conversion
-	v, ok := val.(float64)
-	if !ok {
-		return 0, errConversion(val, "float64")
-	}
-	return v, nil
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// try to retrieve a float value from the local partial
+	return c.partial.Float(path, def...)
 }
 
-// String will retrieve a value stored in the quested path cast to string
+// String will retrieve a string configuration value loaded from a source.
 func (c *Config) String(
 	path string,
 	def ...string,
 ) (string, error) {
-	var val interface{}
-	var e error
-
-	// retrieve the config value
-	if len(def) > 0 {
-		val, e = c.Get(path, def[0])
-	} else {
-		val, e = c.Get(path)
-	}
-	// error retrieving the path value
-	if e != nil {
-		return "", e
-	}
-	// result conversion
-	v, ok := val.(string)
-	if !ok {
-		return "", errConversion(val, "string")
-	}
-	return v, nil
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// try to retrieve a string value from the local partial
+	return c.partial.String(path, def...)
 }
 
-// List will retrieve a value stored in the quested path cast to list
+// List will retrieve a list configuration value loaded from a source.
 func (c *Config) List(
 	path string,
 	def ...[]interface{},
 ) ([]interface{}, error) {
-	var val interface{}
-	var e error
-
-	// retrieve the config value
-	if len(def) > 0 {
-		val, e = c.Get(path, def[0])
-	} else {
-		val, e = c.Get(path)
-	}
-	// error retrieving the path value
-	if e != nil {
-		return nil, e
-	}
-	// result conversion
-	v, ok := val.([]interface{})
-	if !ok {
-		return nil, errConversion(val, "[]interface{}")
-	}
-	return v, nil
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// try to retrieve a list value from the local partial
+	return c.partial.List(path, def...)
 }
 
-// Config will retrieve a value stored in the quested path cast to config
-func (c *Config) Config(
+// Partial will retrieve partial values loaded from a source.
+func (c *Config) Partial(
 	path string,
-	def ...Config,
-) (IConfig, error) {
-	var val interface{}
-	var e error
-
-	// retrieve the config value
-	if len(def) > 0 {
-		val, e = c.Get(path, def[0])
-	} else {
-		val, e = c.Get(path)
-	}
-	// error retrieving the path value
-	if e != nil {
-		return nil, e
-	}
-	// result conversion
-	v, ok := val.(Config)
-	if !ok {
-		return nil, errConversion(val, "config.Config")
-	}
-	return &v, nil
+	def ...Partial,
+) (*Partial, error) {
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// try to retrieve a partial value from the local partial
+	return c.partial.Partial(path, def...)
 }
 
-// Populate will try to populate the data argument with the data stored
-// in the path config location.
+// Populate will retrieve a config value loaded from a source.
 func (c *Config) Populate(
 	path string,
 	data interface{},
 	icase ...bool,
 ) (interface{}, error) {
-	// check the case-insensitive flag
-	ic := false
-	if len(icase) == 0 || icase[0] == true {
-		ic = true
-		path = strings.ToLower(path)
-	}
-	// retrieve the config value
-	v, e := c.Get(path)
-	// error retrieving the path value
-	if e != nil {
-		return nil, e
-	}
-	// call recursive data population method
-	dataType := reflect.TypeOf(data)
-	if dataType.Kind() == reflect.Ptr {
-		return c.populate(v, reflect.ValueOf(data).Elem(), ic)
-	}
-	return c.populate(v, reflect.New(dataType).Elem(), ic)
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// try to populate a value from the local partial
+	return c.partial.Populate(path, data, icase...)
 }
 
-// Merge will increment the current config instance with the
-// information stored in another config.
-func (c *Config) Merge(
-	src Config,
-) {
-	// try to Merge every source stored element into the target config
-	for key, value := range src {
-		// if the key does not exist in the target config, just store it
-		if local, ok := (*c)[key]; !ok {
-			(*c)[key] = value
-		} else {
-			// check if the 2 are partials
-			typedLocal, okLocal := local.(Config)
-			typedValue, okValue := value.(Config)
-			if okLocal && okValue {
-				// Merge the both partials
-				typedLocal.Merge(typedValue)
-			} else {
-				// just override the target value
-				(*c)[key] = value
-			}
+// HasSource check if a source with a specific id has been registered.
+func (c *Config) HasSource(
+	id string,
+) bool {
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// try to find a source with the requested id
+	for _, ref := range c.sources {
+		if ref.id == id {
+			return true
 		}
 	}
+	return false
 }
 
-func (c *Config) path(
-	path string,
-) (interface{}, error) {
-	var ok bool
-	var it interface{}
-
-	// iterate through the path
-	it = *c
-	for _, part := range strings.Split(path, PathSeparator) {
-		// if the iterated path is empty
-		// (double occurrence of a separator), just continue
-		if part == "" {
-			continue
-		}
-		switch i := it.(type) {
-		// check if the iterated part references a config
-		case Config:
-			// retrieve the part reference
-			it, ok = i[part]
-			if !ok {
-				return nil, errPathNotFound(path)
-			}
-		default:
-			return nil, errPathNotFound(path)
-		}
+// AddSource register a new source with a specific id with a given priority.
+func (c *Config) AddSource(
+	id string,
+	priority int,
+	src Source,
+) error {
+	// check the source argument reference
+	if src == nil {
+		return errNilPointer("source")
 	}
-	return it, nil
+	// check if there is already a registered source with the given id
+	if c.HasSource(id) {
+		return errDuplicateSource(id)
+	}
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// add the source to the config and sort them so that the
+	// data can be correctly merged
+	c.sources = append(c.sources, sourceRef{id, priority, src})
+	sort.Sort(sourceRefSorter(c.sources))
+	// rebuild the local partial with the source's partial information
+	c.rebuild()
+	return nil
 }
 
-func (c *Config) populate(
-	source interface{},
-	target reflect.Value,
-	icase bool,
-) (interface{}, error) {
-	// get the types of the source and target
-	sourceType := reflect.TypeOf(source)
-	targetType := target.Type()
-	// if the types are the same, just return the source
-	if sourceType == targetType {
-		return source, nil
-	}
-	// source type action
-	switch sourceType {
-	case reflect.TypeOf(&Config{}):
-		return c.populate(*source.(*Config), target, icase)
-	case reflect.TypeOf(Config{}):
-		// iterate through all the target fields to be assigned
-		for i := 0; i < target.NumField(); i++ {
-			// get the field value and type
-			fieldValue := target.Field(i)
-			fieldType := target.Type().Field(i)
-			// check if the field is exported
-			if !fieldType.IsExported() {
-				continue
-			}
-			// check if the retrieved configuration value can be
-			// assigned to the field
-			if fieldValue.CanAddr() {
-				switch fieldValue.Kind() {
-				case reflect.Struct:
-					// get the configuration value
-					path := fieldType.Name
-					if icase {
-						path = strings.ToLower(path)
-					}
-					cfg := source.(Config)
-					data, e := cfg.Config(path)
-					if e != nil {
-						continue
-					}
-					// recursive assignment
-					_, e = c.populate(data, fieldValue, icase)
-					if e != nil {
-						return nil, e
-					}
-				default:
-					// get the configuration value
-					path := fieldType.Name
-					if icase {
-						path = strings.ToLower(path)
-					}
-					cfg := source.(Config)
-					data, e := cfg.Get(path)
-					if e != nil {
-						continue
-					}
-					// assign the configuration value to the field
-					if reflect.TypeOf(data) != fieldType.Type {
-						return nil, errConversion(data, fieldType.Type.Name())
-					}
-					fieldValue.Set(reflect.ValueOf(data))
+// RemoveSource remove a source from the registration list
+// of the configuration. This will also update the configuration content and
+// re-validate the observed paths.
+func (c *Config) RemoveSource(
+	id string,
+) error {
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// try to find the requested source to be removed
+	for i, ref := range c.sources {
+		if ref.id == id {
+			// check if the source implements the closer interface
+			if src, ok := ref.source.(io.Closer); ok {
+				// close the removing source
+				if e := src.Close(); e != nil {
+					return e
 				}
 			}
+			// remove the source from the config sources
+			c.sources = append(c.sources[:i], c.sources[i+1:]...)
+			// rebuild the local partial
+			c.rebuild()
+			return nil
 		}
-	default:
-		return nil, errConversion(source, targetType.Name())
 	}
-	return target.Interface(), nil
+	return nil
+}
+
+// RemoveAllSources remove all the registered sources from the registration
+// list of the configuration. This will also update the configuration content and
+// re-validate the observed paths.
+func (c *Config) RemoveAllSources() error {
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// iterate through all the stored sources
+	for _, ref := range c.sources {
+		// check if the iterated source implements the close interface
+		if src, ok := ref.source.(io.Closer); ok {
+			// close the source
+			if e := src.Close(); e != nil {
+				return e
+			}
+		}
+	}
+	// recreate the sources array and rebuild the local partial
+	c.sources = []sourceRef{}
+	c.rebuild()
+	return nil
+}
+
+// Source retrieve a previously registered source with a requested id.
+func (c *Config) Source(
+	id string,
+) (Source, error) {
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// try to find the requested source
+	for _, ref := range c.sources {
+		if ref.id == id {
+			return ref.source, nil
+		}
+	}
+	return nil, errSourceNotFound(id)
+}
+
+// SourcePriority set a priority value of a previously registered
+// source with the specified id. This may change the defined values if there
+// was an override process of the configuration paths of the changing source.
+func (c *Config) SourcePriority(
+	id string,
+	priority int,
+) error {
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// try to find the requested source to be updated
+	for i, ref := range c.sources {
+		if ref.id == id {
+			// redefine the stored source priority
+			c.sources[i] = sourceRef{
+				id:       ref.id,
+				priority: priority,
+				source:   ref.source,
+			}
+			// sort the sources and rebuild the local partial
+			sort.Sort(sourceRefSorter(c.sources))
+			c.rebuild()
+			return nil
+		}
+	}
+	return errSourceNotFound(id)
+}
+
+// HasObserver check if there is an observer to a configuration value path.
+func (c *Config) HasObserver(
+	path string,
+) bool {
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// check if the requested observer is registered
+	for _, oreg := range c.observers {
+		if oreg.path == path {
+			return true
+		}
+	}
+	return false
+}
+
+// AddObserver register a new observer to a configuration path.
+func (c *Config) AddObserver(
+	path string,
+	callback Observer,
+) error {
+	// validate the callback argument reference
+	if callback == nil {
+		return errNilPointer("callback")
+	}
+	// check if the requested path is present
+	val, e := c.Get(path)
+	if e != nil {
+		return e
+	}
+	// if the founded value is a partial, clone it, so
+	// it can be used for update checks
+	if v, ok := val.(Partial); ok {
+		val = v.Clone()
+	}
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// register the requested observer with the current path value
+	c.observers = append(c.observers, observerRef{path, val, callback})
+	return nil
+}
+
+// RemoveObserver remove an observer to a configuration path.
+func (c *Config) RemoveObserver(
+	path string,
+) {
+	// lock the config for handling
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	// try to find the observer to be removed
+	for i, oreg := range c.observers {
+		if oreg.path == path {
+			// remove the found observer
+			c.observers = append(c.observers[:i], c.observers[i+1:]...)
+			return
+		}
+	}
+}
+
+func (c *Config) reload() error {
+	// iterate through all stores sources
+	reloaded := false
+	for _, ref := range c.sources {
+		// check if the iterated source is an observable source
+		if s, ok := ref.source.(ObsSource); ok {
+			// reload the source and update the reloaded flag if the request
+			// resulted in a source info update
+			updated, _ := s.Reload()
+			reloaded = reloaded || updated
+		}
+	}
+	// check if the iteration resulted in an update of any info
+	if reloaded {
+		// lock the config for handling
+		c.mutex.Lock()
+		defer c.mutex.Unlock()
+		// rebuild the local partial with the new source info
+		c.rebuild()
+	}
+	return nil
+}
+
+func (c *Config) rebuild() {
+	// iterate through all the stored sources
+	updated := Partial{}
+	for _, ref := range c.sources {
+		// retrieve the source stored partial information
+		// and Merge it with all parsed sources
+		cfg, _ := ref.source.Get("")
+		updated.Merge(cfg.(Partial))
+	}
+	// store locally the resulting partial
+	c.partial = &updated
+	// iterate through all observers
+	for id, observer := range c.observers {
+		// retrieve the observer path value
+		// and check if the current value differs from the previous one
+		val, e := c.partial.Get(observer.path)
+		if e == nil && !reflect.DeepEqual(observer.current, val) {
+			// store the new value in the observer registry
+			// and call the observer callback
+			old := observer.current
+			c.observers[id].current = val
+			observer.callback(old, val)
+		}
+	}
 }

@@ -19,7 +19,7 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		decoderFactory := NewMockDecoderFactory(ctrl)
+		decoderFactory := config.NewDecoderFactory()
 
 		sut, e := NewSource(nil, "uri", config.UnknownDecoderFormat, decoderFactory, "path")
 		switch {
@@ -55,7 +55,7 @@ func Test_NewSource(t *testing.T) {
 
 		expected := fmt.Errorf(`parse "\n": net/url: invalid control character in URL`)
 		client := NewMockHTTPClient(ctrl)
-		decoderFactory := NewMockDecoderFactory(ctrl)
+		decoderFactory := config.NewDecoderFactory()
 
 		sut, e := NewSource(client, "\n", config.UnknownDecoderFormat, decoderFactory, "path")
 		switch {
@@ -75,7 +75,7 @@ func Test_NewSource(t *testing.T) {
 		expected := fmt.Errorf(`test exception`)
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(nil, expected).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
+		decoderFactory := config.NewDecoderFactory()
 
 		sut, e := NewSource(client, "uri", config.UnknownDecoderFormat, decoderFactory, "path")
 		switch {
@@ -92,13 +92,14 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("error message")
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path"`))
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(config.UnknownDecoderFormat, gomock.Any()).Return(nil, expected).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept(config.UnknownDecoderFormat).Return(false).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, e := NewSource(client, "uri", config.UnknownDecoderFormat, decoderFactory, "path")
 		switch {
@@ -106,8 +107,8 @@ func Test_NewSource(t *testing.T) {
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		case !errors.Is(e, config.ErrInvalidFormat):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, config.ErrInvalidFormat)
 		}
 	})
 
@@ -123,8 +124,11 @@ func Test_NewSource(t *testing.T) {
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(nil, expected).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", gomock.Any()).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, e := NewSource(client, "uri", "format", decoderFactory, "path")
 		switch {
@@ -146,10 +150,13 @@ func Test_NewSource(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
-		decoder.EXPECT().Decode().Return(&config.Config{}, nil).Times(1)
+		decoder.EXPECT().Decode().Return(&config.Partial{}, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", gomock.Any()).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, e := NewSource(client, "uri", "format", decoderFactory, "path")
 		switch {
@@ -171,10 +178,13 @@ func Test_NewSource(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
-		decoder.EXPECT().Decode().Return(&config.Config{"path": 123}, nil).Times(1)
+		decoder.EXPECT().Decode().Return(&config.Partial{"path": 123}, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", gomock.Any()).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, e := NewSource(client, "uri", "format", decoderFactory, "path.node")
 		switch {
@@ -196,10 +206,13 @@ func Test_NewSource(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
-		decoder.EXPECT().Decode().Return(&config.Config{"path": 123}, nil).Times(1)
+		decoder.EXPECT().Decode().Return(&config.Partial{"path": 123}, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", gomock.Any()).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, e := NewSource(client, "uri", "format", decoderFactory, "path")
 		switch {
@@ -216,16 +229,19 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := config.Config{"field": "data"}
+		expected := config.Partial{"field": "data"}
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "data"}}`))
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
-		decoder.EXPECT().Decode().Return(&config.Config{"path": expected}, nil).Times(1)
+		decoder.EXPECT().Decode().Return(&config.Partial{"path": expected}, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", gomock.Any()).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, e := NewSource(client, "uri", "format", decoderFactory, "path")
 		switch {
@@ -233,7 +249,7 @@ func Test_NewSource(t *testing.T) {
 			t.Errorf("returned the unexpected e : %v", e)
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
-		case !reflect.DeepEqual(sut.Config, expected):
+		case !reflect.DeepEqual(sut.Partial, expected):
 			t.Error("didn't correctly stored the decoded Partial")
 		}
 	})
@@ -242,16 +258,19 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := config.Config{"field": "data"}
+		expected := config.Partial{"field": "data"}
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"node": {"inner_node": {"field": "data"}}}`))
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
-		decoder.EXPECT().Decode().Return(&config.Config{"node": config.Config{"inner_node": expected}}, nil).Times(1)
+		decoder.EXPECT().Decode().Return(&config.Partial{"node": config.Partial{"inner_node": expected}}, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", gomock.Any()).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, e := NewSource(client, "uri", "format", decoderFactory, "node..inner_node")
 		switch {
@@ -259,7 +278,7 @@ func Test_NewSource(t *testing.T) {
 			t.Errorf("returned the unexpected e : %v", e)
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
-		case !reflect.DeepEqual(sut.Config, expected):
+		case !reflect.DeepEqual(sut.Partial, expected):
 			t.Error("didn't correctly stored the decoded Partial")
 		}
 	})

@@ -1,27 +1,18 @@
 package config
 
-// ISourceFactory defined the interface of a
-// config source factory instance.
-type ISourceFactory interface {
-	Register(strategy ISourceStrategy) error
-	Create(cfg IConfig) (ISource, error)
-}
-
 // SourceFactory defines an object responsible to instantiate a
-// new config source.
-type SourceFactory []ISourceStrategy
-
-var _ ISourceFactory = &SourceFactory{}
+// new partial source.
+type SourceFactory []SourceStrategy
 
 // NewSourceFactory will instantiate a new source factory instance
-func NewSourceFactory() ISourceFactory {
+func NewSourceFactory() *SourceFactory {
 	return &SourceFactory{}
 }
 
 // Register will register a new source factory strategy to be used
 // on creation request.
 func (f *SourceFactory) Register(
-	strategy ISourceStrategy,
+	strategy SourceStrategy,
 ) error {
 	// check the strategy argument reference
 	if strategy == nil {
@@ -32,22 +23,22 @@ func (f *SourceFactory) Register(
 	return nil
 }
 
-// Create will instantiate and return a new config source where the
+// Create will instantiate and return a new partial source where the
 // data used to decide the strategy to be used and also the initialization
 // data comes from a configuration storing Partial instance.
 func (f *SourceFactory) Create(
-	config IConfig,
-) (ISource, error) {
-	// check the config argument reference
-	if config == nil {
-		return nil, errNilPointer("config")
+	partial *Partial,
+) (Source, error) {
+	// check the partial argument reference
+	if partial == nil {
+		return nil, errNilPointer("partial")
 	}
 	// find a strategy that accepts the requested source type
 	for _, strategy := range *f {
-		if strategy.Accept(config) {
-			// create the requested config source
-			return strategy.Create(config)
+		if strategy.Accept(partial) {
+			// create the requested partial source
+			return strategy.Create(partial)
 		}
 	}
-	return nil, errInvalidSource(config)
+	return nil, errInvalidSource(partial)
 }

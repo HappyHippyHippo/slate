@@ -8,7 +8,7 @@ import (
 
 const (
 	// Format defines the value to be used to declare
-	// a YAML config source format.
+	// a YAML config source encoding format.
 	Format = "yaml"
 )
 
@@ -16,7 +16,7 @@ const (
 // instantiation strategy
 type DecoderStrategy struct{}
 
-var _ config.IDecoderStrategy = &DecoderStrategy{}
+var _ config.DecoderStrategy = &DecoderStrategy{}
 
 // NewDecoderStrategy will instantiate a new YAML format
 // decoder creation strategy
@@ -33,11 +33,11 @@ func (DecoderStrategy) Accept(
 	return format == Format
 }
 
-// Create will instantiate the desired decoder instance with the given reader
-// instance as source of the content to decode.
+// Create will instantiate the desired decoder instance with the given YAML
+// underlying decoder instance as source of the content to decode.
 func (DecoderStrategy) Create(
 	args ...interface{},
-) (config.IDecoder, error) {
+) (config.Decoder, error) {
 	// check for the existence of the mandatory reader argument
 	if len(args) == 0 {
 		return nil, errNilPointer("args[0]")

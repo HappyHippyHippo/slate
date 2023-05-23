@@ -13,15 +13,15 @@ import (
 // recursive or not, and parse each one and store all the read content
 // as a config.
 type Source struct {
-	source.BaseSource
+	source.Source
 	path           string
 	format         string
 	recursive      bool
 	fs             afero.Fs
-	decoderFactory config.IDecoderFactory
+	decoderFactory *config.DecoderFactory
 }
 
-var _ config.ISource = &Source{}
+var _ config.Source = &Source{}
 
 // NewSource will instantiate a new configuration source
 // that will read a directory files for configuration information.
@@ -30,7 +30,7 @@ func NewSource(
 	format string,
 	recursive bool,
 	fs afero.Fs,
-	decoderFactory config.IDecoderFactory,
+	decoderFactory *config.DecoderFactory,
 ) (*Source, error) {
 	// check file system argument reference
 	if fs == nil {
@@ -42,9 +42,9 @@ func NewSource(
 	}
 	// instantiates the config source
 	s := &Source{
-		BaseSource: source.BaseSource{
-			Mutex:  &sync.Mutex{},
-			Config: config.Config{},
+		Source: source.Source{
+			Mutex:   &sync.Mutex{},
+			Partial: config.Partial{},
 		},
 		path:           path,
 		format:         format,
@@ -67,14 +67,14 @@ func (s *Source) load() error {
 	}
 	// store the parsed content into the source local config
 	s.Mutex.Lock()
-	s.Config = *p
+	s.Partial = *p
 	s.Mutex.Unlock()
 	return nil
 }
 
 func (s *Source) loadDir(
 	path string,
-) (*config.Config, error) {
+) (*config.Partial, error) {
 	// open the directory stream
 	dir, e := s.fs.Open(path)
 	if e != nil {
@@ -87,7 +87,7 @@ func (s *Source) loadDir(
 		return nil, e
 	}
 	// parse each founded entry
-	loaded := &config.Config{}
+	loaded := &config.Partial{}
 	for _, file := range files {
 		// check if is an inner directory
 		if file.IsDir() {
@@ -116,7 +116,7 @@ func (s *Source) loadDir(
 
 func (s *Source) loadFile(
 	path string,
-) (*config.Config, error) {
+) (*config.Partial, error) {
 	// open the file for reading
 	f, e := s.fs.OpenFile(path, os.O_RDONLY, 0o644)
 	if e != nil {
@@ -130,9 +130,5 @@ func (s *Source) loadFile(
 	}
 	defer func() { _ = d.Close() }()
 	// decode the read file content
-	p, e := d.Decode()
-	if e != nil {
-		return nil, e
-	}
-	return p.(*config.Config), nil
+	return d.Decode()
 }

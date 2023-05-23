@@ -27,20 +27,20 @@ const (
 	SourceFactoryID = ID + ".source.factory"
 
 	// LoaderID defines the id to be used as the container
-	// registration id of a config loader instance.
-	LoaderID = ID + ".loader"
+	// registration id of a config observer instance.
+	LoaderID = ID + ".observer"
 )
 
 // Provider defines the slate.config module service provider to be used
 // on the application initialization to register the config service.
 type Provider struct{}
 
-var _ slate.IProvider = &Provider{}
+var _ slate.Provider = &Provider{}
 
 // Register will register the configuration module instances in the
 // application container.
 func (Provider) Register(
-	container slate.IContainer,
+	container *slate.Container,
 ) error {
 	// check container argument reference
 	if container == nil {
@@ -49,15 +49,15 @@ func (Provider) Register(
 	// register the services
 	_ = container.Service(DecoderFactoryID, NewDecoderFactory)
 	_ = container.Service(SourceFactoryID, NewSourceFactory)
-	_ = container.Service(ID, NewManager)
+	_ = container.Service(ID, NewConfig)
 	_ = container.Service(LoaderID, NewLoader)
 	return nil
 }
 
-// Boot will start the configuration config instance by calling the
-// configuration loader with the defined provider base entry information.
+// Boot will start the config instance by calling the config
+// observer with the defined provider base entry information.
 func (p Provider) Boot(
-	container slate.IContainer,
+	container *slate.Container,
 ) (e error) {
 	// check container argument reference
 	if container == nil {
@@ -80,44 +80,44 @@ func (p Provider) Boot(
 	for _, s := range p.getSourceStrategies(container) {
 		_ = sourceFactory.Register(s)
 	}
-	// check if the config loader is active
+	// check if the config observer is active
 	if !LoaderActive {
 		return nil
 	}
-	// execute the loader action
+	// execute the observer action
 	return p.getLoader(container).Load()
 }
 
 func (Provider) getDecoderFactory(
-	container slate.IContainer,
-) IDecoderFactory {
+	container *slate.Container,
+) *DecoderFactory {
 	// retrieve the factory entry
 	entry, e := container.Get(DecoderFactoryID)
 	if e != nil {
 		panic(e)
 	}
 	// validate the retrieved entry type
-	instance, ok := entry.(IDecoderFactory)
+	instance, ok := entry.(*DecoderFactory)
 	if !ok {
-		panic(errConversion(entry, "config.IDecoderFactory"))
+		panic(errConversion(entry, "config.*DecoderFactory"))
 	}
 	return instance
 }
 
 func (Provider) getDecoderStrategies(
-	container slate.IContainer,
-) []IDecoderStrategy {
+	container *slate.Container,
+) []DecoderStrategy {
 	// retrieve the strategies entries
 	entries, e := container.Tag(DecoderStrategyTag)
 	if e != nil {
 		panic(e)
 	}
 	// type check the retrieved strategies
-	var strategies []IDecoderStrategy
+	var strategies []DecoderStrategy
 	for _, entry := range entries {
-		s, ok := entry.(IDecoderStrategy)
+		s, ok := entry.(DecoderStrategy)
 		if !ok {
-			panic(errConversion(entry, "config.IDecoderStrategy"))
+			panic(errConversion(entry, "config.DecoderStrategy"))
 		}
 		strategies = append(strategies, s)
 	}
@@ -125,35 +125,35 @@ func (Provider) getDecoderStrategies(
 }
 
 func (Provider) getSourceFactory(
-	container slate.IContainer,
-) ISourceFactory {
+	container *slate.Container,
+) *SourceFactory {
 	// retrieve the factory entry
 	entry, e := container.Get(SourceFactoryID)
 	if e != nil {
 		panic(e)
 	}
 	// validate the retrieved entry type
-	instance, ok := entry.(ISourceFactory)
+	instance, ok := entry.(*SourceFactory)
 	if !ok {
-		panic(errConversion(entry, "config.ISourceFactory"))
+		panic(errConversion(entry, "config.*SourceFactory"))
 	}
 	return instance
 }
 
 func (Provider) getSourceStrategies(
-	container slate.IContainer,
-) []ISourceStrategy {
+	container *slate.Container,
+) []SourceStrategy {
 	// retrieve the strategies entries
 	entries, e := container.Tag(SourceStrategyTag)
 	if e != nil {
 		panic(e)
 	}
 	// type check the retrieved strategies
-	var strategies []ISourceStrategy
+	var strategies []SourceStrategy
 	for _, entry := range entries {
-		s, ok := entry.(ISourceStrategy)
+		s, ok := entry.(SourceStrategy)
 		if !ok {
-			panic(errConversion(entry, "config.ISourceStrategy"))
+			panic(errConversion(entry, "config.SourceStrategy"))
 		}
 		strategies = append(strategies, s)
 	}
@@ -161,17 +161,17 @@ func (Provider) getSourceStrategies(
 }
 
 func (Provider) getLoader(
-	container slate.IContainer,
-) ILoader {
-	// retrieve the loader entry
+	container *slate.Container,
+) *Loader {
+	// retrieve the observer entry
 	entry, e := container.Get(LoaderID)
 	if e != nil {
 		panic(e)
 	}
 	// validate the retrieved entry type
-	instance, ok := entry.(ILoader)
+	instance, ok := entry.(*Loader)
 	if !ok {
-		panic(errConversion(entry, "config.ILoader"))
+		panic(errConversion(entry, "config.loader"))
 	}
 	return instance
 }

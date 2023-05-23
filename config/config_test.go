@@ -2,1033 +2,1078 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"sort"
 	"testing"
+	"time"
 
+	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
 )
 
-func Test_Config_Clone(t *testing.T) {
-	t.Run("clone empty config", func(t *testing.T) {
-		sut := Config{}
-		c := sut.Clone()
-		sut["extra"] = "value"
+func Test_NewConfig(t *testing.T) {
+	t.Run("new config without reload", func(t *testing.T) {
+		ObserveFrequency = 0
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
 
-		if c == nil {
-			t.Error("clone call didn't returned a valid reference")
-		} else if len(c) != 0 {
-			t.Errorf("cloned config is not empty : %v", c)
+		switch {
+		case sut.mutex == nil:
+			t.Error("didn't instantiate the access mutex")
+		case sut.sources == nil:
+			t.Error("didn't instantiate the sources storing array")
+		case sut.observers == nil:
+			t.Error("didn't instantiate the observers storing array")
+		case sut.observer != nil:
+			t.Error("instantiated the sources reload trigger")
 		}
 	})
 
-	t.Run("clone non-empty config", func(t *testing.T) {
-		sut := Config{"field": "value"}
-		expected := Config{"field": "value"}
-		c := sut.Clone()
-		sut["extra"] = "value"
+	t.Run("new config with reload", func(t *testing.T) {
+		ObserveFrequency = 10
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
 
-		if c == nil {
-			t.Error("clone call didn't returned a valid reference")
-		} else if !reflect.DeepEqual(c, expected) {
-			t.Errorf("cloned config (%v) is not the expected : %v", c, expected)
-		}
-	})
-
-	t.Run("recursive cloning", func(t *testing.T) {
-		sut := Config{"field": Config{"field": "value"}}
-		expected := Config{"field": Config{"field": "value"}}
-		c := sut.Clone()
-		sut["extra"] = "value"
-		sut["field"].(Config)["extra"] = "value"
-
-		if c == nil {
-			t.Error("clone call didn't returned a valid reference")
-		} else if !reflect.DeepEqual(c, expected) {
-			t.Errorf("cloned config (%v) is not the expected : %v", c, expected)
-		}
-	})
-
-	t.Run("recursive cloning with lists", func(t *testing.T) {
-		sut := Config{"field": []interface{}{Config{"field": "value"}}}
-		expected := Config{"field": []interface{}{Config{"field": "value"}}}
-		c := sut.Clone()
-		sut["extra"] = "value"
-		sut["field"].([]interface{})[0].(Config)["extra"] = "value"
-
-		if c == nil {
-			t.Error("clone call didn't returned a valid reference")
-		} else if !reflect.DeepEqual(c, expected) {
-			t.Errorf("cloned config (%v) is not the expected : %v", c, expected)
-		}
-	})
-
-	t.Run("recursive cloning with multi-level lists", func(t *testing.T) {
-		sut := Config{"field": []interface{}{[]interface{}{Config{"field": "value"}}}}
-		expected := Config{"field": []interface{}{[]interface{}{Config{"field": "value"}}}}
-		c := sut.Clone()
-		sut["extra"] = "value"
-		sut["field"].([]interface{})[0].([]interface{})[0].(Config)["extra"] = "value"
-
-		if c == nil {
-			t.Error("clone call didn't returned a valid reference")
-		} else if !reflect.DeepEqual(c, expected) {
-			t.Errorf("cloned config (%v) is not the expected : %v", c, expected)
+		switch {
+		case sut.mutex == nil:
+			t.Error("didn't instantiate the access mutex")
+		case sut.sources == nil:
+			t.Error("didn't instantiate the sources storing array")
+		case sut.observers == nil:
+			t.Error("didn't instantiate the observers storing array")
+		case sut.observer == nil:
+			t.Error("didn't instantiate the sources reload trigger")
 		}
 	})
 }
 
+func Test_Config_Close(t *testing.T) {
+	t.Run("error while closing source", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		expected := fmt.Errorf("error message")
+
+		ObserveFrequency = 60
+		sut := NewConfig()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Get("").Return(Partial{}, nil).AnyTimes()
+		src.EXPECT().Close().Return(expected).Times(1)
+		_ = sut.AddSource("src", 0, src)
+
+		if e := sut.Close(); e == nil {
+			t.Error("didn't returned the expected error")
+		} else if e.Error() != expected.Error() {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		}
+	})
+	t.Run("error while closing observer", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		expected := fmt.Errorf("error message")
+		ObserveFrequency = 60
+		sut := NewConfig()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Get("").Return(Partial{}, nil).AnyTimes()
+		src.EXPECT().Close().Return(nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
+		observer := NewMockRecurringTrigger(ctrl)
+		observer.EXPECT().Close().Return(expected).Times(1)
+		sut.observer = observer
+
+		if e := sut.Close(); e == nil {
+			t.Error("didn't returned the expected error")
+		} else if e.Error() != expected.Error() {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		}
+	})
+
+	t.Run("propagate close to sources", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ObserveFrequency = 60
+		sut := NewConfig()
+		id1 := "src.1"
+		id2 := "src.2"
+		priority1 := 0
+		priority2 := 1
+		src1 := NewMockSource(ctrl)
+		src1.EXPECT().Get("").Return(Partial{}, nil).AnyTimes()
+		src1.EXPECT().Close().Times(1)
+		src2 := NewMockSource(ctrl)
+		src2.EXPECT().Get("").Return(Partial{}, nil).AnyTimes()
+		src2.EXPECT().Close().Times(1)
+		_ = sut.AddSource(id1, priority1, src1)
+		_ = sut.AddSource(id2, priority2, src2)
+
+		_ = sut.Close()
+	})
+}
+
 func Test_Config_Entries(t *testing.T) {
-	t.Run("empty config", func(t *testing.T) {
-		if (&Config{}).Entries() != nil {
-			t.Errorf("didn't returned the expected empty list")
+	t.Run("return partial entries", func(t *testing.T) {
+		scenarios := []struct {
+			config   Partial
+			expected []string
+		}{
+			{ // _test the empty partial
+				config:   Partial{},
+				expected: nil,
+			},
+			{ // _test the single entry partial
+				config:   Partial{"field": "value"},
+				expected: []string{"field"},
+			},
+			{ // _test the multi entry partial
+				config:   Partial{"field1": "value 1", "field2": "value 2"},
+				expected: []string{"field1", "field2"},
+			},
 		}
-	})
 
-	t.Run("single entry config", func(t *testing.T) {
-		if !reflect.DeepEqual((&Config{"field": "value"}).Entries(), []string{"field"}) {
-			t.Errorf("didn't returned the expected single entry list")
-		}
-	})
+		for _, scenario := range scenarios {
+			test := func() {
+				ctrl := gomock.NewController(t)
 
-	t.Run("multi entry config", func(t *testing.T) {
-		check := (&Config{
-			"field1": "value 1",
-			"field2": "value 2",
-		}).Entries()
-		expected := []string{"field1", "field2"}
+				ObserveFrequency = 60
+				sut := NewConfig()
+				src := NewMockSource(ctrl)
+				src.EXPECT().Close().Times(1)
+				src.EXPECT().Get("").Return(scenario.config, nil).Times(1)
+				_ = sut.AddSource("src", 0, src)
 
-		sort.Strings(check)
-		sort.Strings(expected)
-		if !reflect.DeepEqual(check, expected) {
-			t.Errorf("didn't returned the expected single entry list")
+				defer func() { _ = sut.Close(); ctrl.Finish() }()
+
+				check := sut.Entries()
+
+				sort.Strings(scenario.expected)
+				sort.Strings(check)
+				if !reflect.DeepEqual(check, scenario.expected) {
+					t.Errorf("returned (%v) when expecting (%v)", check, scenario.expected)
+				}
+			}
+			test()
 		}
 	})
 }
 
 func Test_Config_Has(t *testing.T) {
-	t.Run("check if a valid path exists", func(t *testing.T) {
+	t.Run("return the existence of the path", func(t *testing.T) {
 		scenarios := []struct {
-			partial Config
-			search  string
+			config   Partial
+			search   string
+			expected bool
 		}{
-			{ // _test empty Config, search for everything
-				partial: Config{},
-				search:  "",
+			{ // _test the existence of a present path
+				config:   Partial{"node": "value"},
+				search:   "node",
+				expected: true,
 			},
-			{ // _test single node, search for root node
-				partial: Config{"node": "value"},
-				search:  "",
-			},
-			{ // _test single node search
-				partial: Config{"node": "value"},
-				search:  "node",
-			},
-			{ // _test multiple node, search for root node
-				partial: Config{"node1": "value", "node2": "value"},
-				search:  "",
-			},
-			{ // _test multiple node search for first
-				partial: Config{"node1": "value", "node2": "value"},
-				search:  "node1",
-			},
-			{ // _test multiple node search for non-first
-				partial: Config{"node1": "value", "node2": "value"},
-				search:  "node2",
-			},
-			{ // _test tree, search for root node
-				partial: Config{"node1": Config{"node2": "value"}},
-				search:  "",
-			},
-			{ // _test tree, search for root level node
-				partial: Config{"node1": Config{"node2": "value"}},
-				search:  "node1",
-			},
-			{ // _test tree, search for sub node
-				partial: Config{"node1": Config{"node2": "value"}},
-				search:  "node1.node2",
+			{ // _test the non-existence of a missing path
+				config:   Partial{"node": "value"},
+				search:   "invalid-node",
+				expected: false,
 			},
 		}
 
 		for _, scenario := range scenarios {
-			if check := scenario.partial.Has(scenario.search); !check {
-				t.Errorf("didn't found the (%s) path in (%v)", scenario.search, scenario.partial)
-			}
-		}
-	})
+			test := func() {
+				ctrl := gomock.NewController(t)
 
-	t.Run("check if a invalid path do not exists", func(t *testing.T) {
-		scenarios := []struct {
-			partial Config
-			search  string
-		}{
-			{ // _test single node search (invalid)
-				partial: Config{"node": "value"},
-				search:  "node2",
-			},
-			{ // _test multiple node search for invalid node
-				partial: Config{"node1": "value", "node2": "value"},
-				search:  "node3",
-			},
-			{ // _test tree search for invalid root node
-				partial: Config{"node": Config{"node": "value"}},
-				search:  "node1",
-			},
-			{ // _test tree search for invalid sub node
-				partial: Config{"node": Config{"node": "value"}},
-				search:  "node.node1",
-			},
-			{ // _test tree search for invalid sub-sub-node
-				partial: Config{"node": Config{"node": "value"}},
-				search:  "node.node.node",
-			},
-		}
+				ObserveFrequency = 60
+				sut := NewConfig()
+				src := NewMockSource(ctrl)
+				src.EXPECT().Close().Times(1)
+				src.EXPECT().Get("").Return(scenario.config, nil).Times(1)
+				_ = sut.AddSource("src", 0, src)
 
-		for _, scenario := range scenarios {
-			if check := scenario.partial.Has(scenario.search); check {
-				t.Errorf("founded the (%s) path in (%v)", scenario.search, scenario.partial)
+				defer func() { _ = sut.Close(); ctrl.Finish() }()
+
+				if check := sut.Has(scenario.search); check != scenario.expected {
+					t.Errorf("returned (%v) when expecting (%v)", check, scenario.expected)
+				}
 			}
+			test()
 		}
 	})
 }
 
 func Test_Config_Get(t *testing.T) {
-	t.Run("retrieve a value of a existent path", func(t *testing.T) {
-		scenarios := []struct {
-			partial  Config
-			search   string
-			expected interface{}
-		}{
-			{ // _test empty Config, search for everything
-				partial:  Config{},
-				search:   "",
-				expected: Config{},
-			},
-			{ // _test single node, search for root node
-				partial:  Config{"node": "value"},
-				search:   "",
-				expected: Config{"node": "value"},
-			},
-			{ // _test single node search
-				partial:  Config{"node": "value"},
-				search:   "node",
-				expected: "value",
-			},
-			{ // _test multiple node, search for root node
-				partial:  Config{"node1": "value1", "node2": "value2"},
-				search:   "",
-				expected: Config{"node1": "value1", "node2": "value2"},
-			},
-			{ // _test multiple node search for first
-				partial:  Config{"node1": "value1", "node2": "value2"},
-				search:   "node1",
-				expected: "value1",
-			},
-			{ // _test multiple node search for non-first
-				partial:  Config{"node1": "value1", "node2": "value2"},
-				search:   "node2",
-				expected: "value2",
-			},
-			{ // _test tree, search for root node
-				partial:  Config{"node": Config{"node": "value"}},
-				search:   "",
-				expected: Config{"node": Config{"node": "value"}},
-			},
-			{ // _test tree, search for root level node
-				partial:  Config{"node": Config{"node": "value"}},
-				search:   "node",
-				expected: Config{"node": "value"},
-			},
-			{ // _test tree, search for sub node
-				partial:  Config{"node": Config{"node": "value"}},
-				search:   "node.node",
-				expected: "value",
-			},
-		}
+	t.Run("return path value", func(t *testing.T) {
+		search := "node"
+		expected := "value"
+		config := Partial{search: expected}
 
-		for _, scenario := range scenarios {
-			if check, e := scenario.partial.Get(scenario.search); e != nil {
-				t.Errorf("returned the unexpected error (%v) when retrieving (%v)", e, scenario.search)
-			} else if !reflect.DeepEqual(check, scenario.expected) {
-				t.Errorf("returned (%v) when retrieving (%v), expected (%v)", check, scenario.search, scenario.expected)
-			}
-		}
-	})
+		ctrl := gomock.NewController(t)
 
-	t.Run("return nil if a path don't exists", func(t *testing.T) {
-		scenarios := []struct {
-			partial Config
-			search  string
-		}{
-			{ // _test empty Config search for non-existent node
-				partial: Config{},
-				search:  "node",
-			},
-			{ // _test single node search for non-existent node
-				partial: Config{"node": "value"},
-				search:  "node2",
-			},
-			{ // _test multiple node search for non-existent node
-				partial: Config{"node1": "value1", "node2": "value2"},
-				search:  "node3",
-			},
-			{ // _test tree search for non-existent root node
-				partial: Config{"node1": Config{"node2": "value"}},
-				search:  "node2",
-			},
-			{ // _test tree search for non-existent sub node
-				partial: Config{"node1": Config{"node2": "value"}},
-				search:  "node1.node1",
-			},
-			{ // _test tree search for non-existent sub-sub-node
-				partial: Config{"node1": Config{"node2": "value"}},
-				search:  "node1.node2.node3",
-			},
-		}
+		ObserveFrequency = 60
+		sut := NewConfig()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(config, nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
 
-		for _, scenario := range scenarios {
-			check, e := scenario.partial.Get(scenario.search)
-			switch {
-			case e == nil:
-				t.Error("didn't returned the expected error")
-			case !errors.Is(e, ErrPathNotFound):
-				t.Errorf("returned error was not a config path not found error : %v", e)
-			case check != nil:
-				t.Error("unexpectedly returned a valid reference to a stored config value")
-			}
-		}
-	})
+		defer func() { _ = sut.Close(); ctrl.Finish() }()
 
-	t.Run("return nil if the node actually stores nil", func(t *testing.T) {
-		sut := Config{"node1": nil, "node2": "value2"}
-
-		if check, e := sut.Get("node1", "default_value"); e != nil {
+		if check, e := sut.Get(search); e != nil {
 			t.Errorf("returned the unexpected error : %v", e)
-		} else if check != nil {
-			t.Errorf("returned the (%v) check", check)
+		} else if check != expected {
+			t.Errorf("returned (%v) when expecting (%v)", check, expected)
 		}
 	})
 
-	t.Run("return the def value if a path don't exists", func(t *testing.T) {
-		scenarios := []struct {
-			partial Config
-			search  string
-		}{
-			{ // _test empty Config search for non-existent node
-				partial: Config{},
-				search:  "node",
-			},
-			{ // _test single node search for non-existent node
-				partial: Config{"node": "value"},
-				search:  "node2",
-			},
-			{ // _test multiple node search for non-existent node
-				partial: Config{"node1": "value1", "node2": "value2"},
-				search:  "node3",
-			},
-			{ // _test tree search for non-existent root node
-				partial: Config{"node1": Config{"node2": "value"}},
-				search:  "node2",
-			},
-			{ // _test tree search for non-existent sub node
-				partial: Config{"node1": Config{"node2": "value"}},
-				search:  "node1.node1",
-			},
-			{ // _test tree search for non-existent sub-sub-node
-				partial: Config{"node1": Config{"node2": "value"}},
-				search:  "node1.node2.node3",
-			},
-		}
+	t.Run("return internal Partial get error", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-		def := "default_value"
-		for _, scenario := range scenarios {
-			if check, e := scenario.partial.Get(scenario.search, def); e != nil {
-				t.Errorf("returned the unexpected error : %v", e)
-			} else if check != def {
-				t.Errorf("returned (%v) when retrieving (%v)", check, scenario.search)
-			}
+		data := Partial{"node1": Partial{"node2": 101}}
+		path := "node3"
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(data, nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
+
+		check, e := sut.Get(path)
+		switch {
+		case check != nil:
+			t.Errorf("returned the unexpected valid value : %v", check)
+		case e == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(e, ErrPathNotFound):
+			t.Errorf("returned (%v) error when expecting (%v)", e, ErrPathNotFound)
+		}
+	})
+
+	t.Run("return def if path was not found", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		data := Partial{"node1": Partial{"node2": 101}}
+		path := "node3"
+		val := 3
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(data, nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
+
+		if check, e := sut.Get(path, val); e != nil {
+			t.Errorf("returned the unexpected error : %v", e)
+		} else if check != val {
+			t.Errorf("returned (%v) when expecting (%v)", check, val)
 		}
 	})
 }
 
 func Test_Config_Bool(t *testing.T) {
-	t.Run("return valid stored value", func(t *testing.T) {
-		path := "node"
-		sut := Config{path: true}
+	t.Run("return the stored boolean value", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-		if check, e := sut.Bool(path, false); e != nil {
+		path := "node"
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{path: true}, nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
+
+		if check, e := sut.Bool(path); e != nil {
 			t.Errorf("returned the unexpected error : %v", e)
 		} else if !check {
-			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, true)
-		}
-	})
-
-	t.Run("return conversion error if not storing a bool", func(t *testing.T) {
-		path := "node"
-		value := "123"
-		sut := Config{path: value}
-
-		check, e := sut.Bool(path, true)
-		switch {
-		case check:
-			t.Errorf("returned the unexpected value : %v", check)
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("the returned error is the expected error convertion error : %v", e)
-		}
-	})
-
-	t.Run("return path not found error if no def value is given", func(t *testing.T) {
-		sut := Config{}
-
-		check, e := sut.Bool("node")
-		switch {
-		case check:
-			t.Errorf("returned the unexpected value : %v", check)
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, ErrPathNotFound):
-			t.Errorf("the returned error is the expected error convertion error : %v", e)
-		}
-	})
-
-	t.Run("return def value if the path don't exists", func(t *testing.T) {
-		sut := Config{}
-
-		check, e := sut.Bool("node", true)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected error : %v", e)
-		case !check:
-			t.Errorf("returned the unexpected value (%v) when expecting : %v", check, true)
+			t.Errorf("returned (%v)", check)
 		}
 	})
 }
 
 func Test_Config_Int(t *testing.T) {
-	t.Run("return valid stored value", func(t *testing.T) {
-		path := "node"
-		value := 123
-		sut := Config{path: value}
+	t.Run("return the stored integer value", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-		if check, e := sut.Int(path, 456); e != nil {
+		value := 123
+		path := "node"
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{path: value}, nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
+
+		if check, e := sut.Int(path); e != nil {
 			t.Errorf("returned the unexpected error : %v", e)
 		} else if check != value {
-			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
-		}
-	})
-
-	t.Run("return conversion error if not storing an int", func(t *testing.T) {
-		path := "node"
-		value := "123"
-		sut := Config{path: value}
-
-		check, e := sut.Int(path, 456)
-		switch {
-		case check != 0:
-			t.Errorf("returned the unexpected value : %v", check)
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("the returned error is the expected error convertion error : %v", e)
-		}
-	})
-
-	t.Run("return path not found error if no def value is given", func(t *testing.T) {
-		sut := Config{}
-
-		check, e := sut.Int("node")
-		switch {
-		case check != 0:
-			t.Errorf("returned the unexpected value : %v", check)
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, ErrPathNotFound):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
-		}
-	})
-
-	t.Run("return def value if the path don't exists", func(t *testing.T) {
-		value := 123
-		sut := Config{}
-
-		check, e := sut.Int("node", value)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
-		case check != value:
-			t.Errorf("returned the unexpected value (%v) when expecting : %v", check, value)
+			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
 	})
 }
 
 func Test_Config_Float(t *testing.T) {
-	t.Run("return valid stored value", func(t *testing.T) {
-		path := "node"
-		value := 123.456
-		sut := Config{path: value}
+	t.Run("return the stored integer value", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-		if check, e := sut.Float(path, 456.789); e != nil {
-			t.Errorf("returned the unexpected e : %v", e)
+		value := 123.4
+		path := "node"
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{path: value}, nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
+
+		if check, e := sut.Float(path); e != nil {
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if check != value {
-			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
-		}
-	})
-
-	t.Run("return conversion e if not storing an float", func(t *testing.T) {
-		path := "node"
-		value := "123.456"
-		sut := Config{path: value}
-
-		check, e := sut.Float(path, 456)
-		switch {
-		case check != 0:
-			t.Errorf("returned the unexpected value : %v", check)
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
-		}
-	})
-
-	t.Run("return path not found e if no def value is given", func(t *testing.T) {
-		sut := Config{}
-
-		check, e := sut.Float("node")
-		switch {
-		case check != 0:
-			t.Errorf("returned the unexpected value : %v", check)
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, ErrPathNotFound):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
-		}
-	})
-
-	t.Run("return def value if the path don't exists", func(t *testing.T) {
-		value := 123.456
-		sut := Config{}
-
-		check, e := sut.Float("node", value)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
-		case check != value:
-			t.Errorf("returned the unexpected value (%v) when expecting : %v", check, value)
+			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
 	})
 }
 
 func Test_Config_String(t *testing.T) {
-	t.Run("return valid stored value", func(t *testing.T) {
-		path := "node"
+	t.Run("return the stored integer value", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
 		value := "value"
-		sut := Config{path: value}
-
-		if check, e := sut.String(path, "def value"); e != nil {
-			t.Errorf("returned the unexpected e : %v", e)
-		} else if check != value {
-			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
-		}
-	})
-
-	t.Run("return conversion e if not storing an string", func(t *testing.T) {
 		path := "node"
-		value := 123
-		sut := Config{path: value}
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{path: value}, nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
 
-		check, e := sut.String(path, "def value")
-		switch {
-		case check != "":
-			t.Errorf("returned the unexpected value : %v", check)
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
-		}
-	})
-
-	t.Run("return path not found e if no def value is given", func(t *testing.T) {
-		sut := Config{}
-
-		check, e := sut.String("node")
-		switch {
-		case check != "":
-			t.Errorf("returned the unexpected value : %v", check)
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, ErrPathNotFound):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
-		}
-	})
-
-	t.Run("return def value if the path don't exists", func(t *testing.T) {
-		value := "def value"
-		sut := Config{}
-
-		check, e := sut.String("node", value)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
-		case check != value:
-			t.Errorf("returned the unexpected value (%v) when expecting : %v", check, value)
+		if check, e := sut.String(path); e != nil {
+			t.Errorf("returned the unexpected error : %v", e)
+		} else if check != value {
+			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
 	})
 }
 
 func Test_Config_List(t *testing.T) {
-	t.Run("return valid stored value", func(t *testing.T) {
-		path := "node"
-		value := []interface{}{"value"}
-		sut := Config{path: value}
+	t.Run("return the stored integer value", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-		if check, e := sut.List(path, []interface{}{"def value"}); e != nil {
-			t.Errorf("returned the unexpected e : %v", e)
+		value := []interface{}{1, 2, 3}
+		path := "node"
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{path: value}, nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
+
+		if check, e := sut.List(path); e != nil {
+			t.Errorf("returned the unexpected error : %v", e)
 		} else if !reflect.DeepEqual(check, value) {
-			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
-		}
-	})
-
-	t.Run("return conversion e if not storing an list", func(t *testing.T) {
-		path := "node"
-		value := 123
-		sut := Config{path: value}
-
-		check, e := sut.List(path, []interface{}{"def value"})
-		switch {
-		case check != nil:
-			t.Errorf("returned the unexpected value : %v", check)
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
-		}
-	})
-
-	t.Run("return path not found e if no def value is given", func(t *testing.T) {
-		sut := Config{}
-
-		check, e := sut.List("node")
-		switch {
-		case check != nil:
-			t.Errorf("returned the unexpected value : %v", check)
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, ErrPathNotFound):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
-		}
-	})
-
-	t.Run("return def value if the path don't exists", func(t *testing.T) {
-		value := []interface{}{"def value"}
-		sut := Config{}
-
-		check, e := sut.List("node", value)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
-		case !reflect.DeepEqual(check, value):
-			t.Errorf("returned the unexpected value (%v) when expecting : %v", check, value)
+			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
 	})
 }
 
-func Test_Config_Config(t *testing.T) {
-	t.Run("return valid stored value", func(t *testing.T) {
+func Test_Config_Partial(t *testing.T) {
+	t.Run("return the stored partial value", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		value := Partial{"field": "value"}
 		path := "node"
-		value := Config{"id": "value"}
-		sut := Config{path: value}
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{path: value}, nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
 
-		if check, e := sut.Config(path, Config{"id": "def value"}); e != nil {
-			t.Errorf("returned the unexpected e : %v", e)
-		} else if !reflect.DeepEqual(*check.(*Config), value) {
-			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
-		}
-	})
-
-	t.Run("return conversion e if not storing an Config", func(t *testing.T) {
-		path := "node"
-		value := 123
-		sut := Config{path: value}
-
-		check, e := sut.Config(path, Config{"id": "def value"})
-		switch {
-		case check != nil:
-			t.Errorf("returned the unexpected value : %v", check)
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
-		}
-	})
-
-	t.Run("return path not found e if no def value is given", func(t *testing.T) {
-		sut := Config{}
-
-		check, e := sut.Config("node")
-		switch {
-		case check != nil:
-			t.Errorf("returned the unexpected value : %v", check)
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, ErrPathNotFound):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
-		}
-	})
-
-	t.Run("return def value if the path don't exists", func(t *testing.T) {
-		value := Config{"id": "def value"}
-		sut := Config{}
-
-		check, e := sut.Config("node", value)
-		switch {
-		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
-		case !reflect.DeepEqual(*check.(*Config), value):
-			t.Errorf("returned the unexpected value (%v) when expecting : %v", check, value)
-		}
-	})
-}
-
-func Test_Config_Merge(t *testing.T) {
-	t.Run("merges two partials", func(t *testing.T) {
-		scenarios := []struct {
-			partial1 Config
-			partial2 Config
-			expected Config
-		}{
-			{ // _test merging nil Config source
-				partial1: Config{},
-				partial2: nil,
-				expected: Config{},
-			},
-			{ // _test merging empty Config
-				partial1: Config{},
-				partial2: Config{},
-				expected: Config{},
-			},
-			{ // _test merging empty Config with a non-empty Config
-				partial1: Config{"node1": "value1"},
-				partial2: Config{},
-				expected: Config{"node1": "value1"},
-			},
-			{ // _test merging Config into empty Config
-				partial1: Config{},
-				partial2: Config{"node1": "value1"},
-				expected: Config{"node1": "value1"},
-			},
-			{ // _test merging override source value
-				partial1: Config{"node1": "value1"},
-				partial2: Config{"node1": "value2"},
-				expected: Config{"node1": "value2"},
-			},
-			{ // _test merging does not override non-present value in merged Config (create)
-				partial1: Config{"node1": "value1"},
-				partial2: Config{"node2": "value2"},
-				expected: Config{"node1": "value1", "node2": "value2"},
-			},
-			{ // _test merging does not override non-present value in merged Config (override)
-				partial1: Config{"node1": "value1", "node2": "value2"},
-				partial2: Config{"node2": "value3"},
-				expected: Config{"node1": "value1", "node2": "value3"},
-			},
-			{ // _test merging override source value to a subtree
-				partial1: Config{"node1": "value1"},
-				partial2: Config{"node1": Config{"node2": "value"}},
-				expected: Config{"node1": Config{"node2": "value"}},
-			},
-			{ // _test merging override source value in a subtree (to a value)
-				partial1: Config{"node1": Config{"node2": "value1"}},
-				partial2: Config{"node1": Config{"node2": "value2"}},
-				expected: Config{"node1": Config{"node2": "value2"}},
-			},
-			{ // _test merging override source value in a subtree (to a subtree)
-				partial1: Config{"node1": Config{"node2": "value"}},
-				partial2: Config{"node1": Config{"node2": Config{"node3": "value"}}},
-				expected: Config{"node1": Config{"node2": Config{"node3": "value"}}},
-			},
-		}
-
-		for _, scenario := range scenarios {
-			check := scenario.partial1
-			check.Merge(scenario.partial2)
-
-			if !reflect.DeepEqual(check, scenario.expected) {
-				t.Errorf("resulted in (%s) when merging (%v) and (%v), expecting (%v)", check, scenario.partial1, scenario.partial2, scenario.expected)
-			}
-		}
-	})
-
-	t.Run("merging works with copies", func(t *testing.T) {
-		data1 := Config{"node1": Config{"node2": "value 2"}}
-		data2 := Config{"node1": Config{"node3": Config{"node4": "value 4"}}}
-		expected := Config{"node1": Config{"node2": "value 2", "node3": Config{"node4": "value 4"}}}
-
-		check := Config{}
-		check.Merge(data1)
-		check.Merge(data2)
-
-		if !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%s) when merging (%v) and (%v), expecting (%v)", check, data1, data2, expected)
+		if check, e := sut.Partial(path); e != nil {
+			t.Errorf("returned the unexpected error : %v", e)
+		} else if !reflect.DeepEqual(*check, value) {
+			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
 	})
 }
 
 func Test_Config_Populate(t *testing.T) {
-	t.Run("error if path not found", func(t *testing.T) {
-		data := Config{"field1": 123, "field2": 456}
-		path := "field3"
-		target := 0
+	t.Run("populate the given structure", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-		v, e := data.Populate(path, target)
-		switch {
-		case v != nil:
-			t.Error("returned an unexpected valid reference to a data")
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, ErrPathNotFound):
+		value := Partial{"field": Partial{"field": "value"}}
+		target := struct{ Field string }{}
+		expected := struct{ Field string }{Field: "value"}
+		path := "node"
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{path: value}, nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
+
+		if check, e := sut.Populate(path+"."+"field", target); e != nil {
 			t.Errorf("returned the unexpected error : %v", e)
+		} else if !reflect.DeepEqual(check, expected) {
+			t.Errorf("returned (%v) when expecting : %v", check, expected)
+		}
+	})
+}
+
+func Test_Config_HasSource(t *testing.T) {
+	t.Run("validate if the source is registered", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{}, nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
+
+		if !sut.HasSource("src") {
+			t.Error("returned false")
 		}
 	})
 
-	t.Run("error on populating an invalid type", func(t *testing.T) {
-		data := Config{"field1": 123, "field2": Config{"field1": 123, "field2": 456}}
-		path := "field1"
-		target := struct{ Field1 string }{}
+	t.Run("invalidate if the source is not registered", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-		v, e := data.Populate(path, target)
-		switch {
-		case v != nil:
-			t.Error("returned an unexpected valid reference to a data")
-		case e == nil:
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{}, nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
+
+		if sut.HasSource("invalid source id") {
+			t.Error("returned true")
+		}
+	})
+}
+
+func Test_Config_AddSource(t *testing.T) {
+	t.Run("nil source", func(t *testing.T) {
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+
+		if e := sut.AddSource("src", 0, nil); e == nil {
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the unexpected error : %v", e)
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
-	t.Run("error on populating an invalid type struct field", func(t *testing.T) {
-		data := Config{"field1": 123, "field2": Config{"field1": 123, "field2": 456}}
-		path := "field2"
-		target := struct{ Field1 string }{}
+	t.Run("register a new source", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-		v, e := data.Populate(path, target)
-		switch {
-		case v != nil:
-			t.Error("returned an unexpected valid reference to a data")
-		case e == nil:
-			t.Error("didn't returned the expected error")
-		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the unexpected error : %v", e)
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{}, nil).Times(1)
+
+		if e := sut.AddSource("src", 0, src); e != nil {
+			t.Errorf("returned the (%v) error", e)
+		} else if !sut.HasSource("src") {
+			t.Error("didn't stored the source")
 		}
 	})
 
-	t.Run("error on populating an inner invalid type struct field", func(t *testing.T) {
-		data := Config{"field1": 123, "field2": Config{"field1": 123, "field2": 456}}
-		path := ""
-		target := struct{ Field2 struct{ Field1 string } }{}
+	t.Run("duplicate id", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-		v, e := data.Populate(path, target)
-		switch {
-		case v != nil:
-			t.Error("returned an unexpected valid reference to a data")
-		case e == nil:
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{}, nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
+
+		if e := sut.AddSource("src", 0, src); e == nil {
 			t.Error("didn't returned the expected error")
-		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the unexpected error : %v", e)
+		} else if !errors.Is(e, ErrDuplicateSource) {
+			t.Errorf("returned (%v) error when expecting (%v)", e, ErrDuplicateSource)
 		}
 	})
 
-	t.Run("no-op if field is not found in config", func(t *testing.T) {
-		data := Config{"field1": 123, "field2": Config{"field1": 123, "field2": 456}}
-		path := ""
-		target := struct{ Field3 int }{Field3: 123}
-		expValue := struct{ Field3 int }{Field3: 0}
+	t.Run("override path if the insert have higher priority", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-		v, e := data.Populate(path, target)
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src1 := NewMockSource(ctrl)
+		src1.EXPECT().Close().Times(1)
+		src1.EXPECT().Get("").Return(Partial{"node": "value.1"}, nil).AnyTimes()
+		src2 := NewMockSource(ctrl)
+		src2.EXPECT().Close().Times(1)
+		src2.EXPECT().Get("").Return(Partial{"node": "value.2"}, nil).AnyTimes()
+		_ = sut.AddSource("src.1", 1, src1)
+		_ = sut.AddSource("src.2", 2, src2)
+
+		if check, _ := sut.Get("node"); check != "value.2" {
+			t.Errorf("returned the (%v) value when expecting (value.2)", check)
+		}
+	})
+
+	t.Run("do not override path if the insert have lower priority", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src1 := NewMockSource(ctrl)
+		src1.EXPECT().Close().Times(1)
+		src1.EXPECT().Get("").Return(Partial{"node": "value.1"}, nil).AnyTimes()
+		src2 := NewMockSource(ctrl)
+		src2.EXPECT().Close().Times(1)
+		src2.EXPECT().Get("").Return(Partial{"node": "value.2"}, nil).AnyTimes()
+		_ = sut.AddSource("src.1", 2, src1)
+		_ = sut.AddSource("src.2", 1, src2)
+
+		if check, _ := sut.Get("node"); check != "value.1" {
+			t.Errorf("returned the (%v) value when expecting (value.1)", check)
+		}
+	})
+
+	t.Run("still be able to get not overridden paths of a inserted lower priority", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src1 := NewMockSource(ctrl)
+		src1.EXPECT().Close().Times(1)
+		src1.EXPECT().Get("").Return(Partial{"node": "value.1"}, nil).AnyTimes()
+		src2 := NewMockSource(ctrl)
+		src2.EXPECT().Close().Times(1)
+		src2.EXPECT().Get("").Return(Partial{"node": "value.2", "extendedNode": "extendedValue"}, nil).AnyTimes()
+		_ = sut.AddSource("src.1", 2, src1)
+		_ = sut.AddSource("src.2", 1, src2)
+
+		if check, _ := sut.Get("extendedNode"); check != "extendedValue" {
+			t.Errorf("returned the (%v) value when expecting (extendedValue)", check)
+		}
+	})
+}
+
+func Test_Config_RemoveSource(t *testing.T) {
+	t.Run("unregister a non-registered source", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+
+		if e := sut.RemoveSource("src"); e != nil {
+			t.Errorf("returned the unexpected error (%v)", e)
+		}
+	})
+
+	t.Run("error unregister a previously registered source", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		expected := fmt.Errorf("error message")
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Return(expected).Times(2)
+		src.EXPECT().Get("").Return(Partial{"node": "value.1"}, nil).AnyTimes()
+		_ = sut.AddSource("src", 0, src)
+
+		if e := sut.RemoveSource("src"); e == nil {
+			t.Error("didn't returned the expected error")
+		} else if e.Error() != expected.Error() {
+			t.Errorf("returned the error (%v) when was expecting (%v)", e, expected)
+		}
+	})
+
+	t.Run("unregister a previously registered source", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src1 := NewMockSource(ctrl)
+		src1.EXPECT().Close().Times(1)
+		src1.EXPECT().Get("").Return(Partial{"node": "value.1"}, nil).AnyTimes()
+		src2 := NewMockSource(ctrl)
+		src2.EXPECT().Close().Times(1)
+		src2.EXPECT().Get("").Return(Partial{"node": "value.2"}, nil).AnyTimes()
+		src3 := NewMockSource(ctrl)
+		src3.EXPECT().Close().Times(1)
+		src3.EXPECT().Get("").Return(Partial{"node": "value.3"}, nil).AnyTimes()
+		_ = sut.AddSource("src.1", 0, src1)
+		_ = sut.AddSource("src.2", 0, src2)
+		_ = sut.AddSource("src.3", 0, src3)
+		_ = sut.RemoveSource("src.2")
+
+		if sut.HasSource("src.2") {
+			t.Error("didn't remove the source")
+		}
+	})
+
+	t.Run("recover path overridden by the removed source", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src1 := NewMockSource(ctrl)
+		src1.EXPECT().Close().Times(1)
+		src1.EXPECT().Get("").Return(Partial{"node": "value.1"}, nil).AnyTimes()
+		src2 := NewMockSource(ctrl)
+		src2.EXPECT().Close().Times(1)
+		src2.EXPECT().Get("").Return(Partial{"node": "value.2"}, nil).AnyTimes()
+		src3 := NewMockSource(ctrl)
+		src3.EXPECT().Close().Times(1)
+		src3.EXPECT().Get("").Return(Partial{"node": "value.3"}, nil).AnyTimes()
+		_ = sut.AddSource("src.1", 0, src1)
+		_ = sut.AddSource("src.2", 1, src2)
+		_ = sut.AddSource("src.3", 2, src3)
+		_ = sut.RemoveSource("src.3")
+
+		if check, _ := sut.Get("node"); check != "value.2" {
+			t.Errorf("returned (%check) value when expecting (value.2)", check)
+		}
+	})
+}
+
+func Test_Config_RemoveAllSources(t *testing.T) {
+	t.Run("remove all the sources", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+
+		expected := fmt.Errorf("error string")
+		src1 := NewMockSource(ctrl)
+		src1.EXPECT().Close().MinTimes(1)
+		src1.EXPECT().Get("").Return(Partial{"node": "value.1"}, nil).AnyTimes()
+		src2 := NewMockSource(ctrl)
+		src2.EXPECT().Close().MinTimes(1)
+		src2.EXPECT().Get("").Return(Partial{"node": "value.2"}, nil).AnyTimes()
+		src3 := NewMockSource(ctrl)
+		src3.EXPECT().Close().Return(expected).MinTimes(1)
+		src3.EXPECT().Get("").Return(Partial{"node": "value.3"}, nil).AnyTimes()
+		_ = sut.AddSource("src.1", 0, src1)
+		_ = sut.AddSource("src.2", 1, src2)
+		_ = sut.AddSource("src.3", 2, src3)
+
+		if e := sut.RemoveAllSources(); e == nil {
+			t.Error("didn't returned the expected error")
+		} else if e.Error() != expected.Error() {
+			t.Errorf("returned the error (%v) when was expecting (%v)", e, expected)
+		}
+	})
+
+	t.Run("remove all the sources", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+
+		src1 := NewMockSource(ctrl)
+		src1.EXPECT().Close().Times(1)
+		src1.EXPECT().Get("").Return(Partial{"node": "value.1"}, nil).AnyTimes()
+		src2 := NewMockSource(ctrl)
+		src2.EXPECT().Close().Times(1)
+		src2.EXPECT().Get("").Return(Partial{"node": "value.2"}, nil).AnyTimes()
+		src3 := NewMockSource(ctrl)
+		src3.EXPECT().Close().Times(1)
+		src3.EXPECT().Get("").Return(Partial{"node": "value.3"}, nil).AnyTimes()
+		_ = sut.AddSource("src.1", 0, src1)
+		_ = sut.AddSource("src.2", 1, src2)
+		_ = sut.AddSource("src.3", 2, src3)
+		_ = sut.RemoveAllSources()
+
+		if len(sut.sources) != 0 {
+			t.Error("didn't removed all the registered sources")
+		}
+	})
+}
+
+func Test_Config_Source(t *testing.T) {
+	t.Run("error if the source don't exists", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+
+		check, e := sut.Source("invalid id")
 		switch {
-		case !reflect.DeepEqual(v, expValue):
-			t.Errorf("didn't returned the (%v) expected value : %v", expValue, v)
+		case check != nil:
+			t.Error("returned a valid reference")
+		case e == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(e, ErrSourceNotFound):
+			t.Errorf("returned (%v) error when expecting (%v)", e, ErrSourceNotFound)
+		}
+	})
+
+	t.Run("return the registered source", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{}, nil).Times(1)
+		_ = sut.AddSource("src", 0, src)
+
+		check, e := sut.Source("src")
+		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("returned the (%v) error", e)
+		case check == nil:
+			t.Error("returned nil")
+		case !reflect.DeepEqual(check, src):
+			t.Errorf("returned (%v) when expecting (%v)", check, src)
+		}
+	})
+}
+
+func Test_Config_SourcePriority(t *testing.T) {
+	t.Run("error if the source was not found", func(t *testing.T) {
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+
+		if e := sut.SourcePriority("invalid id", 0); e == nil {
+			t.Error("didn't returned the expected error")
+		} else if !errors.Is(e, ErrSourceNotFound) {
+			t.Errorf("returned (%v) error when expecting (%v)", e, ErrSourceNotFound)
 		}
 	})
 
-	t.Run("no-op if field is not found in inner config", func(t *testing.T) {
-		data := Config{"field1": 123}
-		path := ""
-		target := struct {
-			Field1 int
-			Field2 struct{ Field3 int }
-		}{}
-		expValue := struct {
-			Field1 int
-			Field2 struct{ Field3 int }
-		}{Field1: 123}
+	t.Run("update the priority of the source", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-		v, e := data.Populate(path, target)
-		switch {
-		case !reflect.DeepEqual(v, expValue):
-			t.Errorf("didn't returned the (%v) expected value : %v", expValue, v)
-		case e != nil:
-			t.Errorf("returned the unexpected (%v) error", e)
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src1 := NewMockSource(ctrl)
+		src1.EXPECT().Close().Times(1)
+		src1.EXPECT().Get("").Return(Partial{"node": "value.1"}, nil).AnyTimes()
+		src2 := NewMockSource(ctrl)
+		src2.EXPECT().Close().Times(1)
+		src2.EXPECT().Get("").Return(Partial{"node": "value.2"}, nil).AnyTimes()
+		_ = sut.AddSource("src.1", 1, src1)
+		_ = sut.AddSource("src.2", 2, src2)
+
+		if check, _ := sut.Get("node"); check != "value.2" {
+			t.Errorf("returned the (%v) value prior the change, when expecting (value.2)", check)
+		}
+		if e := sut.SourcePriority("src.2", 0); e != nil {
+			t.Errorf("returned the unexpeced error : (%v)", e)
+		}
+		if check, _ := sut.Get("node"); check != "value.1" {
+			t.Errorf("returned the (%v) value after the change, when expecting (value.1)", check)
 		}
 	})
+}
 
-	t.Run("populate scalar values", func(t *testing.T) {
+func Test_Config_HasObserver(t *testing.T) {
+	t.Run("check the existence of a observer", func(t *testing.T) {
 		scenarios := []struct {
-			data     Config
-			path     string
-			target   interface{}
-			expValue interface{}
+			observers []string
+			search    string
+			exp       bool
 		}{
-			{ // populate an integer
-				data:     Config{"field1": 123, "field2": 456},
-				path:     "field2",
-				target:   0,
-				expValue: 456,
+			{ // Search a non-existing path in an empty list of observers
+				observers: []string{},
+				search:    "node1",
+				exp:       false,
 			},
-			{ // populate an integer from inner field
-				data:     Config{"field1": 123, "field2": Config{"field1": 123, "field2": 456}},
-				path:     "field2.field2",
-				target:   0,
-				expValue: 456,
+			{ // Search a non-existing path in a non-empty list of observers
+				observers: []string{"node1", "node2"},
+				search:    "node3",
+				exp:       false,
 			},
-			{ // populate a string from inner field
-				data:     Config{"field1": 123, "field2": Config{"field1": 123, "field2": "test string"}},
-				path:     "field2.field2",
-				target:   "",
-				expValue: "test string",
+			{ // Search an existing path in a list of observers
+				observers: []string{"node1", "node2", "node3"},
+				search:    "node2",
+				exp:       true,
 			},
 		}
 
 		for _, scenario := range scenarios {
-			v, e := scenario.data.Populate(scenario.path, scenario.target)
-			switch {
-			case !reflect.DeepEqual(v, scenario.expValue):
-				t.Errorf("didn't returned the (%v) expected value : %v", scenario.expValue, v)
-			case e != nil:
-				t.Errorf("returned the unexpected (%v) error", e)
+			test := func() {
+				ctrl := gomock.NewController(t)
+				defer ctrl.Finish()
+
+				ObserveFrequency = 0
+				sut := NewConfig()
+				defer func() { _ = sut.Close() }()
+				src := NewMockSource(ctrl)
+				src.EXPECT().Close().Times(1)
+				src.EXPECT().Get("").Return(Partial{"node1": "value1", "node2": "value2", "node3": "value3"}, nil).Times(1)
+				_ = sut.AddSource("config", 0, src)
+
+				for _, observer := range scenario.observers {
+					_ = sut.AddObserver(observer, func(old, new interface{}) {})
+				}
+
+				if check := sut.HasObserver(scenario.search); check != scenario.exp {
+					t.Errorf("returned (%v) when expecting (%v)", check, scenario.exp)
+				}
 			}
+			test()
+		}
+	})
+}
+
+func Test_Config_AddObserver(t *testing.T) {
+	t.Run("nil callback", func(t *testing.T) {
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+
+		if e := sut.AddObserver("path", nil); e == nil {
+			t.Errorf("didn't returned the expected error")
+		} else if !errors.Is(e, slate.ErrNilPointer) {
+			t.Errorf("returned (%v) error when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
-	t.Run("populate structure references", func(t *testing.T) {
-		scenarios := []struct {
-			data     Config
-			path     string
-			target   interface{}
-			expValue interface{}
-		}{
-			{ // populate a single exposed field structure
-				data:     Config{"field1": 123, "field2": 456},
-				path:     "",
-				target:   struct{ field1, Field2 int }{},
-				expValue: struct{ field1, Field2 int }{field1: 0, Field2: 456},
-			},
-			{ // populate a single exposed field structure from inner field
-				data:     Config{"field1": 123, "field2": Config{"field1": 123, "field2": 456}},
-				path:     "field2",
-				target:   struct{ field1, Field2 int }{},
-				expValue: struct{ field1, Field2 int }{field1: 0, Field2: 456},
-			},
-			{ // populate a multiple exposed field structure
-				data:     Config{"field1": 123, "field2": 456},
-				path:     "",
-				target:   struct{ Field1, Field2 int }{},
-				expValue: struct{ Field1, Field2 int }{Field1: 123, Field2: 456},
-			},
-			{ // populate a multiple exposed field structure from inner field
-				data:     Config{"field1": 123, "field2": Config{"field1": 123, "field2": 456}},
-				path:     "Field2",
-				target:   struct{ Field1, Field2 int }{},
-				expValue: struct{ Field1, Field2 int }{Field1: 123, Field2: 456},
-			},
-			{ // populate a multiple level structure
-				data: Config{"field1": 123, "field2": Config{"field1": 123, "field2": 456}},
-				path: "",
-				target: struct {
-					Field1 int
-					Field2 struct{ Field1, Field2 int }
-				}{},
-				expValue: struct {
-					Field1 int
-					Field2 struct{ Field1, Field2 int }
-				}{Field1: 123, Field2: struct{ Field1, Field2 int }{Field1: 123, Field2: 456}},
-			},
-		}
+	t.Run("error if path not present", func(t *testing.T) {
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
 
-		for _, scenario := range scenarios {
-			v, e := scenario.data.Populate(scenario.path, scenario.target)
-			switch {
-			case !reflect.DeepEqual(v, scenario.expValue):
-				t.Errorf("didn't returned the (%v) expected value : %v", v, scenario.expValue)
-			case e != nil:
-				t.Errorf("returned the unexpected (%v) error", e)
-			}
+		if e := sut.AddObserver("path", func(interface{}, interface{}) {}); e == nil {
+			t.Errorf("didn't returned the expected error")
+		} else if !errors.Is(e, ErrPathNotFound) {
+			t.Errorf("returned (%v) error when expecting (%v)", e, ErrPathNotFound)
 		}
 	})
 
-	t.Run("populate structure pointers", func(t *testing.T) {
-		scenarios := []struct {
-			data     Config
-			path     string
-			target   interface{}
-			expValue interface{}
-		}{
-			{ // populate a single exposed field structure
-				data:     Config{"field1": 123, "field2": 456},
-				path:     "",
-				target:   &struct{ field1, Field2 int }{},
-				expValue: struct{ field1, Field2 int }{field1: 0, Field2: 456},
-			},
-			{ // no-op if field is not in config
-				data:     Config{"field1": 123, "field2": 456},
-				path:     "",
-				target:   &struct{ field1, Field2, Field3 int }{Field3: 789},
-				expValue: struct{ field1, Field2, Field3 int }{field1: 0, Field2: 456, Field3: 789},
-			},
-			{ // populate a single exposed field structure from inner field
-				data:     Config{"field1": 123, "field2": Config{"field1": 123, "field2": 456}},
-				path:     "field2",
-				target:   &struct{ field1, Field2 int }{},
-				expValue: struct{ field1, Field2 int }{field1: 0, Field2: 456},
-			},
-			{ // populate a multiple exposed field structure
-				data:     Config{"field1": 123, "field2": 456},
-				path:     "",
-				target:   &struct{ Field1, Field2 int }{},
-				expValue: struct{ Field1, Field2 int }{Field1: 123, Field2: 456},
-			},
-			{ // populate a multiple exposed field structure from inner field
-				data:     Config{"field1": 123, "field2": Config{"field1": 123, "field2": 456}},
-				path:     "Field2",
-				target:   &struct{ Field1, Field2 int }{},
-				expValue: struct{ Field1, Field2 int }{Field1: 123, Field2: 456},
-			},
-			{ // populate a multiple level structure
-				data: Config{"field1": 123, "field2": Config{"field1": 123, "field2": 456}},
-				path: "",
-				target: &struct {
-					Field1 int
-					Field2 struct{ Field1, Field2 int }
-				}{},
-				expValue: struct {
-					Field1 int
-					Field2 struct{ Field1, Field2 int }
-				}{Field1: 123, Field2: struct{ Field1, Field2 int }{Field1: 123, Field2: 456}},
-			},
-		}
+	t.Run("valid callback", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-		for _, scenario := range scenarios {
-			v, e := scenario.data.Populate(scenario.path, scenario.target)
-			switch {
-			case !reflect.DeepEqual(v, scenario.expValue):
-				t.Errorf("didn't returned the (%v) expected value : %v", scenario.expValue, v)
-			case e != nil:
-				t.Errorf("returned the unexpected (%v) error", e)
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{"path": "value"}, nil).Times(1)
+		_ = sut.AddSource("config", 0, src)
+
+		if e := sut.AddObserver("path", func(interface{}, interface{}) {}); e != nil {
+			t.Errorf("returned the unexpected error, %v", e)
+		} else if len(sut.observers) != 1 {
+			t.Error("didn't stored the requested observer")
+		}
+	})
+}
+
+func Test_Config_RemoveObserver(t *testing.T) {
+	t.Run("remove a registered observer", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ObserveFrequency = 60
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+
+		src := NewMockSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{"node": Partial{"1": "value1", "2": "value2", "3": "value3"}}, nil).Times(1)
+		_ = sut.AddSource("config", 0, src)
+
+		_ = sut.AddObserver("node.1", func(old, new interface{}) {})
+		_ = sut.AddObserver("node.2", func(old, new interface{}) {})
+		_ = sut.AddObserver("node.3", func(old, new interface{}) {})
+		sut.RemoveObserver("node.2")
+
+		if sut.HasObserver("node.2") {
+			t.Errorf("didn't removed the observer")
+		}
+	})
+}
+
+func Test_Config(t *testing.T) {
+	t.Run("reload on observable sources", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ObserveFrequency = 2
+		sut := NewConfig()
+		defer func() { _ = sut.Close() }()
+
+		src := NewMockObsSource(ctrl)
+		src.EXPECT().Close().Times(1)
+		src.EXPECT().Get("").Return(Partial{"node": "value"}, nil).Times(1)
+		src.EXPECT().Reload().Return(false, nil).MinTimes(1)
+		_ = sut.AddSource("src", 0, src)
+
+		time.Sleep(100 * time.Millisecond)
+	})
+
+	t.Run("rebuild if the observable source notify changes", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		ObserveFrequency = 20
+		sut := NewConfig()
+
+		src := NewMockObsSource(ctrl)
+		src.EXPECT().Get("").Return(Partial{"node": "value"}, nil).MinTimes(2)
+		src.EXPECT().Reload().Return(true, nil).MinTimes(1)
+		_ = sut.AddSource("src", 0, src)
+
+		time.Sleep(200 * time.Millisecond)
+
+		if check, _ := sut.Get("node"); check != "value" {
+			t.Errorf("returned (%v) when expecting (value)", check)
+		}
+	})
+
+	t.Run("should call observer callback function on partial changes", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		check := false
+		ObserveFrequency = 20
+		sut := NewConfig()
+
+		src1 := NewMockSource(ctrl)
+		src1.EXPECT().Get("").Return(Partial{"node": "value1"}, nil).AnyTimes()
+		_ = sut.AddSource("src1", 0, src1)
+
+		_ = sut.AddObserver("node", func(old, new interface{}) {
+			check = true
+
+			if old != "value1" {
+				t.Errorf("callback called with (%v) as old value", old)
 			}
+			if new != "value2" {
+				t.Errorf("callback called with (%v) as new value", new)
+			}
+		})
+
+		src2 := NewMockSource(ctrl)
+		src2.EXPECT().Get("").Return(Partial{"node": "value2"}, nil).AnyTimes()
+		_ = sut.AddSource("src2", 1, src2)
+
+		if !check {
+			t.Errorf("didn't actually called the callback")
+		} else if check := sut.observers[0].current; check != "value2" {
+			t.Errorf("stored the current value {%v} instead of the expected {%v}", check, "value2")
+		}
+	})
+
+	t.Run("should call observer callback function on partial changes on a list", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		check := false
+		ObserveFrequency = 20
+		sut := NewConfig()
+		initial := []interface{}{Partial{"sub_node": "value1"}}
+		expected := []interface{}{Partial{"sub_node": "value2"}}
+
+		src1 := NewMockSource(ctrl)
+		src1.EXPECT().Get("").Return(Partial{"node": initial}, nil).AnyTimes()
+		_ = sut.AddSource("src1", 0, src1)
+
+		_ = sut.AddObserver("node", func(old, new interface{}) {
+			check = true
+
+			if old.([]interface{})[0].(Partial)["sub_node"] != initial[0].(Partial)["sub_node"] {
+				t.Errorf("callback called with (%v) as old value", old)
+			}
+			if new.([]interface{})[0].(Partial)["sub_node"] != expected[0].(Partial)["sub_node"] {
+				t.Errorf("callback called with (%v) as new value", new)
+			}
+		})
+
+		src2 := NewMockSource(ctrl)
+		src2.EXPECT().Get("").Return(Partial{"node": expected}, nil).AnyTimes()
+		_ = sut.AddSource("src2", 1, src2)
+
+		if !check {
+			t.Errorf("didn't actually called the callback")
+		} else if check := sut.observers[0].current; check.([]interface{})[0].(Partial)["sub_node"] != expected[0].(Partial)["sub_node"] {
+			t.Errorf("stored the current value {%v} instead of the expected {%v}", check, expected)
+		}
+	})
+
+	t.Run("should call observer callback function on partial changes on a partial", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		check := false
+		ObserveFrequency = 20
+		sut := NewConfig()
+		initial := Partial{"sub_node": "value1"}
+		expected := Partial{"sub_node": "value2"}
+
+		src1 := NewMockSource(ctrl)
+		src1.EXPECT().Get("").Return(Partial{"node": initial}, nil).AnyTimes()
+		_ = sut.AddSource("src1", 0, src1)
+
+		_ = sut.AddObserver("node", func(old, new interface{}) {
+			check = true
+
+			if reflect.DeepEqual(old, initial) {
+				t.Errorf("callback called with (%v) as old value", old)
+			}
+			if reflect.DeepEqual(old, expected) {
+				t.Errorf("callback called with (%v) as new value", new)
+			}
+		})
+
+		src2 := NewMockSource(ctrl)
+		src2.EXPECT().Get("").Return(Partial{"node": expected}, nil).AnyTimes()
+		_ = sut.AddSource("src2", 1, src2)
+
+		if !check {
+			t.Errorf("didn't actually called the callback")
+		} else if check := sut.observers[0].current; check.(Partial)["sub_node"] != expected["sub_node"] {
+			t.Errorf("stored the current value {%v} instead of the expected {%v}", check, expected)
 		}
 	})
 }

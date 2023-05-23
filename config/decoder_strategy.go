@@ -2,14 +2,14 @@ package config
 
 const (
 	// UnknownDecoderFormat defines the value to be used to
-	// declare an unknown config source format.
+	// declare an unknown partial source format.
 	UnknownDecoderFormat = "unknown"
 )
 
-// IDecoderStrategy interface defines the methods of the decoder
+// DecoderStrategy interface defines the methods of the decoder
 // factory strategy that can validate creation requests and instantiation
 // of a particular decoder.
-type IDecoderStrategy interface {
+type DecoderStrategy interface {
 	Accept(format string) bool
-	Create(args ...interface{}) (IDecoder, error)
+	Create(args ...interface{}) (Decoder, error)
 }

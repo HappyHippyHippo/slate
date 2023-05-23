@@ -30,10 +30,10 @@ func Test_NewSource(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 
-		cfg := NewMockConfig(ctrl)
-		cfg.EXPECT().Config("", config.Config{}).Return(nil, expected).Times(1)
+		source := NewMockSource(ctrl)
+		source.EXPECT().Get("", config.Partial{}).Return(nil, expected).Times(1)
 
-		sut, e := NewSource([]config.IConfig{cfg})
+		sut, e := NewSource([]config.Source{source})
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -48,18 +48,18 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := config.Config{"id": "value"}
-		cfg := NewMockConfig(ctrl)
-		cfg.EXPECT().Config("", config.Config{}).Return(&expected, nil).Times(1)
+		expected := config.Partial{"id": "value"}
+		source := NewMockSource(ctrl)
+		source.EXPECT().Get("", config.Partial{}).Return(expected, nil).Times(1)
 
-		sut, e := NewSource([]config.IConfig{cfg})
+		sut, e := NewSource([]config.Source{source})
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e : %v", e)
 		case sut == nil:
 			t.Error("didn't returned the expected valid reference")
-		case !reflect.DeepEqual(sut.Config, expected):
-			t.Errorf("returned the (%v) config when expecting (%v)", sut.Config, expected)
+		case !reflect.DeepEqual(sut.Partial, expected):
+			t.Errorf("returned the (%v) config when expecting (%v)", sut.Partial, expected)
 		}
 	})
 
@@ -67,20 +67,20 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := config.Config{"id 1": "value 1", "id 2": "value 2"}
-		cfg1 := NewMockConfig(ctrl)
-		cfg1.EXPECT().Config("", config.Config{}).Return(&config.Config{"id 1": "value 1"}, nil).Times(1)
-		cfg2 := NewMockConfig(ctrl)
-		cfg2.EXPECT().Config("", config.Config{}).Return(&config.Config{"id 2": "value 2"}, nil).Times(1)
+		expected := config.Partial{"id 1": "value 1", "id 2": "value 2"}
+		source1 := NewMockSource(ctrl)
+		source1.EXPECT().Get("", config.Partial{}).Return(config.Partial{"id 1": "value 1"}, nil).Times(1)
+		source2 := NewMockSource(ctrl)
+		source2.EXPECT().Get("", config.Partial{}).Return(config.Partial{"id 2": "value 2"}, nil).Times(1)
 
-		sut, e := NewSource([]config.IConfig{cfg1, cfg2})
+		sut, e := NewSource([]config.Source{source1, source2})
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e : %v", e)
 		case sut == nil:
 			t.Error("didn't returned the expected valid reference")
-		case !reflect.DeepEqual(sut.Config, expected):
-			t.Errorf("returned the (%v) config when expecting (%v)", sut.Config, expected)
+		case !reflect.DeepEqual(sut.Partial, expected):
+			t.Errorf("returned the (%v) config when expecting (%v)", sut.Partial, expected)
 		}
 	})
 }

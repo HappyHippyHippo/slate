@@ -1,18 +1,11 @@
 package config
 
-// ILoader defines the interface of a config loader instance.
-type ILoader interface {
-	Load() error
-}
-
 // Loader defines an object responsible to initialize a
 // configuration manager.
 type Loader struct {
-	manager       IManager
-	sourceFactory ISourceFactory
+	config        *Config
+	sourceFactory *SourceFactory
 }
-
-var _ ILoader = &Loader{}
 
 type sourceConfig struct {
 	Priority int
@@ -20,52 +13,48 @@ type sourceConfig struct {
 
 // NewLoader instantiate a new configuration loader instance.
 func NewLoader(
-	manager IManager,
-	sourceFactory ISourceFactory,
+	config *Config,
+	sourceFactory *SourceFactory,
 ) (*Loader, error) {
 	// check manager argument reference
-	if manager == nil {
-		return nil, errNilPointer("manager")
+	if config == nil {
+		return nil, errNilPointer("config")
 	}
 	// check source factory argument reference
 	if sourceFactory == nil {
 		return nil, errNilPointer("sourceFactory")
 	}
-	// instantiate the config loader
+	// instantiate the loader
 	return &Loader{
-		manager:       manager,
+		config:        config,
 		sourceFactory: sourceFactory,
 	}, nil
 }
 
-// Load loads the configuration from a base config file defined by a
+// Load loads the configuration from a base partial file defined by a
 // path and format.
 func (l Loader) Load() error {
-	// retrieve the loader entry file config content
-	sc := &Config{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}
-	src, e := l.sourceFactory.Create(sc)
+	// retrieve the loader entry file partial content
+	src, e := l.sourceFactory.Create(&Partial{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat})
 	if e != nil {
 		return e
 	}
 	// add the loaded entry file content into the manager
-	if e := l.manager.AddSource(LoaderSourceID, 0, src); e != nil {
+	if e := l.config.AddSource(LoaderSourceID, 0, src); e != nil {
 		return e
 	}
-	// retrieve from the loaded info the config entries list
-	sources, e := l.manager.Config(LoaderSourceListPath)
+	// retrieve from the loaded info the partial entries list
+	sources, e := l.config.Partial(LoaderSourceListPath)
 	if e != nil {
 		return nil
 	}
 	// iterate through the sources list
 	for _, id := range sources.Entries() {
 		// retrieve the source list entry
-		if entry, e := sources.Get(id); e == nil {
-			// check if the entry is a valid config
-			if cfg, ok := entry.(Config); ok {
-				// load the source
-				if e := l.loadSource(id, &cfg); e != nil {
-					return e
-				}
+		if partial, e := sources.Partial(id); e == nil {
+			// load the source
+			if e := l.loadSource(id, partial); e != nil {
+				return e
 			}
 		}
 	}
@@ -74,19 +63,19 @@ func (l Loader) Load() error {
 
 func (l Loader) loadSource(
 	id string,
-	cfg IConfig,
+	partial *Partial,
 ) error {
 	// parse the configuration
 	sc := sourceConfig{}
-	_, e := cfg.Populate("", &sc)
+	_, e := partial.Populate("", &sc)
 	if e != nil {
 		return e
 	}
-	// create the config source
-	src, e := l.sourceFactory.Create(cfg)
+	// create the partial source
+	src, e := l.sourceFactory.Create(partial)
 	if e != nil {
 		return e
 	}
 	// add the loaded source to the manager
-	return l.manager.AddSource(id, sc.Priority, src)
+	return l.config.AddSource(id, sc.Priority, src)
 }

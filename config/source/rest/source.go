@@ -20,15 +20,15 @@ type httpClient interface {
 // Source defines a config source that read a REST service and
 // store a section of the response as the stored config.
 type Source struct {
-	source.BaseSource
+	source.Source
 	client         httpClient
 	uri            string
 	format         string
-	decoderFactory config.IDecoderFactory
+	decoderFactory *config.DecoderFactory
 	configPath     string
 }
 
-var _ config.ISource = &Source{}
+var _ config.Source = &Source{}
 
 // NewSource will instantiate a new configuration source
 // that will read a REST endpoint for configuration info.
@@ -36,7 +36,7 @@ func NewSource(
 	client httpClient,
 	uri,
 	format string,
-	decoderFactory config.IDecoderFactory,
+	decoderFactory *config.DecoderFactory,
 	configPath string,
 ) (*Source, error) {
 	// check client argument reference
@@ -49,9 +49,9 @@ func NewSource(
 	}
 	// instantiates the config source
 	s := &Source{
-		BaseSource: source.BaseSource{
-			Mutex:  &sync.Mutex{},
-			Config: config.Config{},
+		Source: source.Source{
+			Mutex:   &sync.Mutex{},
+			Partial: config.Partial{},
 		},
 		client:         client,
 		uri:            uri,
@@ -73,7 +73,7 @@ func (s *Source) load() error {
 		return e
 	}
 	// retrieve the config information from the service response data
-	c, e := rc.Config(s.configPath)
+	c, e := rc.Partial(s.configPath)
 	if e != nil {
 		if errors.Is(e, config.ErrPathNotFound) {
 			return errConfigNotFound(s.configPath)
@@ -82,12 +82,12 @@ func (s *Source) load() error {
 	}
 	// store the retrieved config
 	s.Mutex.Lock()
-	s.Config = *c.(*config.Config)
+	s.Partial = *c
 	s.Mutex.Unlock()
 	return nil
 }
 
-func (s *Source) request() (config.IConfig, error) {
+func (s *Source) request() (*config.Partial, error) {
 	var e error
 	// create the REST service config request
 	var req *http.Request

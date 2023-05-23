@@ -14,8 +14,6 @@ func Test_NewDecoderFactory_Register(t *testing.T) {
 		sut := NewDecoderFactory()
 		if sut == nil {
 			t.Error("didn't returned the expected reference")
-		} else if _, ok := sut.(*DecoderFactory); !ok {
-			t.Error("didn't returned a valid decoder factory instance")
 		}
 	})
 }

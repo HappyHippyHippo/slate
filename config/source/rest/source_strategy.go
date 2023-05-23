@@ -24,15 +24,15 @@ type sourceConfig struct {
 // a REST service config source creation strategy.
 type SourceStrategy struct {
 	clientFactory  func() httpClient
-	decoderFactory config.IDecoderFactory
+	decoderFactory *config.DecoderFactory
 }
 
-var _ config.ISourceStrategy = &SourceStrategy{}
+var _ config.SourceStrategy = &SourceStrategy{}
 
 // NewSourceStrategy instantiates a new REST service config
 // source creation strategy.
 func NewSourceStrategy(
-	decoderFactory config.IDecoderFactory,
+	decoderFactory *config.DecoderFactory,
 ) (*SourceStrategy, error) {
 	// check the decoder factory argument reference
 	if decoderFactory == nil {
@@ -49,15 +49,15 @@ func NewSourceStrategy(
 // a source where the data to check comes from a configuration
 // instance.
 func (s SourceStrategy) Accept(
-	cfg config.IConfig,
+	partial *config.Partial,
 ) bool {
 	// check the config argument reference
-	if cfg == nil {
+	if partial == nil {
 		return false
 	}
 	// retrieve the data from the configuration
 	sc := struct{ Type string }{}
-	if _, e := cfg.Populate("", &sc); e != nil {
+	if _, e := partial.Populate("", &sc); e != nil {
 		return false
 	}
 	// return acceptance for the read config type
@@ -67,24 +67,24 @@ func (s SourceStrategy) Accept(
 // Create will instantiate the desired rest source instance where
 // the initialization data comes from a configuration instance.
 func (s SourceStrategy) Create(
-	cfg config.IConfig,
-) (config.ISource, error) {
+	partial *config.Partial,
+) (config.Source, error) {
 	// check the config argument reference
-	if cfg == nil {
-		return nil, errNilPointer("config")
+	if partial == nil {
+		return nil, errNilPointer("partial")
 	}
 	// retrieve the data from the configuration
 	sc := sourceConfig{Format: config.DefaultRestFormat}
-	_, e := cfg.Populate("", &sc)
+	_, e := partial.Populate("", &sc)
 	if e != nil {
 		return nil, e
 	}
 	// validate configuration
 	if sc.URI == "" {
-		return nil, errInvalidSource(cfg, map[string]interface{}{"description": "missing URI"})
+		return nil, errInvalidSource(partial, map[string]interface{}{"description": "missing URI"})
 	}
 	if sc.Path.Config == "" {
-		return nil, errInvalidSource(cfg, map[string]interface{}{"description": "missing response config path"})
+		return nil, errInvalidSource(partial, map[string]interface{}{"description": "missing response config path"})
 	}
 	// return acceptance for the read config type
 	return NewSource(

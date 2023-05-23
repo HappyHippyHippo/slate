@@ -86,7 +86,7 @@ func Test_Decoder_Decode(t *testing.T) {
 		sut, _ := NewDecoder(reader)
 		defer func() { _ = sut.Close() }()
 		underlyingDecoder := NewMockUnderlyingDecoder(ctrl)
-		underlyingDecoder.EXPECT().Decode(&config.Config{}).DoAndReturn(func(p *config.Config) error { return expected }).Times(1)
+		underlyingDecoder.EXPECT().Decode(&config.Partial{}).DoAndReturn(func(p *config.Partial) error { return expected }).Times(1)
 		sut.UnderlyingDecoder = underlyingDecoder
 
 		check, e := sut.Decode()
@@ -104,13 +104,13 @@ func Test_Decoder_Decode(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		data := config.Config{"node": "data"}
+		data := config.Partial{"node": "data"}
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
 		sut, _ := NewDecoder(reader)
 		defer func() { _ = sut.Close() }()
 		underlyingDecoder := NewMockUnderlyingDecoder(ctrl)
-		underlyingDecoder.EXPECT().Decode(&config.Config{}).DoAndReturn(func(p *config.Config) error {
+		underlyingDecoder.EXPECT().Decode(&config.Partial{}).DoAndReturn(func(p *config.Partial) error {
 			(*p)["node"] = data["node"]
 			return nil
 		}).Times(1)
@@ -122,14 +122,14 @@ func Test_Decoder_Decode(t *testing.T) {
 			t.Error("returned a nil data")
 		case e != nil:
 			t.Errorf("returned the unexpected (%v) error", e)
-		case !reflect.DeepEqual(*check.(*config.Config), data):
+		case !reflect.DeepEqual(*check, data):
 			t.Errorf("returned (%v)", check)
 		}
 	})
 
 	t.Run("decode yaml string", func(t *testing.T) {
 		yaml := "node:\n  sub_node: data"
-		expected := config.Config{"node": config.Config{"sub_node": "data"}}
+		expected := config.Partial{"node": config.Partial{"sub_node": "data"}}
 		reader := strings.NewReader(yaml)
 		sut, _ := NewDecoder(reader)
 		defer func() { _ = sut.Close() }()
@@ -140,8 +140,8 @@ func Test_Decoder_Decode(t *testing.T) {
 			t.Error("returned a nil data")
 		case e != nil:
 			t.Errorf("returned the unexpected (%v) error", e)
-		case !reflect.DeepEqual(*(check.(*config.Config)), expected):
-			t.Errorf("returned (%v) instead of the expected (%v)", *(check.(*config.Config)), expected)
+		case !reflect.DeepEqual(*check, expected):
+			t.Errorf("returned (%v) instead of the expected (%v)", *check, expected)
 		}
 	})
 }

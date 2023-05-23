@@ -65,7 +65,7 @@ func Test_Application_Provide(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		sut := NewApplication()
 		provider := NewMockProvider(ctrl)
-		provider.EXPECT().Register(sut).Return(expected).Times(1)
+		provider.EXPECT().Register(&sut.Container).Return(expected).Times(1)
 
 		e := sut.Provide(provider)
 		switch {
@@ -84,7 +84,7 @@ func Test_Application_Provide(t *testing.T) {
 
 		sut := NewApplication()
 		provider := NewMockProvider(ctrl)
-		provider.EXPECT().Register(sut).Return(nil).Times(1)
+		provider.EXPECT().Register(&sut.Container).Return(nil).Times(1)
 
 		if e := sut.Provide(provider); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -102,8 +102,8 @@ func Test_Application_Boot(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		sut := NewApplication()
 		provider := NewMockProvider(ctrl)
-		provider.EXPECT().Register(sut).Return(nil).Times(1)
-		provider.EXPECT().Boot(sut).DoAndReturn(func(IContainer) error { panic(expected) }).Times(1)
+		provider.EXPECT().Register(&sut.Container).Return(nil).Times(1)
+		provider.EXPECT().Boot(&sut.Container).DoAndReturn(func(*Container) error { panic(expected) }).Times(1)
 		_ = sut.Provide(provider)
 
 		if e := sut.Boot(); e == nil {
@@ -120,8 +120,8 @@ func Test_Application_Boot(t *testing.T) {
 		expected := "error message"
 		sut := NewApplication()
 		provider := NewMockProvider(ctrl)
-		provider.EXPECT().Register(sut).Return(nil).Times(1)
-		provider.EXPECT().Boot(sut).DoAndReturn(func(IContainer) error { panic(expected) }).Times(1)
+		provider.EXPECT().Register(&sut.Container).Return(nil).Times(1)
+		provider.EXPECT().Boot(&sut.Container).DoAndReturn(func(*Container) error { panic(expected) }).Times(1)
 		_ = sut.Provide(provider)
 
 		defer assertPanic(t, expected)
@@ -135,8 +135,8 @@ func Test_Application_Boot(t *testing.T) {
 		expected := "error message"
 		sut := NewApplication()
 		provider := NewMockProvider(ctrl)
-		provider.EXPECT().Register(sut).Return(nil).Times(1)
-		provider.EXPECT().Boot(sut).Return(fmt.Errorf("%s", expected)).Times(1)
+		provider.EXPECT().Register(&sut.Container).Return(nil).Times(1)
+		provider.EXPECT().Boot(&sut.Container).Return(fmt.Errorf("%s", expected)).Times(1)
 		_ = sut.Provide(provider)
 
 		if e := sut.Boot(); e == nil {
@@ -152,8 +152,8 @@ func Test_Application_Boot(t *testing.T) {
 
 		sut := NewApplication()
 		provider := NewMockProvider(ctrl)
-		provider.EXPECT().Register(sut).Times(1)
-		provider.EXPECT().Boot(sut).Times(1)
+		provider.EXPECT().Register(&sut.Container).Times(1)
+		provider.EXPECT().Boot(&sut.Container).Times(1)
 		_ = sut.Provide(provider)
 		_ = sut.Boot()
 		_ = sut.Boot()

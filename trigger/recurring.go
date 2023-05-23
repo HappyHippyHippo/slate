@@ -13,13 +13,11 @@ type Recurring struct {
 	doneChannel chan struct{}
 }
 
-var _ ITrigger = &Recurring{}
-
 // NewRecurring instantiate a new trigger that will execute a
 // callback method recurrently with a defined periodicity.
 func NewRecurring(
 	delay time.Duration,
-	callback ICallback,
+	callback Callback,
 ) (*Recurring, error) {
 	if callback == nil {
 		return nil, errNilPointer("callback")

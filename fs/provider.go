@@ -16,11 +16,11 @@ const (
 // adapter service.
 type Provider struct{}
 
-var _ slate.IProvider = &Provider{}
+var _ slate.Provider = &Provider{}
 
 // Register will add to the application container the module services.
 func (Provider) Register(
-	container slate.IContainer,
+	container *slate.Container,
 ) error {
 	if container == nil {
 		return errNilPointer("container")
@@ -30,7 +30,7 @@ func (Provider) Register(
 
 // Boot (no-op).
 func (Provider) Boot(
-	container slate.IContainer,
+	container *slate.Container,
 ) error {
 	if container == nil {
 		return errNilPointer("container")

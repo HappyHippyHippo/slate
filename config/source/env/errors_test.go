@@ -19,7 +19,7 @@ func Test_errNilPointer(t *testing.T) {
 			t.Errorf("error not a instance of slate.ErrNilPointer")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(slate.IError); !ok {
+		} else if te, ok := e.(*slate.Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if te.Context() != nil {
 			t.Errorf("didn't stored a nil value context")
@@ -31,7 +31,7 @@ func Test_errNilPointer(t *testing.T) {
 			t.Errorf("error not a instance of slate.ErrNilPointer")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(slate.IError); !ok {
+		} else if te, ok := e.(*slate.Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
 			t.Errorf("context (%v) not same as expected (%v)", check, context)
@@ -50,7 +50,7 @@ func Test_errConversion(t *testing.T) {
 			t.Errorf("error not a instance of slate.ErrConversion")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(slate.IError); !ok {
+		} else if te, ok := e.(*slate.Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if te.Context() != nil {
 			t.Errorf("didn't stored a nil value context")
@@ -62,7 +62,7 @@ func Test_errConversion(t *testing.T) {
 			t.Errorf("error not a instance of slate.ErrConversion")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(slate.IError); !ok {
+		} else if te, ok := e.(*slate.Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
 			t.Errorf("context (%v) not same as expected (%v)", check, context)
@@ -71,7 +71,7 @@ func Test_errConversion(t *testing.T) {
 }
 
 func Test_errInvalidSource(t *testing.T) {
-	arg := &config.Config{"field": "value"}
+	arg := &config.Partial{"field": "value"}
 	context := map[string]interface{}{"field": "value"}
 	message := "&map[field:value] : invalid config source"
 
@@ -80,7 +80,7 @@ func Test_errInvalidSource(t *testing.T) {
 			t.Errorf("error not a instance of config.ErrInvalidSource")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(slate.IError); !ok {
+		} else if te, ok := e.(*slate.Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if te.Context() != nil {
 			t.Errorf("didn't stored a nil value context")
@@ -92,7 +92,7 @@ func Test_errInvalidSource(t *testing.T) {
 			t.Errorf("error not a instance of config.ErrInvalidSource")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(slate.IError); !ok {
+		} else if te, ok := e.(*slate.Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
 			t.Errorf("context (%v) not same as expected (%v)", check, context)

@@ -11,11 +11,8 @@ import (
 
 func Test_NewSourceFactory_Register(t *testing.T) {
 	t.Run("creation", func(t *testing.T) {
-		sut := NewSourceFactory()
-		if sut == nil {
+		if NewSourceFactory() == nil {
 			t.Error("didn't returned the expected reference")
-		} else if _, ok := sut.(*SourceFactory); !ok {
-			t.Error("didn't returned a valid source factory instance")
 		}
 	})
 }
@@ -45,7 +42,7 @@ func Test_SourceFactory_Register(t *testing.T) {
 }
 
 func Test_SourceFactory_Create(t *testing.T) {
-	t.Run("nil config", func(t *testing.T) {
+	t.Run("nil partial", func(t *testing.T) {
 		sut := &SourceFactory{}
 		src, e := sut.Create(nil)
 		switch {
@@ -65,13 +62,13 @@ func Test_SourceFactory_Create(t *testing.T) {
 		sourceType := "type"
 		path := "path"
 		format := "format"
-		config := &Config{"type": sourceType, "path": path, "format": format}
+		partial := &Partial{"type": sourceType, "path": path, "format": format}
 		strategy := NewMockSourceStrategy(ctrl)
-		strategy.EXPECT().Accept(config).Return(false).Times(1)
+		strategy.EXPECT().Accept(partial).Return(false).Times(1)
 		sut := &SourceFactory{}
 		_ = sut.Register(strategy)
 
-		src, e := sut.Create(config)
+		src, e := sut.Create(partial)
 		switch {
 		case src != nil:
 			t.Error("returned an unexpected source")
@@ -82,22 +79,22 @@ func Test_SourceFactory_Create(t *testing.T) {
 		}
 	})
 
-	t.Run("create the requested config source", func(t *testing.T) {
+	t.Run("create the requested partial source", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		sourceType := "type"
 		path := "path"
 		format := "format"
-		config := &Config{"type": sourceType, "path": path, "format": format}
+		partial := &Partial{"type": sourceType, "path": path, "format": format}
 		src := NewMockSource(ctrl)
 		strategy := NewMockSourceStrategy(ctrl)
-		strategy.EXPECT().Accept(config).Return(true).Times(1)
-		strategy.EXPECT().Create(config).Return(src, nil).Times(1)
+		strategy.EXPECT().Accept(partial).Return(true).Times(1)
+		strategy.EXPECT().Create(partial).Return(src, nil).Times(1)
 		sut := &SourceFactory{}
 		_ = sut.Register(strategy)
 
-		if check, e := sut.Create(config); e != nil {
+		if check, e := sut.Create(partial); e != nil {
 			t.Errorf("returned the (%v) error", e)
 		} else if !reflect.DeepEqual(check, src) {
 			t.Error("didn't returned the created source")

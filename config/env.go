@@ -23,20 +23,20 @@ var (
 	// a config path string into path elements.
 	PathSeparator = env.String(EnvID+"_PATH_SEPARATOR", ".")
 
-	// LoaderActive defines if the config loader should be executed
+	// LoaderActive defines if the config observer should be executed
 	// while the provider boot
 	LoaderActive = env.Bool(EnvID+"_LOADER_ACTIVE", true)
 
 	// LoaderSourceID defines the id to be used as the def of the
-	// entry config source id to be used as the loader entry.
+	// entry config source id to be used as the observer entry.
 	LoaderSourceID = env.String(EnvID+"_LOADER_SOURCE_ID", "_sources")
 
 	// LoaderSourcePath defines the entry config source path
-	// to be used as the loader entry.
+	// to be used as the observer entry.
 	LoaderSourcePath = env.String(EnvID+"_LOADER_SOURCE_PATH", "config/sources.yaml")
 
 	// LoaderSourceFormat defines the entry config source format
-	// to be used as the loader entry.
+	// to be used as the observer entry.
 	LoaderSourceFormat = env.String(EnvID+"_LOADER_SOURCE_FORMAT", "yaml")
 
 	// LoaderSourceListPath defines the entry config source path of

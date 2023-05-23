@@ -13,10 +13,7 @@ import (
 
 func Test_NewSourceStrategy(t *testing.T) {
 	t.Run("nil file system adapter", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		sut, e := NewSourceStrategy(nil, NewMockDecoderFactory(ctrl))
+		sut, e := NewSourceStrategy(nil, config.NewDecoderFactory())
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -47,7 +44,7 @@ func Test_NewSourceStrategy(t *testing.T) {
 		defer ctrl.Finish()
 
 		fs := NewMockFs(ctrl)
-		decoderFactory := NewMockDecoderFactory(ctrl)
+		decoderFactory := config.NewDecoderFactory()
 
 		sut, e := NewSourceStrategy(fs, decoderFactory)
 		switch {
@@ -68,7 +65,7 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
 		if sut.Accept(nil) {
 			t.Error("returned true")
@@ -79,9 +76,9 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if sut.Accept(&config.Config{}) {
+		if sut.Accept(&config.Partial{}) {
 			t.Error("returned true")
 		}
 	})
@@ -90,9 +87,9 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if sut.Accept(&config.Config{"type": 123}) {
+		if sut.Accept(&config.Partial{"type": 123}) {
 			t.Error("returned true")
 		}
 	})
@@ -101,9 +98,9 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if sut.Accept(&config.Config{"type": config.UnknownSourceType}) {
+		if sut.Accept(&config.Partial{"type": config.UnknownSourceType}) {
 			t.Error("returned true")
 		}
 	})
@@ -112,9 +109,9 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if !sut.Accept(&config.Config{"type": Type}) {
+		if !sut.Accept(&config.Partial{"type": Type}) {
 			t.Error("returned false")
 		}
 	})
@@ -125,7 +122,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
 		src, e := sut.Create(nil)
 		switch {
@@ -142,9 +139,9 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"format": "format"})
+		src, e := sut.Create(&config.Partial{"format": "format"})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -159,9 +156,9 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"path": 123, "format": "format"})
+		src, e := sut.Create(&config.Partial{"path": 123, "format": "format"})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -176,9 +173,9 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"path": "path", "format": 123})
+		src, e := sut.Create(&config.Partial{"path": "path", "format": 123})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -196,19 +193,22 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		path := "path"
 		field := "field"
 		value := "value"
-		expected := config.Config{field: value}
+		expected := config.Partial{field: value}
 		file := NewMockFile(ctrl)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", file).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(file).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, _ := NewSourceStrategy(fs, decoderFactory)
 
-		src, e := sut.Create(&config.Config{"path": path, "format": "format"})
+		src, e := sut.Create(&config.Partial{"path": path, "format": "format"})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -234,19 +234,22 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		path := "path"
 		field := "field"
 		value := "value"
-		expected := config.Config{field: value}
+		expected := config.Partial{field: value}
 		file := NewMockFile(ctrl)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("yaml", file).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("yaml").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(file).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, _ := NewSourceStrategy(fs, decoderFactory)
 
-		src, e := sut.Create(&config.Config{"path": path})
+		src, e := sut.Create(&config.Partial{"path": path})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)

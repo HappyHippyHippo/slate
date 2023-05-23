@@ -12,14 +12,14 @@ import (
 // Source defines a config source that read a file content
 // and stores its config contents to be used as a config.
 type Source struct {
-	source.BaseSource
+	source.Source
 	path           string
 	format         string
 	fileSystem     afero.Fs
-	decoderFactory config.IDecoderFactory
+	decoderFactory *config.DecoderFactory
 }
 
-var _ config.ISource = &Source{}
+var _ config.Source = &Source{}
 
 // NewSource will instantiate a new configuration source
 // that will read a file for configuration info.
@@ -27,7 +27,7 @@ func NewSource(
 	path,
 	format string,
 	fileSystem afero.Fs,
-	decoderFactory config.IDecoderFactory,
+	decoderFactory *config.DecoderFactory,
 ) (*Source, error) {
 	// check file system argument reference
 	if fileSystem == nil {
@@ -39,9 +39,9 @@ func NewSource(
 	}
 	// instantiates the config source
 	s := &Source{
-		BaseSource: source.BaseSource{
-			Mutex:  &sync.Mutex{},
-			Config: config.Config{},
+		Source: source.Source{
+			Mutex:   &sync.Mutex{},
+			Partial: config.Partial{},
 		},
 		path:           path,
 		format:         format,
@@ -75,7 +75,7 @@ func (s *Source) load() error {
 	}
 	// store the parsed content into the source local config
 	s.Mutex.Lock()
-	s.Config = *p.(*config.Config)
+	s.Partial = *p
 	s.Mutex.Unlock()
 	return nil
 }

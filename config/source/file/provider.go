@@ -19,12 +19,12 @@ const (
 // on the application initialization to register the config service.
 type Provider struct{}
 
-var _ slate.IProvider = &Provider{}
+var _ slate.Provider = &Provider{}
 
 // Register will register the configuration section instances in the
 // application container.
 func (Provider) Register(
-	container slate.IContainer,
+	container *slate.Container,
 ) error {
 	if container == nil {
 		return errNilPointer("container")
@@ -37,7 +37,7 @@ func (Provider) Register(
 // Boot will start the configuration config instance by calling the
 // configuration loader with the defined provider base entry information.
 func (p Provider) Boot(
-	container slate.IContainer,
+	container *slate.Container,
 ) error {
 	if container == nil {
 		return errNilPointer("container")
