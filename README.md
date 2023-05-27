@@ -29,7 +29,7 @@
   - [x] trigger
   - [x] watchdog
     - [x] formatter
-      - [x] def
+      - [x] simple
 
 ### config
 

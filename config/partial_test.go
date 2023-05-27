@@ -309,7 +309,7 @@ func Test_Partial_Get(t *testing.T) {
 		}
 	})
 
-	t.Run("return the def value if a path don't exists", func(t *testing.T) {
+	t.Run("return the simple value if a path don't exists", func(t *testing.T) {
 		scenarios := []struct {
 			partial Partial
 			search  string
@@ -379,7 +379,7 @@ func Test_Partial_Bool(t *testing.T) {
 		}
 	})
 
-	t.Run("return path not found error if no def value is given", func(t *testing.T) {
+	t.Run("return path not found error if no simple value is given", func(t *testing.T) {
 		sut := Partial{}
 
 		check, e := sut.Bool("node")
@@ -393,7 +393,7 @@ func Test_Partial_Bool(t *testing.T) {
 		}
 	})
 
-	t.Run("return def value if the path don't exists", func(t *testing.T) {
+	t.Run("return simple value if the path don't exists", func(t *testing.T) {
 		sut := Partial{}
 
 		check, e := sut.Bool("node", true)
@@ -435,7 +435,7 @@ func Test_Partial_Int(t *testing.T) {
 		}
 	})
 
-	t.Run("return path not found error if no def value is given", func(t *testing.T) {
+	t.Run("return path not found error if no simple value is given", func(t *testing.T) {
 		sut := Partial{}
 
 		check, e := sut.Int("node")
@@ -449,7 +449,7 @@ func Test_Partial_Int(t *testing.T) {
 		}
 	})
 
-	t.Run("return def value if the path don't exists", func(t *testing.T) {
+	t.Run("return simple value if the path don't exists", func(t *testing.T) {
 		value := 123
 		sut := Partial{}
 
@@ -492,7 +492,7 @@ func Test_Partial_Float(t *testing.T) {
 		}
 	})
 
-	t.Run("return path not found e if no def value is given", func(t *testing.T) {
+	t.Run("return path not found e if no simple value is given", func(t *testing.T) {
 		sut := Partial{}
 
 		check, e := sut.Float("node")
@@ -506,7 +506,7 @@ func Test_Partial_Float(t *testing.T) {
 		}
 	})
 
-	t.Run("return def value if the path don't exists", func(t *testing.T) {
+	t.Run("return simple value if the path don't exists", func(t *testing.T) {
 		value := 123.456
 		sut := Partial{}
 
@@ -526,7 +526,7 @@ func Test_Partial_String(t *testing.T) {
 		value := "value"
 		sut := Partial{path: value}
 
-		if check, e := sut.String(path, "def value"); e != nil {
+		if check, e := sut.String(path, "simple value"); e != nil {
 			t.Errorf("returned the unexpected e : %v", e)
 		} else if check != value {
 			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
@@ -538,7 +538,7 @@ func Test_Partial_String(t *testing.T) {
 		value := 123
 		sut := Partial{path: value}
 
-		check, e := sut.String(path, "def value")
+		check, e := sut.String(path, "simple value")
 		switch {
 		case check != "":
 			t.Errorf("returned the unexpected value : %v", check)
@@ -549,7 +549,7 @@ func Test_Partial_String(t *testing.T) {
 		}
 	})
 
-	t.Run("return path not found e if no def value is given", func(t *testing.T) {
+	t.Run("return path not found e if no simple value is given", func(t *testing.T) {
 		sut := Partial{}
 
 		check, e := sut.String("node")
@@ -563,8 +563,8 @@ func Test_Partial_String(t *testing.T) {
 		}
 	})
 
-	t.Run("return def value if the path don't exists", func(t *testing.T) {
-		value := "def value"
+	t.Run("return simple value if the path don't exists", func(t *testing.T) {
+		value := "simple value"
 		sut := Partial{}
 
 		check, e := sut.String("node", value)
@@ -583,7 +583,7 @@ func Test_Partial_List(t *testing.T) {
 		value := []interface{}{"value"}
 		sut := Partial{path: value}
 
-		if check, e := sut.List(path, []interface{}{"def value"}); e != nil {
+		if check, e := sut.List(path, []interface{}{"simple value"}); e != nil {
 			t.Errorf("returned the unexpected e : %v", e)
 		} else if !reflect.DeepEqual(check, value) {
 			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
@@ -595,7 +595,7 @@ func Test_Partial_List(t *testing.T) {
 		value := 123
 		sut := Partial{path: value}
 
-		check, e := sut.List(path, []interface{}{"def value"})
+		check, e := sut.List(path, []interface{}{"simple value"})
 		switch {
 		case check != nil:
 			t.Errorf("returned the unexpected value : %v", check)
@@ -606,7 +606,7 @@ func Test_Partial_List(t *testing.T) {
 		}
 	})
 
-	t.Run("return path not found e if no def value is given", func(t *testing.T) {
+	t.Run("return path not found e if no simple value is given", func(t *testing.T) {
 		sut := Partial{}
 
 		check, e := sut.List("node")
@@ -620,8 +620,8 @@ func Test_Partial_List(t *testing.T) {
 		}
 	})
 
-	t.Run("return def value if the path don't exists", func(t *testing.T) {
-		value := []interface{}{"def value"}
+	t.Run("return simple value if the path don't exists", func(t *testing.T) {
+		value := []interface{}{"simple value"}
 		sut := Partial{}
 
 		check, e := sut.List("node", value)
@@ -640,7 +640,7 @@ func Test_Partial_Partial(t *testing.T) {
 		value := Partial{"id": "value"}
 		sut := Partial{path: value}
 
-		if check, e := sut.Partial(path, Partial{"id": "def value"}); e != nil {
+		if check, e := sut.Partial(path, Partial{"id": "simple value"}); e != nil {
 			t.Errorf("returned the unexpected e : %v", e)
 		} else if !reflect.DeepEqual(*check, value) {
 			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
@@ -652,7 +652,7 @@ func Test_Partial_Partial(t *testing.T) {
 		value := 123
 		sut := Partial{path: value}
 
-		check, e := sut.Partial(path, Partial{"id": "def value"})
+		check, e := sut.Partial(path, Partial{"id": "simple value"})
 		switch {
 		case check != nil:
 			t.Errorf("returned the unexpected value : %v", check)
@@ -663,7 +663,7 @@ func Test_Partial_Partial(t *testing.T) {
 		}
 	})
 
-	t.Run("return path not found e if no def value is given", func(t *testing.T) {
+	t.Run("return path not found e if no simple value is given", func(t *testing.T) {
 		sut := Partial{}
 
 		check, e := sut.Partial("node")
@@ -677,8 +677,8 @@ func Test_Partial_Partial(t *testing.T) {
 		}
 	})
 
-	t.Run("return def value if the path don't exists", func(t *testing.T) {
-		value := Partial{"id": "def value"}
+	t.Run("return simple value if the path don't exists", func(t *testing.T) {
+		value := Partial{"id": "simple value"}
 		sut := Partial{}
 
 		check, e := sut.Partial("node", value)

@@ -6,7 +6,7 @@ import (
 	"github.com/happyhippyhippo/slate/dig/internal/graph"
 )
 
-// An GetOption modifies the def behavior of Get. It's included for
+// An GetOption modifies the simple behavior of Create. It's included for
 // future functionality; currently, there are no concrete implementations.
 type GetOption interface {
 	unimplemented()

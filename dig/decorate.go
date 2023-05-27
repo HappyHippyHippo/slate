@@ -130,7 +130,7 @@ func (n *decoratorNode) ID() dot.CtorID { return n.id }
 
 func (n *decoratorNode) State() decoratorState { return n.state }
 
-// DecorateOption modifies the def behavior of Decorate.
+// DecorateOption modifies the simple behavior of Decorate.
 type DecorateOption interface {
 	apply(*decorateOptions)
 }

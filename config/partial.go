@@ -24,7 +24,7 @@ func (p *Partial) Clone() Partial {
 		// recursive partial scenario
 		case Partial:
 			return v.Clone()
-		// def scalar value
+		// simple scalar value
 		default:
 			return value
 		}
@@ -60,7 +60,7 @@ func (p *Partial) Has(
 
 // Get will retrieve the value stored in the requested path.
 // If the path does not exist, then the value nil will be returned. Or, if
-// a def value was given as the optional extra argument, then it will
+// a simple value was given as the optional extra argument, then it will
 // be returned instead of the standard nil value.
 func (p *Partial) Get(
 	path string,
@@ -72,13 +72,13 @@ func (p *Partial) Get(
 	// check for non-nil value
 	case val != nil:
 		return val, nil
-	// check if is to return de def value or not
+	// check if is to return de simple value or not
 	case e != nil:
 		if len(def) > 0 {
 			return def[0], nil
 		}
 		return nil, e
-	// def case : return nil
+	// simple case : return nil
 	default:
 		return nil, nil
 	}

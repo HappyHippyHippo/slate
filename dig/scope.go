@@ -29,7 +29,7 @@ import (
 	"time"
 )
 
-// A ScopeOption modifies the def behavior of Scope; currently,
+// A ScopeOption modifies the simple behavior of Scope; currently,
 // there are no implementations.
 type ScopeOption interface {
 	noScopeOption()

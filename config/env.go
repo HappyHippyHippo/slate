@@ -11,11 +11,11 @@ const (
 )
 
 var (
-	// DefaultFileFormat defines the file base config source def
+	// DefaultFileFormat defines the file base config source simple
 	// format if the format is not present in the config.
 	DefaultFileFormat = env.String(EnvID+"_DEFAULT_FILE_FORMAT", "yaml")
 
-	// DefaultRestFormat defines the rest base config source def
+	// DefaultRestFormat defines the rest base config source simple
 	// format if the format is not present in the config.
 	DefaultRestFormat = env.String(EnvID+"_DEFAULT_REST_FORMAT", "json")
 
@@ -27,7 +27,7 @@ var (
 	// while the provider boot
 	LoaderActive = env.Bool(EnvID+"_LOADER_ACTIVE", true)
 
-	// LoaderSourceID defines the id to be used as the def of the
+	// LoaderSourceID defines the id to be used as the simple of the
 	// entry config source id to be used as the observer entry.
 	LoaderSourceID = env.String(EnvID+"_LOADER_SOURCE_ID", "_sources")
 
@@ -43,7 +43,7 @@ var (
 	// loading sources.
 	LoaderSourceListPath = env.String(EnvID+"_LOADER_SOURCE_LIST_PATH", "slate.config.sources")
 
-	// ObserveFrequency defines the id to be used as the def of a
+	// ObserveFrequency defines the id to be used as the simple of a
 	// config observable source frequency time in seconds.
 	ObserveFrequency = env.Int(EnvID+"_OBSERVE_FREQUENCY", 0)
 )

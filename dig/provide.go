@@ -32,7 +32,7 @@ import (
 	"github.com/happyhippyhippo/slate/dig/internal/graph"
 )
 
-// A ProvideOption modifies the def behavior of Provide.
+// A ProvideOption modifies the simple behavior of Provide.
 type ProvideOption interface {
 	applyProvideOption(*provideOptions)
 }
@@ -304,7 +304,7 @@ func (o provideLocationOption) applyProvideOption(opts *provideOptions) {
 
 // Export is a ProvideOption which specifies that the provided function should
 // be made available to all Scopes available in the application, regardless
-// of which Scope it was provided from. By def, it is false.
+// of which Scope it was provided from. By simple, it is false.
 //
 // For example,
 //

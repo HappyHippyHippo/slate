@@ -9,6 +9,5 @@ import (
 // usable configuration Partial instance.
 type Decoder interface {
 	io.Closer
-
 	Decode() (*Partial, error)
 }

@@ -36,7 +36,7 @@ func (m *MockSource) Get(path string, def ...interface{}) (interface{}, error) {
 	for _, a := range def {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "Get", varargs...)
+	ret := m.ctrl.Call(m, "Create", varargs...)
 	ret0, _ := ret[0].(interface{})
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -46,7 +46,7 @@ func (m *MockSource) Get(path string, def ...interface{}) (interface{}, error) {
 func (mr *MockSourceRecorder) Get(path interface{}, def ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{path}, def...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockSource)(nil).Get), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockSource)(nil).Get), varargs...)
 }
 
 // Has mocks base method.

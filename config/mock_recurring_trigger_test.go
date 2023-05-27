@@ -13,7 +13,7 @@ type MockRecurringTrigger struct {
 	recorder *MockRecurringTriggerRecorder
 }
 
-var _ ticker = &MockRecurringTrigger{}
+var _ configTicker = &MockRecurringTrigger{}
 
 // MockRecurringTriggerRecorder is the mock recorder for MockRecurringTrigger.
 type MockRecurringTriggerRecorder struct {

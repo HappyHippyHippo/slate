@@ -45,11 +45,11 @@ func (a *Application) Boot() (e error) {
 	// boot panic fallback
 	defer func() {
 		if r := recover(); r != nil {
-			if tr, ok := r.(error); !ok {
+			tr, ok := r.(error)
+			if !ok {
 				panic(r)
-			} else {
-				e = tr
 			}
+			e = tr
 		}
 	}()
 	// check if the application has already been booted

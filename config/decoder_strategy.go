@@ -1,9 +1,9 @@
 package config
 
 const (
-	// UnknownDecoderFormat defines the value to be used to
+	// UnknownDecoder defines the value to be used to
 	// declare an unknown partial source format.
-	UnknownDecoderFormat = "unknown"
+	UnknownDecoder = "unknown"
 )
 
 // DecoderStrategy interface defines the methods of the decoder

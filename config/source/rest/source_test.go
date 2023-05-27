@@ -21,7 +21,7 @@ func Test_NewSource(t *testing.T) {
 
 		decoderFactory := config.NewDecoderFactory()
 
-		sut, e := NewSource(nil, "uri", config.UnknownDecoderFormat, decoderFactory, "path")
+		sut, e := NewSource(nil, "uri", config.UnknownDecoder, decoderFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -38,7 +38,7 @@ func Test_NewSource(t *testing.T) {
 
 		client := NewMockHTTPClient(ctrl)
 
-		sut, e := NewSource(client, "uri", config.UnknownDecoderFormat, nil, "path")
+		sut, e := NewSource(client, "uri", config.UnknownDecoder, nil, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -57,7 +57,7 @@ func Test_NewSource(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		decoderFactory := config.NewDecoderFactory()
 
-		sut, e := NewSource(client, "\n", config.UnknownDecoderFormat, decoderFactory, "path")
+		sut, e := NewSource(client, "\n", config.UnknownDecoder, decoderFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -77,7 +77,7 @@ func Test_NewSource(t *testing.T) {
 		client.EXPECT().Do(gomock.Any()).Return(nil, expected).Times(1)
 		decoderFactory := config.NewDecoderFactory()
 
-		sut, e := NewSource(client, "uri", config.UnknownDecoderFormat, decoderFactory, "path")
+		sut, e := NewSource(client, "uri", config.UnknownDecoder, decoderFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -97,11 +97,11 @@ func Test_NewSource(t *testing.T) {
 		client := NewMockHTTPClient(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoderStrategy := NewMockDecoderStrategy(ctrl)
-		decoderStrategy.EXPECT().Accept(config.UnknownDecoderFormat).Return(false).Times(1)
+		decoderStrategy.EXPECT().Accept(config.UnknownDecoder).Return(false).Times(1)
 		decoderFactory := config.NewDecoderFactory()
 		_ = decoderFactory.Register(decoderStrategy)
 
-		sut, e := NewSource(client, "uri", config.UnknownDecoderFormat, decoderFactory, "path")
+		sut, e := NewSource(client, "uri", config.UnknownDecoder, decoderFactory, "path")
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")

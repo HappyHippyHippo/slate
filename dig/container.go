@@ -130,7 +130,7 @@ type containerStore interface {
 	// type.
 	getValueDecorator(name string, t reflect.Type) (decorator, bool)
 
-	// Reutrns the decorator that can decorate values for the given group and
+	// Return the decorator that can decorate values for the given group and
 	// type.
 	getGroupDecorator(name string, t reflect.Type) (decorator, bool)
 
@@ -155,7 +155,7 @@ func New(opts ...Option) *Container {
 	return c
 }
 
-// DeferAcyclicVerification is an Option to override the def behavior
+// DeferAcyclicVerification is an Option to override the simple behavior
 // of container.Provide, deferring the dependency graph validation to no longer
 // run after each call to container.Provide. The container will instead verify
 // the graph on first `Invoke`.

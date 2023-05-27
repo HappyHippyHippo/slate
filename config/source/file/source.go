@@ -9,6 +9,10 @@ import (
 	"github.com/spf13/afero"
 )
 
+type decoderFactory interface {
+	Create(format string, args ...interface{}) (config.Decoder, error)
+}
+
 // Source defines a config source that read a file content
 // and stores its config contents to be used as a config.
 type Source struct {
@@ -16,7 +20,7 @@ type Source struct {
 	path           string
 	format         string
 	fileSystem     afero.Fs
-	decoderFactory *config.DecoderFactory
+	decoderFactory decoderFactory
 }
 
 var _ config.Source = &Source{}

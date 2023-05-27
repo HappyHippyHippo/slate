@@ -11,10 +11,12 @@ import (
 	"github.com/happyhippyhippo/slate/config/source"
 )
 
-// httpClient defines the interface of an instance capable to perform the
-// rest config obtain action
 type httpClient interface {
 	Do(req *http.Request) (*http.Response, error)
+}
+
+type decoderFactory interface {
+	Create(format string, args ...interface{}) (config.Decoder, error)
 }
 
 // Source defines a config source that read a REST service and
@@ -24,7 +26,7 @@ type Source struct {
 	client         httpClient
 	uri            string
 	format         string
-	decoderFactory *config.DecoderFactory
+	decoderFactory decoderFactory
 	configPath     string
 }
 

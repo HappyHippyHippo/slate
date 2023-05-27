@@ -1,9 +1,9 @@
 package config
 
 const (
-	// UnknownSourceType defines the value to be used to declare an
+	// UnknownSource defines the value to be used to declare an
 	// unknown partial source type.
-	UnknownSourceType = "unknown"
+	UnknownSource = "unknown"
 )
 
 // SourceStrategy interface defines the methods of the source

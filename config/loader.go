@@ -1,10 +1,19 @@
 package config
 
+type configurer interface {
+	Partial(path string, def ...Partial) (*Partial, error)
+	AddSource(id string, priority int, src Source) error
+}
+
+type sourceFactory interface {
+	Create(partial *Partial) (Source, error)
+}
+
 // Loader defines an object responsible to initialize a
 // configuration manager.
 type Loader struct {
-	config        *Config
-	sourceFactory *SourceFactory
+	config        configurer
+	sourceFactory sourceFactory
 }
 
 type sourceConfig struct {

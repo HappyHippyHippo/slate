@@ -47,7 +47,7 @@ func Test_DecoderFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		format := UnknownDecoderFormat
+		format := UnknownDecoder
 		reader := NewMockReader(ctrl)
 		strategy := NewMockDecoderStrategy(ctrl)
 		strategy.EXPECT().Accept(format).Return(false).Times(1)
@@ -69,7 +69,7 @@ func Test_DecoderFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		format := UnknownDecoderFormat
+		format := UnknownDecoder
 		reader := NewMockReader(ctrl)
 		decoder := NewMockDecoder(ctrl)
 		strategy := NewMockDecoderStrategy(ctrl)

@@ -140,7 +140,7 @@ func Test_NewSource(t *testing.T) {
 		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 		decoderFactory := config.NewDecoderFactory()
 
-		sut, e := NewSource(path, config.UnknownDecoderFormat, true, fs, decoderFactory)
+		sut, e := NewSource(path, config.UnknownDecoder, true, fs, decoderFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -169,11 +169,11 @@ func Test_NewSource(t *testing.T) {
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
 		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoderStrategy := NewMockDecoderStrategy(ctrl)
-		decoderStrategy.EXPECT().Accept(config.UnknownDecoderFormat).Return(false).Times(1)
+		decoderStrategy.EXPECT().Accept(config.UnknownDecoder).Return(false).Times(1)
 		decoderFactory := config.NewDecoderFactory()
 		_ = decoderFactory.Register(decoderStrategy)
 
-		sut, e := NewSource(path, config.UnknownDecoderFormat, true, fs, decoderFactory)
+		sut, e := NewSource(path, config.UnknownDecoder, true, fs, decoderFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")

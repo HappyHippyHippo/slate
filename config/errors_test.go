@@ -100,7 +100,7 @@ func Test_errPathNotFound(t *testing.T) {
 }
 
 func Test_errInvalidFormat(t *testing.T) {
-	arg := UnknownDecoderFormat
+	arg := UnknownDecoder
 	context := map[string]interface{}{"field": "value"}
 	message := "unknown : invalid config format"
 

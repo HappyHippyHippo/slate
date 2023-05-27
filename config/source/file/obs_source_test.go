@@ -99,11 +99,11 @@ func Test_NewObsSource(t *testing.T) {
 		fs.EXPECT().Stat(path).Return(fileInfo, nil).Times(1)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		decoderStrategy := NewMockDecoderStrategy(ctrl)
-		decoderStrategy.EXPECT().Accept(config.UnknownDecoderFormat).Return(false).Times(1)
+		decoderStrategy.EXPECT().Accept(config.UnknownDecoder).Return(false).Times(1)
 		decoderFactory := config.NewDecoderFactory()
 		_ = decoderFactory.Register(decoderStrategy)
 
-		sut, e := NewObsSource(path, config.UnknownDecoderFormat, fs, decoderFactory)
+		sut, e := NewObsSource(path, config.UnknownDecoder, fs, decoderFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")

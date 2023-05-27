@@ -103,7 +103,7 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if sut.Accept(&config.Partial{"type": config.UnknownSourceType}) {
+		if sut.Accept(&config.Partial{"type": config.UnknownSource}) {
 			t.Error("returned true")
 		}
 	})

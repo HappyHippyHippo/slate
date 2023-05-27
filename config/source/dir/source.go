@@ -9,6 +9,10 @@ import (
 	"github.com/spf13/afero"
 )
 
+type decoderFactory interface {
+	Create(format string, args ...interface{}) (config.Decoder, error)
+}
+
 // Source defines a config source that read a directory files,
 // recursive or not, and parse each one and store all the read content
 // as a config.
@@ -18,7 +22,7 @@ type Source struct {
 	format         string
 	recursive      bool
 	fs             afero.Fs
-	decoderFactory *config.DecoderFactory
+	decoderFactory decoderFactory
 }
 
 var _ config.Source = &Source{}

@@ -2,7 +2,10 @@ package rest
 
 import (
 	"errors"
+	"io"
 	"net/http"
+	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -91,7 +94,7 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		if sut.Accept(&config.Partial{"type": config.UnknownSourceType}) {
+		if sut.Accept(&config.Partial{"type": config.UnknownSource}) {
 			t.Error("returned true")
 		}
 	})
@@ -210,89 +213,93 @@ func Test_SourceStrategy_Create(t *testing.T) {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
-	/*
-		t.Run("create the rest source", func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
 
-			uri := "uri"
-			format := "format"
-			path := "path"
-			field := "field"
-			value := "value"
-			expected := config.Partial{field: value}
-			respData := config.Partial{"path": config.Partial{"field": "value"}}
-			decoder := NewMockDecoder(ctrl)
-			decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
-			decoder.EXPECT().Close().Return(nil).Times(1)
-			decoderFactory := config.NewDecoderFactory()
-			decoderFactory.EXPECT().Create("format", gomock.Any()).Return(decoder, nil).Times(1)
+	t.Run("create the rest source", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-			sut, _ := NewSourceStrategy(decoderFactory)
-			response := http.Response{}
-			response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
-			client := NewMockHTTPClient(ctrl)
-			client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-			sut.clientFactory = func() httpClient { return client }
+		uri := "uri"
+		format := "format"
+		path := "path"
+		field := "field"
+		value := "value"
+		expected := config.Partial{field: value}
+		respData := config.Partial{"path": config.Partial{"field": "value"}}
+		decoder := NewMockDecoder(ctrl)
+		decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
+		decoder.EXPECT().Close().Return(nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
-			src, e := sut.Create(&config.Partial{"uri": uri, "format": format, "path": config.Partial{"config": path}})
-			switch {
-			case e != nil:
-				t.Errorf("returned the (%v) error", e)
-			case src == nil:
-				t.Error("didn't returned a valid reference")
-			default:
-				switch s := src.(type) {
-				case *Source:
-					if !reflect.DeepEqual(s.Partial, expected) {
-						t.Error("didn't loaded the content correctly")
-					}
-				default:
-					t.Error("didn't returned a new rest source")
+		sut, _ := NewSourceStrategy(decoderFactory)
+		response := http.Response{}
+		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
+		client := NewMockHTTPClient(ctrl)
+		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
+		sut.clientFactory = func() httpClient { return client }
+
+		src, e := sut.Create(&config.Partial{"uri": uri, "format": format, "path": config.Partial{"config": path}})
+		switch {
+		case e != nil:
+			t.Errorf("returned the (%v) error", e)
+		case src == nil:
+			t.Error("didn't returned a valid reference")
+		default:
+			switch s := src.(type) {
+			case *Source:
+				if !reflect.DeepEqual(s.Partial, expected) {
+					t.Error("didn't loaded the content correctly")
 				}
-			}
-		})
-
-		t.Run("create the rest source defaulting format if not present in config", func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
-
-			uri := "uri"
-			path := "path"
-			field := "field"
-			value := "value"
-			expected := config.Partial{field: value}
-			respData := config.Partial{"path": config.Partial{"field": "value"}}
-			decoder := NewMockDecoder(ctrl)
-			decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
-			decoder.EXPECT().Close().Return(nil).Times(1)
-			decoderFactory := config.NewDecoderFactory()
-			decoderFactory.EXPECT().Create("json", gomock.Any()).Return(decoder, nil).Times(1)
-
-			sut, _ := NewSourceStrategy(decoderFactory)
-			response := http.Response{}
-			response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
-			client := NewMockHTTPClient(ctrl)
-			client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-			sut.clientFactory = func() httpClient { return client }
-
-			src, e := sut.Create(&config.Partial{"uri": uri, "path": config.Partial{"config": path}})
-			switch {
-			case e != nil:
-				t.Errorf("returned the (%v) error", e)
-			case src == nil:
-				t.Error("didn't returned a valid reference")
 			default:
-				switch s := src.(type) {
-				case *Source:
-					if !reflect.DeepEqual(s.Partial, expected) {
-						t.Error("didn't loaded the content correctly")
-					}
-				default:
-					t.Error("didn't returned a new rest source")
-				}
+				t.Error("didn't returned a new rest source")
 			}
-		})
+		}
+	})
 
-	*/
+	t.Run("create the rest source defaulting format if not present in config", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		uri := "uri"
+		path := "path"
+		field := "field"
+		value := "value"
+		expected := config.Partial{field: value}
+		respData := config.Partial{"path": config.Partial{"field": "value"}}
+		decoder := NewMockDecoder(ctrl)
+		decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
+		decoder.EXPECT().Close().Return(nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("json").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
+
+		sut, _ := NewSourceStrategy(decoderFactory)
+		response := http.Response{}
+		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
+		client := NewMockHTTPClient(ctrl)
+		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
+		sut.clientFactory = func() httpClient { return client }
+
+		src, e := sut.Create(&config.Partial{"uri": uri, "path": config.Partial{"config": path}})
+		switch {
+		case e != nil:
+			t.Errorf("returned the (%v) error", e)
+		case src == nil:
+			t.Error("didn't returned a valid reference")
+		default:
+			switch s := src.(type) {
+			case *Source:
+				if !reflect.DeepEqual(s.Partial, expected) {
+					t.Error("didn't loaded the content correctly")
+				}
+			default:
+				t.Error("didn't returned a new rest source")
+			}
+		}
+	})
 }

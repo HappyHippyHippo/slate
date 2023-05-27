@@ -249,7 +249,7 @@ func Test_Config_Get(t *testing.T) {
 		}
 	})
 
-	t.Run("return def if path was not found", func(t *testing.T) {
+	t.Run("return simple if path was not found", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
