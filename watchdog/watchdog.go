@@ -26,7 +26,7 @@ func NewWatchdog(
 }
 
 // Run will run a process overlooked by the current watchdog instance.
-func (w *Watchdog) Run(process IProcess) (e error) {
+func (w *Watchdog) Run(process Processor) (e error) {
 	// create the goroutine signal channels
 	closed := make(chan struct{})
 	errored := make(chan struct{})

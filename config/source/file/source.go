@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/afero"
 )
 
-type decoderFactory interface {
+type decoderCreator interface {
 	Create(format string, args ...interface{}) (config.Decoder, error)
 }
 
@@ -20,7 +20,7 @@ type Source struct {
 	path           string
 	format         string
 	fileSystem     afero.Fs
-	decoderFactory decoderFactory
+	decoderCreator decoderCreator
 }
 
 var _ config.Source = &Source{}
@@ -31,15 +31,15 @@ func NewSource(
 	path,
 	format string,
 	fileSystem afero.Fs,
-	decoderFactory *config.DecoderFactory,
+	decoderCreator decoderCreator,
 ) (*Source, error) {
 	// check file system argument reference
 	if fileSystem == nil {
 		return nil, errNilPointer("fileSystem")
 	}
 	// check decoder factory argument reference
-	if decoderFactory == nil {
-		return nil, errNilPointer("decoderFactory")
+	if decoderCreator == nil {
+		return nil, errNilPointer("decoderCreator")
 	}
 	// instantiates the config source
 	s := &Source{
@@ -50,7 +50,7 @@ func NewSource(
 		path:           path,
 		format:         format,
 		fileSystem:     fileSystem,
-		decoderFactory: decoderFactory,
+		decoderCreator: decoderCreator,
 	}
 	// Load the file config content
 	if e := s.load(); e != nil {
@@ -66,7 +66,7 @@ func (s *Source) load() error {
 		return e
 	}
 	// creates the decoder to parse the file content
-	d, e := s.decoderFactory.Create(s.format, f)
+	d, e := s.decoderCreator.Create(s.format, f)
 	if e != nil {
 		_ = f.Close()
 		return e

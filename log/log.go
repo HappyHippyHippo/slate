@@ -12,8 +12,6 @@ type Log struct {
 	streams map[string]Stream
 }
 
-var _ logger = &Log{}
-
 // NewLog instantiate a new Log instance.
 func NewLog() *Log {
 	// instantiate the logger
@@ -160,9 +158,8 @@ func (l *Log) Stream(
 	l.mutex.Lock()
 	defer func() { l.mutex.Unlock() }()
 	// retrieve the requested stream
-	s, ok := l.streams[id]
-	if !ok {
-		return nil, errStreamNotFound(id)
+	if s, ok := l.streams[id]; ok {
+		return s, nil
 	}
-	return s, nil
+	return nil, errStreamNotFound(id)
 }

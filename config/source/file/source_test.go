@@ -151,7 +151,7 @@ func Test_NewSource(t *testing.T) {
 				t.Error("didn't stored the file content format")
 			case sut.fileSystem != fs:
 				t.Error("didn't stored the file system adapter reference")
-			case sut.decoderFactory != decoderFactory:
+			case sut.decoderCreator != decoderFactory:
 				t.Error("didn't stored the decoder factory reference")
 			case !reflect.DeepEqual(sut.Partial, partial):
 				t.Error("didn't stored the decoder information")

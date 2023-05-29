@@ -43,10 +43,8 @@ func (DecoderStrategy) Create(
 		return nil, errNilPointer("args[0]")
 	}
 	// validate the reader argument
-	reader, ok := args[0].(io.Reader)
-	if !ok {
-		return nil, errConversion(args[0], "io.Reader")
+	if reader, ok := args[0].(io.Reader); ok {
+		return NewDecoder(reader)
 	}
-	// create the decoder
-	return NewDecoder(reader)
+	return nil, errConversion(args[0], "io.Reader")
 }

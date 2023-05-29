@@ -13,10 +13,14 @@ type configurer interface {
 	AddObserver(path string, callback config.Observer) error
 }
 
+type connectionCreator interface {
+	Create(cfg *config.Partial, gormCfg *gorm.Config) (*gorm.DB, error)
+}
+
 // ConnectionPool is a database connection pool and generator.
 type ConnectionPool struct {
 	cfg               configurer
-	connectionFactory connectionFactory
+	connectionCreator connectionCreator
 	instances         map[string]*gorm.DB
 }
 
@@ -24,20 +28,20 @@ type ConnectionPool struct {
 // database connection pool instance.
 func NewConnectionPool(
 	cfg *config.Config,
-	factory *ConnectionFactory,
+	connectionCreator *ConnectionFactory,
 ) (*ConnectionPool, error) {
 	// check config argument reference
 	if cfg == nil {
 		return nil, errNilPointer("config")
 	}
 	// check ConnectionFactory argument reference
-	if factory == nil {
-		return nil, errNilPointer("factory")
+	if connectionCreator == nil {
+		return nil, errNilPointer("connectionCreator")
 	}
 	// instantiate the connection pool instance
 	pool := &ConnectionPool{
 		cfg:               cfg,
-		connectionFactory: factory,
+		connectionCreator: connectionCreator,
 		instances:         map[string]*gorm.DB{},
 	}
 	// check if is to observe connection configuration changes
@@ -80,7 +84,7 @@ func (f *ConnectionPool) Get(
 		return nil, e
 	}
 	// create the connection
-	conn, e := f.connectionFactory.Create(cfg, gormCfg)
+	conn, e := f.connectionCreator.Create(cfg, gormCfg)
 	if e != nil {
 		return nil, e
 	}

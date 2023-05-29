@@ -42,8 +42,7 @@ func (p *Partial) Clone() Partial {
 func (p *Partial) Entries() []string {
 	var entries []string
 	for k := range *p {
-		key, ok := k.(string)
-		if ok {
+		if key, ok := k.(string); ok {
 			entries = append(entries, key)
 		}
 	}
@@ -103,11 +102,10 @@ func (p *Partial) Bool(
 		return false, e
 	}
 	// result conversion
-	v, ok := val.(bool)
-	if !ok {
-		return false, errConversion(val, "bool")
+	if v, ok := val.(bool); ok {
+		return v, nil
 	}
-	return v, nil
+	return false, errConversion(val, "bool")
 }
 
 // Int will retrieve a value stored in the quested path cast to int
@@ -129,11 +127,10 @@ func (p *Partial) Int(
 		return 0, e
 	}
 	// result conversion
-	v, ok := val.(int)
-	if !ok {
-		return 0, errConversion(val, "int")
+	if v, ok := val.(int); ok {
+		return v, nil
 	}
-	return v, nil
+	return 0, errConversion(val, "int")
 }
 
 // Float will retrieve a value stored in the quested path cast to float
@@ -155,11 +152,10 @@ func (p *Partial) Float(
 		return 0, e
 	}
 	// result conversion
-	v, ok := val.(float64)
-	if !ok {
-		return 0, errConversion(val, "float64")
+	if v, ok := val.(float64); ok {
+		return v, nil
 	}
-	return v, nil
+	return 0, errConversion(val, "float64")
 }
 
 // String will retrieve a value stored in the quested path cast to string
@@ -181,11 +177,10 @@ func (p *Partial) String(
 		return "", e
 	}
 	// result conversion
-	v, ok := val.(string)
-	if !ok {
-		return "", errConversion(val, "string")
+	if v, ok := val.(string); ok {
+		return v, nil
 	}
-	return v, nil
+	return "", errConversion(val, "string")
 }
 
 // List will retrieve a value stored in the quested path cast to list
@@ -207,11 +202,10 @@ func (p *Partial) List(
 		return nil, e
 	}
 	// result conversion
-	v, ok := val.([]interface{})
-	if !ok {
-		return nil, errConversion(val, "[]interface{}")
+	if v, ok := val.([]interface{}); ok {
+		return v, nil
 	}
-	return v, nil
+	return nil, errConversion(val, "[]interface{}")
 }
 
 // Partial will retrieve a value stored in the quested path cast to partial
@@ -233,11 +227,10 @@ func (p *Partial) Partial(
 		return nil, e
 	}
 	// result conversion
-	v, ok := val.(Partial)
-	if !ok {
-		return nil, errConversion(val, "config.Partial")
+	if v, ok := val.(Partial); ok {
+		return &v, nil
 	}
-	return &v, nil
+	return nil, errConversion(val, "config.Partial")
 }
 
 // Populate will try to populate the data argument with the data stored
@@ -310,8 +303,7 @@ func (p *Partial) path(
 		// check if the iterated part references a partial
 		case Partial:
 			// retrieve the part reference
-			it, ok = i[part]
-			if !ok {
+			if it, ok = i[part]; !ok {
 				return nil, errPathNotFound(path)
 			}
 		default:
@@ -363,8 +355,7 @@ func (p *Partial) populate(
 						continue
 					}
 					// recursive assignment
-					_, e = p.populate(data, fieldValue, icase)
-					if e != nil {
+					if _, e := p.populate(data, fieldValue, icase); e != nil {
 						return nil, e
 					}
 				default:

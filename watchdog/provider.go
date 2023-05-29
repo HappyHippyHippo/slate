@@ -19,9 +19,9 @@ const (
 	// registration id of the log formatter factory.
 	LogFormatterFactoryID = ID + ".formatter.factory"
 
-	// FactoryID defines the id to be used as the container
+	// WatchdogFactoryID defines the id to be used as the container
 	// registration id of the watchdog factory.
-	FactoryID = ID + ".factory"
+	WatchdogFactoryID = ID + ".factory"
 
 	// ProcessTag defines the simple tag to be used
 	// to identify a watchdog process entry in the container.
@@ -46,7 +46,7 @@ func (p Provider) Register(
 	// add log formatter strategies and factory
 	_ = container.Service(LogFormatterFactoryID, NewLogFormatterFactory)
 	// add the watchdog factory and kennel
-	_ = container.Service(FactoryID, NewFactory)
+	_ = container.Service(WatchdogFactoryID, NewFactory)
 	_ = container.Service(ID, NewKennel)
 	return nil
 }
@@ -95,11 +95,10 @@ func (Provider) getLogFormatterFactory(
 		panic(e)
 	}
 	// validate the retrieved entry type
-	instance, ok := entry.(*LogFormatterFactory)
-	if !ok {
-		panic(errConversion(entry, "*watchdog.LogFormatterFactory"))
+	if instance, ok := entry.(*LogFormatterFactory); ok {
+		return instance
 	}
-	return instance
+	panic(errConversion(entry, "*watchdog.LogFormatterFactory"))
 }
 
 func (Provider) getLogFormatterStrategies(
@@ -131,27 +130,26 @@ func (Provider) getKennel(
 		panic(e)
 	}
 	// validate the retrieved entry type
-	instance, ok := entry.(*Kennel)
-	if !ok {
-		panic(errConversion(entry, "*watchdog.Kennel"))
+	if instance, ok := entry.(*Kennel); ok {
+		return instance
 	}
-	return instance
+	panic(errConversion(entry, "*watchdog.Kennel"))
 }
 
 func (p Provider) getProcesses(
 	container *slate.Container,
-) []IProcess {
+) []Processor {
 	// retrieve the watchdog processes entries
 	tags, e := container.Tag(ProcessTag)
 	if e != nil {
 		panic(e)
 	}
 	// type check the retrieved processes
-	var processes []IProcess
+	var processes []Processor
 	for _, service := range tags {
-		p, ok := service.(IProcess)
+		p, ok := service.(Processor)
 		if !ok {
-			panic(errConversion(service, "watchdog.IProcess"))
+			panic(errConversion(service, "watchdog.Processor"))
 		}
 		processes = append(processes, p)
 	}

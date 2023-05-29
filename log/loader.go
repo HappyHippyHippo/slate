@@ -14,7 +14,7 @@ type logger interface {
 	AddStream(id string, stream Stream) error
 }
 
-type streamFactory interface {
+type streamCreator interface {
 	Create(cfg *config.Partial) (Stream, error)
 }
 
@@ -23,14 +23,14 @@ type streamFactory interface {
 type Loader struct {
 	cfg           configurer
 	log           logger
-	streamFactory streamFactory
+	streamCreator streamCreator
 }
 
 // NewLoader generates a new logger initialization instance.
 func NewLoader(
 	cfg *config.Config,
 	log *Log,
-	streamFactory *StreamFactory,
+	streamCreator *StreamFactory,
 ) (*Loader, error) {
 	// check the config argument reference
 	if cfg == nil {
@@ -41,14 +41,14 @@ func NewLoader(
 		return nil, errNilPointer("logger")
 	}
 	// check the stream factory argument reference
-	if streamFactory == nil {
-		return nil, errNilPointer("factory")
+	if streamCreator == nil {
+		return nil, errNilPointer("streamCreator")
 	}
 	// instantiate the loader
 	return &Loader{
 		cfg:           cfg,
 		log:           log,
-		streamFactory: streamFactory,
+		streamCreator: streamCreator,
 	}, nil
 }
 
@@ -96,13 +96,12 @@ func (l Loader) load(
 			return e
 		}
 		// generate the new stream
-		stream, e := l.streamFactory.Create(entry)
+		stream, e := l.streamCreator.Create(entry)
 		if e != nil {
 			return e
 		}
 		// add the stream to the logger stream pool
-		e = l.log.AddStream(id, stream)
-		if e != nil {
+		if e := l.log.AddStream(id, stream); e != nil {
 			return e
 		}
 	}

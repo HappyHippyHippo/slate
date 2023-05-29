@@ -36,7 +36,7 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 
 		sut, e := NewSource(client, "uri", config.UnknownDecoder, nil, "path")
 		switch {
@@ -54,7 +54,7 @@ func Test_NewSource(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf(`parse "\n": net/url: invalid control character in URL`)
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		decoderFactory := config.NewDecoderFactory()
 
 		sut, e := NewSource(client, "\n", config.UnknownDecoder, decoderFactory, "path")
@@ -73,7 +73,7 @@ func Test_NewSource(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf(`test exception`)
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(nil, expected).Times(1)
 		decoderFactory := config.NewDecoderFactory()
 
@@ -94,7 +94,7 @@ func Test_NewSource(t *testing.T) {
 
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path"`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoderStrategy := NewMockDecoderStrategy(ctrl)
 		decoderStrategy.EXPECT().Accept(config.UnknownDecoder).Return(false).Times(1)
@@ -119,7 +119,7 @@ func Test_NewSource(t *testing.T) {
 		expected := fmt.Errorf(`error message`)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path"`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(nil, expected).Times(1)
@@ -147,7 +147,7 @@ func Test_NewSource(t *testing.T) {
 
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"other_path": 123}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&config.Partial{}, nil).Times(1)
@@ -175,7 +175,7 @@ func Test_NewSource(t *testing.T) {
 
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": 123}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&config.Partial{"path": 123}, nil).Times(1)
@@ -203,7 +203,7 @@ func Test_NewSource(t *testing.T) {
 
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": 123}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&config.Partial{"path": 123}, nil).Times(1)
@@ -232,7 +232,7 @@ func Test_NewSource(t *testing.T) {
 		expected := config.Partial{"field": "data"}
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "data"}}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&config.Partial{"path": expected}, nil).Times(1)
@@ -261,7 +261,7 @@ func Test_NewSource(t *testing.T) {
 		expected := config.Partial{"field": "data"}
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"node": {"inner_node": {"field": "data"}}}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&config.Partial{"node": config.Partial{"inner_node": expected}}, nil).Times(1)

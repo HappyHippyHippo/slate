@@ -10,23 +10,23 @@ import (
 	"github.com/happyhippyhippo/slate/trigger"
 )
 
-type configSourceRef struct {
+type sourceRef struct {
 	id       string
 	priority int
 	source   Source
 }
 
-type configSourceRefSorter []configSourceRef
+type sourceRefSorter []sourceRef
 
-func (sources configSourceRefSorter) Len() int {
+func (sources sourceRefSorter) Len() int {
 	return len(sources)
 }
 
-func (sources configSourceRefSorter) Swap(i, j int) {
+func (sources sourceRefSorter) Swap(i, j int) {
 	sources[i], sources[j] = sources[j], sources[i]
 }
 
-func (sources configSourceRefSorter) Less(i, j int) bool {
+func (sources sourceRefSorter) Less(i, j int) bool {
 	return sources[i].priority < sources[j].priority
 }
 
@@ -34,13 +34,13 @@ func (sources configSourceRefSorter) Less(i, j int) bool {
 // configuration path has changed.
 type Observer func(interface{}, interface{})
 
-type configObserverRef struct {
+type observerRef struct {
 	path     string
 	current  interface{}
 	callback Observer
 }
 
-type configTicker interface {
+type ticker interface {
 	io.Closer
 	Delay() time.Duration
 }
@@ -49,10 +49,10 @@ type configTicker interface {
 // several defines sources and partial values observers.
 type Config struct {
 	mutex     sync.Locker
-	sources   []configSourceRef
-	observers []configObserverRef
+	sources   []sourceRef
+	observers []observerRef
 	partial   *Partial
-	observer  configTicker
+	observer  ticker
 }
 
 // NewConfig instantiate a new configuration object.
@@ -63,15 +63,14 @@ func NewConfig() *Config {
 	// instantiate the config
 	c := &Config{
 		mutex:     &sync.Mutex{},
-		sources:   []configSourceRef{},
-		observers: []configObserverRef{},
+		sources:   []sourceRef{},
+		observers: []observerRef{},
 		partial:   &Partial{},
 		observer:  nil,
 	}
 	// check if there is a need to create the observable sources
 	// ticker trigger
-	period := time.Duration(ObserveFrequency) * time.Millisecond
-	if period != 0 {
+	if period := time.Duration(ObserveFrequency) * time.Millisecond; period != 0 {
 		// create the ticker trigger used to poll the
 		// observable sources
 		c.observer, _ = trigger.NewRecurring(period, func() error {
@@ -263,8 +262,8 @@ func (c *Config) AddSource(
 	defer c.mutex.Unlock()
 	// add the source to the config and sort them so that the
 	// data can be correctly merged
-	c.sources = append(c.sources, configSourceRef{id, priority, src})
-	sort.Sort(configSourceRefSorter(c.sources))
+	c.sources = append(c.sources, sourceRef{id, priority, src})
+	sort.Sort(sourceRefSorter(c.sources))
 	// rebuild the local partial with the source's partial information
 	c.rebuild()
 	return nil
@@ -281,20 +280,21 @@ func (c *Config) RemoveSource(
 	defer c.mutex.Unlock()
 	// try to find the requested source to be removed
 	for i, ref := range c.sources {
-		if ref.id == id {
-			// check if the source implements the closer interface
-			if src, ok := ref.source.(io.Closer); ok {
-				// close the removing source
-				if e := src.Close(); e != nil {
-					return e
-				}
-			}
-			// remove the source from the config sources
-			c.sources = append(c.sources[:i], c.sources[i+1:]...)
-			// rebuild the local partial
-			c.rebuild()
-			return nil
+		if ref.id != id {
+			continue
 		}
+		// check if the source implements the closer interface
+		if src, ok := ref.source.(io.Closer); ok {
+			// close the removing source
+			if e := src.Close(); e != nil {
+				return e
+			}
+		}
+		// remove the source from the config sources
+		c.sources = append(c.sources[:i], c.sources[i+1:]...)
+		// rebuild the local partial
+		c.rebuild()
+		return nil
 	}
 	return nil
 }
@@ -317,7 +317,7 @@ func (c *Config) RemoveAllSources() error {
 		}
 	}
 	// recreate the sources array and rebuild the local partial
-	c.sources = []configSourceRef{}
+	c.sources = []sourceRef{}
 	c.rebuild()
 	return nil
 }
@@ -350,18 +350,19 @@ func (c *Config) SourcePriority(
 	defer c.mutex.Unlock()
 	// try to find the requested source to be updated
 	for i, ref := range c.sources {
-		if ref.id == id {
-			// redefine the stored source priority
-			c.sources[i] = configSourceRef{
-				id:       ref.id,
-				priority: priority,
-				source:   ref.source,
-			}
-			// sort the sources and rebuild the local partial
-			sort.Sort(configSourceRefSorter(c.sources))
-			c.rebuild()
-			return nil
+		if ref.id != id {
+			continue
 		}
+		// redefine the stored source priority
+		c.sources[i] = sourceRef{
+			id:       ref.id,
+			priority: priority,
+			source:   ref.source,
+		}
+		// sort the sources and rebuild the local partial
+		sort.Sort(sourceRefSorter(c.sources))
+		c.rebuild()
+		return nil
 	}
 	return errSourceNotFound(id)
 }
@@ -405,7 +406,7 @@ func (c *Config) AddObserver(
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	// register the requested observer with the current path value
-	c.observers = append(c.observers, configObserverRef{path, val, callback})
+	c.observers = append(c.observers, observerRef{path, val, callback})
 	return nil
 }
 

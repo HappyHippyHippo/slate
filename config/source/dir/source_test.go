@@ -116,7 +116,7 @@ func Test_NewSource(t *testing.T) {
 				t.Error("didn't stored the file content format")
 			case sut.fs != fs:
 				t.Error("didn't stored the file system adapter reference")
-			case sut.decoderFactory != decoderFactory:
+			case sut.decoderCreator != decoderFactory:
 				t.Error("didn't stored the decoder factory reference")
 			}
 		}
@@ -264,7 +264,7 @@ func Test_NewSource(t *testing.T) {
 				t.Error("didn't stored the file content format")
 			case sut.fs != fs:
 				t.Error("didn't stored the file system adapter reference")
-			case sut.decoderFactory != decoderFactory:
+			case sut.decoderCreator != decoderFactory:
 				t.Error("didn't stored the decoder factory reference")
 			case !reflect.DeepEqual(sut.Partial, *partial):
 				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, *partial)
@@ -317,7 +317,7 @@ func Test_NewSource(t *testing.T) {
 				t.Error("didn't stored the file content format")
 			case sut.fs != fs:
 				t.Error("didn't stored the file system adapter reference")
-			case sut.decoderFactory != decoderFactory:
+			case sut.decoderCreator != decoderFactory:
 				t.Error("didn't stored the decoder factory reference")
 			case !reflect.DeepEqual(sut.Partial, *partial):
 				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, *partial)
@@ -438,7 +438,7 @@ func Test_NewSource(t *testing.T) {
 				t.Error("didn't stored the file content format")
 			case sut.fs != fs:
 				t.Error("didn't stored the file system adapter reference")
-			case sut.decoderFactory != decoderFactory:
+			case sut.decoderCreator != decoderFactory:
 				t.Error("didn't stored the decoder factory reference")
 			case !reflect.DeepEqual(sut.Partial, expected):
 				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, expected)

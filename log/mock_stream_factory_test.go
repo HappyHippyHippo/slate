@@ -7,7 +7,7 @@ import (
 	"github.com/golang/mock/gomock"
 )
 
-// MockStreamFactory is a mock of streamFactory interface.
+// MockStreamFactory is a mock of streamCreator interface.
 type MockStreamFactory struct {
 	ctrl     *gomock.Controller
 	recorder *MockStreamFactoryRecorder

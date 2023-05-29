@@ -26,6 +26,27 @@ func Test_NewSource(t *testing.T) {
 		}
 	})
 
+	t.Run("with empty environment", func(t *testing.T) {
+		env := "env"
+
+		expected := config.Partial{}
+
+		sut, e := NewSource(map[string]string{env: "id"})
+		switch {
+		case sut == nil:
+			t.Errorf("didn't returned a valid reference")
+		case e != nil:
+			t.Errorf("returned the (%v) error", e)
+		default:
+			switch {
+			case sut.Mutex == nil:
+				t.Error("didn't created the access mutex")
+			case !reflect.DeepEqual(sut.Partial, expected):
+				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, expected)
+			}
+		}
+	})
+
 	t.Run("with root mappings", func(t *testing.T) {
 		env := "env"
 		value := "value"

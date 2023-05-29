@@ -22,15 +22,15 @@ var _ config.SourceStrategy = &SourceStrategy{}
 // a source where the data to check comes from a configuration
 // instance.
 func (s SourceStrategy) Accept(
-	partial *config.Partial,
+	cfg *config.Partial,
 ) bool {
 	// check the config argument reference
-	if partial == nil {
+	if cfg == nil {
 		return false
 	}
 	// retrieve the data from the configuration
 	sc := struct{ Type string }{}
-	if _, e := partial.Populate("", &sc); e != nil {
+	if _, e := cfg.Populate("", &sc); e != nil {
 		return false
 	}
 	// return acceptance for the read config type

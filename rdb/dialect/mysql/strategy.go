@@ -18,16 +18,6 @@ const (
 	Type = "mysql"
 )
 
-type dialectConfig struct {
-	Username string
-	Password string
-	Protocol string
-	Host     string
-	Port     int
-	Schema   string
-	Params   config.Partial
-}
-
 // DialectStrategy define a MySQL dialect generation strategy instance.
 type DialectStrategy struct{}
 
@@ -49,8 +39,7 @@ func (DialectStrategy) Accept(
 	}
 	// retrieve the connection dialect from the configuration
 	dc := struct{ Dialect string }{}
-	_, e := cfg.Populate("", &dc)
-	if e != nil {
+	if _, e := cfg.Populate("", &dc); e != nil {
 		return false
 	}
 	// only accepts a mysql dialect request
@@ -66,9 +55,19 @@ func (DialectStrategy) Create(
 		return nil, errNilPointer("cfg")
 	}
 	// retrieve the data from the configuration
-	dc := dialectConfig{Protocol: "tcp", Port: 3306}
-	_, e := cfg.Populate("", &dc)
-	if e != nil {
+	dc := struct {
+		Username string
+		Password string
+		Protocol string
+		Host     string
+		Port     int
+		Schema   string
+		Params   config.Partial
+	}{
+		Protocol: "tcp",
+		Port:     3306,
+	}
+	if _, e := cfg.Populate("", &dc); e != nil {
 		return nil, e
 	}
 	// compose the connection DSN string

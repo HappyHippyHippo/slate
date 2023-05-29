@@ -13,15 +13,13 @@ const (
 	Type = "console"
 )
 
-type streamConfig struct {
-	Format   string
-	Channels []interface{}
-	Level    string
+type formatterCreator interface {
+	Create(format string, args ...interface{}) (log.Formatter, error)
 }
 
 // StreamStrategy defines a console log stream generation strategy.
 type StreamStrategy struct {
-	formatterFactory *log.FormatterFactory
+	formatterCreator formatterCreator
 }
 
 var _ log.StreamStrategy = &StreamStrategy{}
@@ -29,15 +27,15 @@ var _ log.StreamStrategy = &StreamStrategy{}
 // NewStreamStrategy generates a new console log stream
 // generation strategy instance.
 func NewStreamStrategy(
-	formatterFactory *log.FormatterFactory,
+	formatterCreator *log.FormatterFactory,
 ) (*StreamStrategy, error) {
 	// check formatter factory argument reference
-	if formatterFactory == nil {
-		return nil, errNilPointer("formatterFactory")
+	if formatterCreator == nil {
+		return nil, errNilPointer("formatterCreator")
 	}
 	// instantiates the console stream strategy
 	return &StreamStrategy{
-		formatterFactory: formatterFactory,
+		formatterCreator: formatterCreator,
 	}, nil
 }
 
@@ -70,9 +68,12 @@ func (s StreamStrategy) Create(
 		return nil, errNilPointer("config")
 	}
 	// retrieve the data from the configuration
-	sc := streamConfig{}
-	_, e := cfg.Populate("", &sc)
-	if e != nil {
+	sc := struct {
+		Format   string
+		Channels []interface{}
+		Level    string
+	}{}
+	if _, e := cfg.Populate("", &sc); e != nil {
 		return nil, e
 	}
 	// validate configuration
@@ -81,7 +82,7 @@ func (s StreamStrategy) Create(
 		return nil, e
 	}
 	// create the stream formatter to be given to the console stream
-	formatter, e := s.formatterFactory.Create(sc.Format)
+	formatter, e := s.formatterCreator.Create(sc.Format)
 	if e != nil {
 		return nil, e
 	}
@@ -107,8 +108,7 @@ func (StreamStrategy) channels(
 ) []string {
 	var result []string
 	for _, channel := range list {
-		c, ok := channel.(string)
-		if ok {
+		if c, ok := channel.(string); ok {
 			result = append(result, c)
 		}
 	}

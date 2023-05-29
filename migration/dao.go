@@ -23,12 +23,6 @@ func (Record) TableName() string {
 	return "__version"
 }
 
-type dao interface {
-	Last() (Record, error)
-	Up(version uint64) (Record, error)
-	Down(last Record) error
-}
-
 // Dao defines an object to the migration DAO instance responsible
 // to manager the installed migrations.
 type Dao struct {

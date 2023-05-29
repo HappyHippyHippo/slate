@@ -27,18 +27,18 @@ func (f *SourceFactory) Register(
 // data used to decide the strategy to be used and also the initialization
 // data comes from a configuration storing Partial instance.
 func (f *SourceFactory) Create(
-	partial *Partial,
+	cfg *Partial,
 ) (Source, error) {
 	// check the partial argument reference
-	if partial == nil {
-		return nil, errNilPointer("partial")
+	if cfg == nil {
+		return nil, errNilPointer("cfg")
 	}
 	// find a strategy that accepts the requested source type
 	for _, strategy := range *f {
-		if strategy.Accept(partial) {
+		if strategy.Accept(cfg) {
 			// create the requested partial source
-			return strategy.Create(partial)
+			return strategy.Create(cfg)
 		}
 	}
-	return nil, errInvalidSource(partial)
+	return nil, errInvalidSource(cfg)
 }

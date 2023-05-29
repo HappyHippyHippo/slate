@@ -18,11 +18,6 @@ const (
 	Type = "sqlite"
 )
 
-type dialectConfig struct {
-	Host   string
-	Params config.Partial
-}
-
 // DialectStrategy define a Sqlite dialect generation strategy instance.
 type DialectStrategy struct{}
 
@@ -44,8 +39,7 @@ func (DialectStrategy) Accept(
 	}
 	// retrieve the connection dialect from the configuration
 	dc := struct{ Dialect string }{}
-	_, e := cfg.Populate("", &dc)
-	if e != nil {
+	if _, e := cfg.Populate("", &dc); e != nil {
 		return false
 	}
 	// only accepts a mysql dialect request
@@ -61,9 +55,11 @@ func (DialectStrategy) Create(
 		return nil, errNilPointer("cfg")
 	}
 	// retrieve the data from the configuration
-	dc := dialectConfig{}
-	_, e := cfg.Populate("", &dc)
-	if e != nil {
+	dc := struct {
+		Host   string
+		Params config.Partial
+	}{}
+	if _, e := cfg.Populate("", &dc); e != nil {
 		return nil, e
 	}
 	// add the extra parameters to the generated DSN string

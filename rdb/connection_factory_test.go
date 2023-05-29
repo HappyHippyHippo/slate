@@ -65,7 +65,7 @@ func Test_ConnectionFactory_Create(t *testing.T) {
 		dialectFactory.EXPECT().Create(cfg).Return(dialect, nil).Times(1)
 
 		sut, _ := NewConnectionFactory(NewDialectFactory())
-		sut.dialectFactory = dialectFactory
+		sut.dialectCreator = dialectFactory
 
 		conn, e := sut.Create(cfg, &gorm.Config{Logger: logger.Discard})
 		switch {
@@ -89,7 +89,7 @@ func Test_ConnectionFactory_Create(t *testing.T) {
 		dialectFactory.EXPECT().Create(cfg).Return(dialect, nil).Times(1)
 
 		sut, _ := NewConnectionFactory(NewDialectFactory())
-		sut.dialectFactory = dialectFactory
+		sut.dialectCreator = dialectFactory
 
 		if check, e := sut.Create(cfg, &gorm.Config{Logger: logger.Discard}); check == nil {
 			t.Error("didn't return the expected connection instance")

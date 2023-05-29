@@ -272,9 +272,9 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		sut, _ := NewObsSourceStrategy(decoderFactory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}, "timestamp": "2021-12-15T21:07:48.239Z"}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		sut.clientFactory = func() httpClient { return client }
+		sut.clientFactory = func() requester { return client }
 
 		src, e := sut.Create(&config.Partial{"uri": uri, "format": format, "path": config.Partial{"config": configPath, "timestamp": timestampPath}})
 		switch {
@@ -317,9 +317,9 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		sut, _ := NewObsSourceStrategy(decoderFactory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}, "timestamp": "2021-12-15T21:07:48.239Z"}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		sut.clientFactory = func() httpClient { return client }
+		sut.clientFactory = func() requester { return client }
 
 		src, e := sut.Create(&config.Partial{"uri": uri, "path": config.Partial{"config": configPath, "timestamp": timestampPath}})
 		switch {

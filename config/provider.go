@@ -97,11 +97,11 @@ func (Provider) getDecoderFactory(
 		panic(e)
 	}
 	// validate the retrieved entry type
-	instance, ok := entry.(*DecoderFactory)
-	if !ok {
-		panic(errConversion(entry, "config.*DecoderFactory"))
+
+	if instance, ok := entry.(*DecoderFactory); ok {
+		return instance
 	}
-	return instance
+	panic(errConversion(entry, "*config.DecoderFactory"))
 }
 
 func (Provider) getDecoderStrategies(
@@ -133,11 +133,10 @@ func (Provider) getSourceFactory(
 		panic(e)
 	}
 	// validate the retrieved entry type
-	instance, ok := entry.(*SourceFactory)
-	if !ok {
-		panic(errConversion(entry, "config.*SourceFactory"))
+	if instance, ok := entry.(*SourceFactory); ok {
+		return instance
 	}
-	return instance
+	panic(errConversion(entry, "*config.SourceFactory"))
 }
 
 func (Provider) getSourceStrategies(
@@ -169,9 +168,8 @@ func (Provider) getLoader(
 		panic(e)
 	}
 	// validate the retrieved entry type
-	instance, ok := entry.(*Loader)
-	if !ok {
-		panic(errConversion(entry, "config.loader"))
+	if instance, ok := entry.(*Loader); ok {
+		return instance
 	}
-	return instance
+	panic(errConversion(entry, "*config.Loader"))
 }

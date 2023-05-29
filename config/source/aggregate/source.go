@@ -44,11 +44,11 @@ func (s *Source) load() error {
 	// merge all the cfg partials given into the local cfg
 	c := config.Partial{}
 	for _, s := range s.sources {
-		partial, e := s.Get("", config.Partial{})
+		p, e := s.Get("", config.Partial{})
 		if e != nil {
 			return e
 		}
-		c.Merge(partial.(config.Partial))
+		c.Merge(p.(config.Partial))
 	}
 	// assign the merged sources to the source config
 	s.Mutex.Lock()

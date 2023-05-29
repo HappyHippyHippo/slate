@@ -6,7 +6,7 @@ import (
 	"github.com/golang/mock/gomock"
 )
 
-// MockSourceFactory is a mock of sourceFactory interface.
+// MockSourceFactory is a mock of sourceCreator interface.
 type MockSourceFactory struct {
 	ctrl     *gomock.Controller
 	recorder *MockSourceFactoryRecorder

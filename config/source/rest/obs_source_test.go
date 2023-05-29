@@ -36,7 +36,7 @@ func Test_NewObsSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 
 		sut, e := NewObsSource(client, "uri", "format", nil, "timestampPath", "configPath")
 		switch {
@@ -54,7 +54,7 @@ func Test_NewObsSource(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf(`parse "\n": net/url: invalid control character in URL`)
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		decoderFactory := config.NewDecoderFactory()
 
 		sut, e := NewObsSource(client, "\n", "format", decoderFactory, "timestampPath", "configPath")
@@ -73,7 +73,7 @@ func Test_NewObsSource(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf(`test exception`)
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(nil, expected).Times(1)
 		decoderFactory := config.NewDecoderFactory()
 
@@ -93,7 +93,7 @@ func Test_NewObsSource(t *testing.T) {
 
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path"`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoderFactory := config.NewDecoderFactory()
 
@@ -115,7 +115,7 @@ func Test_NewObsSource(t *testing.T) {
 		expected := fmt.Errorf(`error message`)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path"`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(nil, expected).Times(1)
@@ -143,7 +143,7 @@ func Test_NewObsSource(t *testing.T) {
 
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"other_path": 123}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&config.Partial{}, nil).Times(1)
@@ -171,7 +171,7 @@ func Test_NewObsSource(t *testing.T) {
 
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"timestamp": 123}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&config.Partial{"timestamp": 123}, nil).Times(1)
@@ -200,7 +200,7 @@ func Test_NewObsSource(t *testing.T) {
 		expected := "parsing time \"abc\" as \"2006-01-02T15:04:05Z07:00\": cannot parse \"abc\" as \"2006\""
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"timestamp": "abc"}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&config.Partial{"timestamp": "abc"}, nil).Times(1)
@@ -228,7 +228,7 @@ func Test_NewObsSource(t *testing.T) {
 
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"timestamp": "2000-01-01T00:00:00Z", other_path": 123}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&config.Partial{"timestamp": "2000-01-01T00:00:00Z"}, nil).Times(1)
@@ -256,7 +256,7 @@ func Test_NewObsSource(t *testing.T) {
 
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"timestamp": "2000-01-01T00:00:00Z", "path": 123}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&config.Partial{"timestamp": "2000-01-01T00:00:00Z", "path": 123}, nil).Times(1)
@@ -284,7 +284,7 @@ func Test_NewObsSource(t *testing.T) {
 
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"timestamp": "2000-01-01T00:00:00Z", "path": 123}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&config.Partial{"timestamp": "2000-01-01T00:00:00Z", "path": 123}, nil).Times(1)
@@ -313,7 +313,7 @@ func Test_NewObsSource(t *testing.T) {
 		expected := config.Partial{"field": "data"}
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"timestamp": "2000-01-01T00:00:00Z", "path": {"field": "data"}}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&config.Partial{"timestamp": "2000-01-01T00:00:00Z", "path": expected}, nil).Times(1)
@@ -342,7 +342,7 @@ func Test_NewObsSource(t *testing.T) {
 		expected := config.Partial{"field": "data"}
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"timestamp": "2000-01-01T00:00:00Z", "node": {"inner_node": {"field": "data"}}}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&config.Partial{"timestamp": "2000-01-01T00:00:00Z", "node": config.Partial{"inner_node": expected}}, nil).Times(1)
@@ -375,7 +375,7 @@ func Test_ObsSource_Reload(t *testing.T) {
 		response1.Body = io.NopCloser(strings.NewReader(`{"node": {"field": "data 1"}, "timestamp": "2021-12-15T21:07:48.239Z"}`))
 		response2 := http.Response{}
 		response2.Body = io.NopCloser(strings.NewReader(`{"node": {"field": "data 2"}, "timestamp": "2021-12-15T21:07:48.239Z"}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		gomock.InOrder(
 			client.EXPECT().Do(gomock.Any()).Return(&response1, nil),
 			client.EXPECT().Do(gomock.Any()).Return(&response2, nil),
@@ -420,7 +420,7 @@ func Test_ObsSource_Reload(t *testing.T) {
 		response1.Body = io.NopCloser(strings.NewReader(`{"node": {"field": "data 1"}, "timestamp": "2021-12-15T21:07:48.239Z"}`))
 		response2 := http.Response{}
 		response2.Body = io.NopCloser(strings.NewReader(`{"node": {"field": "data 2"}, "timestamp": "2021-12-15T21:07:48.240Z"}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		gomock.InOrder(
 			client.EXPECT().Do(gomock.Any()).Return(&response1, nil),
 			client.EXPECT().Do(gomock.Any()).Return(&response2, nil),

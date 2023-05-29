@@ -104,11 +104,10 @@ func (Provider) getDialectFactory(
 		panic(e)
 	}
 	// validate the retrieved entry type
-	i, ok := instance.(*DialectFactory)
-	if !ok {
-		panic(errConversion(instance, "*rdb.DialectFactory"))
+	if i, ok := instance.(*DialectFactory); ok {
+		return i
 	}
-	return i
+	panic(errConversion(instance, "*rdb.DialectFactory"))
 }
 
 func (Provider) getDialectStrategies(

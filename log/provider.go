@@ -98,11 +98,10 @@ func (Provider) getFormatterFactory(
 		panic(e)
 	}
 	// validate the retrieved entry type
-	instance, ok := entry.(*FormatterFactory)
-	if !ok {
-		panic(errConversion(entry, "*logger.FormatterFactory"))
+	if instance, ok := entry.(*FormatterFactory); ok {
+		return instance
 	}
-	return instance
+	panic(errConversion(entry, "*logger.FormatterFactory"))
 }
 
 func (Provider) getFormatterStrategies(
@@ -134,11 +133,10 @@ func (Provider) getStreamFactory(
 		panic(e)
 	}
 	// validate the retrieved entry type
-	instance, ok := entry.(*StreamFactory)
-	if !ok {
-		panic(errConversion(entry, "*logger.StreamFactory"))
+	if instance, ok := entry.(*StreamFactory); ok {
+		return instance
 	}
-	return instance
+	panic(errConversion(entry, "*logger.StreamFactory"))
 }
 
 func (Provider) getStreamStrategies(
@@ -170,9 +168,8 @@ func (Provider) getLoader(
 		panic(e)
 	}
 	// validate the retrieved entry type
-	instance, ok := entry.(*Loader)
-	if !ok {
-		panic(errConversion(entry, "*logger.Loader"))
+	if instance, ok := entry.(*Loader); ok {
+		return instance
 	}
-	return instance
+	panic(errConversion(entry, "*logger.Loader"))
 }

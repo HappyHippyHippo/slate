@@ -78,7 +78,7 @@ func Test_NewConnectionPool(t *testing.T) {
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(cfg, cf)
-		sut.connectionFactory = connectionFactory
+		sut.connectionCreator = connectionFactory
 
 		_, _ = sut.Get(name, gormCfg)
 		if len(sut.instances) != 1 {
@@ -103,7 +103,7 @@ func Test_ConnectionPool_Get(t *testing.T) {
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(config.NewConfig(), cf)
-		sut.connectionFactory = connectionFactory
+		sut.connectionCreator = connectionFactory
 		sut.cfg = cfg
 
 		conn, e := sut.Get("primary", &gorm.Config{})
@@ -129,7 +129,7 @@ func Test_ConnectionPool_Get(t *testing.T) {
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(config.NewConfig(), cf)
-		sut.connectionFactory = connectionFactory
+		sut.connectionCreator = connectionFactory
 		sut.cfg = cfg
 
 		conn, e := sut.Get("name", &gorm.Config{})
@@ -158,7 +158,7 @@ func Test_ConnectionPool_Get(t *testing.T) {
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(config.NewConfig(), cf)
-		sut.connectionFactory = connectionFactory
+		sut.connectionCreator = connectionFactory
 		sut.cfg = cfg
 
 		conn, e := sut.Get("name", gormCfg)
@@ -186,7 +186,7 @@ func Test_ConnectionPool_Get(t *testing.T) {
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(config.NewConfig(), cf)
-		sut.connectionFactory = connectionFactory
+		sut.connectionCreator = connectionFactory
 		sut.cfg = cfg
 
 		if check, e := sut.Get("name", gormCfg); check == nil {
@@ -210,7 +210,7 @@ func Test_ConnectionPool_Get(t *testing.T) {
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(config.NewConfig(), cf)
-		sut.connectionFactory = connectionFactory
+		sut.connectionCreator = connectionFactory
 		sut.cfg = cfg
 
 		conn, _ := sut.Get("name", gormCfg)

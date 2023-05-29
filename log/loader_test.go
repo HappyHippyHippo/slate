@@ -152,7 +152,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		sut, _ := NewLoader(config.NewConfig(), NewLog(), NewStreamFactory())
 		sut.cfg = cfg
-		sut.streamFactory = streamFactory
+		sut.streamCreator = streamFactory
 
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
@@ -178,7 +178,7 @@ func Test_Loader_Load(t *testing.T) {
 		sut, _ := NewLoader(config.NewConfig(), NewLog(), NewStreamFactory())
 		sut.cfg = cfg
 		sut.log = log
-		sut.streamFactory = streamFactory
+		sut.streamCreator = streamFactory
 
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
@@ -204,7 +204,7 @@ func Test_Loader_Load(t *testing.T) {
 		sut, _ := NewLoader(config.NewConfig(), NewLog(), NewStreamFactory())
 		sut.cfg = cfg
 		sut.log = log
-		sut.streamFactory = streamFactory
+		sut.streamCreator = streamFactory
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -231,7 +231,7 @@ func Test_Loader_Load(t *testing.T) {
 		log.EXPECT().AddStream("id", stream).Return(nil).Times(1)
 
 		sut, _ := NewLoader(cfg, NewLog(), NewStreamFactory())
-		sut.streamFactory = streamFactory
+		sut.streamCreator = streamFactory
 		sut.log = log
 		_ = sut.Load()
 
@@ -269,7 +269,7 @@ func Test_Loader_Load(t *testing.T) {
 		)
 
 		sut, _ := NewLoader(cfg, NewLog(), NewStreamFactory())
-		sut.streamFactory = streamFactory
+		sut.streamCreator = streamFactory
 		sut.log = log
 		_ = sut.Load()
 

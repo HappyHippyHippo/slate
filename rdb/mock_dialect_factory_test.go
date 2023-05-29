@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// MockDialectFactory is a mock of dialectFactory interface.
+// MockDialectFactory is a mock of dialectCreator interface.
 type MockDialectFactory struct {
 	ctrl     *gomock.Controller
 	recorder *MockDialectFactoryRecorder

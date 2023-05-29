@@ -8,7 +8,7 @@ import (
 // registered list of stream generation strategies.
 type StreamFactory []StreamStrategy
 
-var _ streamFactory = &StreamFactory{}
+var _ streamCreator = &StreamFactory{}
 
 // NewStreamFactory will instantiate a new stream factory instance
 func NewStreamFactory() *StreamFactory {

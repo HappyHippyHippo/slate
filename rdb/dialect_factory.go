@@ -5,16 +5,10 @@ import (
 	"gorm.io/gorm"
 )
 
-type dialectFactory interface {
-	Create(cfg *config.Partial) (gorm.Dialector, error)
-}
-
 // DialectFactory defines an object that will generate a database
 // dialect interface based on a registered list of dialect
 // generation strategies.
 type DialectFactory []DialectStrategy
-
-var _ dialectFactory = &DialectFactory{}
 
 // NewDialectFactory will instantiate a new relational database
 // dialect factory instance.

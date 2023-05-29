@@ -29,7 +29,7 @@ func (m *MockWatchdog) EXPECT() *MockWatchdogRecorder {
 }
 
 // Run mocks base method.
-func (m *MockWatchdog) Run(process IProcess) error {
+func (m *MockWatchdog) Run(process Processor) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Run", process)
 	ret0, _ := ret[0].(error)

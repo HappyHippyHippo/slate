@@ -5,7 +5,7 @@ import (
 )
 
 type kennelReg struct {
-	process  IProcess
+	process  Processor
 	watchdog *Watchdog
 }
 
@@ -35,7 +35,7 @@ func NewKennel(factory *Factory) (*Kennel, error) {
 
 // Add will create a new watchdog instance that will guard the
 // requested process instance.
-func (k *Kennel) Add(process IProcess) error {
+func (k *Kennel) Add(process Processor) error {
 	// check if there is a watchdog for the requested service
 	if _, ok := k.regs[process.Service()]; ok {
 		return errDuplicateService(process.Service())
@@ -68,8 +68,7 @@ func (k *Kennel) Run() error {
 		// run the registered process
 		go func(reg kennelReg) {
 			// run the process on a created watchdog
-			e := reg.watchdog.Run(reg.process)
-			if e != nil {
+			if e := reg.watchdog.Run(reg.process); e != nil {
 				result = e
 			}
 			// signal the wait group that the watchdog terminated

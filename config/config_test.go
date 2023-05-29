@@ -79,7 +79,7 @@ func Test_Config_Close(t *testing.T) {
 		src.EXPECT().Get("").Return(Partial{}, nil).AnyTimes()
 		src.EXPECT().Close().Return(nil).Times(1)
 		_ = sut.AddSource("src", 0, src)
-		observer := NewMockRecurringTrigger(ctrl)
+		observer := NewMockTicker(ctrl)
 		observer.EXPECT().Close().Return(expected).Times(1)
 		sut.observer = observer
 

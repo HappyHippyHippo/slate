@@ -28,15 +28,15 @@ func NewObsSource(
 	path,
 	format string,
 	fileSystem afero.Fs,
-	decoderFactory *config.DecoderFactory,
+	decoderCreator decoderCreator,
 ) (*ObsSource, error) {
 	// check file system argument reference
 	if fileSystem == nil {
 		return nil, errNilPointer("fileSystem")
 	}
 	// check decoder factory argument reference
-	if decoderFactory == nil {
-		return nil, errNilPointer("decoderFactory")
+	if decoderCreator == nil {
+		return nil, errNilPointer("decoderCreator")
 	}
 	// return the requested observable config source instance
 	s := &ObsSource{
@@ -48,7 +48,7 @@ func NewObsSource(
 			path:           path,
 			format:         format,
 			fileSystem:     fileSystem,
-			decoderFactory: decoderFactory,
+			decoderCreator: decoderCreator,
 		},
 		timestamp: time.Unix(0, 0),
 	}

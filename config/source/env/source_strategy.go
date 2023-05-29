@@ -10,10 +10,6 @@ const (
 	Type = "env"
 )
 
-type sourceConfig struct {
-	Mappings config.Partial
-}
-
 // SourceStrategy defines a strategy used to instantiate an
 // environment variable mapped config source creation strategy.
 type SourceStrategy struct{}
@@ -30,15 +26,15 @@ func NewSourceStrategy() *SourceStrategy {
 // a source where the data to check comes from a configuration
 // instance.
 func (s SourceStrategy) Accept(
-	partial *config.Partial,
+	cfg *config.Partial,
 ) bool {
 	// check config argument reference
-	if partial == nil {
+	if cfg == nil {
 		return false
 	}
 	// retrieve the data from the configuration
 	sc := struct{ Type string }{}
-	if _, e := partial.Populate("", &sc); e != nil {
+	if _, e := cfg.Populate("", &sc); e != nil {
 		return false
 	}
 	// return acceptance for the read config type
@@ -48,16 +44,15 @@ func (s SourceStrategy) Accept(
 // Create will instantiate the desired environment source instance
 // where the initialization data comes from a configuration instance.
 func (s SourceStrategy) Create(
-	partial *config.Partial,
+	cfg *config.Partial,
 ) (config.Source, error) {
 	// check config argument reference
-	if partial == nil {
-		return nil, errNilPointer("partial")
+	if cfg == nil {
+		return nil, errNilPointer("cfg")
 	}
 	// retrieve the data from the configuration
-	sc := sourceConfig{}
-	_, e := partial.Populate("", &sc)
-	if e != nil {
+	sc := struct{ Mappings config.Partial }{}
+	if _, e := cfg.Populate("", &sc); e != nil {
 		return nil, e
 	}
 	// create the mappings map

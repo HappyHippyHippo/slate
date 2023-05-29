@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// MockConnectionFactory is a mock of connectionFactory interface.
+// MockConnectionFactory is a mock of connectionCreator interface.
 type MockConnectionFactory struct {
 	ctrl     *gomock.Controller
 	recorder *MockConnectionFactoryRecorder

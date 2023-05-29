@@ -59,27 +59,25 @@ func (p Provider) Register(
 // to the last registered migration
 func (p Provider) Boot(
 	container *slate.Container,
-) error {
+) (e error) {
 	// check container argument reference
 	if container == nil {
 		return errNilPointer("container")
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			e = r.(error)
+		}
+	}()
+
 	// check the application auto migration flag
 	if !AutoMigrate {
 		return nil
 	}
-	// retrieve the migration manager
-	migrator, e := p.getMigrator(container)
-	if e != nil {
-		return e
-	}
-	// retrieve the list of migrations of the application
-	migrations, e := p.getMigrations(container)
-	if e != nil {
-		return e
-	}
 	// add all the found migrations into the migration manager
-	for _, migration := range migrations {
+	migrator := p.getMigrator(container)
+	for _, migration := range p.getMigrations(container) {
 		_ = migrator.AddMigration(migration)
 	}
 	// execute the migrations
@@ -88,36 +86,35 @@ func (p Provider) Boot(
 
 func (p Provider) getMigrator(
 	container *slate.Container,
-) (*Migrator, error) {
+) *Migrator {
 	// retrieve the manager entry
 	instance, e := container.Get(ID)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// validate the retrieved entry type
-	i, ok := instance.(*Migrator)
-	if !ok {
-		return nil, errConversion(instance, "*migration.Migrator")
+	if i, ok := instance.(*Migrator); ok {
+		return i
 	}
-	return i, nil
+	panic(errConversion(instance, "*migration.Migrator"))
 }
 
 func (p Provider) getMigrations(
 	container *slate.Container,
-) ([]Migration, error) {
+) []Migration {
 	// retrieve the migrations entries
 	tags, e := container.Tag(MigrationTag)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// type check the retrieved migrations
 	var list []Migration
 	for _, service := range tags {
 		s, ok := service.(Migration)
 		if !ok {
-			return nil, errConversion(service, "migration.Migration")
+			panic(errConversion(service, "migration.Migration"))
 		}
 		list = append(list, s)
 	}
-	return list, nil
+	return list
 }

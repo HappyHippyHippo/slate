@@ -9,7 +9,7 @@ import (
 // UnderlyingDecoder defines the interface to a decoder underlying
 // format decoder
 type UnderlyingDecoder interface {
-	Decode(partial interface{}) error
+	Decode(cfg interface{}) error
 }
 
 // Decoder defines a config source content decoder instance.

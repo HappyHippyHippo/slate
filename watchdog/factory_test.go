@@ -232,7 +232,7 @@ func Test_Factory_Create(t *testing.T) {
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
 		sut.config = cfg
-		sut.formatterFactory = formatterFactory
+		sut.formatterCreator = formatterFactory
 
 		chk, e := sut.Create(service)
 		switch {
@@ -260,7 +260,7 @@ func Test_Factory_Create(t *testing.T) {
 
 		sut, _ := NewFactory(config.NewConfig(), logger, NewLogFormatterFactory())
 		sut.config = cfg
-		sut.formatterFactory = formatterFactory
+		sut.formatterCreator = formatterFactory
 
 		wd, e := sut.Create(service)
 		switch {

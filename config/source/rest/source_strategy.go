@@ -12,18 +12,10 @@ const (
 	Type = "rest"
 )
 
-type sourceConfig struct {
-	URI    string
-	Format string
-	Path   struct {
-		Config string
-	}
-}
-
 // SourceStrategy defines a strategy used to instantiate
 // a REST service config source creation strategy.
 type SourceStrategy struct {
-	clientFactory  func() httpClient
+	clientFactory  func() requester
 	decoderFactory *config.DecoderFactory
 }
 
@@ -36,11 +28,11 @@ func NewSourceStrategy(
 ) (*SourceStrategy, error) {
 	// check the decoder factory argument reference
 	if decoderFactory == nil {
-		return nil, errNilPointer("decoderFactory")
+		return nil, errNilPointer("decoderCreator")
 	}
 	// instantiate the strategy
 	return &SourceStrategy{
-		clientFactory:  func() httpClient { return &http.Client{} },
+		clientFactory:  func() requester { return &http.Client{} },
 		decoderFactory: decoderFactory,
 	}, nil
 }
@@ -49,15 +41,15 @@ func NewSourceStrategy(
 // a source where the data to check comes from a configuration
 // instance.
 func (s SourceStrategy) Accept(
-	partial *config.Partial,
+	cfg *config.Partial,
 ) bool {
 	// check the config argument reference
-	if partial == nil {
+	if cfg == nil {
 		return false
 	}
 	// retrieve the data from the configuration
 	sc := struct{ Type string }{}
-	if _, e := partial.Populate("", &sc); e != nil {
+	if _, e := cfg.Populate("", &sc); e != nil {
 		return false
 	}
 	// return acceptance for the read config type
@@ -67,24 +59,31 @@ func (s SourceStrategy) Accept(
 // Create will instantiate the desired rest source instance where
 // the initialization data comes from a configuration instance.
 func (s SourceStrategy) Create(
-	partial *config.Partial,
+	cfg *config.Partial,
 ) (config.Source, error) {
 	// check the config argument reference
-	if partial == nil {
-		return nil, errNilPointer("partial")
+	if cfg == nil {
+		return nil, errNilPointer("cfg")
 	}
 	// retrieve the data from the configuration
-	sc := sourceConfig{Format: config.DefaultRestFormat}
-	_, e := partial.Populate("", &sc)
-	if e != nil {
+	sc := struct {
+		URI    string
+		Format string
+		Path   struct {
+			Config string
+		}
+	}{
+		Format: config.DefaultRestFormat,
+	}
+	if _, e := cfg.Populate("", &sc); e != nil {
 		return nil, e
 	}
 	// validate configuration
 	if sc.URI == "" {
-		return nil, errInvalidSource(partial, map[string]interface{}{"description": "missing URI"})
+		return nil, errInvalidSource(cfg, map[string]interface{}{"description": "missing URI"})
 	}
 	if sc.Path.Config == "" {
-		return nil, errInvalidSource(partial, map[string]interface{}{"description": "missing response config path"})
+		return nil, errInvalidSource(cfg, map[string]interface{}{"description": "missing response config path"})
 	}
 	// return acceptance for the read config type
 	return NewSource(

@@ -65,7 +65,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
 		sut.config = cfg
-		sut.sourceFactory = sourceFactory
+		sut.sourceCreator = sourceFactory
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
@@ -87,7 +87,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
 		sut.config = cfg
-		sut.sourceFactory = sourceFactory
+		sut.sourceCreator = sourceFactory
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
@@ -109,7 +109,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
 		sut.config = cfg
-		sut.sourceFactory = sourceFactory
+		sut.sourceCreator = sourceFactory
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -130,7 +130,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
 		sut.config = cfg
-		sut.sourceFactory = sourceFactory
+		sut.sourceCreator = sourceFactory
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the unexpected error : %v", e)
@@ -151,7 +151,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
 		sut.config = cfg
-		sut.sourceFactory = sourceFactory
+		sut.sourceCreator = sourceFactory
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
@@ -179,7 +179,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
 		sut.config = cfg
-		sut.sourceFactory = sourceFactory
+		sut.sourceCreator = sourceFactory
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
@@ -211,7 +211,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
 		sut.config = cfg
-		sut.sourceFactory = sourceFactory
+		sut.sourceCreator = sourceFactory
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
@@ -242,7 +242,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
 		sut.config = cfg
-		sut.sourceFactory = sourceFactory
+		sut.sourceCreator = sourceFactory
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -276,7 +276,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
 		sut.config = cfg
-		sut.sourceFactory = sourceFactory
+		sut.sourceCreator = sourceFactory
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -310,7 +310,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
 		sut.config = cfg
-		sut.sourceFactory = sourceFactory
+		sut.sourceCreator = sourceFactory
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -344,7 +344,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
 		sut.config = cfg
-		sut.sourceFactory = sourceFactory
+		sut.sourceCreator = sourceFactory
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -373,7 +373,7 @@ func Test_Loader_Load(t *testing.T) {
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
 		sut.config = cfg
-		sut.sourceFactory = sourceFactory
+		sut.sourceCreator = sourceFactory
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)

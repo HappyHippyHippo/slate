@@ -5,29 +5,29 @@ import (
 	"gorm.io/gorm"
 )
 
-type connectionFactory interface {
-	Create(cfg *config.Partial, gormCfg *gorm.Config) (*gorm.DB, error)
+type dialectCreator interface {
+	Create(cfg *config.Partial) (gorm.Dialector, error)
 }
 
 // ConnectionFactory is a database connection generator.
 type ConnectionFactory struct {
-	dialectFactory dialectFactory
+	dialectCreator dialectCreator
 }
 
-var _ connectionFactory = &ConnectionFactory{}
+var _ connectionCreator = &ConnectionFactory{}
 
 // NewConnectionFactory will instantiate a new relational
 // database connection factory instance.
 func NewConnectionFactory(
-	dialectFactory *DialectFactory,
+	dialectCreator *DialectFactory,
 ) (*ConnectionFactory, error) {
 	// check dialect factory argument reference
-	if dialectFactory == nil {
-		return nil, errNilPointer("dialectFactory")
+	if dialectCreator == nil {
+		return nil, errNilPointer("dialectCreator")
 	}
 	// instantiate the connection factory
 	return &ConnectionFactory{
-		dialectFactory: dialectFactory,
+		dialectCreator: dialectCreator,
 	}, nil
 }
 
@@ -39,7 +39,7 @@ func (f *ConnectionFactory) Create(
 	gormCfg *gorm.Config,
 ) (*gorm.DB, error) {
 	// get a dialect instance for the connection
-	dialect, e := f.dialectFactory.Create(cfg)
+	dialect, e := f.dialectCreator.Create(cfg)
 	if e != nil {
 		return nil, e
 	}

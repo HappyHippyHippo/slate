@@ -4,6 +4,12 @@ import (
 	"sort"
 )
 
+type dao interface {
+	Last() (Record, error)
+	Up(version uint64) (Record, error)
+	Down(last Record) error
+}
+
 // Migrator defines a new migration manager instance.
 type Migrator struct {
 	dao        dao
@@ -73,8 +79,7 @@ func (m *Migrator) Migrate() error {
 				return e
 			}
 			// register the executed migration
-			current, e = m.dao.Up(migrationVersion)
-			if e != nil {
+			if current, e = m.dao.Up(migrationVersion); e != nil {
 				return e
 			}
 		}

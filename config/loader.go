@@ -5,38 +5,38 @@ type configurer interface {
 	AddSource(id string, priority int, src Source) error
 }
 
-type sourceFactory interface {
-	Create(partial *Partial) (Source, error)
+var _ configurer = &Config{}
+
+type sourceCreator interface {
+	Create(cfg *Partial) (Source, error)
 }
+
+var _ sourceCreator = &SourceFactory{}
 
 // Loader defines an object responsible to initialize a
 // configuration manager.
 type Loader struct {
 	config        configurer
-	sourceFactory sourceFactory
-}
-
-type sourceConfig struct {
-	Priority int
+	sourceCreator sourceCreator
 }
 
 // NewLoader instantiate a new configuration loader instance.
 func NewLoader(
-	config *Config,
-	sourceFactory *SourceFactory,
+	cfg *Config,
+	sourceCreator *SourceFactory,
 ) (*Loader, error) {
 	// check manager argument reference
-	if config == nil {
-		return nil, errNilPointer("config")
+	if cfg == nil {
+		return nil, errNilPointer("cfg")
 	}
 	// check source factory argument reference
-	if sourceFactory == nil {
-		return nil, errNilPointer("sourceFactory")
+	if sourceCreator == nil {
+		return nil, errNilPointer("sourceCreator")
 	}
 	// instantiate the loader
 	return &Loader{
-		config:        config,
-		sourceFactory: sourceFactory,
+		config:        cfg,
+		sourceCreator: sourceCreator,
 	}, nil
 }
 
@@ -44,7 +44,7 @@ func NewLoader(
 // path and format.
 func (l Loader) Load() error {
 	// retrieve the loader entry file partial content
-	src, e := l.sourceFactory.Create(&Partial{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat})
+	src, e := l.sourceCreator.Create(&Partial{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat})
 	if e != nil {
 		return e
 	}
@@ -72,16 +72,15 @@ func (l Loader) Load() error {
 
 func (l Loader) loadSource(
 	id string,
-	partial *Partial,
+	cfg *Partial,
 ) error {
 	// parse the configuration
-	sc := sourceConfig{}
-	_, e := partial.Populate("", &sc)
-	if e != nil {
+	sc := struct{ Priority int }{}
+	if _, e := cfg.Populate("", &sc); e != nil {
 		return e
 	}
 	// create the partial source
-	src, e := l.sourceFactory.Create(partial)
+	src, e := l.sourceCreator.Create(cfg)
 	if e != nil {
 		return e
 	}

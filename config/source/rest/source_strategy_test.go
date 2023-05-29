@@ -48,7 +48,7 @@ func Test_NewSourceStrategy(t *testing.T) {
 			switch client.(type) {
 			case *http.Client:
 			default:
-				t.Error("didn't stored a valid http client decoderFactory")
+				t.Error("didn't stored a valid http client decoderCreator")
 			}
 		}
 	})
@@ -237,9 +237,9 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		sut, _ := NewSourceStrategy(decoderFactory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		sut.clientFactory = func() httpClient { return client }
+		sut.clientFactory = func() requester { return client }
 
 		src, e := sut.Create(&config.Partial{"uri": uri, "format": format, "path": config.Partial{"config": path}})
 		switch {
@@ -281,9 +281,9 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		sut, _ := NewSourceStrategy(decoderFactory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		sut.clientFactory = func() httpClient { return client }
+		sut.clientFactory = func() requester { return client }
 
 		src, e := sut.Create(&config.Partial{"uri": uri, "path": config.Partial{"config": path}})
 		switch {
