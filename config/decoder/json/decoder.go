@@ -13,13 +13,13 @@ type Decoder struct {
 	decoder.Decoder
 }
 
-var _ config.IDecoder = &Decoder{}
+var _ config.Decoder = &Decoder{}
 
 // NewDecoder will instantiate a new JSON configuration decoder.
 func NewDecoder(
 	reader io.Reader,
 ) (*Decoder, error) {
-	// validate the jsonReader reference
+	// validate the reader reference
 	if reader == nil {
 		return nil, errNilPointer("jsonReader")
 	}

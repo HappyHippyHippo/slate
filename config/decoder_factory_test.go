@@ -14,8 +14,6 @@ func Test_NewDecoderFactory_Register(t *testing.T) {
 		sut := NewDecoderFactory()
 		if sut == nil {
 			t.Error("didn't returned the expected reference")
-		} else if _, ok := sut.(*DecoderFactory); !ok {
-			t.Error("didn't returned a valid decoder factory instance")
 		}
 	})
 }
@@ -49,7 +47,7 @@ func Test_DecoderFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		format := UnknownDecoderFormat
+		format := UnknownDecoder
 		reader := NewMockReader(ctrl)
 		strategy := NewMockDecoderStrategy(ctrl)
 		strategy.EXPECT().Accept(format).Return(false).Times(1)
@@ -71,7 +69,7 @@ func Test_DecoderFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		format := UnknownDecoderFormat
+		format := UnknownDecoder
 		reader := NewMockReader(ctrl)
 		decoder := NewMockDecoder(ctrl)
 		strategy := NewMockDecoderStrategy(ctrl)

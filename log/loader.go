@@ -4,52 +4,59 @@ import (
 	"github.com/happyhippyhippo/slate/config"
 )
 
-// ILoader defines the interface of a log loader instance.
-type ILoader interface {
-	Load() error
+type configurer interface {
+	Partial(path string, def ...config.Partial) (*config.Partial, error)
+	AddObserver(path string, callback config.Observer) error
 }
 
-// Loader defines the log instantiation and initialization of a new
-// log proxy.
+type logger interface {
+	RemoveAllStreams()
+	AddStream(id string, stream Stream) error
+}
+
+type streamCreator interface {
+	Create(cfg *config.Partial) (Stream, error)
+}
+
+// Loader defines the logger instantiation and initialization of a new
+// logger proxy.
 type Loader struct {
-	cfg           config.IManager
-	log           ILog
-	streamFactory IStreamFactory
+	cfg           configurer
+	log           logger
+	streamCreator streamCreator
 }
 
-var _ ILoader = &Loader{}
-
-// NewLoader generates a new log initialization instance.
+// NewLoader generates a new logger initialization instance.
 func NewLoader(
-	cfg config.IManager,
-	log ILog,
-	streamFactory IStreamFactory,
-) (ILoader, error) {
+	cfg *config.Config,
+	log *Log,
+	streamCreator *StreamFactory,
+) (*Loader, error) {
 	// check the config argument reference
 	if cfg == nil {
 		return nil, errNilPointer("cfg")
 	}
-	// check the log argument reference
+	// check the logger argument reference
 	if log == nil {
-		return nil, errNilPointer("log")
+		return nil, errNilPointer("logger")
 	}
 	// check the stream factory argument reference
-	if streamFactory == nil {
-		return nil, errNilPointer("factory")
+	if streamCreator == nil {
+		return nil, errNilPointer("streamCreator")
 	}
 	// instantiate the loader
 	return &Loader{
 		cfg:           cfg,
 		log:           log,
-		streamFactory: streamFactory,
+		streamCreator: streamCreator,
 	}, nil
 }
 
 // Load will parse the configuration and instantiates logging streams
 // depending the data on the configuration.
 func (l Loader) Load() error {
-	// retrieve the log entries from the config instance
-	entries, e := l.cfg.Config(LoaderConfigPath, config.Config{})
+	// retrieve the logger entries from the config instance
+	entries, e := l.cfg.Partial(LoaderConfigPath, config.Partial{})
 	if e != nil {
 		return e
 	}
@@ -57,25 +64,21 @@ func (l Loader) Load() error {
 	if e := l.load(entries); e != nil {
 		return e
 	}
-	// check if the log streams list should be observed for updates
+	// check if the logger streams list should be observed for updates
 	if LoaderObserveConfig {
 		// add the observer to the given config
 		_ = l.cfg.AddObserver(
 			LoaderConfigPath,
 			func(_ interface{}, newConfig interface{}) {
-				// type check the new log config with the logging streams
-				cfg, ok := newConfig.(config.Config)
+				// type check the new logger config with the logging streams
+				cfg, ok := newConfig.(config.Partial)
 				if !ok {
-					// log the input value error
-					_ = l.log.Signal(LoaderErrorChannel, ERROR, "reloading log streams error", Context{"error": e})
 					return
 				}
 				// remove all the current registered streams
 				l.log.RemoveAllStreams()
 				// load the new stream entries
-				if e := l.load(&cfg); e != nil {
-					_ = l.log.Signal(LoaderErrorChannel, ERROR, "reloading log streams error", Context{"error": e})
-				}
+				_ = l.load(&cfg)
 			},
 		)
 	}
@@ -83,23 +86,22 @@ func (l Loader) Load() error {
 }
 
 func (l Loader) load(
-	cfg config.IConfig,
+	cfg *config.Partial,
 ) error {
-	// iterate through the given log config stream list
+	// iterate through the given logger config stream list
 	for _, id := range cfg.Entries() {
 		// get the configuration
-		entry, e := cfg.Config(id)
+		entry, e := cfg.Partial(id)
 		if e != nil {
 			return e
 		}
 		// generate the new stream
-		stream, e := l.streamFactory.Create(entry)
+		stream, e := l.streamCreator.Create(entry)
 		if e != nil {
 			return e
 		}
-		// add the stream to the log stream pool
-		e = l.log.AddStream(id, stream)
-		if e != nil {
+		// add the stream to the logger stream pool
+		if e := l.log.AddStream(id, stream); e != nil {
 			return e
 		}
 	}

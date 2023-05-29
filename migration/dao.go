@@ -23,25 +23,20 @@ func (Record) TableName() string {
 	return "__version"
 }
 
-// IDao defines the interface to the migration manager DAO instance.
-type IDao interface {
-	Last() (Record, error)
-	Up(version uint64) (Record, error)
-	Down(last Record) error
-}
-
 // Dao defines an object to the migration DAO instance responsible
 // to manager the installed migrations.
 type Dao struct {
 	db *gorm.DB
 }
 
-var _ IDao = &Dao{}
-
 // NewDao will instantiate a new migration DAO instance.
 func NewDao(
 	db *gorm.DB,
-) (IDao, error) {
+) (*Dao, error) {
+	// check db argument reference
+	if db == nil {
+		return nil, errNilPointer("db")
+	}
 	// execute the dao auto migration to guarantee the table existence
 	if e := db.AutoMigrate(&Record{}); e != nil {
 		return nil, e

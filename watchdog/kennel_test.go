@@ -30,7 +30,7 @@ func Test_NewKennel(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		factory := NewMockFactory(ctrl)
+		factory := &Factory{}
 		sut, e := NewKennel(factory)
 
 		switch {
@@ -38,9 +38,9 @@ func Test_NewKennel(t *testing.T) {
 			t.Errorf("returned the (%v) error", e)
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
-		case sut.(*Kennel).factory != factory:
+		case sut.factory != factory:
 			t.Errorf("didn't store the given config instance")
-		case sut.(*Kennel).regs == nil:
+		case sut.regs == nil:
 			t.Errorf("didn't initialize the kennel registration map")
 		}
 	})
@@ -54,8 +54,9 @@ func Test_Kennel_Add(t *testing.T) {
 		service := "service"
 		process := &Process{service: service}
 		factory := NewMockFactory(ctrl)
-		sut, _ := NewKennel(factory)
-		sut.(*Kennel).regs[service] = kennelReg{}
+		sut, _ := NewKennel(&Factory{})
+		sut.factory = factory
+		sut.regs[service] = kennelReg{}
 
 		e := sut.Add(process)
 		switch {
@@ -75,7 +76,8 @@ func Test_Kennel_Add(t *testing.T) {
 		process := &Process{service: service}
 		factory := NewMockFactory(ctrl)
 		factory.EXPECT().Create(service).Return(nil, expected).Times(1)
-		sut, _ := NewKennel(factory)
+		sut, _ := NewKennel(&Factory{})
+		sut.factory = factory
 
 		e := sut.Add(process)
 		switch {
@@ -92,20 +94,21 @@ func Test_Kennel_Add(t *testing.T) {
 
 		service := "service"
 		process := &Process{service: service}
-		wd := NewMockWatchdog(ctrl)
+		wd := &Watchdog{}
 		factory := NewMockFactory(ctrl)
 		factory.EXPECT().Create(service).Return(wd, nil).Times(1)
-		sut, _ := NewKennel(factory)
+		sut, _ := NewKennel(&Factory{})
+		sut.factory = factory
 
 		e := sut.Add(process)
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected error : %v", e)
-		case len(sut.(*Kennel).regs) != 1:
+		case len(sut.regs) != 1:
 			t.Error("didn't stored the process registry")
-		case sut.(*Kennel).regs[service].process != process:
+		case sut.regs[service].process != process:
 			t.Error("didn't stored the process info in the created registry")
-		case sut.(*Kennel).regs[service].watchdog != wd:
+		case sut.regs[service].watchdog != wd:
 			t.Error("didn't stored the generated watchdog in the created registry")
 		}
 	})
@@ -116,8 +119,7 @@ func Test_Kennel_Run(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		factory := NewMockFactory(ctrl)
-		sut, _ := NewKennel(factory)
+		sut, _ := NewKennel(&Factory{})
 
 		if e := sut.Run(); e != nil {
 			t.Errorf("returned the unexpected error : %v", e)
@@ -129,12 +131,15 @@ func Test_Kennel_Run(t *testing.T) {
 		defer ctrl.Finish()
 
 		service := "service"
-		process := &Process{service: service}
-		wd := NewMockWatchdog(ctrl)
-		wd.EXPECT().Run(process).Return(nil).Times(1)
+		process := &Process{service: service, runner: func() error { return nil }}
+		logAdapter := NewMockLogAdapter(ctrl)
+		logAdapter.EXPECT().Start().Return(nil).Times(1)
+		logAdapter.EXPECT().Done().Return(nil).Times(1)
+		wd := &Watchdog{log: logAdapter}
 		factory := NewMockFactory(ctrl)
 		factory.EXPECT().Create(service).Return(wd, nil).Times(1)
-		sut, _ := NewKennel(factory)
+		sut, _ := NewKennel(&Factory{})
+		sut.factory = factory
 		_ = sut.Add(process)
 
 		if e := sut.Run(); e != nil {
@@ -146,22 +151,29 @@ func Test_Kennel_Run(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		process1 := &Process{service: "service1"}
-		process2 := &Process{service: "service2"}
-		process3 := &Process{service: "service3"}
-		wd1 := NewMockWatchdog(ctrl)
-		wd1.EXPECT().Run(process1).Return(nil).Times(1)
-		wd2 := NewMockWatchdog(ctrl)
-		wd2.EXPECT().Run(process2).Return(nil).Times(1)
-		wd3 := NewMockWatchdog(ctrl)
-		wd3.EXPECT().Run(process3).Return(nil).Times(1)
+		process1 := &Process{service: "service1", runner: func() error { return nil }}
+		logAdapter1 := NewMockLogAdapter(ctrl)
+		logAdapter1.EXPECT().Start().Return(nil).Times(1)
+		logAdapter1.EXPECT().Done().Return(nil).Times(1)
+		wd1 := &Watchdog{log: logAdapter1}
+		process2 := &Process{service: "service2", runner: func() error { return nil }}
+		logAdapter2 := NewMockLogAdapter(ctrl)
+		logAdapter2.EXPECT().Start().Return(nil).Times(1)
+		logAdapter2.EXPECT().Done().Return(nil).Times(1)
+		wd2 := &Watchdog{log: logAdapter2}
+		process3 := &Process{service: "service3", runner: func() error { return nil }}
+		logAdapter3 := NewMockLogAdapter(ctrl)
+		logAdapter3.EXPECT().Start().Return(nil).Times(1)
+		logAdapter3.EXPECT().Done().Return(nil).Times(1)
+		wd3 := &Watchdog{log: logAdapter3}
 		factory := NewMockFactory(ctrl)
 		gomock.InOrder(
 			factory.EXPECT().Create("service1").Return(wd1, nil).Times(1),
 			factory.EXPECT().Create("service2").Return(wd2, nil).Times(1),
 			factory.EXPECT().Create("service3").Return(wd3, nil).Times(1),
 		)
-		sut, _ := NewKennel(factory)
+		sut, _ := NewKennel(&Factory{})
+		sut.factory = factory
 		_ = sut.Add(process1)
 		_ = sut.Add(process2)
 		_ = sut.Add(process3)
@@ -176,22 +188,38 @@ func Test_Kennel_Run(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		process1 := &Process{service: "service1"}
-		process2 := &Process{service: "service2"}
-		process3 := &Process{service: "service3"}
-		wd1 := NewMockWatchdog(ctrl)
-		wd1.EXPECT().Run(process1).Return(nil).Times(1)
-		wd2 := NewMockWatchdog(ctrl)
-		wd2.EXPECT().Run(process2).Return(expected).Times(1)
-		wd3 := NewMockWatchdog(ctrl)
-		wd3.EXPECT().Run(process3).Return(nil).Times(1)
+		panicError := fmt.Errorf("panic error")
+		process1 := &Process{service: "service1", runner: func() error { return nil }}
+		logAdapter1 := NewMockLogAdapter(ctrl)
+		logAdapter1.EXPECT().Start().Return(nil).Times(1)
+		logAdapter1.EXPECT().Done().Return(nil).Times(1)
+		wd1 := &Watchdog{log: logAdapter1}
+		count := 0
+		process2 := &Process{service: "service2", runner: func() error {
+			count++
+			if count == 1 {
+				panic(panicError)
+			}
+			return expected
+		}}
+		logAdapter2 := NewMockLogAdapter(ctrl)
+		logAdapter2.EXPECT().Start().Return(nil).Times(1)
+		logAdapter2.EXPECT().Error(panicError).Return(nil).Times(1)
+		logAdapter2.EXPECT().Done().Return(nil).Times(1)
+		wd2 := &Watchdog{log: logAdapter2}
+		process3 := &Process{service: "service3", runner: func() error { return nil }}
+		logAdapter3 := NewMockLogAdapter(ctrl)
+		logAdapter3.EXPECT().Start().Return(nil).Times(1)
+		logAdapter3.EXPECT().Done().Return(nil).Times(1)
+		wd3 := &Watchdog{log: logAdapter3}
 		factory := NewMockFactory(ctrl)
 		gomock.InOrder(
 			factory.EXPECT().Create("service1").Return(wd1, nil).Times(1),
 			factory.EXPECT().Create("service2").Return(wd2, nil).Times(1),
 			factory.EXPECT().Create("service3").Return(wd3, nil).Times(1),
 		)
-		sut, _ := NewKennel(factory)
+		sut, _ := NewKennel(&Factory{})
+		sut.factory = factory
 		_ = sut.Add(process1)
 		_ = sut.Add(process2)
 		_ = sut.Add(process3)

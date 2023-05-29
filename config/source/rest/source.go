@@ -11,32 +11,34 @@ import (
 	"github.com/happyhippyhippo/slate/config/source"
 )
 
-// httpClient defines the interface of an instance capable to perform the
-// rest config obtain action
-type httpClient interface {
+type requester interface {
 	Do(req *http.Request) (*http.Response, error)
+}
+
+type decoderCreator interface {
+	Create(format string, args ...interface{}) (config.Decoder, error)
 }
 
 // Source defines a config source that read a REST service and
 // store a section of the response as the stored config.
 type Source struct {
-	source.BaseSource
-	client         httpClient
+	source.Source
+	client         requester
 	uri            string
 	format         string
-	decoderFactory config.IDecoderFactory
+	decoderCreator decoderCreator
 	configPath     string
 }
 
-var _ config.ISource = &Source{}
+var _ config.Source = &Source{}
 
 // NewSource will instantiate a new configuration source
 // that will read a REST endpoint for configuration info.
 func NewSource(
-	client httpClient,
+	client requester,
 	uri,
 	format string,
-	decoderFactory config.IDecoderFactory,
+	decoderCreator decoderCreator,
 	configPath string,
 ) (*Source, error) {
 	// check client argument reference
@@ -44,19 +46,19 @@ func NewSource(
 		return nil, errNilPointer("client")
 	}
 	// check decoder factory argument reference
-	if decoderFactory == nil {
-		return nil, errNilPointer("decoderFactory")
+	if decoderCreator == nil {
+		return nil, errNilPointer("decoderCreator")
 	}
 	// instantiates the config source
 	s := &Source{
-		BaseSource: source.BaseSource{
-			Mutex:  &sync.Mutex{},
-			Config: config.Config{},
+		Source: source.Source{
+			Mutex:   &sync.Mutex{},
+			Partial: config.Partial{},
 		},
 		client:         client,
 		uri:            uri,
 		format:         format,
-		decoderFactory: decoderFactory,
+		decoderCreator: decoderCreator,
 		configPath:     configPath,
 	}
 	// load the config information from the REST service
@@ -68,12 +70,12 @@ func NewSource(
 
 func (s *Source) load() error {
 	// get the REST service information
-	rc, e := s.request()
+	cfg, e := s.request()
 	if e != nil {
 		return e
 	}
 	// retrieve the config information from the service response data
-	c, e := rc.Config(s.configPath)
+	c, e := cfg.Partial(s.configPath)
 	if e != nil {
 		if errors.Is(e, config.ErrPathNotFound) {
 			return errConfigNotFound(s.configPath)
@@ -82,12 +84,12 @@ func (s *Source) load() error {
 	}
 	// store the retrieved config
 	s.Mutex.Lock()
-	s.Config = *c.(*config.Config)
+	s.Partial = *c
 	s.Mutex.Unlock()
 	return nil
 }
 
-func (s *Source) request() (config.IConfig, error) {
+func (s *Source) request() (*config.Partial, error) {
 	var e error
 	// create the REST service config request
 	var req *http.Request
@@ -101,7 +103,7 @@ func (s *Source) request() (config.IConfig, error) {
 	}
 	b, _ := io.ReadAll(res.Body)
 	// gat a decoder to parse the service data
-	d, e := s.decoderFactory.Create(s.format, bytes.NewReader(b))
+	d, e := s.decoderCreator.Create(s.format, bytes.NewReader(b))
 	if e != nil {
 		return nil, e
 	}

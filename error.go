@@ -5,13 +5,6 @@ import (
 	"fmt"
 )
 
-// IError defines an interface to a contextualized error instance
-type IError interface {
-	error
-	Unwrap() error
-	Context() map[string]interface{}
-}
-
 // Error defines a contextualized error
 type Error struct {
 	err     error
@@ -19,7 +12,6 @@ type Error struct {
 }
 
 var _ error = &Error{}
-var _ IError = &Error{}
 
 // NewError will instantiate a new error instance
 func NewError(

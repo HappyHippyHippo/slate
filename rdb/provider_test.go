@@ -3,13 +3,12 @@ package rdb
 import (
 	"errors"
 	"fmt"
-	"testing"
-
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/fs"
 	"gorm.io/gorm"
+	"testing"
 )
 
 func Test_Provider_Register(t *testing.T) {
@@ -70,7 +69,7 @@ func Test_Provider_Register(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.NewContainer()
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(config.ID, func() (config.IManager, error) { return nil, expected })
+		_ = container.Service(config.ID, func() (*config.Config, error) { return nil, expected })
 
 		if _, e := container.Get(ID); e == nil {
 			t.Error("didn't returned the expected error")
@@ -84,7 +83,7 @@ func Test_Provider_Register(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&config.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(DialectFactoryID, func() (IDialectFactory, error) { return nil, expected })
+		_ = container.Service(DialectFactoryID, func() (*DialectFactory, error) { return nil, expected })
 
 		if _, e := container.Get(ID); e == nil {
 			t.Error("didn't returned the expected error")
@@ -114,7 +113,7 @@ func Test_Provider_Register(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.NewContainer()
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(ID, func() (IConnectionPool, error) { return nil, expected })
+		_ = container.Service(ID, func() (*ConnectionPool, error) { return nil, expected })
 
 		if _, e := container.Get(ConnectionPrimaryID); e == nil {
 			t.Error("didn't returned the expected error")
@@ -147,17 +146,25 @@ func Test_Provider_Register(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&Provider{}).Register(container)
 
-		cfg := config.Config{"dialect": "sqlite", "host": ":memory:"}
+		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
+		partial := config.Partial{
+			"slate": config.Partial{
+				"rdb": config.Partial{
+					"connections": config.Partial{
+						"primary": rdbCfg}}}}
 		dialect := NewMockDialect(ctrl)
 		dialect.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
-		dialectFactory := NewMockDialectFactory(ctrl)
-		dialectFactory.EXPECT().Get(&cfg).Return(dialect, nil).Times(1)
-		_ = container.Service(DialectFactoryID, func() IDialectFactory { return dialectFactory })
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfgManager.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
-		cfgManager.EXPECT().Config("slate.rdb.connections.primary").Return(&cfg, nil).Times(1)
-		_ = container.Service(config.ID, func() config.IManager { return cfgManager })
+		dialectStrategy := NewMockDialectStrategy(ctrl)
+		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialect, nil).Times(1)
+		dialectFactory := NewDialectFactory()
+		_ = dialectFactory.Register(dialectStrategy)
+		_ = container.Service(DialectFactoryID, func() *DialectFactory { return dialectFactory })
+		source := NewMockConfigSource(ctrl)
+		source.EXPECT().Get("").Return(partial, nil).Times(1)
+		cfg := config.NewConfig()
+		_ = cfg.AddSource("id", 1, source)
+		_ = container.Service(config.ID, func() *config.Config { return cfg })
 
 		if check, e := container.Get(ConnectionPrimaryID); e != nil {
 			t.Errorf("returned the unexpected error (%v)", e)
@@ -170,24 +177,32 @@ func Test_Provider_Register(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		container := slate.NewContainer()
-		_ = (&Provider{}).Register(container)
-
 		primary := "other_primary"
 		Primary = primary
 		defer func() { Primary = "primary" }()
 
-		cfg := config.Config{"dialect": "sqlite", "host": ":memory:"}
+		container := slate.NewContainer()
+		_ = (&Provider{}).Register(container)
+
+		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
+		partial := config.Partial{
+			"slate": config.Partial{
+				"rdb": config.Partial{
+					"connections": config.Partial{
+						"other_primary": rdbCfg}}}}
 		dialect := NewMockDialect(ctrl)
 		dialect.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
-		dialectFactory := NewMockDialectFactory(ctrl)
-		dialectFactory.EXPECT().Get(&cfg).Return(dialect, nil).Times(1)
-		_ = container.Service(DialectFactoryID, func() IDialectFactory { return dialectFactory })
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfgManager.EXPECT().Has("slate.rdb.connections.other_primary").Return(true).Times(1)
-		cfgManager.EXPECT().Config("slate.rdb.connections.other_primary").Return(&cfg, nil).Times(1)
-		_ = container.Service(config.ID, func() config.IManager { return cfgManager })
+		dialectStrategy := NewMockDialectStrategy(ctrl)
+		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialect, nil).Times(1)
+		dialectFactory := NewDialectFactory()
+		_ = dialectFactory.Register(dialectStrategy)
+		_ = container.Service(DialectFactoryID, func() *DialectFactory { return dialectFactory })
+		source := NewMockConfigSource(ctrl)
+		source.EXPECT().Get("").Return(partial, nil).Times(1)
+		cfg := config.NewConfig()
+		_ = cfg.AddSource("id", 1, source)
+		_ = container.Service(config.ID, func() *config.Config { return cfg })
 
 		if check, e := container.Get(ConnectionPrimaryID); e != nil {
 			t.Errorf("returned the unexpected error (%v)", e)
@@ -211,7 +226,7 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		provider := &Provider{}
 		_ = provider.Register(container)
-		_ = container.Service(DialectFactoryID, func() (IDialectFactory, error) { return nil, expected })
+		_ = container.Service(DialectFactoryID, func() (*DialectFactory, error) { return nil, expected })
 
 		if e := provider.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")

@@ -7,38 +7,41 @@ import (
 	"gorm.io/gorm"
 )
 
-// IConnectionPool defines the interface of a connection pool instance.
-type IConnectionPool interface {
-	Get(name string, gormCfg *gorm.Config) (*gorm.DB, error)
+type configurer interface {
+	Has(path string) bool
+	Partial(path string, def ...config.Partial) (*config.Partial, error)
+	AddObserver(path string, callback config.Observer) error
 }
 
-// connectionPool is a database connection pool and generator.
-type connectionPool struct {
-	cfg               config.IManager
-	connectionFactory IConnectionFactory
+type connectionCreator interface {
+	Create(cfg *config.Partial, gormCfg *gorm.Config) (*gorm.DB, error)
+}
+
+// ConnectionPool is a database connection pool and generator.
+type ConnectionPool struct {
+	cfg               configurer
+	connectionCreator connectionCreator
 	instances         map[string]*gorm.DB
 }
-
-var _ IConnectionPool = &connectionPool{}
 
 // NewConnectionPool will instantiate a new relational
 // database connection pool instance.
 func NewConnectionPool(
-	cfg config.IManager,
-	factory IConnectionFactory,
-) (IConnectionPool, error) {
+	cfg *config.Config,
+	connectionCreator *ConnectionFactory,
+) (*ConnectionPool, error) {
 	// check config argument reference
 	if cfg == nil {
 		return nil, errNilPointer("config")
 	}
 	// check ConnectionFactory argument reference
-	if factory == nil {
-		return nil, errNilPointer("factory")
+	if connectionCreator == nil {
+		return nil, errNilPointer("connectionCreator")
 	}
 	// instantiate the connection pool instance
-	pool := &connectionPool{
+	pool := &ConnectionPool{
 		cfg:               cfg,
-		connectionFactory: factory,
+		connectionCreator: connectionCreator,
 		instances:         map[string]*gorm.DB{},
 	}
 	// check if is to observe connection configuration changes
@@ -61,7 +64,7 @@ func NewConnectionPool(
 // Get execute the process of the connection creation based on the
 // base configuration defined by the given name of the connection,
 // and apply the extra connection cfg also given as arguments.
-func (f *connectionPool) Get(
+func (f *ConnectionPool) Get(
 	name string,
 	gormCfg *gorm.Config,
 ) (*gorm.DB, error) {
@@ -76,12 +79,12 @@ func (f *connectionPool) Get(
 		return nil, errConfigNotFound(path)
 	}
 	// obtain the connection configuration
-	cfg, e := f.cfg.Config(path)
+	cfg, e := f.cfg.Partial(path)
 	if e != nil {
 		return nil, e
 	}
 	// create the connection
-	conn, e := f.connectionFactory.Create(cfg, gormCfg)
+	conn, e := f.connectionCreator.Create(cfg, gormCfg)
 	if e != nil {
 		return nil, e
 	}

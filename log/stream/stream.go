@@ -10,7 +10,7 @@ import (
 
 // Stream defines the base interaction with a Log stream instance.
 type Stream struct {
-	Formatter log.IFormatter
+	Formatter log.Formatter
 	Channels  []string
 	Level     log.Level
 	Writer    io.Writer
@@ -104,7 +104,7 @@ func (s *Stream) Broadcast(
 	if s.Level < level {
 		return nil
 	}
-	// write the message after formatting to the def writer (stdout)
+	// write the message after formatting to the simple writer (stdout)
 	_, e := fmt.Fprintln(s.Writer, s.Format(level, msg, ctx...))
 	return e
 }

@@ -33,7 +33,7 @@ func Test_NewSourceStrategy(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		decoderFactory := NewMockDecoderFactory(ctrl)
+		decoderFactory := config.NewDecoderFactory()
 
 		sut, e := NewSourceStrategy(decoderFactory)
 		switch {
@@ -48,7 +48,7 @@ func Test_NewSourceStrategy(t *testing.T) {
 			switch client.(type) {
 			case *http.Client:
 			default:
-				t.Error("didn't stored a valid http client decoderFactory")
+				t.Error("didn't stored a valid http client decoderCreator")
 			}
 		}
 	})
@@ -59,7 +59,7 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
 		if sut.Accept(nil) {
 			t.Error("returned true")
@@ -70,9 +70,9 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		if sut.Accept(&config.Config{}) {
+		if sut.Accept(&config.Partial{}) {
 			t.Error("returned true")
 		}
 	})
@@ -81,9 +81,9 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		if sut.Accept(&config.Config{"type": 123}) {
+		if sut.Accept(&config.Partial{"type": 123}) {
 			t.Error("returned true")
 		}
 	})
@@ -92,9 +92,9 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		if sut.Accept(&config.Config{"type": config.UnknownSourceType}) {
+		if sut.Accept(&config.Partial{"type": config.UnknownSource}) {
 			t.Error("returned true")
 		}
 	})
@@ -103,9 +103,9 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		if !sut.Accept(&config.Config{"type": Type}) {
+		if !sut.Accept(&config.Partial{"type": Type}) {
 			t.Error("returned false")
 		}
 	})
@@ -116,7 +116,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
 		src, e := sut.Create(nil)
 		switch {
@@ -133,9 +133,9 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"format": "format", "configPath": "path"})
+		src, e := sut.Create(&config.Partial{"format": "format", "configPath": "path"})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -150,9 +150,9 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"uri": "path", "format": "format"})
+		src, e := sut.Create(&config.Partial{"uri": "path", "format": "format"})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -167,9 +167,9 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"uri": 123, "format": "format", "configPath": "path"})
+		src, e := sut.Create(&config.Partial{"uri": 123, "format": "format", "configPath": "path"})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -184,9 +184,9 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"uri": "uri", "format": 123, "configPath": "path"})
+		src, e := sut.Create(&config.Partial{"uri": "uri", "format": 123, "configPath": "path"})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -201,9 +201,9 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"uri": "uri", "format": "format", "path": config.Config{"config": 123}})
+		src, e := sut.Create(&config.Partial{"uri": "uri", "format": "format", "path": config.Partial{"config": 123}})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -223,22 +223,25 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		path := "path"
 		field := "field"
 		value := "value"
-		expected := config.Config{field: value}
-		respData := config.Config{"path": config.Config{"field": "value"}}
+		expected := config.Partial{field: value}
+		respData := config.Partial{"path": config.Partial{"field": "value"}}
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", gomock.Any()).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, _ := NewSourceStrategy(decoderFactory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		sut.clientFactory = func() httpClient { return client }
+		sut.clientFactory = func() requester { return client }
 
-		src, e := sut.Create(&config.Config{"uri": uri, "format": format, "path": config.Config{"config": path}})
+		src, e := sut.Create(&config.Partial{"uri": uri, "format": format, "path": config.Partial{"config": path}})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -247,7 +250,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *Source:
-				if !reflect.DeepEqual(s.Config, expected) {
+				if !reflect.DeepEqual(s.Partial, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
@@ -264,22 +267,25 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		path := "path"
 		field := "field"
 		value := "value"
-		expected := config.Config{field: value}
-		respData := config.Config{"path": config.Config{"field": "value"}}
+		expected := config.Partial{field: value}
+		respData := config.Partial{"path": config.Partial{"field": "value"}}
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("json", gomock.Any()).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("json").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, _ := NewSourceStrategy(decoderFactory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		sut.clientFactory = func() httpClient { return client }
+		sut.clientFactory = func() requester { return client }
 
-		src, e := sut.Create(&config.Config{"uri": uri, "path": config.Config{"config": path}})
+		src, e := sut.Create(&config.Partial{"uri": uri, "path": config.Partial{"config": path}})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -288,7 +294,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *Source:
-				if !reflect.DeepEqual(s.Config, expected) {
+				if !reflect.DeepEqual(s.Partial, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:

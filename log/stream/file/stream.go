@@ -13,15 +13,15 @@ type Stream struct {
 	stream.Stream
 }
 
-var _ log.IStream = &Stream{}
+var _ log.Stream = &Stream{}
 
 // NewStream generate a new file log stream instance.
 func NewStream(
 	writer io.Writer,
-	formatter log.IFormatter,
+	formatter log.Formatter,
 	channels []string,
 	level log.Level,
-) (log.IStream, error) {
+) (log.Stream, error) {
 	// check the formatter argument reference
 	if formatter == nil {
 		return nil, errNilPointer("formatter")

@@ -18,16 +18,16 @@ type ObsSource struct {
 	timestamp     time.Time
 }
 
-var _ config.IObsSource = &ObsSource{}
+var _ config.ObsSource = &ObsSource{}
 
 // NewObsSource will instantiate a new configuration source
 // that will read a REST endpoint for configuration info, opening the
 // possibility for on-the-fly update on source content change.
 func NewObsSource(
-	client httpClient,
+	client requester,
 	uri,
 	format string,
-	decoderFactory config.IDecoderFactory,
+	decoderCreator decoderCreator,
 	timestampPath,
 	configPath string,
 ) (*ObsSource, error) {
@@ -36,20 +36,20 @@ func NewObsSource(
 		return nil, errNilPointer("client")
 	}
 	// check decoder factory argument reference
-	if decoderFactory == nil {
-		return nil, errNilPointer("decoderFactory")
+	if decoderCreator == nil {
+		return nil, errNilPointer("decoderCreator")
 	}
 	// instantiates the config source
 	s := &ObsSource{
 		Source: Source{
-			BaseSource: source.BaseSource{
-				Mutex:  &sync.Mutex{},
-				Config: config.Config{},
+			Source: source.Source{
+				Mutex:   &sync.Mutex{},
+				Partial: config.Partial{},
 			},
 			client:         client,
 			uri:            uri,
 			format:         format,
-			decoderFactory: decoderFactory,
+			decoderCreator: decoderCreator,
 			configPath:     configPath,
 		},
 		timestampPath: timestampPath,
@@ -66,20 +66,20 @@ func NewObsSource(
 // source configuration content.
 func (s *ObsSource) Reload() (bool, error) {
 	// get the REST service information
-	rc, e := s.request()
+	cfg, e := s.request()
 	if e != nil {
 		return false, e
 	}
 	// search for the response timestamp
 	var t time.Time
-	if t, e = s.searchTimestamp(rc); e != nil {
+	if t, e = s.searchTimestamp(cfg); e != nil {
 		return false, e
 	}
 	// check if the response timestamp is greater than the locally stored
 	// config information timestamp
 	if s.timestamp.Equal(time.Unix(0, 0)) || s.timestamp.Before(t) {
 		// get the response config information
-		c, e := rc.Config(s.configPath)
+		c, e := cfg.Partial(s.configPath)
 		if e != nil {
 			if errors.Is(e, config.ErrPathNotFound) {
 				return false, errConfigNotFound(s.configPath)
@@ -88,7 +88,7 @@ func (s *ObsSource) Reload() (bool, error) {
 		}
 		// store the loaded config information and response timestamp
 		s.Mutex.Lock()
-		s.Config = *c.(*config.Config)
+		s.Partial = *c
 		s.timestamp = t
 		s.Mutex.Unlock()
 		return true, nil
@@ -97,10 +97,10 @@ func (s *ObsSource) Reload() (bool, error) {
 }
 
 func (s *ObsSource) searchTimestamp(
-	rc config.IConfig,
+	cfg *config.Partial,
 ) (time.Time, error) {
 	// retrieve the timestamp information from the parsed response data
-	t, e := rc.String(s.timestampPath)
+	t, e := cfg.String(s.timestampPath)
 	if e != nil {
 		if errors.Is(e, config.ErrPathNotFound) {
 			return time.Now(), errTimestampNotFound(s.timestampPath)

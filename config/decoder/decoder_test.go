@@ -70,7 +70,7 @@ func Test_BaseDecoder_Decode(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		data := config.Config{"node": "data"}
+		data := config.Partial{"node": "data"}
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
 		sut := Decoder{Reader: reader}
@@ -86,7 +86,7 @@ func Test_BaseDecoder_Decode(t *testing.T) {
 		switch {
 		case check == nil:
 			t.Error("returned a nil data")
-		case !reflect.DeepEqual(*check.(*config.Config), data):
+		case !reflect.DeepEqual(*check, data):
 			t.Errorf("returned (%v)", check)
 		case e != nil:
 			t.Errorf("returned the unexpected (%v) error", e)

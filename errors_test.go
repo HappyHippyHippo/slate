@@ -17,7 +17,7 @@ func Test_errNilPointer(t *testing.T) {
 			t.Errorf("error not a instance of ErrNilPointer")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(IError); !ok {
+		} else if te, ok := e.(*Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if te.Context() != nil {
 			t.Errorf("didn't stored a nil value context")
@@ -29,7 +29,7 @@ func Test_errNilPointer(t *testing.T) {
 			t.Errorf("error not a instance of ErrNilPointer")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(IError); !ok {
+		} else if te, ok := e.(*Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
 			t.Errorf("context (%v) not same as expected (%v)", check, context)
@@ -47,7 +47,7 @@ func Test_errContainer(t *testing.T) {
 			t.Errorf("error not a instance of ErrContainer")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(IError); !ok {
+		} else if te, ok := e.(*Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if te.Context() != nil {
 			t.Errorf("didn't stored a nil value context")
@@ -59,7 +59,7 @@ func Test_errContainer(t *testing.T) {
 			t.Errorf("error not a instance of ErrContainer")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(IError); !ok {
+		} else if te, ok := e.(*Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
 			t.Errorf("context (%v) not same as expected (%v)", check, context)
@@ -77,7 +77,7 @@ func Test_errNonFunctionFactory(t *testing.T) {
 			t.Errorf("error not a instance of ErrNonFunctionFactory")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(IError); !ok {
+		} else if te, ok := e.(*Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if te.Context() != nil {
 			t.Errorf("didn't stored a nil value context")
@@ -89,7 +89,7 @@ func Test_errNonFunctionFactory(t *testing.T) {
 			t.Errorf("error not a instance of ErrNonFunctionFactory")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(IError); !ok {
+		} else if te, ok := e.(*Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
 			t.Errorf("context (%v) not same as expected (%v)", check, context)
@@ -107,7 +107,7 @@ func Test_errFactoryWithoutResult(t *testing.T) {
 			t.Errorf("error not a instance of ErrFactoryWithoutResult")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(IError); !ok {
+		} else if te, ok := e.(*Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if te.Context() != nil {
 			t.Errorf("didn't stored a nil value context")
@@ -119,7 +119,7 @@ func Test_errFactoryWithoutResult(t *testing.T) {
 			t.Errorf("error not a instance of ErrFactoryWithoutResult")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(IError); !ok {
+		} else if te, ok := e.(*Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
 			t.Errorf("context (%v) not same as expected (%v)", check, context)
@@ -137,7 +137,7 @@ func Test_errServiceNotFound(t *testing.T) {
 			t.Errorf("error not a instance of ErrServiceNotFound")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(IError); !ok {
+		} else if te, ok := e.(*Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if te.Context() != nil {
 			t.Errorf("didn't stored a nil value context")
@@ -149,7 +149,7 @@ func Test_errServiceNotFound(t *testing.T) {
 			t.Errorf("error not a instance of ErrServiceNotFound")
 		} else if e.Error() != message {
 			t.Errorf("error message (%v) not same as expected (%v)", e, message)
-		} else if te, ok := e.(IError); !ok {
+		} else if te, ok := e.(*Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
 			t.Errorf("context (%v) not same as expected (%v)", check, context)

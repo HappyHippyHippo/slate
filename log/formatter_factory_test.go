@@ -2,11 +2,10 @@ package log
 
 import (
 	"errors"
-	"reflect"
-	"testing"
-
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
+	"reflect"
+	"testing"
 )
 
 func Test_NewFormatterFactory(t *testing.T) {
@@ -14,8 +13,6 @@ func Test_NewFormatterFactory(t *testing.T) {
 		sut := NewFormatterFactory()
 		if sut == nil {
 			t.Error("didn't returned the expected reference")
-		} else if _, ok := sut.(*FormatterFactory); !ok {
-			t.Error("didn't returned a valid Formatter factory instance")
 		}
 	})
 }

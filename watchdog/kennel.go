@@ -4,29 +4,24 @@ import (
 	"sync"
 )
 
-// IKennel defines an interface to a kennel instance that will manage
-// a group of watchdog instances, and is used to run them in parallel.
-type IKennel interface {
-	Add(process IProcess) error
-	Run() error
+type kennelReg struct {
+	process  Processor
+	watchdog *Watchdog
 }
 
-type kennelReg struct {
-	process  IProcess
-	watchdog IWatchdog
+type factory interface {
+	Create(service string) (*Watchdog, error)
 }
 
 // Kennel define an instance that will manage a group of watchdog
 // instances, and is used to run them in parallel.
 type Kennel struct {
-	factory IFactory
+	factory factory
 	regs    map[string]kennelReg
 }
 
-var _ IKennel = &Kennel{}
-
 // NewKennel will generate a new kennel instance.
-func NewKennel(factory IFactory) (IKennel, error) {
+func NewKennel(factory *Factory) (*Kennel, error) {
 	// check factory argument reference
 	if factory == nil {
 		return nil, errNilPointer("factory")
@@ -40,7 +35,7 @@ func NewKennel(factory IFactory) (IKennel, error) {
 
 // Add will create a new watchdog instance that will guard the
 // requested process instance.
-func (k *Kennel) Add(process IProcess) error {
+func (k *Kennel) Add(process Processor) error {
 	// check if there is a watchdog for the requested service
 	if _, ok := k.regs[process.Service()]; ok {
 		return errDuplicateService(process.Service())
@@ -73,8 +68,7 @@ func (k *Kennel) Run() error {
 		// run the registered process
 		go func(reg kennelReg) {
 			// run the process on a created watchdog
-			e := reg.watchdog.Run(reg.process)
-			if e != nil {
+			if e := reg.watchdog.Run(reg.process); e != nil {
 				result = e
 			}
 			// signal the wait group that the watchdog terminated

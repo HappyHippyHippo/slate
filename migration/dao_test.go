@@ -2,7 +2,9 @@ package migration
 
 import (
 	"database/sql/driver"
+	"errors"
 	"fmt"
+	"github.com/happyhippyhippo/slate"
 	"reflect"
 	"testing"
 	"time"
@@ -22,6 +24,18 @@ func (a AnyTime) Match(v driver.Value) bool {
 }
 
 func Test_NewDao(t *testing.T) {
+	t.Run("nil db", func(t *testing.T) {
+		sut, e := NewDao(nil)
+		switch {
+		case sut != nil:
+			t.Error("returned a valid reference")
+		case e == nil:
+			t.Error("didn't returned the expected error")
+		case !errors.Is(e, slate.ErrNilPointer):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+		}
+	})
+
 	t.Run("error on auto migrate", func(t *testing.T) {
 		db, mockDB, e := sqlmock.New()
 		if e != nil {

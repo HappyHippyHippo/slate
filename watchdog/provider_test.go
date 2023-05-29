@@ -30,7 +30,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("returned the (%v) error", e)
 		case !container.Has(LogFormatterFactoryID):
 			t.Errorf("didn't registered the log formatter factory : %v", sut)
-		case !container.Has(FactoryID):
+		case !container.Has(WatchdogFactoryID):
 			t.Errorf("didn't registered the watchdog factory : %v", sut)
 		case !container.Has(ID):
 			t.Errorf("didn't registered the kannel : %v", sut)
@@ -69,7 +69,7 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&log.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		sut, e := container.Get(FactoryID)
+		sut, e := container.Get(WatchdogFactoryID)
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected error (%v)", e)
@@ -159,7 +159,7 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = sut.Register(container)
 		_ = container.Service(
 			"id",
-			func() (ILogFormatterStrategy, error) { return nil, fmt.Errorf("error message") },
+			func() (LogFormatterStrategy, error) { return nil, fmt.Errorf("error message") },
 			LogFormatterStrategyTag,
 		)
 
@@ -195,7 +195,7 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = (&log.Provider{}).Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(ID, func() (*LogFormatterFactory, error) { return nil, fmt.Errorf("error message") })
+		_ = container.Service(ID, func() (*Kennel, error) { return nil, fmt.Errorf("error message") })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
@@ -233,7 +233,7 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = sut.Register(container)
 		_ = container.Service(
 			"id",
-			func() (IProcess, error) { return nil, fmt.Errorf("error message") },
+			func() (Processor, error) { return nil, fmt.Errorf("error message") },
 			ProcessTag,
 		)
 
@@ -272,13 +272,13 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		formatter := NewMockLogFormatter(ctrl)
 		formatterStrategy := NewMockLogFormatterStrategy(ctrl)
-		formatterStrategy.EXPECT().Accept(&config.Config{"type": "def"}).Return(true)
-		formatterStrategy.EXPECT().Create(&config.Config{"type": "def"}).Return(formatter, nil)
+		formatterStrategy.EXPECT().Accept(&config.Partial{"type": "simple"}).Return(true)
+		formatterStrategy.EXPECT().Create(&config.Partial{"type": "simple"}).Return(formatter, nil)
 		_ = (&config.Provider{}).Register(container)
 		_ = (&log.Provider{}).Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service("log.formatter", func() ILogFormatterStrategy { return formatterStrategy }, LogFormatterStrategyTag)
+		_ = container.Service("log.formatter", func() LogFormatterStrategy { return formatterStrategy }, LogFormatterStrategyTag)
 		_ = container.Service(
 			"id1",
 			func() (*Process1, error) {
@@ -310,16 +310,16 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		formatter := NewMockLogFormatter(ctrl)
 		formatterStrategy := NewMockLogFormatterStrategy(ctrl)
-		formatterStrategy.EXPECT().Accept(&config.Config{"type": "def"}).Return(true)
-		formatterStrategy.EXPECT().Create(&config.Config{"type": "def"}).Return(formatter, nil)
+		formatterStrategy.EXPECT().Accept(&config.Partial{"type": "simple"}).Return(true)
+		formatterStrategy.EXPECT().Create(&config.Partial{"type": "simple"}).Return(formatter, nil)
 		_ = (&config.Provider{}).Register(container)
 		_ = (&log.Provider{}).Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service("log.formatter", func() ILogFormatterStrategy { return formatterStrategy }, LogFormatterStrategyTag)
+		_ = container.Service("log.formatter", func() LogFormatterStrategy { return formatterStrategy }, LogFormatterStrategyTag)
 		_ = container.Service(
 			"id",
-			func() (IProcess, error) { return NewProcess("service", func() error { return nil }) },
+			func() (Processor, error) { return NewProcess("service", func() error { return nil }) },
 			ProcessTag,
 		)
 

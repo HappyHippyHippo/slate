@@ -11,13 +11,11 @@ type Pulse struct {
 	timer *time.Timer
 }
 
-var _ ITrigger = &Pulse{}
-
 // NewPulse instantiate a new pulse trigger that will execute a
 // callback method after a determined amount of time.
 func NewPulse(
 	delay time.Duration,
-	callback ICallback,
+	callback Callback,
 ) (*Pulse, error) {
 	if callback == nil {
 		return nil, errNilPointer("callback")

@@ -31,17 +31,17 @@ func Test_Provider_Register(t *testing.T) {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
 		case !container.Has(DecoderFactoryID):
-			t.Errorf("didn't registered the config decoder factory : %v", sut)
+			t.Errorf("didn't registered the decoder factory : %v", sut)
 		case !container.Has(SourceFactoryID):
-			t.Errorf("didn't registered the config source factory : %v", sut)
+			t.Errorf("didn't registered the source factory : %v", sut)
 		case !container.Has(ID):
 			t.Errorf("didn't registered the config : %v", sut)
 		case !container.Has(LoaderID):
-			t.Errorf("didn't registered the config loader : %v", sut)
+			t.Errorf("didn't registered the loader : %v", sut)
 		}
 	})
 
-	t.Run("retrieving config decoder factory", func(t *testing.T) {
+	t.Run("retrieving decoder factory", func(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&Provider{}).Register(container)
 
@@ -60,7 +60,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving the config source factory", func(t *testing.T) {
+	t.Run("retrieving the source factory", func(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
@@ -93,9 +93,9 @@ func Test_Provider_Register(t *testing.T) {
 			t.Error("didn't returned a valid reference")
 		default:
 			switch cfg.(type) {
-			case *Manager:
+			case *Config:
 			default:
-				t.Error("didn't return a config manager reference")
+				t.Error("didn't return a config reference")
 			}
 		}
 	})
@@ -104,7 +104,7 @@ func Test_Provider_Register(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(ID, func() IManager { return nil })
+		_ = container.Service(ID, func() *Config { return nil })
 
 		if _, e := container.Get(LoaderID); e == nil {
 			t.Error("didn't returned the expected error")
@@ -113,11 +113,11 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving config on retrieving loader", func(t *testing.T) {
+	t.Run("error retrieving source factory on retrieving loader", func(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(SourceFactoryID, func() ISourceFactory { return nil })
+		_ = container.Service(SourceFactoryID, func() *SourceFactory { return nil })
 
 		if _, e := container.Get(LoaderID); e == nil {
 			t.Error("didn't returned the expected error")
@@ -126,7 +126,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving config loader", func(t *testing.T) {
+	t.Run("retrieving loader", func(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&fs.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
@@ -141,7 +141,7 @@ func Test_Provider_Register(t *testing.T) {
 			switch l.(type) {
 			case *Loader:
 			default:
-				t.Error("didn't return a config loader reference")
+				t.Error("didn't return a loader reference")
 			}
 		}
 	})
@@ -156,12 +156,12 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving config decoder factory", func(t *testing.T) {
+	t.Run("error retrieving decoder factory", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		sut := &Provider{}
 		container := slate.NewContainer()
 		_ = sut.Register(container)
-		_ = container.Service(DecoderFactoryID, func() (IDecoderFactory, error) { return nil, expected })
+		_ = container.Service(DecoderFactoryID, func() (*DecoderFactory, error) { return nil, expected })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
@@ -170,11 +170,11 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid config decoder factory", func(t *testing.T) {
+	t.Run("invalid decoder factory", func(t *testing.T) {
 		sut := &Provider{}
 		container := slate.NewContainer()
 		_ = sut.Register(container)
-		_ = container.Service(DecoderFactoryID, func() IDecoderFactory { return nil })
+		_ = container.Service(DecoderFactoryID, func() (string, error) { return "string", nil })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
@@ -183,12 +183,12 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving config decoder strategy", func(t *testing.T) {
+	t.Run("error retrieving decoder strategy", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		sut := &Provider{}
 		container := slate.NewContainer()
 		_ = sut.Register(container)
-		_ = container.Service("id", func() (IDecoderStrategy, error) { return nil, expected }, DecoderStrategyTag)
+		_ = container.Service("id", func() (DecoderStrategy, error) { return nil, expected }, DecoderStrategyTag)
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
@@ -197,7 +197,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving invalid config decoder strategy", func(t *testing.T) {
+	t.Run("retrieving invalid decoder strategy", func(t *testing.T) {
 		sut := &Provider{}
 		container := slate.NewContainer()
 		_ = sut.Register(container)
@@ -210,13 +210,13 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving config source factory", func(t *testing.T) {
+	t.Run("error retrieving source factory", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		sut := &Provider{}
 		container := slate.NewContainer()
 		_ = sut.Register(container)
 
-		_ = container.Service(SourceFactoryID, func() (ISourceFactory, error) { return nil, expected })
+		_ = container.Service(SourceFactoryID, func() (*SourceFactory, error) { return nil, expected })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
@@ -225,11 +225,11 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid config source factory", func(t *testing.T) {
+	t.Run("invalid source factory", func(t *testing.T) {
 		sut := &Provider{}
 		container := slate.NewContainer()
 		_ = sut.Register(container)
-		_ = container.Service(SourceFactoryID, func() ISourceFactory { return nil })
+		_ = container.Service(SourceFactoryID, func() (string, error) { return "string", nil })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
@@ -238,12 +238,12 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving config source strategy", func(t *testing.T) {
+	t.Run("error retrieving source strategy", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		sut := &Provider{}
 		container := slate.NewContainer()
 		_ = sut.Register(container)
-		_ = container.Service("id", func() (ISourceStrategy, error) { return nil, expected }, SourceStrategyTag)
+		_ = container.Service("id", func() (SourceStrategy, error) { return nil, expected }, SourceStrategyTag)
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
@@ -252,7 +252,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving invalid config source strategy", func(t *testing.T) {
+	t.Run("retrieving invalid source strategy", func(t *testing.T) {
 		sut := &Provider{}
 		container := slate.NewContainer()
 		_ = sut.Register(container)
@@ -265,12 +265,12 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving config source strategy", func(t *testing.T) {
+	t.Run("error retrieving source strategy", func(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		sut := &Provider{}
 		container := slate.NewContainer()
 		_ = sut.Register(container)
-		_ = container.Service("id", func() (ISourceStrategy, error) { return nil, expected }, SourceStrategyTag)
+		_ = container.Service("id", func() (SourceStrategy, error) { return nil, expected }, SourceStrategyTag)
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
@@ -294,8 +294,8 @@ func Test_Provider_Boot(t *testing.T) {
 		decoderStrategy := NewMockDecoderStrategy(ctrl)
 		sourceStrategy := NewMockSourceStrategy(ctrl)
 
-		_ = container.Service("decoder.id", func() IDecoderStrategy { return decoderStrategy }, DecoderStrategyTag)
-		_ = container.Service("source.id", func() ISourceStrategy { return sourceStrategy }, SourceStrategyTag)
+		_ = container.Service("decoder.id", func() DecoderStrategy { return decoderStrategy }, DecoderStrategyTag)
+		_ = container.Service("source.id", func() SourceStrategy { return sourceStrategy }, SourceStrategyTag)
 
 		if e := sut.Boot(container); e != nil {
 			t.Errorf("returned the unexpected e (%v)", e)
@@ -311,7 +311,7 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = fs.Provider{}.Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(LoaderID, func() (ILoader, error) { return nil, expected })
+		_ = container.Service(LoaderID, func() (*Loader, error) { return nil, expected })
 
 		if e := sut.Boot(container); e != nil {
 			t.Errorf("returned the unexpected e (%v)", e)
@@ -324,7 +324,7 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = fs.Provider{}.Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(LoaderID, func() (ILoader, error) { return nil, expected })
+		_ = container.Service(LoaderID, func() (*Loader, error) { return nil, expected })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
@@ -338,7 +338,7 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = fs.Provider{}.Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(LoaderID, func() ILoader { return nil })
+		_ = container.Service(LoaderID, func() (string, error) { return "string", nil })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
@@ -351,12 +351,16 @@ func Test_Provider_Boot(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		partial := &Partial{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}
 		container := slate.NewContainer()
-		loader := NewMockLoader(ctrl)
-		loader.EXPECT().Load().Times(1)
+		source := NewMockSource(ctrl)
+		source.EXPECT().Get("").Return(Partial{}, nil).Times(1)
+		sourceStrategy := NewMockSourceStrategy(ctrl)
+		sourceStrategy.EXPECT().Accept(partial).Return(true).Times(1)
+		sourceStrategy.EXPECT().Create(partial).Return(source, nil).Times(1)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(LoaderID, func() ILoader { return loader })
+		_ = container.Service("source", func() SourceStrategy { return sourceStrategy }, SourceStrategyTag)
 
 		if e := sut.Boot(container); e != nil {
 			t.Errorf("returned the unexpected e (%v)", e)

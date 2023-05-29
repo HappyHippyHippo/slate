@@ -3,13 +3,13 @@ package rdb
 import (
 	"errors"
 	"fmt"
+	"gorm.io/gorm/logger"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 func Test_NewConnectionFactory(t *testing.T) {
@@ -26,7 +26,7 @@ func Test_NewConnectionFactory(t *testing.T) {
 	})
 
 	t.Run("valid creation", func(t *testing.T) {
-		if sut, e := NewConnectionFactory(&DialectFactory{}); sut == nil {
+		if sut, e := NewConnectionFactory(NewDialectFactory()); sut == nil {
 			t.Error("didn't returned the expected valid connection factory instance")
 		} else if e != nil {
 			t.Errorf("return the unexpected error : %v", e)
@@ -39,20 +39,17 @@ func Test_ConnectionFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("error message")
-		cfg := &config.Config{"dialect": "invalid", "host": ":memory:"}
-		dialectFactory := NewMockDialectFactory(ctrl)
-		dialectFactory.EXPECT().Get(cfg).Return(nil, expected).Times(1)
+		cfg := &config.Partial{"dialect": "invalid"}
 
-		sut, _ := NewConnectionFactory(dialectFactory)
+		sut, _ := NewConnectionFactory(NewDialectFactory())
 		conn, e := sut.Create(cfg, &gorm.Config{})
 		switch {
 		case conn != nil:
 			t.Error("return an unexpected valid connection instance")
 		case e == nil:
 			t.Error("didn't return the expected error")
-		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
+		case !errors.Is(e, ErrUnknownDialect):
+			t.Errorf("returned the (%v) error when expected (%v)", e, ErrUnknownDialect)
 		}
 	})
 
@@ -61,13 +58,14 @@ func Test_ConnectionFactory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		cfg := &config.Config{"dialect": "invalid", "host": ":memory:"}
+		cfg := &config.Partial{"dialect": "invalid", "host": ":memory:"}
 		dialect := NewMockDialect(ctrl)
 		dialect.EXPECT().Initialize(gomock.Any()).Return(expected).Times(1)
 		dialectFactory := NewMockDialectFactory(ctrl)
-		dialectFactory.EXPECT().Get(cfg).Return(dialect, nil).Times(1)
+		dialectFactory.EXPECT().Create(cfg).Return(dialect, nil).Times(1)
 
-		sut, _ := NewConnectionFactory(dialectFactory)
+		sut, _ := NewConnectionFactory(NewDialectFactory())
+		sut.dialectCreator = dialectFactory
 
 		conn, e := sut.Create(cfg, &gorm.Config{Logger: logger.Discard})
 		switch {
@@ -84,13 +82,14 @@ func Test_ConnectionFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := &config.Config{"dialect": "invalid", "host": ":memory:"}
+		cfg := &config.Partial{"dialect": "invalid", "host": ":memory:"}
 		dialect := NewMockDialect(ctrl)
 		dialect.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
 		dialectFactory := NewMockDialectFactory(ctrl)
-		dialectFactory.EXPECT().Get(cfg).Return(dialect, nil).Times(1)
+		dialectFactory.EXPECT().Create(cfg).Return(dialect, nil).Times(1)
 
-		sut, _ := NewConnectionFactory(dialectFactory)
+		sut, _ := NewConnectionFactory(NewDialectFactory())
+		sut.dialectCreator = dialectFactory
 
 		if check, e := sut.Create(cfg, &gorm.Config{Logger: logger.Discard}); check == nil {
 			t.Error("didn't return the expected connection instance")

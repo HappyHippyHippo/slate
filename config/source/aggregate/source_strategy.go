@@ -13,16 +13,16 @@ const (
 // SourceStrategy defines a strategy used to instantiate
 // a config aggregation config source creation strategy.
 type SourceStrategy struct {
-	configs []config.IConfig
+	sources []config.Source
 }
 
-var _ config.ISourceStrategy = &SourceStrategy{}
+var _ config.SourceStrategy = &SourceStrategy{}
 
 // Accept will check if the source dFactory strategy can instantiate
 // a source where the data to check comes from a configuration
 // instance.
 func (s SourceStrategy) Accept(
-	cfg config.IConfig,
+	cfg *config.Partial,
 ) bool {
 	// check the config argument reference
 	if cfg == nil {
@@ -40,8 +40,8 @@ func (s SourceStrategy) Accept(
 // Create will instantiate the desired environment source instance
 // where the initialization data comes from a configuration instance.
 func (s SourceStrategy) Create(
-	_ config.IConfig,
-) (config.ISource, error) {
+	_ *config.Partial,
+) (config.Source, error) {
 	// create the aggregate config source
-	return NewSource(s.configs)
+	return NewSource(s.sources)
 }

@@ -16,9 +16,7 @@ func Test_Factory(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		l := NewMockLog(ctrl)
-		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		sut, e := NewFactory(nil, l, formatterFactory)
+		sut, e := NewFactory(nil, log.NewLog(), NewLogFormatterFactory())
 
 		switch {
 		case sut != nil:
@@ -34,9 +32,7 @@ func Test_Factory(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewMockConfigManager(ctrl)
-		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		sut, e := NewFactory(cfg, nil, formatterFactory)
+		sut, e := NewFactory(config.NewConfig(), nil, NewLogFormatterFactory())
 
 		switch {
 		case sut != nil:
@@ -52,9 +48,7 @@ func Test_Factory(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewMockConfigManager(ctrl)
-		l := NewMockLog(ctrl)
-		sut, e := NewFactory(cfg, l, nil)
+		sut, e := NewFactory(config.NewConfig(), log.NewLog(), nil)
 
 		switch {
 		case sut != nil:
@@ -70,22 +64,13 @@ func Test_Factory(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewMockConfigManager(ctrl)
-		l := NewMockLog(ctrl)
-		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		sut, e := NewFactory(cfg, l, formatterFactory)
+		sut, e := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
 
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
-		case sut.(*Factory).config != cfg:
-			t.Errorf("didn't store the given config instance")
-		case sut.(*Factory).log != l:
-			t.Errorf("didn't store the given log instance")
-		case sut.(*Factory).formatterFactory != formatterFactory:
-			t.Errorf("didn't store the given formatter instance")
 		}
 	})
 }
@@ -95,13 +80,13 @@ func Test_Factory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("error message")
 		service := "test"
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(nil, expected).Times(1)
-		l := NewMockLog(ctrl)
-		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		sut, _ := NewFactory(cfgManager, l, formatterFactory)
+		expected := fmt.Errorf("error message")
+		cfg := NewMockConfigurer(ctrl)
+		cfg.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(nil, expected).Times(1)
+
+		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
+		sut.config = cfg
 
 		chk, e := sut.Create(service)
 		switch {
@@ -122,13 +107,13 @@ func Test_Factory_Create(t *testing.T) {
 		ConfigPathPrefix = "path"
 		defer func() { ConfigPathPrefix = prev }()
 
-		expected := fmt.Errorf("error message")
 		service := "test"
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("path.test", gomock.Any()).Return(nil, expected).Times(1)
-		l := NewMockLog(ctrl)
-		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		sut, _ := NewFactory(cfgManager, l, formatterFactory)
+		expected := fmt.Errorf("error message")
+		cfg := NewMockConfigurer(ctrl)
+		cfg.EXPECT().Partial("path.test", config.Partial{}).Return(nil, expected).Times(1)
+
+		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
+		sut.config = cfg
 
 		chk, e := sut.Create(service)
 		switch {
@@ -145,15 +130,13 @@ func Test_Factory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("error message")
 		service := "test"
-		cfg := NewMockConfig(ctrl)
-		cfg.EXPECT().Populate("", gomock.Any()).Return(nil, expected).Times(1)
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
-		l := NewMockLog(ctrl)
-		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		sut, _ := NewFactory(cfgManager, l, formatterFactory)
+		watchdogCfg := &config.Partial{"formatter": 123}
+		cfg := NewMockConfigurer(ctrl)
+		cfg.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+
+		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
+		sut.config = cfg
 
 		chk, e := sut.Create(service)
 		switch {
@@ -161,8 +144,8 @@ func Test_Factory_Create(t *testing.T) {
 			t.Errorf("returned an unexpected watchdog reference")
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
-		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		case !errors.Is(e, slate.ErrConversion):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -171,16 +154,12 @@ func Test_Factory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		service := "test"
-		cfg := NewMockConfig(ctrl)
-		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
-			c.Level.Start = "invalid"
-			return nil, nil
-		}).Times(1)
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
-		l := NewMockLog(ctrl)
-		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		sut, _ := NewFactory(cfgManager, l, formatterFactory)
+		watchdogCfg := &config.Partial{"level": config.Partial{"start": "invalid"}}
+		cfg := NewMockConfigurer(ctrl)
+		cfg.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+
+		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
+		sut.config = cfg
 
 		chk, e := sut.Create(service)
 		switch {
@@ -198,16 +177,12 @@ func Test_Factory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		service := "test"
-		cfg := NewMockConfig(ctrl)
-		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
-			c.Level.Error = "invalid"
-			return nil, nil
-		}).Times(1)
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
-		l := NewMockLog(ctrl)
-		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		sut, _ := NewFactory(cfgManager, l, formatterFactory)
+		watchdogCfg := &config.Partial{"level": config.Partial{"error": "invalid"}}
+		cfg := NewMockConfigurer(ctrl)
+		cfg.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+
+		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
+		sut.config = cfg
 
 		chk, e := sut.Create(service)
 		switch {
@@ -225,16 +200,12 @@ func Test_Factory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		service := "test"
-		cfg := NewMockConfig(ctrl)
-		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
-			c.Level.Done = "invalid"
-			return nil, nil
-		}).Times(1)
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
-		l := NewMockLog(ctrl)
-		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		sut, _ := NewFactory(cfgManager, l, formatterFactory)
+		watchdogCfg := &config.Partial{"level": config.Partial{"done": "invalid"}}
+		cfg := NewMockConfigurer(ctrl)
+		cfg.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+
+		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
+		sut.config = cfg
 
 		chk, e := sut.Create(service)
 		switch {
@@ -253,43 +224,15 @@ func Test_Factory_Create(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		service := "test"
-		cfg := NewMockConfig(ctrl)
-		cfg.EXPECT().Populate("", gomock.Any()).Return(nil, nil).Times(1)
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
-		l := NewMockLog(ctrl)
+		watchdogCfg := &config.Partial{"formatter": "my formatter"}
+		cfg := NewMockConfigurer(ctrl)
+		cfg.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
 		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(&config.Config{"type": "def"}).Return(nil, expected).Times(1)
-		sut, _ := NewFactory(cfgManager, l, formatterFactory)
+		formatterFactory.EXPECT().Create(&config.Partial{"type": "my formatter"}).Return(nil, expected).Times(1)
 
-		chk, e := sut.Create(service)
-		switch {
-		case chk != nil:
-			t.Errorf("returned an unexpected watchdog reference")
-		case e == nil:
-			t.Errorf("didn't returned the expected error")
-		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
-		}
-	})
-
-	t.Run("error creating the log formatter with type from config", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		expected := fmt.Errorf("error message")
-		service := "test"
-		cfg := NewMockConfig(ctrl)
-		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
-			c.Formatter = "my_formatter"
-			return nil, nil
-		}).Times(1)
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
-		l := NewMockLog(ctrl)
-		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(&config.Config{"type": "my_formatter"}).Return(nil, expected).Times(1)
-		sut, _ := NewFactory(cfgManager, l, formatterFactory)
+		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
+		sut.config = cfg
+		sut.formatterCreator = formatterFactory
 
 		chk, e := sut.Create(service)
 		switch {
@@ -307,18 +250,17 @@ func Test_Factory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		service := "test"
-		cfg := NewMockConfig(ctrl)
-		cfg.EXPECT().Populate("", gomock.Any()).DoAndReturn(func(path string, c *watchdogConfig, icase ...bool) (interface{}, error) {
-			c.Name = service
-			return nil, nil
-		}).Times(1)
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().Config("slate.watchdog.services.test", gomock.Any()).Return(cfg, nil).Times(1)
-		l := NewMockLog(ctrl)
+		watchdogCfg := &config.Partial{"name": service}
+		cfg := NewMockConfigurer(ctrl)
+		cfg.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
 		formatter := NewMockLogFormatter(ctrl)
 		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(&config.Config{"type": "def"}).Return(formatter, nil).Times(1)
-		sut, _ := NewFactory(cfgManager, l, formatterFactory)
+		formatterFactory.EXPECT().Create(&config.Partial{"type": "simple"}).Return(formatter, nil).Times(1)
+		logger := log.NewLog()
+
+		sut, _ := NewFactory(config.NewConfig(), logger, NewLogFormatterFactory())
+		sut.config = cfg
+		sut.formatterCreator = formatterFactory
 
 		wd, e := sut.Create(service)
 		switch {
@@ -326,19 +268,19 @@ func Test_Factory_Create(t *testing.T) {
 			t.Errorf("returned the unexpected error : %v", e)
 		case wd == nil:
 			t.Errorf("didn't returned the expected watchdog reference")
-		case wd.(*Watchdog).log.(*LogAdapter).name != service:
+		case wd.log.(*LogAdapter).name != service:
 			t.Errorf("didn't stored the expected service name")
-		case wd.(*Watchdog).log.(*LogAdapter).channel != LogChannel:
+		case wd.log.(*LogAdapter).channel != LogChannel:
 			t.Errorf("didn't stored the expected channel name")
-		case wd.(*Watchdog).log.(*LogAdapter).startLevel != log.LevelMap[LogStartLevel]:
+		case wd.log.(*LogAdapter).startLevel != log.LevelMap[LogStartLevel]:
 			t.Errorf("didn't stored the expected start log message level")
-		case wd.(*Watchdog).log.(*LogAdapter).errorLevel != log.LevelMap[LogErrorLevel]:
+		case wd.log.(*LogAdapter).errorLevel != log.LevelMap[LogErrorLevel]:
 			t.Errorf("didn't stored the expected error log message level")
-		case wd.(*Watchdog).log.(*LogAdapter).doneLevel != log.LevelMap[LogDoneLevel]:
+		case wd.log.(*LogAdapter).doneLevel != log.LevelMap[LogDoneLevel]:
 			t.Errorf("didn't stored the expected done log message level")
-		case wd.(*Watchdog).log.(*LogAdapter).logger != l:
+		case wd.log.(*LogAdapter).logger != logger:
 			t.Errorf("didn't stored the expected logger")
-		case wd.(*Watchdog).log.(*LogAdapter).formatter != formatter:
+		case wd.log.(*LogAdapter).formatter != formatter:
 			t.Errorf("didn't stored the expected formatter")
 		}
 	})

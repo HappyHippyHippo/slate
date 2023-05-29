@@ -10,10 +10,10 @@ const (
 	UnknownStream = "unknown"
 )
 
-// IStreamStrategy interface defines the methods of the stream
+// StreamStrategy interface defines the methods of the stream
 // factory strategy that can validate creation requests and instantiation
 // of particular type of stream.
-type IStreamStrategy interface {
-	Accept(cfg config.IConfig) bool
-	Create(cfg config.IConfig) (IStream, error)
+type StreamStrategy interface {
+	Accept(cfg *config.Partial) bool
+	Create(cfg *config.Partial) (Stream, error)
 }

@@ -44,8 +44,8 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&config.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		cfg1 := NewMockConfig(ctrl)
-		_ = container.Service("cfg1", func() config.IConfig { return cfg1 }, SourceTag)
+		source1 := NewMockSource(ctrl)
+		_ = container.Service("cfg1", func() *MockSource { return source1 }, SourceTag)
 
 		strategy, e := container.Get(ID)
 		switch {

@@ -9,25 +9,25 @@ import (
 
 var (
 	// ErrInvalidFormat defines an error that signal an invalid
-	// log format.
+	// logger format.
 	ErrInvalidFormat = fmt.Errorf("invalid output log format")
 
 	// ErrInvalidLevel defines an error that signal an invalid
-	// log Level.
+	// logger Level.
 	ErrInvalidLevel = fmt.Errorf("invalid log Level")
 
 	// ErrInvalidStream defines an error that signal that the
-	// given log stream configuration was unable to be parsed correctly
-	// enabling the log stream generation.
+	// given logger stream configuration was unable to be parsed correctly
+	// enabling the logger stream generation.
 	ErrInvalidStream = fmt.Errorf("invalid log stream")
 
 	// ErrStreamNotFound defines an error that signal that the
-	// given stream was not found in the log manager.
+	// given stream was not found in the logger manager.
 	ErrStreamNotFound = fmt.Errorf("log stream not found")
 
 	// ErrDuplicateStream defines an error that signal that the
-	// requested log stream to be registered have an id of an already
-	// registered log stream.
+	// requested logger stream to be registered have an id of an already
+	// registered logger stream.
 	ErrDuplicateStream = fmt.Errorf("log stream already registered")
 )
 
@@ -61,7 +61,7 @@ func errInvalidLevel(
 }
 
 func errInvalidStream(
-	cfg config.IConfig,
+	cfg *config.Partial,
 	ctx ...map[string]interface{},
 ) error {
 	return slate.NewErrorFrom(ErrInvalidStream, fmt.Sprintf("%v", cfg), ctx...)

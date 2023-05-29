@@ -5,36 +5,19 @@ import (
 	"sync"
 )
 
-// ILog defines the interface of a Log instance.
-type ILog interface {
-	io.Closer
-
-	Signal(channel string, level Level, msg string, ctx ...Context) error
-	Broadcast(level Level, msg string, ctx ...Context) error
-
-	HasStream(id string) bool
-	ListStreams() []string
-	AddStream(id string, stream IStream) error
-	RemoveStream(id string)
-	RemoveAllStreams()
-	Stream(id string) (IStream, error)
-}
-
 // Log defines a new logging manager used to centralize the logging
 // messaging propagation to a list of registered output streams.
 type Log struct {
 	mutex   sync.Locker
-	streams map[string]IStream
+	streams map[string]Stream
 }
 
-var _ ILog = &Log{}
-
 // NewLog instantiate a new Log instance.
-func NewLog() ILog {
-	// instantiate the log
+func NewLog() *Log {
+	// instantiate the logger
 	return &Log{
 		mutex:   &sync.Mutex{},
-		streams: map[string]IStream{},
+		streams: map[string]Stream{},
 	}
 }
 
@@ -53,7 +36,7 @@ func (l *Log) Signal(
 	msg string,
 	ctx ...Context,
 ) error {
-	// lock the log for handling
+	// lock the logger for handling
 	l.mutex.Lock()
 	defer func() { l.mutex.Unlock() }()
 	// propagate the signal request to all registered stream
@@ -71,7 +54,7 @@ func (l *Log) Broadcast(
 	msg string,
 	ctx ...Context,
 ) error {
-	// lock the log for handling
+	// lock the logger for handling
 	l.mutex.Lock()
 	defer func() { l.mutex.Unlock() }()
 	// propagate the broadcast request to all registered stream
@@ -87,7 +70,7 @@ func (l *Log) Broadcast(
 func (l *Log) HasStream(
 	id string,
 ) bool {
-	// lock the log for handling
+	// lock the logger for handling
 	l.mutex.Lock()
 	defer func() { l.mutex.Unlock() }()
 	// check if there is a registered stream with the requested id
@@ -97,7 +80,7 @@ func (l *Log) HasStream(
 
 // ListStreams retrieve a list of id's of all registered streams on the Log.
 func (l *Log) ListStreams() []string {
-	// lock the log for handling
+	// lock the logger for handling
 	l.mutex.Lock()
 	defer func() { l.mutex.Unlock() }()
 	// generate a list with all the registered streams id's
@@ -111,7 +94,7 @@ func (l *Log) ListStreams() []string {
 // AddStream registers a new stream into the Log instance.
 func (l *Log) AddStream(
 	id string,
-	stream IStream,
+	stream Stream,
 ) error {
 	// check the stream argument reference
 	if stream == nil {
@@ -121,10 +104,10 @@ func (l *Log) AddStream(
 	if l.HasStream(id) {
 		return errDuplicateStream(id)
 	}
-	// lock the log for handling
+	// lock the logger for handling
 	l.mutex.Lock()
 	defer func() { l.mutex.Unlock() }()
-	// add the stream to the log stream pool
+	// add the stream to the logger stream pool
 	l.streams[id] = stream
 	return nil
 }
@@ -134,7 +117,7 @@ func (l *Log) AddStream(
 func (l *Log) RemoveStream(
 	id string,
 ) {
-	// lock the log for handling
+	// lock the logger for handling
 	l.mutex.Lock()
 	defer func() { l.mutex.Unlock() }()
 	// search for the requested removing stream
@@ -151,7 +134,7 @@ func (l *Log) RemoveStream(
 
 // RemoveAllStreams will remove all registered streams from the Log.
 func (l *Log) RemoveAllStreams() {
-	// lock the log for handling
+	// lock the logger for handling
 	l.mutex.Lock()
 	defer func() { l.mutex.Unlock() }()
 	// iterate through all the registered streams
@@ -170,14 +153,13 @@ func (l *Log) RemoveAllStreams() {
 // requested id.
 func (l *Log) Stream(
 	id string,
-) (IStream, error) {
-	// lock the log for handling
+) (Stream, error) {
+	// lock the logger for handling
 	l.mutex.Lock()
 	defer func() { l.mutex.Unlock() }()
 	// retrieve the requested stream
-	s, ok := l.streams[id]
-	if !ok {
-		return nil, errStreamNotFound(id)
+	if s, ok := l.streams[id]; ok {
+		return s, nil
 	}
-	return s, nil
+	return nil, errStreamNotFound(id)
 }

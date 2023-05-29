@@ -13,7 +13,7 @@ func Test_NewError(t *testing.T) {
 
 		if e := NewError(msg); e.Error() != msg {
 			t.Errorf("error message (%v) not same as expected (%v)", e, msg)
-		} else if te, ok := e.(IError); !ok {
+		} else if te, ok := e.(*Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if te.Context() != nil {
 			t.Errorf("didn't stored a nil value context")
@@ -26,7 +26,7 @@ func Test_NewError(t *testing.T) {
 
 		if e := NewError(msg, context); e.Error() != msg {
 			t.Errorf("error message (%v) not same as expected (%v)", e, msg)
-		} else if te, ok := e.(IError); !ok {
+		} else if te, ok := e.(*Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
 			t.Errorf("context (%v) not same as expected (%v)", check, context)
@@ -44,7 +44,7 @@ func Test_NewErrorFrom(t *testing.T) {
 			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
 		} else if !errors.Is(e, from) {
 			t.Errorf("didn't returned a wrapped error from source (%v)", from)
-		} else if te, ok := e.(IError); !ok {
+		} else if te, ok := e.(*Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if te.Context() != nil {
 			t.Errorf("didn't stored a nil value context")
@@ -61,7 +61,7 @@ func Test_NewErrorFrom(t *testing.T) {
 			t.Errorf("error message (%v) not same as expected (%v)", e, expected)
 		} else if !errors.Is(e, from) {
 			t.Errorf("didn't returned a wrapped error from source (%v)", from)
-		} else if te, ok := e.(IError); !ok {
+		} else if te, ok := e.(*Error); !ok {
 			t.Errorf("didn't returned a slate error instance")
 		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
 			t.Errorf("context (%v) not same as expected (%v)", check, context)
@@ -109,7 +109,7 @@ func Test_Error_Unwrap(t *testing.T) {
 func Test_Error_Context(t *testing.T) {
 	t.Run("retrieve nil from no context error", func(t *testing.T) {
 		e := NewError("error message")
-		if check := e.(IError).Context(); check != nil {
+		if check := e.(*Error).Context(); check != nil {
 			t.Errorf("returned the unexpeceted context : %v", check)
 		}
 	})
@@ -117,7 +117,7 @@ func Test_Error_Context(t *testing.T) {
 	t.Run("retrieve assigned error context", func(t *testing.T) {
 		context := map[string]interface{}{"field": "value"}
 		e := NewError("error message", context)
-		if check := e.(IError).Context(); check == nil {
+		if check := e.(*Error).Context(); check == nil {
 			t.Errorf("didn't returned the expeceted context reference")
 		} else if !reflect.DeepEqual(check, context) {
 			t.Errorf("returned (%v) context when expecting (%v)", check, context)

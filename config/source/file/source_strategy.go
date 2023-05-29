@@ -11,25 +11,20 @@ const (
 	Type = "file"
 )
 
-type sourceConfig struct {
-	Path   string
-	Format string
-}
-
 // SourceStrategy defines a strategy used to instantiate a
 // file config source creation strategy.
 type SourceStrategy struct {
 	fileSystem     afero.Fs
-	decoderFactory config.IDecoderFactory
+	decoderFactory *config.DecoderFactory
 }
 
-var _ config.ISourceStrategy = &SourceStrategy{}
+var _ config.SourceStrategy = &SourceStrategy{}
 
 // NewSourceStrategy instantiates a new file config source
 // creation strategy.
 func NewSourceStrategy(
 	fileSystem afero.Fs,
-	decoderFactory config.IDecoderFactory,
+	decoderFactory *config.DecoderFactory,
 ) (*SourceStrategy, error) {
 	// check the file system argument reference
 	if fileSystem == nil {
@@ -50,7 +45,7 @@ func NewSourceStrategy(
 // a source where the data to check comes from a configuration
 // instance.
 func (s SourceStrategy) Accept(
-	cfg config.IConfig,
+	cfg *config.Partial,
 ) bool {
 	// check the config argument reference
 	if cfg == nil {
@@ -68,16 +63,20 @@ func (s SourceStrategy) Accept(
 // Create will instantiate the desired file source instance where
 // the initialization data comes from a configuration instance.
 func (s SourceStrategy) Create(
-	cfg config.IConfig,
-) (config.ISource, error) {
+	cfg *config.Partial,
+) (config.Source, error) {
 	// check the config argument reference
 	if cfg == nil {
-		return nil, errNilPointer("config")
+		return nil, errNilPointer("partial")
 	}
 	// retrieve the data from the configuration
-	sc := sourceConfig{Format: config.DefaultFileFormat}
-	_, e := cfg.Populate("", &sc)
-	if e != nil {
+	sc := struct {
+		Path   string
+		Format string
+	}{
+		Format: config.DefaultFileFormat,
+	}
+	if _, e := cfg.Populate("", &sc); e != nil {
 		return nil, e
 	}
 	// validate configuration

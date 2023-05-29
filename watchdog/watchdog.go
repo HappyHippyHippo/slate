@@ -1,22 +1,19 @@
 package watchdog
 
-// IWatchdog defines an interface to a watchdog instance used to
-// overlook a process execution maintaining and recovering
-// error/panic states.
-type IWatchdog interface {
-	Run(process IProcess) error
+type logAdapter interface {
+	Start() error
+	Error(e error) error
+	Done() error
 }
 
 // Watchdog defines the instance used to overlook a process execution.
 type Watchdog struct {
-	log ILogAdapter
+	log logAdapter
 }
-
-var _ IWatchdog = &Watchdog{}
 
 // NewWatchdog generates a new watchdog instance.
 func NewWatchdog(
-	log ILogAdapter,
+	log *LogAdapter,
 ) (*Watchdog, error) {
 	// check log argument reference
 	if log == nil {
@@ -29,7 +26,7 @@ func NewWatchdog(
 }
 
 // Run will run a process overlooked by the current watchdog instance.
-func (w *Watchdog) Run(process IProcess) (e error) {
+func (w *Watchdog) Run(process Processor) (e error) {
 	// create the goroutine signal channels
 	closed := make(chan struct{})
 	errored := make(chan struct{})

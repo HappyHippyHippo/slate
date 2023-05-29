@@ -1,31 +1,19 @@
 package slate
 
-// IApplication defines the interface of a slate application instance
-// that implements a container and handles a series of service providers
-// so the application can properly initialize.
-type IApplication interface {
-	IContainer
-
-	Provide(provider IProvider) error
-	Boot() error
-}
-
 // Application defines the structure that controls the application
 // container and container initialization.
 type Application struct {
 	Container
 
-	providers []IProvider
+	providers []Provider
 	isBoot    bool
 }
-
-var _ IApplication = &Application{}
 
 // NewApplication used to instantiate a new application.
 func NewApplication() *Application {
 	return &Application{
 		Container: *NewContainer(),
-		providers: []IProvider{},
+		providers: []Provider{},
 		isBoot:    false,
 	}
 }
@@ -33,7 +21,7 @@ func NewApplication() *Application {
 // Provide will register a new provider into the application used
 // on the application boot.
 func (a *Application) Provide(
-	provider IProvider,
+	provider Provider,
 ) error {
 	// check provider argument
 	if provider == nil {
@@ -41,7 +29,7 @@ func (a *Application) Provide(
 	}
 	// call the provider registration method over the
 	// application service container
-	if e := provider.Register(a); e != nil {
+	if e := provider.Register(&a.Container); e != nil {
 		return e
 	}
 	// add the provider to the application provider slice
@@ -57,18 +45,18 @@ func (a *Application) Boot() (e error) {
 	// boot panic fallback
 	defer func() {
 		if r := recover(); r != nil {
-			if tr, ok := r.(error); !ok {
+			tr, ok := r.(error)
+			if !ok {
 				panic(r)
-			} else {
-				e = tr
 			}
+			e = tr
 		}
 	}()
 	// check if the application has already been booted
 	if !a.isBoot {
 		// call boot on all the registered providers
 		for _, provider := range a.providers {
-			if e := provider.Boot(a); e != nil {
+			if e := provider.Boot(&a.Container); e != nil {
 				return e
 			}
 		}

@@ -3,12 +3,11 @@ package log
 import (
 	"errors"
 	"fmt"
-	"testing"
-
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/fs"
+	"testing"
 )
 
 func Test_Provider_Register(t *testing.T) {
@@ -31,17 +30,17 @@ func Test_Provider_Register(t *testing.T) {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
 		case !container.Has(FormatterFactoryID):
-			t.Error("didn't registered the log Formatter factory", e)
+			t.Error("didn't registered the logger Formatter factory", e)
 		case !container.Has(StreamFactoryID):
-			t.Error("didn't registered the log stream factory", e)
+			t.Error("didn't registered the logger stream factory", e)
 		case !container.Has(ID):
 			t.Error("didn't registered the logger", e)
 		case !container.Has(LoaderID):
-			t.Error("didn't registered the log loader", e)
+			t.Error("didn't registered the logger loader", e)
 		}
 	})
 
-	t.Run("retrieving log Formatter factory", func(t *testing.T) {
+	t.Run("retrieving logger Formatter factory", func(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (Provider{}).Register(container)
 
@@ -60,7 +59,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving log stream factory", func(t *testing.T) {
+	t.Run("retrieving logger stream factory", func(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (Provider{}).Register(container)
 
@@ -93,7 +92,7 @@ func Test_Provider_Register(t *testing.T) {
 			switch log.(type) {
 			case *Log:
 			default:
-				t.Error("didn't return a log reference")
+				t.Error("didn't return a logger reference")
 			}
 		}
 	})
@@ -102,7 +101,7 @@ func Test_Provider_Register(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		container := slate.NewContainer()
 		_ = (Provider{}).Register(container)
-		_ = container.Service(config.ID, func() (config.IManager, error) { return nil, expected })
+		_ = container.Service(config.ID, func() (*config.Config, error) { return nil, expected })
 
 		if _, e := container.Get(LoaderID); e == nil {
 			t.Error("didn't returned the expected error")
@@ -140,7 +139,7 @@ func Test_Provider_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("retrieving log loader", func(t *testing.T) {
+	t.Run("retrieving logger loader", func(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (fs.Provider{}).Register(container)
 		_ = (config.Provider{}).Register(container)
@@ -298,8 +297,8 @@ func Test_Provider_Boot(t *testing.T) {
 		formatterStrategy := NewMockFormatterStrategy(ctrl)
 		streamStrategy := NewMockStreamStrategy(ctrl)
 
-		_ = container.Service("formatter.id", func() IFormatterStrategy { return formatterStrategy }, FormatterStrategyTag)
-		_ = container.Service("stream.id", func() IStreamStrategy { return streamStrategy }, StreamStrategyTag)
+		_ = container.Service("formatter.id", func() FormatterStrategy { return formatterStrategy }, FormatterStrategyTag)
+		_ = container.Service("stream.id", func() StreamStrategy { return streamStrategy }, StreamStrategyTag)
 
 		if e := sut.Boot(container); e != nil {
 			t.Errorf("returned the unexpected e (%v)", e)
@@ -355,23 +354,26 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid log entry config", func(t *testing.T) {
+	t.Run("invalid logger entry config", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("error message")
 		container := slate.NewContainer()
 		_ = (fs.Provider{}).Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().Config("slate.log.streams", config.Config{}).Return(nil, expected).Times(1)
-		_ = container.Service(config.ID, func() (config.IManager, error) { return cfg, nil })
+
+		partial := config.Partial{"slate": config.Partial{"logger": config.Partial{"streams": "string"}}}
+		source := NewMockConfigSource(ctrl)
+		source.EXPECT().Get("").Return(partial, nil).Times(1)
+		cfg := config.NewConfig()
+		_ = cfg.AddSource("id", 1, source)
+		_ = container.Service(config.ID, func() (*config.Config, error) { return cfg, nil })
 
 		if e := sut.Boot(container); e == nil {
 			t.Errorf("didn't returned the expected error")
-		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		} else if !errors.Is(e, slate.ErrConversion) {
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -383,10 +385,12 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = (fs.Provider{}).Register(container)
 		provider := &Provider{}
 		_ = provider.Register(container)
-		cfg := NewMockConfigManager(ctrl)
-		cfg.EXPECT().Config("slate.log.streams", config.Config{}).Return(&config.Config{}, nil).Times(1)
-		cfg.EXPECT().AddObserver("slate.log.streams", gomock.Any()).Return(nil).Times(1)
-		_ = container.Service(config.ID, func() (config.IManager, error) { return cfg, nil })
+		partial := config.Partial{"slate": config.Partial{"logger": config.Partial{"streams": config.Partial{}}}}
+		source := NewMockConfigSource(ctrl)
+		source.EXPECT().Get("").Return(partial, nil).Times(1)
+		cfg := config.NewConfig()
+		_ = cfg.AddSource("id", 1, source)
+		_ = container.Service(config.ID, func() (*config.Config, error) { return cfg, nil })
 
 		if e := provider.Boot(container); e != nil {
 			t.Errorf("returned the (%v) error", e)

@@ -17,7 +17,7 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, e := NewSource("path", "format", nil, NewMockDecoderFactory(ctrl))
+		sut, e := NewSource("path", "format", nil, config.NewDecoderFactory())
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -52,7 +52,7 @@ func Test_NewSource(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 
-		sut, e := NewSource(path, "format", fs, NewMockDecoderFactory(ctrl))
+		sut, e := NewSource(path, "format", fs, config.NewDecoderFactory())
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -67,23 +67,24 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("error message")
 		path := "path"
 		file := NewMockFile(ctrl)
 		file.EXPECT().Close().Times(1)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().OpenFile(path, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(config.UnknownDecoderFormat, file).Return(nil, expected).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept(config.UnknownDecoder).Return(false).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
-		sut, e := NewSource(path, config.UnknownDecoderFormat, fs, decoderFactory)
+		sut, e := NewSource(path, config.UnknownDecoder, fs, decoderFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		case errors.Is(e, config.ErrInvalidSource):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, config.ErrInvalidSource)
 		}
 	})
 
@@ -99,8 +100,11 @@ func Test_NewSource(t *testing.T) {
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(nil, expected).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", file).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(file).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, e := NewSource(path, "format", fs, decoderFactory)
 		switch {
@@ -117,7 +121,7 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partial := config.Config{"field": "value"}
+		partial := config.Partial{"field": "value"}
 		path := "path"
 		file := NewMockFile(ctrl)
 		fs := NewMockFs(ctrl)
@@ -125,8 +129,11 @@ func Test_NewSource(t *testing.T) {
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&partial, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", file).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(file).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, e := NewSource(path, "format", fs, decoderFactory)
 		switch {
@@ -144,9 +151,9 @@ func Test_NewSource(t *testing.T) {
 				t.Error("didn't stored the file content format")
 			case sut.fileSystem != fs:
 				t.Error("didn't stored the file system adapter reference")
-			case sut.decoderFactory != decoderFactory:
+			case sut.decoderCreator != decoderFactory:
 				t.Error("didn't stored the decoder factory reference")
-			case !reflect.DeepEqual(sut.Config, partial):
+			case !reflect.DeepEqual(sut.Partial, partial):
 				t.Error("didn't stored the decoder information")
 			}
 		}

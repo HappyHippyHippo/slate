@@ -14,10 +14,7 @@ import (
 
 func Test_NewObsSourceStrategy(t *testing.T) {
 	t.Run("nil file system adapter", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		sut, e := NewObsSourceStrategy(nil, NewMockDecoderFactory(ctrl))
+		sut, e := NewObsSourceStrategy(nil, config.NewDecoderFactory())
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -48,7 +45,7 @@ func Test_NewObsSourceStrategy(t *testing.T) {
 		defer ctrl.Finish()
 
 		fs := NewMockFs(ctrl)
-		decoderFactory := NewMockDecoderFactory(ctrl)
+		decoderFactory := config.NewDecoderFactory()
 
 		sut, e := NewObsSourceStrategy(fs, decoderFactory)
 		switch {
@@ -69,7 +66,7 @@ func Test_ObsSourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
 		if sut.Accept(nil) {
 			t.Error("returned true")
@@ -80,9 +77,9 @@ func Test_ObsSourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if sut.Accept(&config.Config{}) {
+		if sut.Accept(&config.Partial{}) {
 			t.Error("returned true")
 		}
 	})
@@ -91,9 +88,9 @@ func Test_ObsSourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if sut.Accept(&config.Config{"type": 123}) {
+		if sut.Accept(&config.Partial{"type": 123}) {
 			t.Error("returned true")
 		}
 	})
@@ -102,9 +99,9 @@ func Test_ObsSourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if sut.Accept(&config.Config{"type": config.UnknownSourceType}) {
+		if sut.Accept(&config.Partial{"type": config.UnknownSource}) {
 			t.Error("returned true")
 		}
 	})
@@ -113,9 +110,9 @@ func Test_ObsSourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if !sut.Accept(&config.Config{"type": ObsType}) {
+		if !sut.Accept(&config.Partial{"type": ObsType}) {
 			t.Error("returned false")
 		}
 	})
@@ -126,7 +123,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
 		src, e := sut.Create(nil)
 		switch {
@@ -143,9 +140,9 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"format": "format"})
+		src, e := sut.Create(&config.Partial{"format": "format"})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -160,9 +157,9 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"path": 123, "format": "format"})
+		src, e := sut.Create(&config.Partial{"path": 123, "format": "format"})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -177,9 +174,9 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"path": "path", "format": 123})
+		src, e := sut.Create(&config.Partial{"path": "path", "format": 123})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -197,7 +194,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		path := "path"
 		field := "field"
 		value := "value"
-		expected := config.Config{field: value}
+		expected := config.Partial{field: value}
 		file := NewMockFile(ctrl)
 		fileInfo := NewMockFileInfo(ctrl)
 		fileInfo.EXPECT().ModTime().Return(time.Unix(0, 1)).Times(1)
@@ -207,12 +204,15 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", file).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(file).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, _ := NewObsSourceStrategy(fs, decoderFactory)
 
-		src, e := sut.Create(&config.Config{"path": path, "format": "format"})
+		src, e := sut.Create(&config.Partial{"path": path, "format": "format"})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -238,7 +238,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		path := "path"
 		field := "field"
 		value := "value"
-		expected := config.Config{field: value}
+		expected := config.Partial{field: value}
 		file := NewMockFile(ctrl)
 		fileInfo := NewMockFileInfo(ctrl)
 		fileInfo.EXPECT().ModTime().Return(time.Unix(0, 1)).Times(1)
@@ -248,12 +248,15 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("yaml", file).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("yaml").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(file).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, _ := NewObsSourceStrategy(fs, decoderFactory)
 
-		src, e := sut.Create(&config.Config{"path": path})
+		src, e := sut.Create(&config.Partial{"path": path})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)

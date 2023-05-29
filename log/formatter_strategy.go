@@ -1,15 +1,15 @@
 package log
 
 const (
-	// UnknownFormatterFormat defines the value to be used to declare a
+	// UnknownFormatter defines the value to be used to declare a
 	// unknown Log Formatter format.
-	UnknownFormatterFormat = "unknown"
+	UnknownFormatter = "unknown"
 )
 
-// IFormatterStrategy interface defines the methods of the Formatter
+// FormatterStrategy interface defines the methods of the Formatter
 // factory strategy that can validate creation requests and instantiation
 // of particular decoder.
-type IFormatterStrategy interface {
+type FormatterStrategy interface {
 	Accept(format string) bool
-	Create(args ...interface{}) (IFormatter, error)
+	Create(args ...interface{}) (Formatter, error)
 }

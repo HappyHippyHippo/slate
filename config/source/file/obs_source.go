@@ -18,8 +18,8 @@ type ObsSource struct {
 	timestamp time.Time
 }
 
-var _ config.ISource = &ObsSource{}
-var _ config.IObsSource = &ObsSource{}
+var _ config.Source = &ObsSource{}
+var _ config.ObsSource = &ObsSource{}
 
 // NewObsSource will instantiate a new configuration source
 // that will read a file for configuration info, opening the
@@ -28,27 +28,27 @@ func NewObsSource(
 	path,
 	format string,
 	fileSystem afero.Fs,
-	decoderFactory config.IDecoderFactory,
+	decoderCreator decoderCreator,
 ) (*ObsSource, error) {
 	// check file system argument reference
 	if fileSystem == nil {
 		return nil, errNilPointer("fileSystem")
 	}
 	// check decoder factory argument reference
-	if decoderFactory == nil {
-		return nil, errNilPointer("decoderFactory")
+	if decoderCreator == nil {
+		return nil, errNilPointer("decoderCreator")
 	}
 	// return the requested observable config source instance
 	s := &ObsSource{
 		Source: Source{
-			BaseSource: source.BaseSource{
-				Mutex:  &sync.Mutex{},
-				Config: config.Config{},
+			Source: source.Source{
+				Mutex:   &sync.Mutex{},
+				Partial: config.Partial{},
 			},
 			path:           path,
 			format:         format,
 			fileSystem:     fileSystem,
-			decoderFactory: decoderFactory,
+			decoderCreator: decoderCreator,
 		},
 		timestamp: time.Unix(0, 0),
 	}

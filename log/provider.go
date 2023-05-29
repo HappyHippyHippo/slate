@@ -6,9 +6,9 @@ import (
 
 const (
 	// ID defines the id to be used as the container
-	// registration id of a logger instance, as a base id of all other log
+	// registration id of a logger instance, as a base id of all other logger
 	// package instances registered in the application container.
-	ID = slate.ID + ".log"
+	ID = slate.ID + ".logger"
 
 	// FormatterStrategyTag defines the tag to be assigned to all
 	// container Formatter strategies.
@@ -31,16 +31,16 @@ const (
 	LoaderID = ID + ".loader"
 )
 
-// Provider defines the slate.log module service provider to be used on
+// Provider defines the slate.logger module service provider to be used on
 // the application initialization to register the logging service.
 type Provider struct{}
 
-var _ slate.IProvider = &Provider{}
+var _ slate.Provider = &Provider{}
 
 // Register will register the logger package instances in the
 // application container.
 func (p Provider) Register(
-	container slate.IContainer,
+	container *slate.Container,
 ) error {
 	// check container argument reference
 	if container == nil {
@@ -56,7 +56,7 @@ func (p Provider) Register(
 // Boot will start the logger package config instance by calling the
 // logger loader with the defined provider base entry information.
 func (p Provider) Boot(
-	container slate.IContainer,
+	container *slate.Container,
 ) (e error) {
 	// check container argument reference
 	if container == nil {
@@ -81,7 +81,7 @@ func (p Provider) Boot(
 	for _, s := range p.getStreamStrategies(container) {
 		_ = streamFactory.Register(s)
 	}
-	// check if the log loader is active
+	// check if the logger loader is active
 	if !LoaderActive {
 		return nil
 	}
@@ -90,35 +90,34 @@ func (p Provider) Boot(
 }
 
 func (Provider) getFormatterFactory(
-	container slate.IContainer,
-) IFormatterFactory {
+	container *slate.Container,
+) *FormatterFactory {
 	// retrieve the factory entry
 	entry, e := container.Get(FormatterFactoryID)
 	if e != nil {
 		panic(e)
 	}
 	// validate the retrieved entry type
-	instance, ok := entry.(IFormatterFactory)
-	if !ok {
-		panic(errConversion(entry, "log.IFormatterFactory"))
+	if instance, ok := entry.(*FormatterFactory); ok {
+		return instance
 	}
-	return instance
+	panic(errConversion(entry, "*logger.FormatterFactory"))
 }
 
 func (Provider) getFormatterStrategies(
-	container slate.IContainer,
-) []IFormatterStrategy {
+	container *slate.Container,
+) []FormatterStrategy {
 	// retrieve the strategies entries
 	entries, e := container.Tag(FormatterStrategyTag)
 	if e != nil {
 		panic(e)
 	}
 	// type check the retrieved strategies
-	var strategies []IFormatterStrategy
+	var strategies []FormatterStrategy
 	for _, entry := range entries {
-		s, ok := entry.(IFormatterStrategy)
+		s, ok := entry.(FormatterStrategy)
 		if !ok {
-			panic(errConversion(entry, "log.IFormatterStrategy"))
+			panic(errConversion(entry, "logger.FormatterStrategy"))
 		}
 		strategies = append(strategies, s)
 	}
@@ -126,35 +125,34 @@ func (Provider) getFormatterStrategies(
 }
 
 func (Provider) getStreamFactory(
-	container slate.IContainer,
-) IStreamFactory {
+	container *slate.Container,
+) *StreamFactory {
 	// retrieve the factory entry
 	entry, e := container.Get(StreamFactoryID)
 	if e != nil {
 		panic(e)
 	}
 	// validate the retrieved entry type
-	instance, ok := entry.(IStreamFactory)
-	if !ok {
-		panic(errConversion(entry, "log.IStreamFactory"))
+	if instance, ok := entry.(*StreamFactory); ok {
+		return instance
 	}
-	return instance
+	panic(errConversion(entry, "*logger.StreamFactory"))
 }
 
 func (Provider) getStreamStrategies(
-	container slate.IContainer,
-) []IStreamStrategy {
+	container *slate.Container,
+) []StreamStrategy {
 	// retrieve the strategies entries
 	entries, e := container.Tag(StreamStrategyTag)
 	if e != nil {
 		panic(e)
 	}
 	// type check the retrieved strategies
-	var strategies []IStreamStrategy
+	var strategies []StreamStrategy
 	for _, entry := range entries {
-		s, ok := entry.(IStreamStrategy)
+		s, ok := entry.(StreamStrategy)
 		if !ok {
-			panic(errConversion(entry, "log.IStreamStrategy"))
+			panic(errConversion(entry, "logger.StreamStrategy"))
 		}
 		strategies = append(strategies, s)
 	}
@@ -162,17 +160,16 @@ func (Provider) getStreamStrategies(
 }
 
 func (Provider) getLoader(
-	container slate.IContainer,
-) ILoader {
+	container *slate.Container,
+) *Loader {
 	// retrieve the loader entry
 	entry, e := container.Get(LoaderID)
 	if e != nil {
 		panic(e)
 	}
 	// validate the retrieved entry type
-	instance, ok := entry.(ILoader)
-	if !ok {
-		panic(errConversion(entry, "log.ILoader"))
+	if instance, ok := entry.(*Loader); ok {
+		return instance
 	}
-	return instance
+	panic(errConversion(entry, "*logger.Loader"))
 }

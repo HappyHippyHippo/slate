@@ -5,30 +5,29 @@ import (
 	"gorm.io/gorm"
 )
 
-// IConnectionFactory defines the interface of a connection factory instance.
-type IConnectionFactory interface {
-	Create(cfg config.IConfig, gormCfg *gorm.Config) (*gorm.DB, error)
+type dialectCreator interface {
+	Create(cfg *config.Partial) (gorm.Dialector, error)
 }
 
 // ConnectionFactory is a database connection generator.
 type ConnectionFactory struct {
-	dialectFactory IDialectFactory
+	dialectCreator dialectCreator
 }
 
-var _ IConnectionFactory = &ConnectionFactory{}
+var _ connectionCreator = &ConnectionFactory{}
 
 // NewConnectionFactory will instantiate a new relational
 // database connection factory instance.
 func NewConnectionFactory(
-	dialectFactory IDialectFactory,
-) (IConnectionFactory, error) {
+	dialectCreator *DialectFactory,
+) (*ConnectionFactory, error) {
 	// check dialect factory argument reference
-	if dialectFactory == nil {
-		return nil, errNilPointer("dialectFactory")
+	if dialectCreator == nil {
+		return nil, errNilPointer("dialectCreator")
 	}
 	// instantiate the connection factory
 	return &ConnectionFactory{
-		dialectFactory: dialectFactory,
+		dialectCreator: dialectCreator,
 	}, nil
 }
 
@@ -36,11 +35,11 @@ func NewConnectionFactory(
 // base configuration defined by the given name of the connection,
 // and apply the extra connection cfg also given as arguments.
 func (f *ConnectionFactory) Create(
-	cfg config.IConfig,
+	cfg *config.Partial,
 	gormCfg *gorm.Config,
 ) (*gorm.DB, error) {
 	// get a dialect instance for the connection
-	dialect, e := f.dialectFactory.Get(cfg)
+	dialect, e := f.dialectCreator.Create(cfg)
 	if e != nil {
 		return nil, e
 	}

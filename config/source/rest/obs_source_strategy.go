@@ -12,36 +12,27 @@ const (
 	ObsType = "observable-rest"
 )
 
-type obsSourceConfig struct {
-	URI    string
-	Format string
-	Path   struct {
-		Config    string
-		Timestamp string
-	}
-}
-
 // ObsSourceStrategy defines a strategy used to instantiate
 // an observable REST service config source creation strategy.
 type ObsSourceStrategy struct {
 	SourceStrategy
 }
 
-var _ config.ISourceStrategy = &ObsSourceStrategy{}
+var _ config.SourceStrategy = &ObsSourceStrategy{}
 
 // NewObsSourceStrategy instantiates a new observable REST
 // service config source creation strategy.
 func NewObsSourceStrategy(
-	decoderFactory config.IDecoderFactory,
+	decoderFactory *config.DecoderFactory,
 ) (*ObsSourceStrategy, error) {
 	// check the decoder factory argument reference
 	if decoderFactory == nil {
-		return nil, errNilPointer("decoderFactory")
+		return nil, errNilPointer("decoderCreator")
 	}
 	// instantiate the strategy
 	return &ObsSourceStrategy{
 		SourceStrategy: SourceStrategy{
-			clientFactory:  func() httpClient { return &http.Client{} },
+			clientFactory:  func() requester { return &http.Client{} },
 			decoderFactory: decoderFactory,
 		},
 	}, nil
@@ -51,7 +42,7 @@ func NewObsSourceStrategy(
 // a source where the data to check comes from a configuration
 // instance.
 func (s ObsSourceStrategy) Accept(
-	cfg config.IConfig,
+	cfg *config.Partial,
 ) bool {
 	// check the config argument reference
 	if cfg == nil {
@@ -69,16 +60,24 @@ func (s ObsSourceStrategy) Accept(
 // Create will instantiate the desired rest source instance where
 // the initialization data comes from a configuration instance.
 func (s ObsSourceStrategy) Create(
-	cfg config.IConfig,
-) (config.ISource, error) {
+	cfg *config.Partial,
+) (config.Source, error) {
 	// check the config argument reference
 	if cfg == nil {
-		return nil, errNilPointer("config")
+		return nil, errNilPointer("partial")
 	}
 	// retrieve the data from the configuration
-	sc := obsSourceConfig{Format: config.DefaultRestFormat}
-	_, e := cfg.Populate("", &sc)
-	if e != nil {
+	sc := struct {
+		URI    string
+		Format string
+		Path   struct {
+			Config    string
+			Timestamp string
+		}
+	}{
+		Format: config.DefaultRestFormat,
+	}
+	if _, e := cfg.Populate("", &sc); e != nil {
 		return nil, e
 	}
 	// validate configuration

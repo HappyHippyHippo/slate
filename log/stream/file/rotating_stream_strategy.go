@@ -12,40 +12,33 @@ const (
 	RotatingType = "rotating-file"
 )
 
-type rotatingStreamConfig struct {
-	Path     string
-	Format   string
-	Channels []interface{}
-	Level    string
-}
-
 // RotatingStreamStrategy define a new rotating file log
 // stream generation strategy.
 type RotatingStreamStrategy struct {
 	StreamStrategy
 }
 
-var _ log.IStreamStrategy = &RotatingStreamStrategy{}
+var _ log.StreamStrategy = &RotatingStreamStrategy{}
 
 // NewRotatingStreamStrategy generate a new rotating file log stream
 // generation strategy.
 func NewRotatingStreamStrategy(
 	fs afero.Fs,
-	formatterFactory log.IFormatterFactory,
+	formatterCreator *log.FormatterFactory,
 ) (*RotatingStreamStrategy, error) {
 	// check file system argument reference
 	if fs == nil {
 		return nil, errNilPointer("fs")
 	}
 	// check formatter factory argument reference
-	if formatterFactory == nil {
-		return nil, errNilPointer("formatterFactory")
+	if formatterCreator == nil {
+		return nil, errNilPointer("formatterCreator")
 	}
 	// instantiate the rotating file stream strategy
 	return &RotatingStreamStrategy{
 		StreamStrategy: StreamStrategy{
 			fs:               fs,
-			formatterFactory: formatterFactory,
+			formatterCreator: formatterCreator,
 		},
 	}, nil
 }
@@ -54,7 +47,7 @@ func NewRotatingStreamStrategy(
 // a stream where the data to check comes from a configuration partial
 // instance.
 func (s RotatingStreamStrategy) Accept(
-	cfg config.IConfig,
+	cfg *config.Partial,
 ) bool {
 	// check config argument reference
 	if cfg == nil {
@@ -72,16 +65,20 @@ func (s RotatingStreamStrategy) Accept(
 // Create will instantiate the desired stream instance where
 // the initialization data comes from a configuration instance.
 func (s RotatingStreamStrategy) Create(
-	cfg config.IConfig,
-) (log.IStream, error) {
+	cfg *config.Partial,
+) (log.Stream, error) {
 	// check config argument reference
 	if cfg == nil {
 		return nil, errNilPointer("cfg")
 	}
 	// retrieve the data from the configuration
-	sc := rotatingStreamConfig{}
-	_, e := cfg.Populate("", &sc)
-	if e != nil {
+	sc := struct {
+		Path     string
+		Format   string
+		Channels []interface{}
+		Level    string
+	}{}
+	if _, e := cfg.Populate("", &sc); e != nil {
 		return nil, e
 	}
 	// validate configuration
@@ -90,7 +87,7 @@ func (s RotatingStreamStrategy) Create(
 		return nil, e
 	}
 	// create the stream formatter to be given to the console stream
-	formatter, e := s.formatterFactory.Create(sc.Format)
+	formatter, e := s.formatterCreator.Create(sc.Format)
 	if e != nil {
 		return nil, e
 	}

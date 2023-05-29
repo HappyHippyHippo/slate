@@ -6,25 +6,25 @@ import (
 	"github.com/happyhippyhippo/slate/config"
 )
 
-// IUnderlyingDecoder defines the interface to a decoder underlying
+// UnderlyingDecoder defines the interface to a decoder underlying
 // format decoder
-type IUnderlyingDecoder interface {
-	Decode(partial interface{}) error
+type UnderlyingDecoder interface {
+	Decode(cfg interface{}) error
 }
 
-// Decoder defines a config source JSON content decoder instance.
+// Decoder defines a config source content decoder instance.
 type Decoder struct {
 	Reader            io.Reader
-	UnderlyingDecoder IUnderlyingDecoder
+	UnderlyingDecoder UnderlyingDecoder
 }
 
-// Close terminate the decoder, closing the associated jsonReader.
+// Close terminate the decoder, closing the associated underlying decoder.
 func (d *Decoder) Close() error {
 	// check if there is a jsonReader reference
 	if d.Reader != nil {
-		// check if the jsonReader implements the closer interface
+		// check if the underlying decoder implements the closer interface
 		if r, ok := d.Reader.(io.Closer); ok {
-			// close the jsonReader
+			// close the underlying decoder
 			if e := r.Close(); e != nil {
 				return e
 			}
@@ -34,15 +34,15 @@ func (d *Decoder) Close() error {
 	return nil
 }
 
-// Decode parse the associated configuration source jsonReader content
+// Decode parse the associated configuration source encoded content
 // into a configuration instance.
-func (d *Decoder) Decode() (config.IConfig, error) {
-	// decode the referenced jsonReader data
+func (d *Decoder) Decode() (*config.Partial, error) {
+	// decode the referenced data
 	data := map[string]interface{}{}
 	if e := d.UnderlyingDecoder.Decode(&data); e != nil {
 		return nil, e
 	}
-	// convert the read data into a normalized config
-	p := config.Convert(data).(config.Config)
+	// convert the read data into a normalized partial
+	p := config.Convert(data).(config.Partial)
 	return &p, nil
 }

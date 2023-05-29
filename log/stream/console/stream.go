@@ -13,11 +13,11 @@ type Stream struct {
 	stream.Stream
 }
 
-var _ log.IStream = &Stream{}
+var _ log.Stream = &Stream{}
 
 // NewStream generate a new console log stream instance.
 func NewStream(
-	formatter log.IFormatter,
+	formatter log.Formatter,
 	channels []string,
 	level log.Level,
 ) (*Stream, error) {
@@ -26,7 +26,7 @@ func NewStream(
 		return nil, errNilPointer("formatter")
 	}
 	// instantiate the console stream with the stdout as the
-	// def writer target
+	// simple writer target
 	s := &Stream{
 		Stream: stream.Stream{
 			Formatter: formatter,

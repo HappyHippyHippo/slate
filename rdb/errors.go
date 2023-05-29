@@ -40,7 +40,7 @@ func errConfigNotFound(
 }
 
 func errUnknownDialect(
-	cfg config.IConfig,
+	cfg *config.Partial,
 	ctx ...map[string]interface{},
 ) error {
 	return slate.NewErrorFrom(ErrUnknownDialect, fmt.Sprintf("%v", cfg), ctx...)

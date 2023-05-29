@@ -17,13 +17,13 @@ type ObsSourceStrategy struct {
 	SourceStrategy
 }
 
-var _ config.ISourceStrategy = &ObsSourceStrategy{}
+var _ config.SourceStrategy = &ObsSourceStrategy{}
 
 // NewObsSourceStrategy instantiates a new observable
 // file config source creation strategy.
 func NewObsSourceStrategy(
 	fileSystem afero.Fs,
-	decoderFactory config.IDecoderFactory,
+	decoderFactory *config.DecoderFactory,
 ) (*ObsSourceStrategy, error) {
 	// check the file system argument reference
 	if fileSystem == nil {
@@ -45,7 +45,7 @@ func NewObsSourceStrategy(
 // Accept will check if the source factory strategy can instantiate
 // a source where the data to check comes from a configuration instance.
 func (s ObsSourceStrategy) Accept(
-	cfg config.IConfig,
+	cfg *config.Partial,
 ) bool {
 	// check the config argument reference
 	if cfg == nil {
@@ -63,16 +63,20 @@ func (s ObsSourceStrategy) Accept(
 // Create will instantiate the desired file source instance where
 // the initialization data comes from a configuration instance.
 func (s ObsSourceStrategy) Create(
-	cfg config.IConfig,
-) (config.ISource, error) {
+	cfg *config.Partial,
+) (config.Source, error) {
 	// check the config argument reference
 	if cfg == nil {
-		return nil, errNilPointer("config")
+		return nil, errNilPointer("partial")
 	}
 	// retrieve the data from the configuration
-	sc := sourceConfig{Format: config.DefaultFileFormat}
-	_, e := cfg.Populate("", &sc)
-	if e != nil {
+	sc := struct {
+		Path   string
+		Format string
+	}{
+		Format: config.DefaultFileFormat,
+	}
+	if _, e := cfg.Populate("", &sc); e != nil {
 		return nil, e
 	}
 	// validate configuration

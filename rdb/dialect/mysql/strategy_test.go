@@ -20,27 +20,27 @@ func Test_DialectStrategy_Accept(t *testing.T) {
 	})
 
 	t.Run("refuse on config parsing", func(t *testing.T) {
-		if (&DialectStrategy{}).Accept(&config.Config{"dialect": 123}) == true {
+		if (&DialectStrategy{}).Accept(&config.Partial{"dialect": 123}) == true {
 			t.Error("returned true")
 		}
 	})
 
 	t.Run("refuse if the dialect name is not mysql", func(t *testing.T) {
-		if (&DialectStrategy{}).Accept(&config.Config{"dialect": "sqlite"}) == true {
+		if (&DialectStrategy{}).Accept(&config.Partial{"dialect": "sqlite"}) == true {
 			t.Error("returned true")
 		}
 	})
 
 	t.Run("accept if the dialect name is mysql", func(t *testing.T) {
-		if (&DialectStrategy{}).Accept(&config.Config{"dialect": "mYsQl"}) == false {
+		if (&DialectStrategy{}).Accept(&config.Partial{"dialect": "mYsQl"}) == false {
 			t.Error("returned false")
 		}
 	})
 }
 
-func Test_DialectStrategy_Get(t *testing.T) {
+func Test_DialectStrategy_Create(t *testing.T) {
 	t.Run("error on nil config", func(t *testing.T) {
-		dialect, e := (&DialectStrategy{}).Get(nil)
+		dialect, e := (&DialectStrategy{}).Create(nil)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -52,12 +52,12 @@ func Test_DialectStrategy_Get(t *testing.T) {
 	})
 
 	t.Run("invalid username value on connection configuration", func(t *testing.T) {
-		cfg := &config.Config{
+		cfg := &config.Partial{
 			"dialect":  "mysql",
 			"username": 123,
 		}
 
-		dialect, e := (&DialectStrategy{}).Get(cfg)
+		dialect, e := (&DialectStrategy{}).Create(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -69,13 +69,13 @@ func Test_DialectStrategy_Get(t *testing.T) {
 	})
 
 	t.Run("invalid password value on connection configuration", func(t *testing.T) {
-		cfg := &config.Config{
+		cfg := &config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": 123,
 		}
 
-		dialect, e := (&DialectStrategy{}).Get(cfg)
+		dialect, e := (&DialectStrategy{}).Create(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -87,14 +87,14 @@ func Test_DialectStrategy_Get(t *testing.T) {
 	})
 
 	t.Run("invalid protocol value on connection configuration", func(t *testing.T) {
-		cfg := &config.Config{
+		cfg := &config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
 			"protocol": 123,
 		}
 
-		dialect, e := (&DialectStrategy{}).Get(cfg)
+		dialect, e := (&DialectStrategy{}).Create(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -106,7 +106,7 @@ func Test_DialectStrategy_Get(t *testing.T) {
 	})
 
 	t.Run("invalid host value on connection configuration", func(t *testing.T) {
-		cfg := &config.Config{
+		cfg := &config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
@@ -114,7 +114,7 @@ func Test_DialectStrategy_Get(t *testing.T) {
 			"host":     123,
 		}
 
-		dialect, e := (&DialectStrategy{}).Get(cfg)
+		dialect, e := (&DialectStrategy{}).Create(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -126,7 +126,7 @@ func Test_DialectStrategy_Get(t *testing.T) {
 	})
 
 	t.Run("invalid port value on connection configuration", func(t *testing.T) {
-		cfg := &config.Config{
+		cfg := &config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
@@ -135,7 +135,7 @@ func Test_DialectStrategy_Get(t *testing.T) {
 			"port":     "integer",
 		}
 
-		dialect, e := (&DialectStrategy{}).Get(cfg)
+		dialect, e := (&DialectStrategy{}).Create(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -147,7 +147,7 @@ func Test_DialectStrategy_Get(t *testing.T) {
 	})
 
 	t.Run("invalid schema value on connection configuration", func(t *testing.T) {
-		cfg := &config.Config{
+		cfg := &config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
@@ -157,7 +157,7 @@ func Test_DialectStrategy_Get(t *testing.T) {
 			"schema":   123,
 		}
 
-		dialect, e := (&DialectStrategy{}).Get(cfg)
+		dialect, e := (&DialectStrategy{}).Create(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -169,7 +169,7 @@ func Test_DialectStrategy_Get(t *testing.T) {
 	})
 
 	t.Run("invalid params value on connection configuration", func(t *testing.T) {
-		cfg := &config.Config{
+		cfg := &config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
@@ -180,7 +180,7 @@ func Test_DialectStrategy_Get(t *testing.T) {
 			"params":   123,
 		}
 
-		dialect, e := (&DialectStrategy{}).Get(cfg)
+		dialect, e := (&DialectStrategy{}).Create(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -193,7 +193,7 @@ func Test_DialectStrategy_Get(t *testing.T) {
 
 	t.Run("valid connection", func(t *testing.T) {
 		expected := "user:password@protocol(localhost:123)/rdb"
-		cfg := &config.Config{
+		cfg := &config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
@@ -203,7 +203,7 @@ func Test_DialectStrategy_Get(t *testing.T) {
 			"schema":   "rdb",
 		}
 
-		dialect, e := (&DialectStrategy{}).Get(cfg)
+		dialect, e := (&DialectStrategy{}).Create(cfg)
 		switch {
 		case e != nil:
 			t.Errorf("return the unexpected error : (%v)", e)
@@ -216,9 +216,9 @@ func Test_DialectStrategy_Get(t *testing.T) {
 		}
 	})
 
-	t.Run("valid connection with def protocol and port", func(t *testing.T) {
+	t.Run("valid connection with simple protocol and port", func(t *testing.T) {
 		expected := "user:password@tcp(localhost:3306)/rdb"
-		cfg := &config.Config{
+		cfg := &config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
@@ -226,7 +226,7 @@ func Test_DialectStrategy_Get(t *testing.T) {
 			"schema":   "rdb",
 		}
 
-		dialect, e := (&DialectStrategy{}).Get(cfg)
+		dialect, e := (&DialectStrategy{}).Create(cfg)
 		switch {
 		case e != nil:
 			t.Errorf("return the unexpected error : (%v)", e)
@@ -246,19 +246,19 @@ func Test_DialectStrategy_Get(t *testing.T) {
 
 	t.Run("valid connection with extra params", func(t *testing.T) {
 		expectedPrefix := "user:password@tcp(localhost:3306)/rdb?"
-		cfg := &config.Config{
+		cfg := &config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
 			"host":     "localhost",
 			"schema":   "rdb",
-			"params": config.Config{
+			"params": config.Partial{
 				"param1": "value1",
 				"param2": "value2",
 			},
 		}
 
-		dialect, e := (&DialectStrategy{}).Get(cfg)
+		dialect, e := (&DialectStrategy{}).Create(cfg)
 		switch {
 		case e != nil:
 			t.Errorf("return the unexpected error : (%v)", e)

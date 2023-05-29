@@ -2,11 +2,11 @@ package log
 
 import (
 	"errors"
-	"reflect"
-	"testing"
-
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
+	"github.com/happyhippyhippo/slate/config"
+	"reflect"
+	"testing"
 )
 
 func Test_NewStreamFactory(t *testing.T) {
@@ -14,8 +14,6 @@ func Test_NewStreamFactory(t *testing.T) {
 		sut := NewStreamFactory()
 		if sut == nil {
 			t.Error("didn't returned the expected reference")
-		} else if _, ok := sut.(*StreamFactory); !ok {
-			t.Error("didn't returned a valid stream factory instance")
 		}
 	})
 }
@@ -61,7 +59,7 @@ func Test_StreamFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewMockConfig(ctrl)
+		cfg := &config.Partial{}
 		strategy := NewMockStreamStrategy(ctrl)
 		strategy.EXPECT().Accept(cfg).Return(false).Times(1)
 
@@ -83,7 +81,7 @@ func Test_StreamFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewMockConfig(ctrl)
+		cfg := &config.Partial{}
 		stream := NewMockStream(ctrl)
 		strategy := NewMockStreamStrategy(ctrl)
 		strategy.EXPECT().Accept(cfg).Return(true).Times(1)

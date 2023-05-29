@@ -5,29 +5,21 @@ import (
 	"gorm.io/gorm"
 )
 
-// IDialectFactory defines the interface of a connection dialect instance.
-type IDialectFactory interface {
-	Register(strategy IDialectStrategy) error
-	Get(config.IConfig) (gorm.Dialector, error)
-}
-
 // DialectFactory defines an object that will generate a database
 // dialect interface based on a registered list of dialect
 // generation strategies.
-type DialectFactory []IDialectStrategy
-
-var _ IDialectFactory = &DialectFactory{}
+type DialectFactory []DialectStrategy
 
 // NewDialectFactory will instantiate a new relational database
 // dialect factory instance.
-func NewDialectFactory() IDialectFactory {
+func NewDialectFactory() *DialectFactory {
 	return &DialectFactory{}
 }
 
 // Register will register a new dialect factory strategy to be used
 // on requesting to create a dialect.
 func (f *DialectFactory) Register(
-	strategy IDialectStrategy,
+	strategy DialectStrategy,
 ) error {
 	// check strategy argument reference
 	if strategy == nil {
@@ -38,11 +30,11 @@ func (f *DialectFactory) Register(
 	return nil
 }
 
-// Get generates a new connection dialect interface defined by the
+// Create generates a new connection dialect interface defined by the
 // configuration parameters stored in the configuration partial marked by
 // the given name.
-func (f DialectFactory) Get(
-	cfg config.IConfig,
+func (f *DialectFactory) Create(
+	cfg *config.Partial,
 ) (gorm.Dialector, error) {
 	// check the config argument reference
 	if cfg == nil {
@@ -50,10 +42,10 @@ func (f DialectFactory) Get(
 	}
 	// search for a strategy that can create a dialect instance for the
 	// dialect name retrieved from the configuration
-	for _, strategy := range f {
+	for _, strategy := range *f {
 		if strategy.Accept(cfg) {
 			// generate the dialect instance
-			return strategy.Get(cfg)
+			return strategy.Create(cfg)
 		}
 	}
 	return nil, errUnknownDialect(cfg)

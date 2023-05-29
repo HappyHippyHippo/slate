@@ -17,7 +17,7 @@ const (
 	// registration id of the migrator DAO.
 	DaoID = ID + ".dao"
 
-	// MigrationTag defines the def tag to be used
+	// MigrationTag defines the simple tag to be used
 	// to identify a migration entry in the container.
 	MigrationTag = ID + ".migration"
 )
@@ -26,19 +26,19 @@ const (
 // the application initialization to register the migrations service.
 type Provider struct{}
 
-var _ slate.IProvider = &Provider{}
+var _ slate.Provider = &Provider{}
 
 // Register will register the migration package instances in the
 // application container
 func (p Provider) Register(
-	container slate.IContainer,
+	container *slate.Container,
 ) error {
 	// check container argument reference
 	if container == nil {
 		return errNilPointer("container")
 	}
 	// add the migration DAO
-	_ = container.Service(DaoID, func(connPool rdb.IConnectionPool, cfg *gorm.Config) (IDao, error) {
+	_ = container.Service(DaoID, func(connPool *rdb.ConnectionPool, cfg *gorm.Config) (*Dao, error) {
 		// retrieve the connection instance to be given to the
 		// version control DAO instance
 		conn, e := connPool.Get(Database, cfg)
@@ -58,28 +58,26 @@ func (p Provider) Register(
 // by environment variable, the migrator will automatically try to migrate
 // to the last registered migration
 func (p Provider) Boot(
-	container slate.IContainer,
-) error {
+	container *slate.Container,
+) (e error) {
 	// check container argument reference
 	if container == nil {
 		return errNilPointer("container")
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			e = r.(error)
+		}
+	}()
+
 	// check the application auto migration flag
 	if !AutoMigrate {
 		return nil
 	}
-	// retrieve the migration manager
-	migrator, e := p.getMigrator(container)
-	if e != nil {
-		return e
-	}
-	// retrieve the list of migrations of the application
-	migrations, e := p.getMigrations(container)
-	if e != nil {
-		return e
-	}
 	// add all the found migrations into the migration manager
-	for _, migration := range migrations {
+	migrator := p.getMigrator(container)
+	for _, migration := range p.getMigrations(container) {
 		_ = migrator.AddMigration(migration)
 	}
 	// execute the migrations
@@ -87,37 +85,36 @@ func (p Provider) Boot(
 }
 
 func (p Provider) getMigrator(
-	container slate.IContainer,
-) (IMigrator, error) {
+	container *slate.Container,
+) *Migrator {
 	// retrieve the manager entry
 	instance, e := container.Get(ID)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// validate the retrieved entry type
-	i, ok := instance.(IMigrator)
-	if !ok {
-		return nil, errConversion(instance, "migration.IMigrator")
+	if i, ok := instance.(*Migrator); ok {
+		return i
 	}
-	return i, nil
+	panic(errConversion(instance, "*migration.Migrator"))
 }
 
 func (p Provider) getMigrations(
-	container slate.IContainer,
-) ([]IMigration, error) {
+	container *slate.Container,
+) []Migration {
 	// retrieve the migrations entries
 	tags, e := container.Tag(MigrationTag)
 	if e != nil {
-		return nil, e
+		panic(e)
 	}
 	// type check the retrieved migrations
-	var list []IMigration
+	var list []Migration
 	for _, service := range tags {
-		s, ok := service.(IMigration)
+		s, ok := service.(Migration)
 		if !ok {
-			return nil, errConversion(service, "migration.IMigration")
+			panic(errConversion(service, "migration.Migration"))
 		}
 		list = append(list, s)
 	}
-	return list, nil
+	return list
 }

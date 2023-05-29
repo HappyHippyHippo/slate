@@ -9,19 +9,23 @@ import (
 	"github.com/spf13/afero"
 )
 
+type decoderCreator interface {
+	Create(format string, args ...interface{}) (config.Decoder, error)
+}
+
 // Source defines a config source that read a directory files,
 // recursive or not, and parse each one and store all the read content
 // as a config.
 type Source struct {
-	source.BaseSource
+	source.Source
 	path           string
 	format         string
 	recursive      bool
 	fs             afero.Fs
-	decoderFactory config.IDecoderFactory
+	decoderCreator decoderCreator
 }
 
-var _ config.ISource = &Source{}
+var _ config.Source = &Source{}
 
 // NewSource will instantiate a new configuration source
 // that will read a directory files for configuration information.
@@ -30,27 +34,27 @@ func NewSource(
 	format string,
 	recursive bool,
 	fs afero.Fs,
-	decoderFactory config.IDecoderFactory,
+	decoderCreator decoderCreator,
 ) (*Source, error) {
 	// check file system argument reference
 	if fs == nil {
 		return nil, errNilPointer("fileSystem")
 	}
 	// check decoder factory argument reference
-	if decoderFactory == nil {
-		return nil, errNilPointer("decoderFactory")
+	if decoderCreator == nil {
+		return nil, errNilPointer("decoderCreator")
 	}
 	// instantiates the config source
 	s := &Source{
-		BaseSource: source.BaseSource{
-			Mutex:  &sync.Mutex{},
-			Config: config.Config{},
+		Source: source.Source{
+			Mutex:   &sync.Mutex{},
+			Partial: config.Partial{},
 		},
 		path:           path,
 		format:         format,
 		recursive:      recursive,
 		fs:             fs,
-		decoderFactory: decoderFactory,
+		decoderCreator: decoderCreator,
 	}
 	// load the dir files config content
 	if e := s.load(); e != nil {
@@ -67,14 +71,14 @@ func (s *Source) load() error {
 	}
 	// store the parsed content into the source local config
 	s.Mutex.Lock()
-	s.Config = *p
+	s.Partial = *p
 	s.Mutex.Unlock()
 	return nil
 }
 
 func (s *Source) loadDir(
 	path string,
-) (*config.Config, error) {
+) (*config.Partial, error) {
 	// open the directory stream
 	dir, e := s.fs.Open(path)
 	if e != nil {
@@ -87,7 +91,7 @@ func (s *Source) loadDir(
 		return nil, e
 	}
 	// parse each founded entry
-	loaded := &config.Config{}
+	loaded := &config.Partial{}
 	for _, file := range files {
 		// check if is an inner directory
 		if file.IsDir() {
@@ -116,23 +120,19 @@ func (s *Source) loadDir(
 
 func (s *Source) loadFile(
 	path string,
-) (*config.Config, error) {
+) (*config.Partial, error) {
 	// open the file for reading
 	f, e := s.fs.OpenFile(path, os.O_RDONLY, 0o644)
 	if e != nil {
 		return nil, e
 	}
 	// get a decoder to parse the read file content
-	d, e := s.decoderFactory.Create(s.format, f)
+	d, e := s.decoderCreator.Create(s.format, f)
 	if e != nil {
 		_ = f.Close()
 		return nil, e
 	}
 	defer func() { _ = d.Close() }()
 	// decode the read file content
-	p, e := d.Decode()
-	if e != nil {
-		return nil, e
-	}
-	return p.(*config.Config), nil
+	return d.Decode()
 }

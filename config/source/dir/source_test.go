@@ -17,7 +17,7 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, e := NewSource("path", "format", true, nil, NewMockDecoderFactory(ctrl))
+		sut, e := NewSource("path", "format", true, nil, config.NewDecoderFactory())
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -51,7 +51,7 @@ func Test_NewSource(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(nil, expected).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
+		decoderFactory := config.NewDecoderFactory()
 
 		sut, e := NewSource(path, "format", true, fs, decoderFactory)
 		switch {
@@ -75,7 +75,7 @@ func Test_NewSource(t *testing.T) {
 		dir.EXPECT().Close().Return(nil).Times(1)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
+		decoderFactory := config.NewDecoderFactory()
 
 		sut, e := NewSource(path, "format", true, fs, decoderFactory)
 		switch {
@@ -98,7 +98,7 @@ func Test_NewSource(t *testing.T) {
 		dir.EXPECT().Close().Return(nil).Times(1)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
+		decoderFactory := config.NewDecoderFactory()
 
 		sut, e := NewSource(path, "format", true, fs, decoderFactory)
 		switch {
@@ -116,7 +116,7 @@ func Test_NewSource(t *testing.T) {
 				t.Error("didn't stored the file content format")
 			case sut.fs != fs:
 				t.Error("didn't stored the file system adapter reference")
-			case sut.decoderFactory != decoderFactory:
+			case sut.decoderCreator != decoderFactory:
 				t.Error("didn't stored the decoder factory reference")
 			}
 		}
@@ -138,9 +138,9 @@ func Test_NewSource(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
 		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
+		decoderFactory := config.NewDecoderFactory()
 
-		sut, e := NewSource(path, config.UnknownDecoderFormat, true, fs, decoderFactory)
+		sut, e := NewSource(path, config.UnknownDecoder, true, fs, decoderFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -155,7 +155,6 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("error message")
 		path := "path"
 		fileInfoName := "file.yaml"
 		fileInfo := NewMockFileInfo(ctrl)
@@ -169,17 +168,19 @@ func Test_NewSource(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
 		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create(config.UnknownDecoderFormat, file).Return(nil, expected).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept(config.UnknownDecoder).Return(false).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
-		sut, e := NewSource(path, config.UnknownDecoderFormat, true, fs, decoderFactory)
+		sut, e := NewSource(path, config.UnknownDecoder, true, fs, decoderFactory)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		case errors.Is(e, config.ErrInvalidSource):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, config.ErrInvalidSource)
 		}
 	})
 
@@ -204,8 +205,11 @@ func Test_NewSource(t *testing.T) {
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(nil, expected).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", file).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(file).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, e := NewSource(path, "format", true, fs, decoderFactory)
 		switch {
@@ -222,7 +226,7 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partial := &config.Config{"field": "value"}
+		partial := &config.Partial{"field": "value"}
 		path := "path"
 		fileInfoName := "file.yaml"
 		fileInfo := NewMockFileInfo(ctrl)
@@ -238,8 +242,11 @@ func Test_NewSource(t *testing.T) {
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(partial, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", file).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(file).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, e := NewSource(path, "format", true, fs, decoderFactory)
 		switch {
@@ -257,10 +264,10 @@ func Test_NewSource(t *testing.T) {
 				t.Error("didn't stored the file content format")
 			case sut.fs != fs:
 				t.Error("didn't stored the file system adapter reference")
-			case sut.decoderFactory != decoderFactory:
+			case sut.decoderCreator != decoderFactory:
 				t.Error("didn't stored the decoder factory reference")
-			case !reflect.DeepEqual(sut.Config, *partial):
-				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Config, *partial)
+			case !reflect.DeepEqual(sut.Partial, *partial):
+				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, *partial)
 			}
 		}
 	})
@@ -269,7 +276,7 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partial := &config.Config{"field": "value"}
+		partial := &config.Partial{"field": "value"}
 		path := "path"
 		fileInfoName := "file.yaml"
 		fileInfo := NewMockFileInfo(ctrl)
@@ -288,8 +295,11 @@ func Test_NewSource(t *testing.T) {
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(partial, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", file).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(file).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, e := NewSource(path, "format", false, fs, decoderFactory)
 		switch {
@@ -307,10 +317,10 @@ func Test_NewSource(t *testing.T) {
 				t.Error("didn't stored the file content format")
 			case sut.fs != fs:
 				t.Error("didn't stored the file system adapter reference")
-			case sut.decoderFactory != decoderFactory:
+			case sut.decoderCreator != decoderFactory:
 				t.Error("didn't stored the decoder factory reference")
-			case !reflect.DeepEqual(sut.Config, *partial):
-				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Config, *partial)
+			case !reflect.DeepEqual(sut.Partial, *partial):
+				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, *partial)
 			}
 		}
 	})
@@ -319,7 +329,7 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partial1 := &config.Config{"field": "value"}
+		partial1 := &config.Partial{"field": "value"}
 		path := "path"
 		expected := fmt.Errorf("error message")
 		fileInfoName := "file1.yaml"
@@ -342,8 +352,11 @@ func Test_NewSource(t *testing.T) {
 		decoder1 := NewMockDecoder(ctrl)
 		decoder1.EXPECT().Decode().Return(partial1, nil).Times(1)
 		decoder1.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", file1).Return(decoder1, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(file1).Return(decoder1, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, e := NewSource(path, "format", true, fs, decoderFactory)
 		switch {
@@ -360,9 +373,9 @@ func Test_NewSource(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partial1 := &config.Config{"field1": "value"}
-		partial2 := &config.Config{"field2": "value"}
-		expected := config.Config{"field1": "value", "field2": "value"}
+		partial1 := &config.Partial{"field1": "value"}
+		partial2 := &config.Partial{"field2": "value"}
+		expected := config.Partial{"field1": "value", "field2": "value"}
 		path := "path"
 		fileInfoName := "file1.yaml"
 		fileInfo := NewMockFileInfo(ctrl)
@@ -397,9 +410,17 @@ func Test_NewSource(t *testing.T) {
 		decoder2 := NewMockDecoder(ctrl)
 		decoder2.EXPECT().Decode().Return(partial2, nil).Times(1)
 		decoder2.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", file1).Return(decoder1, nil).Times(1)
-		decoderFactory.EXPECT().Create("format", file2).Return(decoder2, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		gomock.InOrder(
+			decoderStrategy.EXPECT().Accept("format").Return(true),
+			decoderStrategy.EXPECT().Accept("format").Return(true),
+		)
+		gomock.InOrder(
+			decoderStrategy.EXPECT().Create(file1).Return(decoder1, nil),
+			decoderStrategy.EXPECT().Create(file2).Return(decoder2, nil),
+		)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, e := NewSource(path, "format", true, fs, decoderFactory)
 		switch {
@@ -417,10 +438,10 @@ func Test_NewSource(t *testing.T) {
 				t.Error("didn't stored the file content format")
 			case sut.fs != fs:
 				t.Error("didn't stored the file system adapter reference")
-			case sut.decoderFactory != decoderFactory:
+			case sut.decoderCreator != decoderFactory:
 				t.Error("didn't stored the decoder factory reference")
-			case !reflect.DeepEqual(sut.Config, expected):
-				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Config, expected)
+			case !reflect.DeepEqual(sut.Partial, expected):
+				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, expected)
 			}
 		}
 	})

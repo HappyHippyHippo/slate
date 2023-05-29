@@ -2,6 +2,7 @@ package watchdog
 
 import (
 	"errors"
+	"github.com/happyhippyhippo/slate/config"
 	"reflect"
 	"testing"
 
@@ -50,7 +51,7 @@ func Test_LogFormatterFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewMockConfig(ctrl)
+		cfg := &config.Partial{}
 		strategy := NewMockLogFormatterStrategy(ctrl)
 		strategy.EXPECT().Accept(cfg).Return(false).Times(1)
 
@@ -72,7 +73,7 @@ func Test_LogFormatterFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewMockConfig(ctrl)
+		cfg := &config.Partial{}
 		stream := NewMockLogFormatter(ctrl)
 		strategy := NewMockLogFormatterStrategy(ctrl)
 		strategy.EXPECT().Accept(cfg).Return(true).Times(1)

@@ -4,11 +4,10 @@ import (
 	"io"
 )
 
-// IDecoder interface defines the interaction methods to a config
+// Decoder interface defines the interaction methods to a partial
 // content decoder used to parse the source content into an application
-// usable configuration Config instance.
-type IDecoder interface {
+// usable configuration Partial instance.
+type Decoder interface {
 	io.Closer
-
-	Decode() (IConfig, error)
+	Decode() (*Partial, error)
 }

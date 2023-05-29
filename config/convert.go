@@ -5,16 +5,16 @@ import (
 )
 
 // Convert will try to convert a source argument value
-// into a config accepted value. This means that if the value
-// is a map, then it will be converted into a Config instance
+// into a partial accepted value. This means that if the value
+// is a map, then it will be converted into a Partial instance
 // (recursively)
 func Convert(
 	val interface{},
 ) interface{} {
 	// recursive conversion call
-	if v, ok := val.(Config); ok {
-		// return the recursive conversion of the config
-		p := Config{}
+	if v, ok := val.(Partial); ok {
+		// return the recursive conversion of the partial
+		p := Partial{}
 		for k, v := range v {
 			// turn all string keys into lowercase
 			sk, ok := k.(string)
@@ -33,20 +33,20 @@ func Convert(
 		}
 		return p
 	}
-	// check if the value is a map that can be converted to a config
+	// check if the value is a map that can be converted to a partial
 	if v, ok := val.(map[string]interface{}); ok {
-		// return the recursive conversion of the config
-		p := Config{}
+		// return the recursive conversion of the partial
+		p := Partial{}
 		for k, i := range v {
 			// turn all string keys into lowercase
 			p[strings.ToLower(k)] = Convert(i)
 		}
 		return p
 	}
-	// check if the value is a map that can be converted to a config
+	// check if the value is a map that can be converted to a partial
 	if v, ok := val.(map[interface{}]interface{}); ok {
-		// return the recursive conversion of the config
-		p := Config{}
+		// return the recursive conversion of the partial
+		p := Partial{}
 		for k, i := range v {
 			// turn all string keys into lowercase
 			sk, ok := k.(string)

@@ -14,7 +14,7 @@ const (
 // generation strategy.
 type FormatterStrategy struct{}
 
-var _ log.IFormatterStrategy = &FormatterStrategy{}
+var _ log.FormatterStrategy = &FormatterStrategy{}
 
 // NewFormatterStrategy generates a new JSON formatter
 // generation strategy instance.
@@ -34,7 +34,7 @@ func (FormatterStrategy) Accept(
 // Create will instantiate the desired formatter instance.
 func (FormatterStrategy) Create(
 	_ ...interface{},
-) (log.IFormatter, error) {
+) (log.Formatter, error) {
 	// generate the JSON formatter
 	return &Formatter{}, nil
 }

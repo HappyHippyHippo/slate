@@ -19,12 +19,12 @@ const (
 // database services.
 type Provider struct{}
 
-var _ slate.IProvider = &Provider{}
+var _ slate.Provider = &Provider{}
 
 // Register will register the rdb package instances in the
 // application container
 func (p Provider) Register(
-	container slate.IContainer,
+	container *slate.Container,
 ) error {
 	// check container argument reference
 	if container == nil {
@@ -36,7 +36,7 @@ func (p Provider) Register(
 
 // Boot will start the rdb package
 func (p Provider) Boot(
-	container slate.IContainer,
+	container *slate.Container,
 ) error {
 	// check container argument reference
 	if container == nil {

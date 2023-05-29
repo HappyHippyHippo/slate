@@ -12,7 +12,7 @@ import (
 // a JSON string.
 type Formatter struct{}
 
-var _ log.IFormatter = &Formatter{}
+var _ log.Formatter = &Formatter{}
 
 // Format will create the output JSON string message formatted with the
 // content of the passed level, message and context

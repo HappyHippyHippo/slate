@@ -1,7 +1,7 @@
 package watchdog
 
-// IProcess defines an interface to a watchdog process.
-type IProcess interface {
+// Processor defines an interface to a watchdog process.
+type Processor interface {
 	Service() string
 	Runner() func() error
 }
@@ -13,7 +13,7 @@ type Process struct {
 	runner  func() error
 }
 
-var _ IProcess = &Process{}
+var _ Processor = &Process{}
 
 // NewProcess generate a new process instance with the given
 // service name and runner method.

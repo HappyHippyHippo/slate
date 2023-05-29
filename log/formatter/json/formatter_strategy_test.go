@@ -25,7 +25,7 @@ func Test_FormatterStrategy_Accept(t *testing.T) {
 				expected: true,
 			},
 			{ // _test non-json format
-				format:   log.UnknownFormatterFormat,
+				format:   log.UnknownFormatter,
 				expected: false,
 			},
 		}

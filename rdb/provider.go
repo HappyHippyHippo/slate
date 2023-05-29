@@ -41,12 +41,12 @@ const (
 // database services.
 type Provider struct{}
 
-var _ slate.IProvider = &Provider{}
+var _ slate.Provider = &Provider{}
 
 // Register will register the rdb package instances in the
 // application container
 func (p Provider) Register(
-	container slate.IContainer,
+	container *slate.Container,
 ) error {
 	// check container argument reference
 	if container == nil {
@@ -63,17 +63,17 @@ func (p Provider) Register(
 	_ = container.Service(ID, NewConnectionPool)
 	// add the primary connection auxiliary service
 	_ = container.Service(ConnectionPrimaryID, func(
-		connectionFactory IConnectionPool,
+		connectionPool *ConnectionPool,
 		cfg *gorm.Config,
 	) (*gorm.DB, error) {
-		return connectionFactory.Get(Primary, cfg)
+		return connectionPool.Get(Primary, cfg)
 	})
 	return nil
 }
 
 // Boot will start the rdb package
 func (p Provider) Boot(
-	container slate.IContainer,
+	container *slate.Container,
 ) (e error) {
 	// check container argument reference
 	if container == nil {
@@ -96,35 +96,34 @@ func (p Provider) Boot(
 }
 
 func (Provider) getDialectFactory(
-	container slate.IContainer,
-) IDialectFactory {
+	container *slate.Container,
+) *DialectFactory {
 	// retrieve the factory entry
 	instance, e := container.Get(DialectFactoryID)
 	if e != nil {
 		panic(e)
 	}
 	// validate the retrieved entry type
-	i, ok := instance.(IDialectFactory)
-	if !ok {
-		panic(errConversion(instance, "rdb.IDialectFactory"))
+	if i, ok := instance.(*DialectFactory); ok {
+		return i
 	}
-	return i
+	panic(errConversion(instance, "*rdb.DialectFactory"))
 }
 
 func (Provider) getDialectStrategies(
-	container slate.IContainer,
-) []IDialectStrategy {
+	container *slate.Container,
+) []DialectStrategy {
 	// retrieve the strategies entries
 	tags, e := container.Tag(DialectStrategyTag)
 	if e != nil {
 		panic(e)
 	}
 	// type check the retrieved strategies
-	var list []IDialectStrategy
+	var list []DialectStrategy
 	for _, service := range tags {
-		s, ok := service.(IDialectStrategy)
+		s, ok := service.(DialectStrategy)
 		if !ok {
-			panic(errConversion(service, "rdb.IDialectStrategy"))
+			panic(errConversion(service, "rdb.DialectStrategy"))
 		}
 		list = append(list, s)
 	}

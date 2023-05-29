@@ -4,29 +4,20 @@ import (
 	"github.com/happyhippyhippo/slate/config"
 )
 
-// ILogFormatterFactory defined the interface of a
-// watchdog log formatter factory instance.
-type ILogFormatterFactory interface {
-	Register(strategy ILogFormatterStrategy) error
-	Create(cfg config.IConfig) (ILogFormatter, error)
-}
-
 // LogFormatterFactory defines an object responsible to instantiate a
 // new watchdog log formatter.
-type LogFormatterFactory []ILogFormatterStrategy
-
-var _ ILogFormatterFactory = &LogFormatterFactory{}
+type LogFormatterFactory []LogFormatterStrategy
 
 // NewLogFormatterFactory will instantiate a new logging formatter
 // factory instance.
-func NewLogFormatterFactory() ILogFormatterFactory {
+func NewLogFormatterFactory() *LogFormatterFactory {
 	return &LogFormatterFactory{}
 }
 
 // Register will register a new watchdog log formatter factory
 // strategy to be used on creation request.
 func (f *LogFormatterFactory) Register(
-	strategy ILogFormatterStrategy,
+	strategy LogFormatterStrategy,
 ) error {
 	// check the strategy argument reference
 	if strategy == nil {
@@ -40,15 +31,15 @@ func (f *LogFormatterFactory) Register(
 // Create will instantiate and return a new watchdog log formatter where the
 // data used to decide the strategy to be used and also the initialization
 // data comes from a configuration storing Partial instance.
-func (f LogFormatterFactory) Create(
-	cfg config.IConfig,
-) (ILogFormatter, error) {
+func (f *LogFormatterFactory) Create(
+	cfg *config.Partial,
+) (LogFormatter, error) {
 	// check the config argument reference
 	if cfg == nil {
 		return nil, errNilPointer("cfg")
 	}
 	// find a strategy that accepts the requested DefaultLogFormatter type
-	for _, strategy := range f {
+	for _, strategy := range *f {
 		if strategy.Accept(cfg) {
 			// create the requested config DefaultLogFormatter
 			return strategy.Create(cfg)

@@ -33,7 +33,7 @@ func errConversion(
 }
 
 func errInvalidWatchdog(
-	cfg config.IConfig,
+	cfg *config.Partial,
 	ctx ...map[string]interface{},
 ) error {
 	return slate.NewErrorFrom(ErrInvalidWatchdog, fmt.Sprintf("%v", cfg), ctx...)

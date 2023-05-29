@@ -3,9 +3,9 @@ package watchdog
 import (
 	"errors"
 	"fmt"
+	"github.com/golang/mock/gomock"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
 )
 
@@ -23,10 +23,7 @@ func Test_Watchdog(t *testing.T) {
 	})
 
 	t.Run("valid instantiation", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		logAdapter := NewMockLogAdapter(ctrl)
+		logAdapter := &LogAdapter{}
 
 		sut, e := NewWatchdog(logAdapter)
 		switch {
@@ -50,7 +47,8 @@ func Test_Watchdog_Run(t *testing.T) {
 		logAdapter.EXPECT().Start().Return(nil).Times(1)
 		logAdapter.EXPECT().Error(gomock.Any()).Return(nil).Times(0)
 		logAdapter.EXPECT().Done().Return(nil).Times(1)
-		sut, _ := NewWatchdog(logAdapter)
+		sut, _ := NewWatchdog(&LogAdapter{})
+		sut.log = logAdapter
 
 		count := 0
 		p, _ := NewProcess(service, func() error {
@@ -76,7 +74,8 @@ func Test_Watchdog_Run(t *testing.T) {
 		logAdapter.EXPECT().Start().Return(nil).Times(1)
 		logAdapter.EXPECT().Error(gomock.Any()).Return(nil).Times(0)
 		logAdapter.EXPECT().Done().Return(nil).Times(1)
-		sut, _ := NewWatchdog(logAdapter)
+		sut, _ := NewWatchdog(&LogAdapter{})
+		sut.log = logAdapter
 
 		e := fmt.Errorf("error message")
 		count := 0
@@ -107,7 +106,8 @@ func Test_Watchdog_Run(t *testing.T) {
 		logAdapter.EXPECT().Start().Return(nil).Times(1)
 		logAdapter.EXPECT().Error(e).Return(nil).Times(1)
 		logAdapter.EXPECT().Done().Return(nil).Times(1)
-		sut, _ := NewWatchdog(logAdapter)
+		sut, _ := NewWatchdog(&LogAdapter{})
+		sut.log = logAdapter
 
 		count := 0
 		p, _ := NewProcess(service, func() error {
@@ -138,7 +138,8 @@ func Test_Watchdog_Run(t *testing.T) {
 		logAdapter.EXPECT().Start().Return(nil).Times(1)
 		logAdapter.EXPECT().Error(e).Return(nil).Times(1)
 		logAdapter.EXPECT().Done().Return(nil).Times(1)
-		sut, _ := NewWatchdog(logAdapter)
+		sut, _ := NewWatchdog(&LogAdapter{})
+		sut.log = logAdapter
 
 		count := 0
 		p, _ := NewProcess(service, func() error {

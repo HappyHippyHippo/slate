@@ -8,7 +8,7 @@ import (
 
 const (
 	// Format defines the value to be used to declare
-	// a JSON config source format.
+	// a JSON config source encoding format.
 	Format = "json"
 )
 
@@ -16,7 +16,7 @@ const (
 // instantiation strategy
 type DecoderStrategy struct{}
 
-var _ config.IDecoderStrategy = &DecoderStrategy{}
+var _ config.DecoderStrategy = &DecoderStrategy{}
 
 // NewDecoderStrategy will instantiate a new JSON format
 // decoder creation strategy
@@ -33,20 +33,18 @@ func (DecoderStrategy) Accept(
 	return format == Format
 }
 
-// Create will instantiate the desired decoder instance with the given jsonReader
-// instance as source of the content to decode.
+// Create will instantiate the desired decoder instance with the given JSON
+// underlying decoder instance as source of the content to decode.
 func (DecoderStrategy) Create(
 	args ...interface{},
-) (config.IDecoder, error) {
-	// check for the existence of the mandatory jsonReader argument
+) (config.Decoder, error) {
+	// check for the existence of the mandatory reader argument
 	if len(args) == 0 {
 		return nil, errNilPointer("args[0]")
 	}
-	// validate the jsonReader argument
-	reader, ok := args[0].(io.Reader)
-	if !ok {
-		return nil, errConversion(args[0], "io.Reader")
+	// validate the reader argument
+	if reader, ok := args[0].(io.Reader); ok {
+		return NewDecoder(reader)
 	}
-	// create the decoder
-	return NewDecoder(reader)
+	return nil, errConversion(args[0], "io.Reader")
 }

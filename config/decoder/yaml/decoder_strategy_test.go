@@ -28,7 +28,7 @@ func Test_DecoderStrategy_Accept(t *testing.T) {
 				expected: true,
 			},
 			{ // _test non-yaml format
-				format:   config.UnknownDecoderFormat,
+				format:   config.UnknownDecoder,
 				expected: false,
 			},
 		}

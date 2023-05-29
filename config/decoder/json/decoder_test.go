@@ -106,7 +106,7 @@ func Test_Decoder_Decode(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		data := config.Config{"node": "data"}
+		data := config.Partial{"node": "data"}
 		reader := NewMockReader(ctrl)
 		reader.EXPECT().Close().Times(1)
 		sut, _ := NewDecoder(reader)
@@ -122,7 +122,7 @@ func Test_Decoder_Decode(t *testing.T) {
 		switch {
 		case check == nil:
 			t.Error("returned a nil data")
-		case !reflect.DeepEqual(*check.(*config.Config), data):
+		case !reflect.DeepEqual(*check, data):
 			t.Errorf("returned (%v)", check)
 		case e != nil:
 			t.Errorf("returned the unexpected (%v) error", e)
@@ -131,7 +131,7 @@ func Test_Decoder_Decode(t *testing.T) {
 
 	t.Run("decode json string", func(t *testing.T) {
 		json := `{"node": {"sub_node": "data"}}`
-		expected := config.Config{"node": config.Config{"sub_node": "data"}}
+		expected := config.Partial{"node": config.Partial{"sub_node": "data"}}
 		reader := strings.NewReader(json)
 		sut, _ := NewDecoder(reader)
 		defer func() { _ = sut.Close() }()
@@ -140,7 +140,7 @@ func Test_Decoder_Decode(t *testing.T) {
 		switch {
 		case check == nil:
 			t.Error("returned a nil data")
-		case !reflect.DeepEqual(*check.(*config.Config), expected):
+		case !reflect.DeepEqual(*check, expected):
 			t.Errorf("returned (%v)", check)
 		case e != nil:
 			t.Errorf("returned the unexpected (%v) error", e)

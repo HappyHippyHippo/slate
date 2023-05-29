@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	// EnvID defines the log package base environment variable name.
+	// EnvID defines the logger package base environment variable name.
 	EnvID = slate.EnvID + "_LOG"
 )
 
@@ -17,13 +17,10 @@ var (
 
 	// LoaderConfigPath defines the entry config source path
 	// to be used as the loader entry.
-	LoaderConfigPath = env.String(EnvID+"_LOADER_CONFIG_PATH", "slate.log.streams")
+	LoaderConfigPath = env.String(EnvID+"_LOADER_CONFIG_PATH", "slate.logger.streams")
 
 	// LoaderObserveConfig defines the loader config observing flag
-	// used to register in the config object an observer of the log
+	// used to register in the config object an observer of the logger
 	// config entries list, so it can reload the Log streams.
 	LoaderObserveConfig = env.Bool(EnvID+"_LOADER_OBSERVE_CONFIG", true)
-
-	// LoaderErrorChannel defines the loader error logging channel.
-	LoaderErrorChannel = env.String(EnvID+"_LOADER_ERROR_CHANNEL", "exec")
 )

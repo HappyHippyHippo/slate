@@ -13,7 +13,7 @@ type Decoder struct {
 	decoder.Decoder
 }
 
-var _ config.IDecoder = &Decoder{}
+var _ config.Decoder = &Decoder{}
 
 // NewDecoder will instantiate a new YAML configuration decoder.
 func NewDecoder(
@@ -32,15 +32,15 @@ func NewDecoder(
 	}, nil
 }
 
-// Decode parse the associated configuration source reader content
-// into a configuration.
-func (d Decoder) Decode() (config.IConfig, error) {
+// Decode parse the associated configuration source encoded content
+// into a configuration instance.
+func (d Decoder) Decode() (*config.Partial, error) {
 	// decode the referenced reader data
-	data := config.Config{}
+	data := config.Partial{}
 	if e := d.UnderlyingDecoder.Decode(&data); e != nil {
 		return nil, e
 	}
 	// convert the read data into a normalized config
-	p := config.Convert(data).(config.Config)
+	p := config.Convert(data).(config.Partial)
 	return &p, nil
 }

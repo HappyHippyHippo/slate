@@ -5,13 +5,13 @@ import (
 )
 
 const (
-	// UnknownLogFormatterType is used to signal that the log formatter is unknown.
-	UnknownLogFormatterType = "unknown"
+	// UnknownLogFormatter is used to signal that the log formatter is unknown.
+	UnknownLogFormatter = "unknown"
 )
 
-// ILogFormatterStrategy defines a log formatter creation strategy
+// LogFormatterStrategy defines a log formatter creation strategy
 // instance interface.
-type ILogFormatterStrategy interface {
-	Accept(config config.IConfig) bool
-	Create(config config.IConfig) (ILogFormatter, error)
+type LogFormatterStrategy interface {
+	Accept(config *config.Partial) bool
+	Create(config *config.Partial) (LogFormatter, error)
 }

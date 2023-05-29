@@ -4,27 +4,21 @@ import (
 	"github.com/happyhippyhippo/slate/config"
 )
 
-// IStreamFactory defined the interface of a log stream factory instance.
-type IStreamFactory interface {
-	Register(strategy IStreamStrategy) error
-	Create(cfg config.IConfig) (IStream, error)
-}
-
 // StreamFactory is a logging stream generator based on a
 // registered list of stream generation strategies.
-type StreamFactory []IStreamStrategy
+type StreamFactory []StreamStrategy
 
-var _ IStreamFactory = &StreamFactory{}
+var _ streamCreator = &StreamFactory{}
 
 // NewStreamFactory will instantiate a new stream factory instance
-func NewStreamFactory() IStreamFactory {
+func NewStreamFactory() *StreamFactory {
 	return &StreamFactory{}
 }
 
 // Register will register a new stream factory strategy to be used
 // on creation requests.
 func (f *StreamFactory) Register(
-	strategy IStreamStrategy,
+	strategy StreamStrategy,
 ) error {
 	// check the strategy argument reference
 	if strategy == nil {
@@ -38,8 +32,8 @@ func (f *StreamFactory) Register(
 // Create will instantiate and return a new config stream loaded
 // by a configuration instance.
 func (f *StreamFactory) Create(
-	cfg config.IConfig,
-) (IStream, error) {
+	cfg *config.Partial,
+) (Stream, error) {
 	// check config argument reference
 	if cfg == nil {
 		return nil, errNilPointer("config")

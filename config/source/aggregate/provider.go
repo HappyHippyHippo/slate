@@ -12,7 +12,7 @@ const (
 	ID = source.ID + ".aggregate"
 
 	// SourceTag defines the tag to be assigned
-	// to all container defined config partials.
+	// to all container defined config sources to be aggregated.
 	SourceTag = ID + ".tag"
 )
 
@@ -20,12 +20,12 @@ const (
 // on the application initialization to register the config service.
 type Provider struct{}
 
-var _ slate.IProvider = &Provider{}
+var _ slate.Provider = &Provider{}
 
 // Register will register the configuration section instances in the
 // application container.
 func (Provider) Register(
-	container slate.IContainer,
+	container *slate.Container,
 ) error {
 	if container == nil {
 		return errNilPointer("container")
@@ -33,14 +33,14 @@ func (Provider) Register(
 	_ = container.Service(ID, func() *SourceStrategy {
 		// get all the registered config partials
 		tagged, _ := container.Tag(SourceTag)
-		var configs []config.IConfig
+		var sources []config.Source
 		for _, t := range tagged {
-			if p, ok := t.(config.IConfig); ok {
-				configs = append(configs, p)
+			if p, ok := t.(config.Source); ok {
+				sources = append(sources, p)
 			}
 		}
 		// allocate the new source strategy with all retrieved partials
-		return &SourceStrategy{configs: configs}
+		return &SourceStrategy{sources: sources}
 	}, config.SourceStrategyTag)
 	return nil
 }
@@ -48,7 +48,7 @@ func (Provider) Register(
 // Boot will start the configuration config instance by calling the
 // configuration loader with the defined provider base entry information.
 func (p Provider) Boot(
-	container slate.IContainer,
+	container *slate.Container,
 ) error {
 	if container == nil {
 		return errNilPointer("container")

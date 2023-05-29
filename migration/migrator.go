@@ -4,28 +4,22 @@ import (
 	"sort"
 )
 
-// IMigrator defines an object that handles the
-// persistence layer migrations.
-type IMigrator interface {
-	AddMigration(migration IMigration) error
-	Current() (uint64, error)
-	Migrate() error
-	Up() error
-	Down() error
+type dao interface {
+	Last() (Record, error)
+	Up(version uint64) (Record, error)
+	Down(last Record) error
 }
 
 // Migrator defines a new migration manager instance.
 type Migrator struct {
-	dao        IDao
-	migrations []IMigration
+	dao        dao
+	migrations []Migration
 }
-
-var _ IMigrator = &Migrator{}
 
 // NewMigrator will instantiate a new Migrator instance.
 func NewMigrator(
-	dao IDao,
-) (IMigrator, error) {
+	dao *Dao,
+) (*Migrator, error) {
 	// check DAO argument reference
 	if dao == nil {
 		return nil, errNilPointer("dao")
@@ -33,13 +27,13 @@ func NewMigrator(
 	// instantiate the migration manager
 	return &Migrator{
 		dao:        dao,
-		migrations: []IMigration{},
+		migrations: []Migration{},
 	}, nil
 }
 
 // AddMigration registers a migration into the migration manager.
 func (m *Migrator) AddMigration(
-	migration IMigration,
+	migration Migration,
 ) error {
 	// check the migration argument reference
 	if migration == nil {
@@ -55,7 +49,7 @@ func (m *Migrator) AddMigration(
 }
 
 // Current returns the version of the last executed migration.
-func (m Migrator) Current() (uint64, error) {
+func (m *Migrator) Current() (uint64, error) {
 	// get the current/last applied migration
 	current, e := m.dao.Last()
 	if e != nil {
@@ -65,7 +59,7 @@ func (m Migrator) Current() (uint64, error) {
 }
 
 // Migrate execute all migrations that are yet to be executed.
-func (m Migrator) Migrate() error {
+func (m *Migrator) Migrate() error {
 	// check if there is migrations registered
 	if len(m.migrations) == 0 {
 		return nil
@@ -85,8 +79,7 @@ func (m Migrator) Migrate() error {
 				return e
 			}
 			// register the executed migration
-			current, e = m.dao.Up(migrationVersion)
-			if e != nil {
+			if current, e = m.dao.Up(migrationVersion); e != nil {
 				return e
 			}
 		}
@@ -95,7 +88,7 @@ func (m Migrator) Migrate() error {
 }
 
 // Up will try to execute the next migration in queue to be executed.
-func (m Migrator) Up() error {
+func (m *Migrator) Up() error {
 	// check if there is migrations registered
 	if len(m.migrations) == 0 {
 		return nil
@@ -123,7 +116,7 @@ func (m Migrator) Up() error {
 }
 
 // Down will try to revert the last migration executed.
-func (m Migrator) Down() error {
+func (m *Migrator) Down() error {
 	// check if there is migrations registered
 	if len(m.migrations) == 0 {
 		return nil

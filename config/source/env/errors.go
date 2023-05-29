@@ -23,8 +23,8 @@ func errConversion(
 }
 
 func errInvalidSource(
-	cfg config.IConfig,
+	partial *config.Partial,
 	ctx ...map[string]interface{},
 ) error {
-	return slate.NewErrorFrom(config.ErrInvalidSource, fmt.Sprintf("%v", cfg), ctx...)
+	return slate.NewErrorFrom(config.ErrInvalidSource, fmt.Sprintf("%v", partial), ctx...)
 }

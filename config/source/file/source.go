@@ -9,17 +9,21 @@ import (
 	"github.com/spf13/afero"
 )
 
+type decoderCreator interface {
+	Create(format string, args ...interface{}) (config.Decoder, error)
+}
+
 // Source defines a config source that read a file content
 // and stores its config contents to be used as a config.
 type Source struct {
-	source.BaseSource
+	source.Source
 	path           string
 	format         string
 	fileSystem     afero.Fs
-	decoderFactory config.IDecoderFactory
+	decoderCreator decoderCreator
 }
 
-var _ config.ISource = &Source{}
+var _ config.Source = &Source{}
 
 // NewSource will instantiate a new configuration source
 // that will read a file for configuration info.
@@ -27,26 +31,26 @@ func NewSource(
 	path,
 	format string,
 	fileSystem afero.Fs,
-	decoderFactory config.IDecoderFactory,
+	decoderCreator decoderCreator,
 ) (*Source, error) {
 	// check file system argument reference
 	if fileSystem == nil {
 		return nil, errNilPointer("fileSystem")
 	}
 	// check decoder factory argument reference
-	if decoderFactory == nil {
-		return nil, errNilPointer("decoderFactory")
+	if decoderCreator == nil {
+		return nil, errNilPointer("decoderCreator")
 	}
 	// instantiates the config source
 	s := &Source{
-		BaseSource: source.BaseSource{
-			Mutex:  &sync.Mutex{},
-			Config: config.Config{},
+		Source: source.Source{
+			Mutex:   &sync.Mutex{},
+			Partial: config.Partial{},
 		},
 		path:           path,
 		format:         format,
 		fileSystem:     fileSystem,
-		decoderFactory: decoderFactory,
+		decoderCreator: decoderCreator,
 	}
 	// Load the file config content
 	if e := s.load(); e != nil {
@@ -62,7 +66,7 @@ func (s *Source) load() error {
 		return e
 	}
 	// creates the decoder to parse the file content
-	d, e := s.decoderFactory.Create(s.format, f)
+	d, e := s.decoderCreator.Create(s.format, f)
 	if e != nil {
 		_ = f.Close()
 		return e
@@ -75,7 +79,7 @@ func (s *Source) load() error {
 	}
 	// store the parsed content into the source local config
 	s.Mutex.Lock()
-	s.Config = *p.(*config.Config)
+	s.Partial = *p
 	s.Mutex.Unlock()
 	return nil
 }

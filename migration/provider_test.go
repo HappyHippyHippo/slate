@@ -9,7 +9,6 @@ import (
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/rdb"
-	"github.com/happyhippyhippo/slate/rdb/dialect/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -42,7 +41,7 @@ func Test_Provider_Register(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&rdb.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(rdb.ID, func() (rdb.IConnectionPool, error) { return nil, expected })
+		_ = container.Service(rdb.ID, func() (*rdb.ConnectionPool, error) { return nil, expected })
 
 		if _, e := container.Get(DaoID); e == nil {
 			t.Error("didn't returned the expected error")
@@ -92,17 +91,30 @@ func Test_Provider_Register(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
-		_ = (&sqlite.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		_ = (&rdb.Provider{}).Boot(container)
+		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
+		partial := config.Partial{
+			"slate": config.Partial{
+				"rdb": config.Partial{
+					"connections": config.Partial{
+						"primary": rdbCfg}}}}
+		source := NewMockConfigSource(ctrl)
+		source.EXPECT().Get("").Return(partial, nil).Times(1)
+		cfg := config.NewConfig()
+		_ = cfg.AddSource("id", 0, source)
+		_ = container.Service(config.ID, func() *config.Config { return cfg })
+		migrator := NewMockMigrator(ctrl)
+		migrator.EXPECT().AutoMigrate(gomock.Any()).Return(nil).Times(1)
+		dialector := NewMockDialector(ctrl)
+		dialector.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
+		dialector.EXPECT().Migrator(gomock.Any()).Return(migrator).Times(1)
+		dialectStrategy := NewMockDialectStrategy(ctrl)
+		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialector, nil).Times(1)
+		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
 
-		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfgManager.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
-		cfgManager.EXPECT().Config("slate.rdb.connections.primary").Return(&partial, nil).Times(1)
-		_ = container.Service(config.ID, func() config.IManager { return cfgManager })
+		_ = (&rdb.Provider{}).Boot(container)
 
 		sut, e := container.Get(DaoID)
 		switch {
@@ -123,24 +135,37 @@ func Test_Provider_Register(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		prev := Database
 		Database = "secondary"
-		defer func() { Database = "primary" }()
+		defer func() { Database = prev }()
 
 		container := slate.NewContainer()
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
-		_ = (&rdb.Provider{}).Register(container)
-		_ = (&sqlite.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		_ = (&rdb.Provider{}).Boot(container)
+		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
+		partial := config.Partial{
+			"slate": config.Partial{
+				"rdb": config.Partial{
+					"connections": config.Partial{
+						"secondary": rdbCfg}}}}
+		source := NewMockConfigSource(ctrl)
+		source.EXPECT().Get("").Return(partial, nil).Times(1)
+		cfg := config.NewConfig()
+		_ = cfg.AddSource("id", 0, source)
+		_ = container.Service(config.ID, func() *config.Config { return cfg })
+		migrator := NewMockMigrator(ctrl)
+		migrator.EXPECT().AutoMigrate(gomock.Any()).Return(nil).Times(1)
+		dialector := NewMockDialector(ctrl)
+		dialector.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
+		dialector.EXPECT().Migrator(gomock.Any()).Return(migrator).Times(1)
+		dialectStrategy := NewMockDialectStrategy(ctrl)
+		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialector, nil).Times(1)
+		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
 
-		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfgManager.EXPECT().Has("slate.rdb.connections.secondary").Return(true).Times(1)
-		cfgManager.EXPECT().Config("slate.rdb.connections.secondary").Return(&partial, nil).Times(1)
-		_ = container.Service(config.ID, func() config.IManager { return cfgManager })
+		_ = (&rdb.Provider{}).Boot(container)
 
 		sut, e := container.Get(DaoID)
 		switch {
@@ -166,7 +191,7 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(DaoID, func() (IDao, error) { return nil, expected })
+		_ = container.Service(DaoID, func() (*Dao, error) { return nil, expected })
 
 		if _, e := container.Get(ID); e == nil {
 			t.Error("didn't returned the expected error")
@@ -184,7 +209,7 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(DaoID, func() (IDao, error) { return nil, expected })
+		_ = container.Service(DaoID, func() (*Dao, error) { return nil, expected })
 
 		if _, e := container.Get(ID); e == nil {
 			t.Error("didn't returned the expected error")
@@ -200,18 +225,30 @@ func Test_Provider_Register(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
-		_ = (&rdb.Provider{}).Register(container)
-		_ = (&sqlite.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		_ = (&rdb.Provider{}).Boot(container)
+		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
+		partial := config.Partial{
+			"slate": config.Partial{
+				"rdb": config.Partial{
+					"connections": config.Partial{
+						"primary": rdbCfg}}}}
+		source := NewMockConfigSource(ctrl)
+		source.EXPECT().Get("").Return(partial, nil).Times(1)
+		cfg := config.NewConfig()
+		_ = cfg.AddSource("id", 0, source)
+		_ = container.Service(config.ID, func() *config.Config { return cfg })
+		migrator := NewMockMigrator(ctrl)
+		migrator.EXPECT().AutoMigrate(gomock.Any()).Return(nil).Times(1)
+		dialector := NewMockDialector(ctrl)
+		dialector.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
+		dialector.EXPECT().Migrator(gomock.Any()).Return(migrator).Times(1)
+		dialectStrategy := NewMockDialectStrategy(ctrl)
+		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialector, nil).Times(1)
+		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
 
-		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfgManager.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
-		cfgManager.EXPECT().Config("slate.rdb.connections.primary").Return(&partial, nil).Times(1)
-		_ = container.Service(config.ID, func() (config.IManager, error) { return cfgManager, nil })
+		_ = (&rdb.Provider{}).Boot(container)
 
 		sut, e := container.Get(ID)
 		switch {
@@ -274,7 +311,7 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(ID, func() (IMigrator, error) { return nil, expected })
+		_ = container.Service(ID, func() (*Migrator, error) { return nil, expected })
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
@@ -282,7 +319,6 @@ func Test_Provider_Boot(t *testing.T) {
 			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
-
 	t.Run("invalid retrieved migrator", func(t *testing.T) {
 		container := slate.NewContainer()
 		sut := &Provider{}
@@ -303,19 +339,31 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
-		_ = (&rdb.Provider{}).Register(container)
-		_ = (&sqlite.Provider{}).Register(container)
-
-		_ = (&rdb.Provider{}).Boot(container)
 
 		expected := fmt.Errorf("error message")
-		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfgManager.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
-		cfgManager.EXPECT().Config("slate.rdb.connections.primary").Return(&partial, nil).Times(1)
-		_ = container.Service(config.ID, func() (config.IManager, error) { return cfgManager, nil })
+		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
+		partial := config.Partial{
+			"slate": config.Partial{
+				"rdb": config.Partial{
+					"connections": config.Partial{
+						"primary": rdbCfg}}}}
+		source := NewMockConfigSource(ctrl)
+		source.EXPECT().Get("").Return(partial, nil).Times(1)
+		cfg := config.NewConfig()
+		_ = cfg.AddSource("id", 0, source)
+		_ = container.Service(config.ID, func() *config.Config { return cfg })
+		migrator := NewMockMigrator(ctrl)
+		migrator.EXPECT().AutoMigrate(gomock.Any()).Return(nil).Times(1)
+		dialector := NewMockDialector(ctrl)
+		dialector.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
+		dialector.EXPECT().Migrator(gomock.Any()).Return(migrator).Times(1)
+		dialectStrategy := NewMockDialectStrategy(ctrl)
+		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialector, nil).Times(1)
+		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
 		_ = container.Service("id", func() (interface{}, error) { return nil, expected }, MigrationTag)
+
+		_ = (&rdb.Provider{}).Boot(container)
 
 		sut := &Provider{}
 		_ = sut.Register(container)
@@ -334,18 +382,30 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
-		_ = (&rdb.Provider{}).Register(container)
-		_ = (&sqlite.Provider{}).Register(container)
+
+		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
+		partial := config.Partial{
+			"slate": config.Partial{
+				"rdb": config.Partial{
+					"connections": config.Partial{
+						"primary": rdbCfg}}}}
+		source := NewMockConfigSource(ctrl)
+		source.EXPECT().Get("").Return(partial, nil).Times(1)
+		cfg := config.NewConfig()
+		_ = cfg.AddSource("id", 0, source)
+		_ = container.Service(config.ID, func() *config.Config { return cfg })
+		migrator := NewMockMigrator(ctrl)
+		migrator.EXPECT().AutoMigrate(gomock.Any()).Return(nil).Times(1)
+		dialector := NewMockDialector(ctrl)
+		dialector.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
+		dialector.EXPECT().Migrator(gomock.Any()).Return(migrator).Times(1)
+		dialectStrategy := NewMockDialectStrategy(ctrl)
+		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialector, nil).Times(1)
+		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
+		_ = container.Service("id", func() (interface{}, error) { return "string", nil }, MigrationTag)
 
 		_ = (&rdb.Provider{}).Boot(container)
-
-		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfgManager.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
-		cfgManager.EXPECT().Config("slate.rdb.connections.primary").Return(&partial, nil).Times(1)
-		_ = container.Service(config.ID, func() (config.IManager, error) { return cfgManager, nil })
-		_ = container.Service("id", func() (interface{}, error) { return "string", nil }, MigrationTag)
 
 		sut := &Provider{}
 		_ = sut.Register(container)
@@ -364,23 +424,33 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
-		_ = (&sqlite.Provider{}).Register(container)
 
-		_ = (&rdb.Provider{}).Boot(container)
-
-		partial := config.Config{"dialect": "sqlite", "host": ":memory:"}
-		cfgManager := NewMockConfigManager(ctrl)
-		cfgManager.EXPECT().AddObserver("slate.rdb.connections", gomock.Any()).Return(nil).Times(1)
-		cfgManager.EXPECT().Has("slate.rdb.connections.primary").Return(true).Times(1)
-		cfgManager.EXPECT().Config("slate.rdb.connections.primary").Return(&partial, nil).Times(1)
-		_ = container.Service(config.ID, func() (config.IManager, error) { return cfgManager, nil })
-
+		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
+		partial := config.Partial{
+			"slate": config.Partial{
+				"rdb": config.Partial{
+					"connections": config.Partial{
+						"primary": rdbCfg}}}}
+		source := NewMockConfigSource(ctrl)
+		source.EXPECT().Get("").Return(partial, nil).Times(1)
+		cfg := config.NewConfig()
+		_ = cfg.AddSource("id", 0, source)
+		_ = container.Service(config.ID, func() *config.Config { return cfg })
+		migrator := NewMockMigrator(ctrl)
+		migrator.EXPECT().AutoMigrate(gomock.Any()).Return(nil).Times(1)
+		dialector := NewMockDialector(ctrl)
+		dialector.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
+		dialector.EXPECT().Migrator(gomock.Any()).Return(migrator).Times(1)
+		dialectStrategy := NewMockDialectStrategy(ctrl)
+		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialector, nil).Times(1)
+		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(uint64(1)).Times(1)
 		migration.EXPECT().Up().Times(1)
-		_ = container.Service("id", func() (interface{}, error) {
-			return migration, nil
-		}, MigrationTag)
+		_ = container.Service("id", func() (interface{}, error) { return migration, nil }, MigrationTag)
+
+		_ = (&rdb.Provider{}).Boot(container)
 
 		sut := &Provider{}
 		_ = sut.Register(container)

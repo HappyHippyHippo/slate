@@ -18,20 +18,10 @@ const (
 	Type = "mysql"
 )
 
-type dialectConfig struct {
-	Username string
-	Password string
-	Protocol string
-	Host     string
-	Port     int
-	Schema   string
-	Params   config.Config
-}
-
 // DialectStrategy define a MySQL dialect generation strategy instance.
 type DialectStrategy struct{}
 
-var _ rdb.IDialectStrategy = &DialectStrategy{}
+var _ rdb.DialectStrategy = &DialectStrategy{}
 
 // NewDialectStrategy will instantiate a new mysql dialect creation strategy.
 func NewDialectStrategy() *DialectStrategy {
@@ -41,7 +31,7 @@ func NewDialectStrategy() *DialectStrategy {
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
 func (DialectStrategy) Accept(
-	cfg config.IConfig,
+	cfg *config.Partial,
 ) bool {
 	// check config argument reference
 	if cfg == nil {
@@ -49,26 +39,35 @@ func (DialectStrategy) Accept(
 	}
 	// retrieve the connection dialect from the configuration
 	dc := struct{ Dialect string }{}
-	_, e := cfg.Populate("", &dc)
-	if e != nil {
+	if _, e := cfg.Populate("", &dc); e != nil {
 		return false
 	}
 	// only accepts a mysql dialect request
 	return strings.EqualFold(strings.ToLower(dc.Dialect), Type)
 }
 
-// Get instantiates the requested mysql connection dialect.
-func (DialectStrategy) Get(
-	cfg config.IConfig,
+// Create instantiates the requested mysql connection dialect.
+func (DialectStrategy) Create(
+	cfg *config.Partial,
 ) (gorm.Dialector, error) {
 	// check config argument reference
 	if cfg == nil {
 		return nil, errNilPointer("cfg")
 	}
 	// retrieve the data from the configuration
-	dc := dialectConfig{Protocol: "tcp", Port: 3306}
-	_, e := cfg.Populate("", &dc)
-	if e != nil {
+	dc := struct {
+		Username string
+		Password string
+		Protocol string
+		Host     string
+		Port     int
+		Schema   string
+		Params   config.Partial
+	}{
+		Protocol: "tcp",
+		Port:     3306,
+	}
+	if _, e := cfg.Populate("", &dc); e != nil {
 		return nil, e
 	}
 	// compose the connection DSN string

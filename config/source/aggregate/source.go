@@ -10,28 +10,28 @@ import (
 // Source defines a config source that aggregates a list of
 // config partials into a single aggregate provided source.
 type Source struct {
-	source.BaseSource
-	configs []config.IConfig
+	source.Source
+	sources []config.Source
 }
 
-var _ config.ISource = &Source{}
+var _ config.Source = &Source{}
 
 // NewSource will instantiate a new config source
-// that aggregate a list of configs elements.
+// that aggregate a list of sources elements.
 func NewSource(
-	configs []config.IConfig,
+	sources []config.Source,
 ) (*Source, error) {
 	// check config list reference
-	if configs == nil {
-		return nil, errNilPointer("configs")
+	if sources == nil {
+		return nil, errNilPointer("sources")
 	}
 	// instantiates the config source
 	s := &Source{
-		BaseSource: source.BaseSource{
-			Mutex:  &sync.Mutex{},
-			Config: config.Config{},
+		Source: source.Source{
+			Mutex:   &sync.Mutex{},
+			Partial: config.Partial{},
 		},
-		configs: configs,
+		sources: sources,
 	}
 	// load the config information from the passed config partials
 	if e := s.load(); e != nil {
@@ -42,17 +42,17 @@ func NewSource(
 
 func (s *Source) load() error {
 	// merge all the cfg partials given into the local cfg
-	c := config.Config{}
-	for _, cfg := range s.configs {
-		partial, e := cfg.Config("", config.Config{})
+	c := config.Partial{}
+	for _, s := range s.sources {
+		p, e := s.Get("", config.Partial{})
 		if e != nil {
 			return e
 		}
-		c.Merge(*partial.(*config.Config))
+		c.Merge(p.(config.Partial))
 	}
-	// assign the merged configs to the source config
+	// assign the merged sources to the source config
 	s.Mutex.Lock()
-	s.Config = c
+	s.Partial = c
 	s.Mutex.Unlock()
 	return nil
 }

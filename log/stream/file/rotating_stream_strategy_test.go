@@ -3,23 +3,19 @@ package file
 import (
 	"errors"
 	"fmt"
+	"github.com/golang/mock/gomock"
+	"github.com/happyhippyhippo/slate"
+	"github.com/happyhippyhippo/slate/config"
+	"github.com/happyhippyhippo/slate/log"
 	"io"
 	"os"
 	"testing"
 	"time"
-
-	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate"
-	"github.com/happyhippyhippo/slate/log"
-	"github.com/happyhippyhippo/slate/log/formatter/json"
 )
 
 func Test_NewRotatingFileStreamStrategy(t *testing.T) {
 	t.Run("nil file system adapter", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		sut, e := NewRotatingStreamStrategy(nil, NewMockFormatterFactory(ctrl))
+		sut, e := NewRotatingStreamStrategy(nil, log.NewFormatterFactory())
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -49,7 +45,7 @@ func Test_NewRotatingFileStreamStrategy(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, e := NewRotatingStreamStrategy(NewMockFs(ctrl), NewMockFormatterFactory(ctrl))
+		sut, e := NewRotatingStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 		switch {
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
@@ -64,7 +60,7 @@ func Test_RotatingFileStreamStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), NewMockFormatterFactory(ctrl))
+		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
 		if sut.Accept(nil) {
 			t.Error("returned true")
@@ -75,16 +71,10 @@ func Test_RotatingFileStreamStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		config := NewMockConfig(ctrl)
-		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&struct{ Type string }{})).DoAndReturn(
-			func(_ string, data *struct{ Type string }, _ ...bool) (interface{}, error) {
-				return nil, fmt.Errorf("dummy error")
-			},
-		).Times(1)
+		partial := config.Partial{"type": 123}
+		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
-		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), NewMockFormatterFactory(ctrl))
-
-		if sut.Accept(config) {
+		if sut.Accept(&partial) {
 			t.Error("returned true")
 		}
 	})
@@ -93,17 +83,10 @@ func Test_RotatingFileStreamStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		config := NewMockConfig(ctrl)
-		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&struct{ Type string }{})).DoAndReturn(
-			func(_ string, data *struct{ Type string }, _ ...bool) (interface{}, error) {
-				data.Type = log.UnknownStream
-				return data, nil
-			},
-		).Times(1)
+		partial := config.Partial{"type": "invalid"}
+		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
-		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), NewMockFormatterFactory(ctrl))
-
-		if sut.Accept(config) {
+		if sut.Accept(&partial) {
 			t.Error("returned true")
 		}
 	})
@@ -112,17 +95,10 @@ func Test_RotatingFileStreamStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		config := NewMockConfig(ctrl)
-		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&struct{ Type string }{})).DoAndReturn(
-			func(_ string, data *struct{ Type string }, _ ...bool) (interface{}, error) {
-				data.Type = RotatingType
-				return data, nil
-			},
-		).Times(1)
+		partial := config.Partial{"type": RotatingType}
+		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
-		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), NewMockFormatterFactory(ctrl))
-
-		if !sut.Accept(config) {
+		if !sut.Accept(&partial) {
 			t.Error("returned false")
 		}
 	})
@@ -133,7 +109,7 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), NewMockFormatterFactory(ctrl))
+		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
 		src, e := sut.Create(nil)
 		switch {
@@ -146,28 +122,21 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		}
 	})
 
-	t.Run("error on config parsing", func(t *testing.T) {
+	t.Run("non-string format", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("dummy error")
-		config := NewMockConfig(ctrl)
-		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&rotatingStreamConfig{})).DoAndReturn(
-			func(_ string, data *rotatingStreamConfig, _ ...bool) (interface{}, error) {
-				return nil, expected
-			},
-		).Times(1)
+		partial := config.Partial{"type": Type, "format": 123}
+		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
-		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), NewMockFormatterFactory(ctrl))
-
-		src, e := sut.Create(config)
+		src, e := sut.Create(&partial)
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		case !errors.Is(e, slate.ErrConversion):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -175,19 +144,10 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		config := NewMockConfig(ctrl)
-		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&rotatingStreamConfig{})).DoAndReturn(
-			func(_ string, data *rotatingStreamConfig, _ ...bool) (interface{}, error) {
-				data.Path = "path"
-				data.Format = json.Format
-				data.Level = "invalid"
-				return data, nil
-			},
-		).Times(1)
+		partial := config.Partial{"type": Type, "format": "format", "level": "invalid"}
+		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
-		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), NewMockFormatterFactory(ctrl))
-
-		stream, e := sut.Create(config)
+		stream, e := sut.Create(&partial)
 		switch {
 		case stream != nil:
 			t.Error("returned a valid reference")
@@ -202,32 +162,18 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		expected := fmt.Errorf("error message")
+		partial := config.Partial{"type": Type, "format": "format", "level": "fatal"}
+		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
-		config := NewMockConfig(ctrl)
-		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&rotatingStreamConfig{})).DoAndReturn(
-			func(_ string, data *rotatingStreamConfig, _ ...bool) (interface{}, error) {
-				data.Path = "path"
-				data.Format = log.UnknownFormatterFormat
-				data.Level = "fatal"
-				return data, nil
-			},
-		).Times(1)
-
-		formatterFactory := NewMockFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(log.UnknownFormatterFormat).Return(nil, expected).Times(1)
-
-		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), formatterFactory)
-
-		stream, e := sut.Create(config)
+		stream, e := sut.Create(&partial)
 		switch {
 		case stream != nil:
 			_ = stream.(io.Closer).Close()
 			t.Error("returned a valid stream")
 		case e == nil:
 			t.Error("didn't returned the expected error")
-		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+		case !errors.Is(e, log.ErrInvalidFormat):
+			t.Errorf("returned the (%v) error when expecting (%v)", e, log.ErrInvalidFormat)
 		}
 	})
 
@@ -238,26 +184,24 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		path := "path-%s"
 		expectedPath := fmt.Sprintf(path, time.Now().Format("2006-01-02"))
 		expected := fmt.Errorf("error message")
-
-		config := NewMockConfig(ctrl)
-		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&rotatingStreamConfig{})).DoAndReturn(
-			func(_ string, data *rotatingStreamConfig, _ ...bool) (interface{}, error) {
-				data.Path = path
-				data.Format = json.Format
-				data.Level = "fatal"
-				return data, nil
-			},
-		).Times(1)
-
+		partial := config.Partial{
+			"type":     RotatingType,
+			"format":   "format",
+			"level":    "fatal",
+			"path":     path,
+			"channels": []interface{}{"channel1", "channel2"}}
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
 		formatter := NewMockFormatter(ctrl)
-		formatterFactory := NewMockFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(json.Format).Return(formatter, nil).Times(1)
+		formatterStrategy := NewMockFormatterStrategy(ctrl)
+		formatterStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		formatterStrategy.EXPECT().Create(gomock.Any()).Return(formatter, nil).Times(1)
+		formatterFactory := log.NewFormatterFactory()
+		_ = formatterFactory.Register(formatterStrategy)
 
 		sut, _ := NewRotatingStreamStrategy(fileSystem, formatterFactory)
 
-		stream, e := sut.Create(config)
+		stream, e := sut.Create(&partial)
 		switch {
 		case stream != nil:
 			_ = stream.(io.Closer).Close()
@@ -275,29 +219,26 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 
 		path := "path-%s"
 		expectedPath := fmt.Sprintf(path, time.Now().Format("2006-01-02"))
-
-		config := NewMockConfig(ctrl)
-		config.EXPECT().Populate("", gomock.AssignableToTypeOf(&rotatingStreamConfig{})).DoAndReturn(
-			func(_ string, data *rotatingStreamConfig, _ ...bool) (interface{}, error) {
-				data.Path = path
-				data.Format = json.Format
-				data.Level = "fatal"
-				data.Channels = []interface{}{"channel1", "channel2"}
-				return data, nil
-			},
-		).Times(1)
-
+		partial := config.Partial{
+			"type":     RotatingType,
+			"format":   "format",
+			"level":    "fatal",
+			"path":     path,
+			"channels": []interface{}{"channel1", "channel2"}}
 		file := NewMockFile(ctrl)
 		file.EXPECT().Close().Return(nil).Times(1)
 		fileSystem := NewMockFs(ctrl)
 		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
 		formatter := NewMockFormatter(ctrl)
-		formatterFactory := NewMockFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(json.Format).Return(formatter, nil).Times(1)
+		formatterStrategy := NewMockFormatterStrategy(ctrl)
+		formatterStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		formatterStrategy.EXPECT().Create(gomock.Any()).Return(formatter, nil).Times(1)
+		formatterFactory := log.NewFormatterFactory()
+		_ = formatterFactory.Register(formatterStrategy)
 
 		sut, _ := NewRotatingStreamStrategy(fileSystem, formatterFactory)
 
-		stream, e := sut.Create(config)
+		stream, e := sut.Create(&partial)
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)

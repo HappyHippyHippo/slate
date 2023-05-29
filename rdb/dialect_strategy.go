@@ -6,14 +6,14 @@ import (
 )
 
 const (
-	// UnknownDialectType defines the value to be used to
+	// UnknownDialect defines the value to be used to
 	// identify an unknown dialect.
-	UnknownDialectType = "unknown"
+	UnknownDialect = "unknown"
 )
 
-// IDialectStrategy defines the interface to a gorm rdb
+// DialectStrategy defines the interface to a gorm rdb
 // dialect instantiation strategy, based on a configuration.
-type IDialectStrategy interface {
-	Accept(config.IConfig) bool
-	Get(config.IConfig) (gorm.Dialector, error)
+type DialectStrategy interface {
+	Accept(*config.Partial) bool
+	Create(*config.Partial) (gorm.Dialector, error)
 }

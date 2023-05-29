@@ -29,12 +29,7 @@ func Test_NewLogAdapter(t *testing.T) {
 	})
 
 	t.Run("nil log", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		l := NewMockLog(ctrl)
-
-		sut, e := NewLogAdapter("service", "channel", log.FATAL, log.FATAL, log.FATAL, l, nil)
+		sut, e := NewLogAdapter("service", "channel", log.FATAL, log.FATAL, log.FATAL, log.NewLog(), nil)
 		switch {
 		case sut != nil:
 			t.Error("returned a valid reference")
@@ -49,10 +44,10 @@ func Test_NewLogAdapter(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		l := NewMockLog(ctrl)
+		logger := log.NewLog()
 		formatter := NewMockLogFormatter(ctrl)
 
-		sut, e := NewLogAdapter("service", "channel", log.FATAL, log.ERROR, log.WARNING, l, formatter)
+		sut, e := NewLogAdapter("service", "channel", log.FATAL, log.ERROR, log.WARNING, logger, formatter)
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -68,7 +63,7 @@ func Test_NewLogAdapter(t *testing.T) {
 			t.Errorf("didn't store the given error log level : %v", log.LevelMapName[sut.errorLevel])
 		case sut.doneLevel != log.WARNING:
 			t.Errorf("didn't store the given done log level : %v", log.LevelMapName[sut.doneLevel])
-		case sut.logger != l:
+		case sut.logger != logger:
 			t.Errorf("didn't store the given log instance")
 		case sut.formatter != formatter:
 			t.Errorf("didn't store the given formatter instance")
@@ -85,12 +80,13 @@ func Test_LogAdapter_Start(t *testing.T) {
 		channel := "channel name"
 		message := "formatter message"
 		expected := fmt.Errorf("error message")
-		l := NewMockLog(ctrl)
-		l.EXPECT().Signal(channel, log.FATAL, message, nil).Return(expected).Times(1)
+
+		logger := NewMockLogger(ctrl)
+		logger.EXPECT().Signal(channel, log.FATAL, message).Return(expected).Times(1)
 		formatter := NewMockLogFormatter(ctrl)
 		formatter.EXPECT().Start(service).Return(message).Times(1)
-
-		sut, _ := NewLogAdapter(service, channel, log.FATAL, log.ERROR, log.WARNING, l, formatter)
+		sut, _ := NewLogAdapter(service, channel, log.FATAL, log.ERROR, log.WARNING, log.NewLog(), formatter)
+		sut.logger = logger
 
 		chk := sut.Start()
 		switch {
@@ -108,12 +104,13 @@ func Test_LogAdapter_Start(t *testing.T) {
 		service := "service name"
 		channel := "channel name"
 		message := "formatter message"
-		l := NewMockLog(ctrl)
-		l.EXPECT().Signal(channel, log.FATAL, message, nil).Return(nil).Times(1)
+
+		logger := NewMockLogger(ctrl)
+		logger.EXPECT().Signal(channel, log.FATAL, message).Return(nil).Times(1)
 		formatter := NewMockLogFormatter(ctrl)
 		formatter.EXPECT().Start(service).Return(message).Times(1)
-
-		sut, _ := NewLogAdapter(service, channel, log.FATAL, log.ERROR, log.WARNING, l, formatter)
+		sut, _ := NewLogAdapter(service, channel, log.FATAL, log.ERROR, log.WARNING, log.NewLog(), formatter)
+		sut.logger = logger
 
 		if chk := sut.Start(); chk != nil {
 			t.Errorf("returned the unexpected error : %v", chk)
@@ -126,17 +123,18 @@ func Test_LogAdapter_Error(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		e := fmt.Errorf("error")
 		service := "service name"
 		channel := "channel name"
 		message := "formatter message"
-		e := fmt.Errorf("error")
 		expected := fmt.Errorf("error message")
-		l := NewMockLog(ctrl)
-		l.EXPECT().Signal(channel, log.ERROR, message, nil).Return(expected).Times(1)
+
+		logger := NewMockLogger(ctrl)
+		logger.EXPECT().Signal(channel, log.ERROR, message).Return(expected).Times(1)
 		formatter := NewMockLogFormatter(ctrl)
 		formatter.EXPECT().Error(service, e).Return(message).Times(1)
-
-		sut, _ := NewLogAdapter(service, channel, log.FATAL, log.ERROR, log.WARNING, l, formatter)
+		sut, _ := NewLogAdapter(service, channel, log.FATAL, log.ERROR, log.WARNING, log.NewLog(), formatter)
+		sut.logger = logger
 
 		chk := sut.Error(e)
 		switch {
@@ -151,16 +149,17 @@ func Test_LogAdapter_Error(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		e := fmt.Errorf("error")
 		service := "service name"
 		channel := "channel name"
 		message := "formatter message"
-		e := fmt.Errorf("error")
-		l := NewMockLog(ctrl)
-		l.EXPECT().Signal(channel, log.ERROR, message, nil).Return(nil).Times(1)
+
+		logger := NewMockLogger(ctrl)
+		logger.EXPECT().Signal(channel, log.ERROR, message).Return(nil).Times(1)
 		formatter := NewMockLogFormatter(ctrl)
 		formatter.EXPECT().Error(service, e).Return(message).Times(1)
-
-		sut, _ := NewLogAdapter(service, channel, log.FATAL, log.ERROR, log.WARNING, l, formatter)
+		sut, _ := NewLogAdapter(service, channel, log.FATAL, log.ERROR, log.WARNING, log.NewLog(), formatter)
+		sut.logger = logger
 
 		if chk := sut.Error(e); chk != nil {
 			t.Errorf("returned the unexpected error : %v", chk)
@@ -177,12 +176,13 @@ func Test_LogAdapter_Done(t *testing.T) {
 		channel := "channel name"
 		message := "formatter message"
 		expected := fmt.Errorf("error message")
-		l := NewMockLog(ctrl)
-		l.EXPECT().Signal(channel, log.WARNING, message, nil).Return(expected).Times(1)
+
+		logger := NewMockLogger(ctrl)
+		logger.EXPECT().Signal(channel, log.WARNING, message).Return(expected).Times(1)
 		formatter := NewMockLogFormatter(ctrl)
 		formatter.EXPECT().Done(service).Return(message).Times(1)
-
-		sut, _ := NewLogAdapter(service, channel, log.FATAL, log.ERROR, log.WARNING, l, formatter)
+		sut, _ := NewLogAdapter(service, channel, log.FATAL, log.ERROR, log.WARNING, log.NewLog(), formatter)
+		sut.logger = logger
 
 		chk := sut.Done()
 		switch {
@@ -200,12 +200,13 @@ func Test_LogAdapter_Done(t *testing.T) {
 		service := "service name"
 		channel := "channel name"
 		message := "formatter message"
-		l := NewMockLog(ctrl)
-		l.EXPECT().Signal(channel, log.WARNING, message, nil).Return(nil).Times(1)
+
+		logger := NewMockLogger(ctrl)
+		logger.EXPECT().Signal(channel, log.WARNING, message).Return(nil).Times(1)
 		formatter := NewMockLogFormatter(ctrl)
 		formatter.EXPECT().Done(service).Return(message).Times(1)
-
-		sut, _ := NewLogAdapter(service, channel, log.FATAL, log.ERROR, log.WARNING, l, formatter)
+		sut, _ := NewLogAdapter(service, channel, log.FATAL, log.ERROR, log.WARNING, log.NewLog(), formatter)
+		sut.logger = logger
 
 		if chk := sut.Done(); chk != nil {
 			t.Errorf("returned the unexpected error : %v", chk)

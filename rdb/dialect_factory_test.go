@@ -34,11 +34,11 @@ func Test_DialectFactory_Register(t *testing.T) {
 	})
 }
 
-func Test_DialectFactory_Get(t *testing.T) {
+func Test_DialectFactory_Create(t *testing.T) {
 	t.Run("missing cfg", func(t *testing.T) {
 		sut := &DialectFactory{}
 
-		dialect, e := sut.Get(nil)
+		dialect, e := sut.Create(nil)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -53,14 +53,14 @@ func Test_DialectFactory_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := &config.Config{"dialect": "unsupported"}
+		cfg := &config.Partial{"dialect": "unsupported"}
 		strategy := NewMockDialectStrategy(ctrl)
 		strategy.EXPECT().Accept(cfg).Return(false).Times(1)
 
 		sut := &DialectFactory{}
 		_ = sut.Register(strategy)
 
-		dialect, e := sut.Get(cfg)
+		dialect, e := sut.Create(cfg)
 		switch {
 		case dialect != nil:
 			t.Error("return an unexpected valid dialect instance")
@@ -76,15 +76,15 @@ func Test_DialectFactory_Get(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		cfg := &config.Config{"dialect": "unsupported"}
+		cfg := &config.Partial{"dialect": "unsupported"}
 		strategy := NewMockDialectStrategy(ctrl)
 		strategy.EXPECT().Accept(cfg).Return(true).Times(1)
-		strategy.EXPECT().Get(cfg).Return(nil, expected).Times(1)
+		strategy.EXPECT().Create(cfg).Return(nil, expected).Times(1)
 
 		sut := &DialectFactory{}
 		_ = sut.Register(strategy)
 
-		if _, e := sut.Get(cfg); e == nil {
+		if _, e := sut.Create(cfg); e == nil {
 			t.Error("didn't return the expected error")
 		} else if e.Error() != expected.Error() {
 			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
@@ -95,16 +95,16 @@ func Test_DialectFactory_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := &config.Config{"dialect": "unsupported"}
+		cfg := &config.Partial{"dialect": "unsupported"}
 		dialect := NewMockDialect(ctrl)
 		strategy := NewMockDialectStrategy(ctrl)
 		strategy.EXPECT().Accept(cfg).Return(true).Times(1)
-		strategy.EXPECT().Get(cfg).Return(dialect, nil).Times(1)
+		strategy.EXPECT().Create(cfg).Return(dialect, nil).Times(1)
 
 		sut := &DialectFactory{}
 		_ = sut.Register(strategy)
 
-		if check, e := sut.Get(cfg); e != nil {
+		if check, e := sut.Create(cfg); e != nil {
 			t.Errorf("return the unexpected error (%v)", e)
 		} else if check != dialect {
 			t.Error("didn't returned the strategy provided dialect")

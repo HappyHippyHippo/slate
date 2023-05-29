@@ -33,7 +33,7 @@ func Test_NewObsSourceStrategy(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		decoderFactory := NewMockDecoderFactory(ctrl)
+		decoderFactory := config.NewDecoderFactory()
 
 		sut, e := NewObsSourceStrategy(decoderFactory)
 		switch {
@@ -59,7 +59,7 @@ func Test_ObsSourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
 		if sut.Accept(nil) {
 			t.Error("returned true")
@@ -70,9 +70,9 @@ func Test_ObsSourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		if sut.Accept(&config.Config{}) {
+		if sut.Accept(&config.Partial{}) {
 			t.Error("returned true")
 		}
 	})
@@ -81,9 +81,9 @@ func Test_ObsSourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		if sut.Accept(&config.Config{"type": 123}) {
+		if sut.Accept(&config.Partial{"type": 123}) {
 			t.Error("returned true")
 		}
 	})
@@ -92,9 +92,9 @@ func Test_ObsSourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		if sut.Accept(&config.Config{"type": config.UnknownSourceType}) {
+		if sut.Accept(&config.Partial{"type": config.UnknownSource}) {
 			t.Error("returned true")
 		}
 	})
@@ -103,9 +103,9 @@ func Test_ObsSourceStrategy_Accept(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		if !sut.Accept(&config.Config{"type": ObsType}) {
+		if !sut.Accept(&config.Partial{"type": ObsType}) {
 			t.Error("returned false")
 		}
 	})
@@ -116,7 +116,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
 		src, e := sut.Create(nil)
 		switch {
@@ -133,9 +133,9 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"format": "format", "timestampPath": "path", "configPath": "path"})
+		src, e := sut.Create(&config.Partial{"format": "format", "timestampPath": "path", "configPath": "path"})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -150,9 +150,9 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"uri": "uri", "format": "format", "path": config.Config{"config": "path"}})
+		src, e := sut.Create(&config.Partial{"uri": "uri", "format": "format", "path": config.Partial{"config": "path"}})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -167,9 +167,9 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"uri": "uri", "format": "format", "path": config.Config{"timestamp": "path"}})
+		src, e := sut.Create(&config.Partial{"uri": "uri", "format": "format", "path": config.Partial{"timestamp": "path"}})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -184,9 +184,9 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"uri": 123, "format": "format", "path": config.Config{"config": "path", "timestamp": "path"}})
+		src, e := sut.Create(&config.Partial{"uri": 123, "format": "format", "path": config.Partial{"config": "path", "timestamp": "path"}})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -201,9 +201,9 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"uri": "uri", "format": 123, "path": config.Config{"config": "path", "timestamp": "path"}})
+		src, e := sut.Create(&config.Partial{"uri": "uri", "format": 123, "path": config.Partial{"config": "path", "timestamp": "path"}})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -218,9 +218,9 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"uri": "uri", "format": "format", "path": config.Config{"config": "path", "timestamp": 123}})
+		src, e := sut.Create(&config.Partial{"uri": "uri", "format": "format", "path": config.Partial{"config": "path", "timestamp": 123}})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -235,9 +235,9 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		sut, _ := NewObsSourceStrategy(NewMockDecoderFactory(ctrl))
+		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Config{"uri": "uri", "format": "format", "path": config.Config{"config": 123, "timestamp": "path"}})
+		src, e := sut.Create(&config.Partial{"uri": "uri", "format": "format", "path": config.Partial{"config": 123, "timestamp": "path"}})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -258,22 +258,25 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		configPath := "path"
 		field := "field"
 		value := "value"
-		expected := config.Config{field: value}
-		respData := config.Config{"path": config.Config{"field": "value"}, "timestamp": "2000-01-01T00:00:00.000Z"}
+		expected := config.Partial{field: value}
+		respData := config.Partial{"path": config.Partial{"field": "value"}, "timestamp": "2000-01-01T00:00:00.000Z"}
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("format", gomock.Any()).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, _ := NewObsSourceStrategy(decoderFactory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}, "timestamp": "2021-12-15T21:07:48.239Z"}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		sut.clientFactory = func() httpClient { return client }
+		sut.clientFactory = func() requester { return client }
 
-		src, e := sut.Create(&config.Config{"uri": uri, "format": format, "path": config.Config{"config": configPath, "timestamp": timestampPath}})
+		src, e := sut.Create(&config.Partial{"uri": uri, "format": format, "path": config.Partial{"config": configPath, "timestamp": timestampPath}})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -282,7 +285,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *ObsSource:
-				if !reflect.DeepEqual(s.Config, expected) {
+				if !reflect.DeepEqual(s.Partial, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:
@@ -300,22 +303,25 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		configPath := "path"
 		field := "field"
 		value := "value"
-		expected := config.Config{field: value}
-		respData := config.Config{"path": config.Config{"field": "value"}, "timestamp": "2000-01-01T00:00:00.000Z"}
+		expected := config.Partial{field: value}
+		respData := config.Partial{"path": config.Partial{"field": "value"}, "timestamp": "2000-01-01T00:00:00.000Z"}
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
-		decoderFactory := NewMockDecoderFactory(ctrl)
-		decoderFactory.EXPECT().Create("json", gomock.Any()).Return(decoder, nil).Times(1)
+		decoderStrategy := NewMockDecoderStrategy(ctrl)
+		decoderStrategy.EXPECT().Accept("json").Return(true).Times(1)
+		decoderStrategy.EXPECT().Create(gomock.Any()).Return(decoder, nil).Times(1)
+		decoderFactory := config.NewDecoderFactory()
+		_ = decoderFactory.Register(decoderStrategy)
 
 		sut, _ := NewObsSourceStrategy(decoderFactory)
 		response := http.Response{}
 		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}, "timestamp": "2021-12-15T21:07:48.239Z"}`))
-		client := NewMockHTTPClient(ctrl)
+		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
-		sut.clientFactory = func() httpClient { return client }
+		sut.clientFactory = func() requester { return client }
 
-		src, e := sut.Create(&config.Config{"uri": uri, "path": config.Config{"config": configPath, "timestamp": timestampPath}})
+		src, e := sut.Create(&config.Partial{"uri": uri, "path": config.Partial{"config": configPath, "timestamp": timestampPath}})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -324,7 +330,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		default:
 			switch s := src.(type) {
 			case *ObsSource:
-				if !reflect.DeepEqual(s.Config, expected) {
+				if !reflect.DeepEqual(s.Partial, expected) {
 					t.Error("didn't loaded the content correctly")
 				}
 			default:

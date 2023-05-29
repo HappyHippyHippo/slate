@@ -7,38 +7,28 @@ import (
 	"github.com/happyhippyhippo/slate/log"
 )
 
-// IFactory defines an interface to a watchdog factory instance.
-type IFactory interface {
-	Create(service string) (IWatchdog, error)
+type configurer interface {
+	Partial(path string, def ...config.Partial) (*config.Partial, error)
+}
+
+type logFormatterCreator interface {
+	Create(cfg *config.Partial) (LogFormatter, error)
 }
 
 // Factory defines an instance of a watchdog factory, used
 // to create watchdogs related to a configuration entry.
 type Factory struct {
-	config           config.IManager
-	log              log.ILog
-	formatterFactory ILogFormatterFactory
-}
-
-var _ IFactory = &Factory{}
-
-type watchdogConfig struct {
-	Name    string
-	Channel string
-	Level   struct {
-		Start string
-		Error string
-		Done  string
-	}
-	Formatter string
+	config           configurer
+	log              *log.Log
+	formatterCreator logFormatterCreator
 }
 
 // NewFactory will generate a new watchdog factory instance.
 func NewFactory(
-	cfg config.IManager,
-	logger log.ILog,
-	formatterFactory ILogFormatterFactory,
-) (IFactory, error) {
+	cfg *config.Config,
+	logger *log.Log,
+	formatterCreator *LogFormatterFactory,
+) (*Factory, error) {
 	// check config argument reference
 	if cfg == nil {
 		return nil, errNilPointer("cfg")
@@ -48,14 +38,14 @@ func NewFactory(
 		return nil, errNilPointer("logger")
 	}
 	// check formatter factory reference
-	if formatterFactory == nil {
-		return nil, errNilPointer("formatterFactory")
+	if formatterCreator == nil {
+		return nil, errNilPointer("formatterCreator")
 	}
 	// return the created watchdog factory instance
 	return &Factory{
 		config:           cfg,
 		log:              logger,
-		formatterFactory: formatterFactory,
+		formatterCreator: formatterCreator,
 	}, nil
 }
 
@@ -63,14 +53,23 @@ func NewFactory(
 // service with the name passed as argument.
 func (f *Factory) Create(
 	service string,
-) (IWatchdog, error) {
+) (*Watchdog, error) {
 	// get service watchdog configuration
-	cfg, e := f.config.Config(fmt.Sprintf("%s.%s", ConfigPathPrefix, service), config.Config{})
+	cfg, e := f.config.Partial(fmt.Sprintf("%s.%s", ConfigPathPrefix, service), config.Partial{})
 	if e != nil {
 		return nil, e
 	}
 	// parse the retrieved configuration
-	wc := watchdogConfig{
+	wc := struct {
+		Name    string
+		Channel string
+		Level   struct {
+			Start string
+			Error string
+			Done  string
+		}
+		Formatter string
+	}{
 		Channel: LogChannel,
 		Level: struct {
 			Start string
@@ -83,8 +82,7 @@ func (f *Factory) Create(
 		},
 		Formatter: DefaultFormatter,
 	}
-	_, e = cfg.Populate("", &wc)
-	if e != nil {
+	if _, e = cfg.Populate("", &wc); e != nil {
 		return nil, e
 	}
 	// validate the logging levels read from config
@@ -101,7 +99,7 @@ func (f *Factory) Create(
 		return nil, errConversion(wc.Level.Done, "log.Level")
 	}
 	// obtain the formatter for the watchdog log adapter
-	formatter, e := f.formatterFactory.Create(&config.Config{"type": wc.Formatter})
+	formatter, e := f.formatterCreator.Create(&config.Partial{"type": wc.Formatter})
 	if e != nil {
 		return nil, e
 	}
