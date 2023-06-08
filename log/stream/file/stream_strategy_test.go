@@ -72,7 +72,7 @@ func Test_StreamStrategyFile_Accept(t *testing.T) {
 		partial := config.Partial{"type": 123}
 		sut, _ := NewStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
-		if sut.Accept(&partial) {
+		if sut.Accept(partial) {
 			t.Error("returned true")
 		}
 	})
@@ -84,7 +84,7 @@ func Test_StreamStrategyFile_Accept(t *testing.T) {
 		partial := config.Partial{"type": "invalid"}
 		sut, _ := NewStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
-		if sut.Accept(&partial) {
+		if sut.Accept(partial) {
 			t.Error("returned true")
 		}
 	})
@@ -96,7 +96,7 @@ func Test_StreamStrategyFile_Accept(t *testing.T) {
 		partial := config.Partial{"type": Type}
 		sut, _ := NewStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
-		if !sut.Accept(&partial) {
+		if !sut.Accept(partial) {
 			t.Error("returned false")
 		}
 	})
@@ -127,7 +127,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 		partial := config.Partial{"type": Type, "format": 123}
 		sut, _ := NewStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
-		src, e := sut.Create(&partial)
+		src, e := sut.Create(partial)
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -145,7 +145,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 		partial := config.Partial{"type": Type, "format": "format", "level": "invalid"}
 		sut, _ := NewStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
-		stream, e := sut.Create(&partial)
+		stream, e := sut.Create(partial)
 		switch {
 		case stream != nil:
 			t.Error("returned a valid reference")
@@ -163,7 +163,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 		partial := config.Partial{"type": Type, "format": "format", "level": "fatal"}
 		sut, _ := NewStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
-		stream, e := sut.Create(&partial)
+		stream, e := sut.Create(partial)
 		switch {
 		case stream != nil:
 			_ = stream.(io.Closer).Close()
@@ -197,7 +197,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 
 		sut, _ := NewStreamStrategy(fileSystem, formatterFactory)
 
-		stream, e := sut.Create(&partial)
+		stream, e := sut.Create(partial)
 		switch {
 		case stream != nil:
 			_ = stream.(io.Closer).Close()
@@ -232,7 +232,7 @@ func Test_StreamStrategyFile_Create(t *testing.T) {
 
 		sut, _ := NewStreamStrategy(fileSystem, formatterFactory)
 
-		stream, e := sut.Create(&partial)
+		stream, e := sut.Create(partial)
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)

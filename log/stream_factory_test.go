@@ -60,7 +60,7 @@ func Test_StreamFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := &config.Partial{}
+		cfg := config.Partial{}
 		strategy := NewMockStreamStrategy(ctrl)
 		strategy.EXPECT().Accept(cfg).Return(false).Times(1)
 
@@ -82,7 +82,7 @@ func Test_StreamFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := &config.Partial{}
+		cfg := config.Partial{}
 		stream := NewMockStream(ctrl)
 		strategy := NewMockStreamStrategy(ctrl)
 		strategy.EXPECT().Accept(cfg).Return(true).Times(1)

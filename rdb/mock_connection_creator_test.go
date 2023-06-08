@@ -34,7 +34,7 @@ func (m *MockConnectionCreator) EXPECT() *MockConnectionCreatorRecorder {
 }
 
 // Create mocks base method.
-func (m *MockConnectionCreator) Create(cfg *config.Partial, gormCfg *gorm.Config) (*gorm.DB, error) {
+func (m *MockConnectionCreator) Create(cfg config.Partial, gormCfg *gorm.Config) (*gorm.DB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", cfg, gormCfg)
 	ret0, _ := ret[0].(*gorm.DB)

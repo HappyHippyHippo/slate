@@ -47,7 +47,7 @@ func NewRotatingStreamStrategy(
 // a stream where the data to check comes from a configuration partial
 // instance.
 func (s RotatingStreamStrategy) Accept(
-	cfg *config.Partial,
+	cfg config.Partial,
 ) bool {
 	// check config argument reference
 	if cfg == nil {
@@ -65,7 +65,7 @@ func (s RotatingStreamStrategy) Accept(
 // Create will instantiate the desired stream instance where
 // the initialization data comes from a configuration instance.
 func (s RotatingStreamStrategy) Create(
-	cfg *config.Partial,
+	cfg config.Partial,
 ) (log.Stream, error) {
 	// check config argument reference
 	if cfg == nil {

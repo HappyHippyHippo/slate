@@ -8,7 +8,7 @@ import (
 )
 
 type configurer interface {
-	Partial(path string, def ...config.Partial) (*config.Partial, error)
+	Partial(path string, def ...config.Partial) (config.Partial, error)
 }
 
 type logFormatterCreator interface {

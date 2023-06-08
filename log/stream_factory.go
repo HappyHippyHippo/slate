@@ -32,7 +32,7 @@ func (f *StreamFactory) Register(
 // Create will instantiate and return a new config stream loaded
 // by a configuration instance.
 func (f *StreamFactory) Create(
-	cfg *config.Partial,
+	cfg config.Partial,
 ) (Stream, error) {
 	// check config argument reference
 	if cfg == nil {

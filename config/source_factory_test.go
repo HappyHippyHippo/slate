@@ -62,7 +62,7 @@ func Test_SourceFactory_Create(t *testing.T) {
 		sourceType := "type"
 		path := "path"
 		format := "format"
-		partial := &Partial{"type": sourceType, "path": path, "format": format}
+		partial := Partial{"type": sourceType, "path": path, "format": format}
 		strategy := NewMockSourceStrategy(ctrl)
 		strategy.EXPECT().Accept(partial).Return(false).Times(1)
 		sut := &SourceFactory{}
@@ -86,7 +86,7 @@ func Test_SourceFactory_Create(t *testing.T) {
 		sourceType := "type"
 		path := "path"
 		format := "format"
-		partial := &Partial{"type": sourceType, "path": path, "format": format}
+		partial := Partial{"type": sourceType, "path": path, "format": format}
 		src := NewMockSource(ctrl)
 		strategy := NewMockSourceStrategy(ctrl)
 		strategy.EXPECT().Accept(partial).Return(true).Times(1)

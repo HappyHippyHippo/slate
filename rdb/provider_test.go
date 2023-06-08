@@ -148,16 +148,12 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&Provider{}).Register(container)
 
 		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial := config.Partial{
-			"slate": config.Partial{
-				"rdb": config.Partial{
-					"connections": config.Partial{
-						"primary": rdbCfg}}}}
+		partial := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{"primary": rdbCfg}}}}
 		dialect := NewMockDialect(ctrl)
 		dialect.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
 		dialectStrategy := NewMockDialectStrategy(ctrl)
-		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
-		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialect, nil).Times(1)
+		dialectStrategy.EXPECT().Accept(rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(rdbCfg).Return(dialect, nil).Times(1)
 		dialectFactory := NewDialectFactory()
 		_ = dialectFactory.Register(dialectStrategy)
 		_ = container.Service(DialectFactoryID, func() *DialectFactory { return dialectFactory })
@@ -186,16 +182,12 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&Provider{}).Register(container)
 
 		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial := config.Partial{
-			"slate": config.Partial{
-				"rdb": config.Partial{
-					"connections": config.Partial{
-						"other_primary": rdbCfg}}}}
+		partial := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{"other_primary": rdbCfg}}}}
 		dialect := NewMockDialect(ctrl)
 		dialect.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
 		dialectStrategy := NewMockDialectStrategy(ctrl)
-		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
-		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialect, nil).Times(1)
+		dialectStrategy.EXPECT().Accept(rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(rdbCfg).Return(dialect, nil).Times(1)
 		dialectFactory := NewDialectFactory()
 		_ = dialectFactory.Register(dialectStrategy)
 		_ = container.Service(DialectFactoryID, func() *DialectFactory { return dialectFactory })

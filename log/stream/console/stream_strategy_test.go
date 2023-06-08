@@ -46,7 +46,7 @@ func Test_StreamStrategy_Accept(t *testing.T) {
 		partial := config.Partial{"type": config.Partial{}}
 		sut, _ := NewStreamStrategy(log.NewFormatterFactory())
 
-		if sut.Accept(&partial) {
+		if sut.Accept(partial) {
 			t.Error("returned true")
 		}
 	})
@@ -55,7 +55,7 @@ func Test_StreamStrategy_Accept(t *testing.T) {
 		partial := config.Partial{"type": "invalid type"}
 		sut, _ := NewStreamStrategy(log.NewFormatterFactory())
 
-		if sut.Accept(&partial) {
+		if sut.Accept(partial) {
 			t.Error("returned true")
 		}
 	})
@@ -64,7 +64,7 @@ func Test_StreamStrategy_Accept(t *testing.T) {
 		partial := config.Partial{"type": Type}
 		sut, _ := NewStreamStrategy(log.NewFormatterFactory())
 
-		if !sut.Accept(&partial) {
+		if !sut.Accept(partial) {
 			t.Error("returned false")
 		}
 	})
@@ -89,7 +89,7 @@ func Test_StreamStrategy_Create(t *testing.T) {
 		partial := config.Partial{"type": Type, "format": 123}
 		sut, _ := NewStreamStrategy(log.NewFormatterFactory())
 
-		stream, e := sut.Create(&partial)
+		stream, e := sut.Create(partial)
 		switch {
 		case stream != nil:
 			t.Error("returned a valid reference")
@@ -104,7 +104,7 @@ func Test_StreamStrategy_Create(t *testing.T) {
 		partial := config.Partial{"type": Type, "format": json.Format, "level": "invalid"}
 		sut, _ := NewStreamStrategy(log.NewFormatterFactory())
 
-		stream, e := sut.Create(&partial)
+		stream, e := sut.Create(partial)
 		switch {
 		case stream != nil:
 			t.Error("returned a valid reference")
@@ -119,7 +119,7 @@ func Test_StreamStrategy_Create(t *testing.T) {
 		partial := config.Partial{"type": Type, "format": json.Format, "level": "fatal"}
 		sut, _ := NewStreamStrategy(log.NewFormatterFactory())
 
-		stream, e := sut.Create(&partial)
+		stream, e := sut.Create(partial)
 		switch {
 		case stream != nil:
 			t.Error("returned a valid reference")
@@ -147,7 +147,7 @@ func Test_StreamStrategy_Create(t *testing.T) {
 		_ = formatterFactory.Register(formatterStrategy)
 		sut, _ := NewStreamStrategy(formatterFactory)
 
-		stream, e := sut.Create(&partial)
+		stream, e := sut.Create(partial)
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)

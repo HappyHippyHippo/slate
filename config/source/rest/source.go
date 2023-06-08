@@ -84,7 +84,7 @@ func (s *Source) load() error {
 	}
 	// store the retrieved config
 	s.Mutex.Lock()
-	s.Partial = *c
+	s.Partial = c
 	s.Mutex.Unlock()
 	return nil
 }

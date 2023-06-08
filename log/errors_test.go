@@ -131,9 +131,9 @@ func Test_errInvalidLevel(t *testing.T) {
 }
 
 func Test_errInvalidStream(t *testing.T) {
-	arg := &config.Partial{"field": "value"}
+	arg := config.Partial{"field": "value"}
 	context := map[string]interface{}{"field": "value"}
-	message := "&map[field:value] : invalid log stream"
+	message := "map[field:value] : invalid log stream"
 
 	t.Run("creation without context", func(t *testing.T) {
 		if e := errInvalidStream(arg); !errors.Is(e, ErrInvalidStream) {

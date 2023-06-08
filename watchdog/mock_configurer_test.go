@@ -33,14 +33,14 @@ func (m *MockConfigurer) EXPECT() *MockConfigurerRecorder {
 }
 
 // Partial mocks base method.
-func (m *MockConfigurer) Partial(path string, def ...config.Partial) (*config.Partial, error) {
+func (m *MockConfigurer) Partial(path string, def ...config.Partial) (config.Partial, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{path}
 	for _, a := range def {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Partial", varargs...)
-	ret0, _ := ret[0].(*config.Partial)
+	ret0, _ := ret[0].(config.Partial)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

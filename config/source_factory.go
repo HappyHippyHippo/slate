@@ -27,7 +27,7 @@ func (f *SourceFactory) Register(
 // data used to decide the strategy to be used and also the initialization
 // data comes from a configuration storing Partial instance.
 func (f *SourceFactory) Create(
-	cfg *Partial,
+	cfg Partial,
 ) (Source, error) {
 	// check the partial argument reference
 	if cfg == nil {

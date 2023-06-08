@@ -403,7 +403,7 @@ func Test_Config_Partial(t *testing.T) {
 
 		if check, e := sut.Partial(path); e != nil {
 			t.Errorf("returned the unexpected error : %v", e)
-		} else if !reflect.DeepEqual(*check, value) {
+		} else if !reflect.DeepEqual(check, value) {
 			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
 	})

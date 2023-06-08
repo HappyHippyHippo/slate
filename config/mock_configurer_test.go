@@ -46,14 +46,14 @@ func (mr *MockConfigurerRecorder) AddSource(id, priority, src interface{}) *gomo
 }
 
 // Partial mocks base method.
-func (m *MockConfigurer) Partial(path string, def ...Partial) (*Partial, error) {
+func (m *MockConfigurer) Partial(path string, def ...Partial) (Partial, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{path}
 	for _, a := range def {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Partial", varargs...)
-	ret0, _ := ret[0].(*Partial)
+	ret0, _ := ret[0].(Partial)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

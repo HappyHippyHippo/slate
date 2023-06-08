@@ -61,7 +61,7 @@ func errInvalidLevel(
 }
 
 func errInvalidStream(
-	cfg *config.Partial,
+	cfg config.Partial,
 	ctx ...map[string]interface{},
 ) error {
 	return slate.NewErrorFrom(ErrInvalidStream, fmt.Sprintf("%v", cfg), ctx...)

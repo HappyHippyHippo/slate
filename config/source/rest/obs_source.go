@@ -88,7 +88,7 @@ func (s *ObsSource) Reload() (bool, error) {
 		}
 		// store the loaded config information and response timestamp
 		s.Mutex.Lock()
-		s.Partial = *c
+		s.Partial = c
 		s.timestamp = t
 		s.Mutex.Unlock()
 		return true, nil

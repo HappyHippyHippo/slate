@@ -26,7 +26,7 @@ func NewSourceStrategy() *SourceStrategy {
 // a source where the data to check comes from a configuration
 // instance.
 func (s SourceStrategy) Accept(
-	cfg *config.Partial,
+	cfg config.Partial,
 ) bool {
 	// check config argument reference
 	if cfg == nil {
@@ -44,7 +44,7 @@ func (s SourceStrategy) Accept(
 // Create will instantiate the desired environment source instance
 // where the initialization data comes from a configuration instance.
 func (s SourceStrategy) Create(
-	cfg *config.Partial,
+	cfg config.Partial,
 ) (config.Source, error) {
 	// check config argument reference
 	if cfg == nil {

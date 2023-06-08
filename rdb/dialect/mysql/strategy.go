@@ -31,7 +31,7 @@ func NewDialectStrategy() *DialectStrategy {
 // Accept check if the provided configuration should the handled as a mysql
 // connection definition,
 func (DialectStrategy) Accept(
-	cfg *config.Partial,
+	cfg config.Partial,
 ) bool {
 	// check config argument reference
 	if cfg == nil {
@@ -48,7 +48,7 @@ func (DialectStrategy) Accept(
 
 // Create instantiates the requested mysql connection dialect.
 func (DialectStrategy) Create(
-	cfg *config.Partial,
+	cfg config.Partial,
 ) (gorm.Dialector, error) {
 	// check config argument reference
 	if cfg == nil {

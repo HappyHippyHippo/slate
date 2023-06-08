@@ -94,11 +94,7 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&Provider{}).Register(container)
 
 		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial := config.Partial{
-			"slate": config.Partial{
-				"rdb": config.Partial{
-					"connections": config.Partial{
-						"primary": rdbCfg}}}}
+		partial := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{"primary": rdbCfg}}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
 		cfg := config.NewConfig()
@@ -110,8 +106,8 @@ func Test_Provider_Register(t *testing.T) {
 		dialector.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
 		dialector.EXPECT().Migrator(gomock.Any()).Return(migrator).Times(1)
 		dialectStrategy := NewMockDialectStrategy(ctrl)
-		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
-		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialector, nil).Times(1)
+		dialectStrategy.EXPECT().Accept(rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(rdbCfg).Return(dialector, nil).Times(1)
 		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
 
 		_ = (&rdb.Provider{}).Boot(container)
@@ -145,11 +141,7 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&Provider{}).Register(container)
 
 		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial := config.Partial{
-			"slate": config.Partial{
-				"rdb": config.Partial{
-					"connections": config.Partial{
-						"secondary": rdbCfg}}}}
+		partial := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{"secondary": rdbCfg}}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
 		cfg := config.NewConfig()
@@ -161,8 +153,8 @@ func Test_Provider_Register(t *testing.T) {
 		dialector.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
 		dialector.EXPECT().Migrator(gomock.Any()).Return(migrator).Times(1)
 		dialectStrategy := NewMockDialectStrategy(ctrl)
-		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
-		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialector, nil).Times(1)
+		dialectStrategy.EXPECT().Accept(rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(rdbCfg).Return(dialector, nil).Times(1)
 		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
 
 		_ = (&rdb.Provider{}).Boot(container)
@@ -228,11 +220,7 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&Provider{}).Register(container)
 
 		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial := config.Partial{
-			"slate": config.Partial{
-				"rdb": config.Partial{
-					"connections": config.Partial{
-						"primary": rdbCfg}}}}
+		partial := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{"primary": rdbCfg}}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
 		cfg := config.NewConfig()
@@ -244,8 +232,8 @@ func Test_Provider_Register(t *testing.T) {
 		dialector.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
 		dialector.EXPECT().Migrator(gomock.Any()).Return(migrator).Times(1)
 		dialectStrategy := NewMockDialectStrategy(ctrl)
-		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
-		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialector, nil).Times(1)
+		dialectStrategy.EXPECT().Accept(rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(rdbCfg).Return(dialector, nil).Times(1)
 		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
 
 		_ = (&rdb.Provider{}).Boot(container)
@@ -342,11 +330,7 @@ func Test_Provider_Boot(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial := config.Partial{
-			"slate": config.Partial{
-				"rdb": config.Partial{
-					"connections": config.Partial{
-						"primary": rdbCfg}}}}
+		partial := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{"primary": rdbCfg}}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
 		cfg := config.NewConfig()
@@ -358,8 +342,8 @@ func Test_Provider_Boot(t *testing.T) {
 		dialector.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
 		dialector.EXPECT().Migrator(gomock.Any()).Return(migrator).Times(1)
 		dialectStrategy := NewMockDialectStrategy(ctrl)
-		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
-		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialector, nil).Times(1)
+		dialectStrategy.EXPECT().Accept(rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(rdbCfg).Return(dialector, nil).Times(1)
 		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
 		_ = container.Service("id", func() (interface{}, error) { return nil, expected }, MigrationTag)
 
@@ -384,11 +368,7 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = (&rdb.Provider{}).Register(container)
 
 		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial := config.Partial{
-			"slate": config.Partial{
-				"rdb": config.Partial{
-					"connections": config.Partial{
-						"primary": rdbCfg}}}}
+		partial := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{"primary": rdbCfg}}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
 		cfg := config.NewConfig()
@@ -400,8 +380,8 @@ func Test_Provider_Boot(t *testing.T) {
 		dialector.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
 		dialector.EXPECT().Migrator(gomock.Any()).Return(migrator).Times(1)
 		dialectStrategy := NewMockDialectStrategy(ctrl)
-		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
-		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialector, nil).Times(1)
+		dialectStrategy.EXPECT().Accept(rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(rdbCfg).Return(dialector, nil).Times(1)
 		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
 		_ = container.Service("id", func() (interface{}, error) { return "string", nil }, MigrationTag)
 
@@ -426,11 +406,7 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = (&rdb.Provider{}).Register(container)
 
 		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial := config.Partial{
-			"slate": config.Partial{
-				"rdb": config.Partial{
-					"connections": config.Partial{
-						"primary": rdbCfg}}}}
+		partial := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{"primary": rdbCfg}}}}
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
 		cfg := config.NewConfig()
@@ -442,8 +418,8 @@ func Test_Provider_Boot(t *testing.T) {
 		dialector.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
 		dialector.EXPECT().Migrator(gomock.Any()).Return(migrator).Times(1)
 		dialectStrategy := NewMockDialectStrategy(ctrl)
-		dialectStrategy.EXPECT().Accept(&rdbCfg).Return(true).Times(1)
-		dialectStrategy.EXPECT().Create(&rdbCfg).Return(dialector, nil).Times(1)
+		dialectStrategy.EXPECT().Accept(rdbCfg).Return(true).Times(1)
+		dialectStrategy.EXPECT().Create(rdbCfg).Return(dialector, nil).Times(1)
 		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(uint64(1)).Times(1)

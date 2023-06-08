@@ -26,19 +26,19 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 	})
 
 	t.Run("don't accept if type is missing", func(t *testing.T) {
-		if (&SourceStrategy{}).Accept(&config.Partial{}) {
+		if (&SourceStrategy{}).Accept(config.Partial{}) {
 			t.Error("returned true")
 		}
 	})
 
 	t.Run("don't accept if type is not a string", func(t *testing.T) {
-		if (&SourceStrategy{}).Accept(&config.Partial{"type": 123}) {
+		if (&SourceStrategy{}).Accept(config.Partial{"type": 123}) {
 			t.Error("returned true")
 		}
 	})
 
 	t.Run("don't accept if type is not env", func(t *testing.T) {
-		if (&SourceStrategy{}).Accept(&config.Partial{"type": config.UnknownSource}) {
+		if (&SourceStrategy{}).Accept(config.Partial{"type": config.UnknownSource}) {
 			t.Error("returned true")
 		}
 	})
@@ -58,7 +58,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 	})
 
 	t.Run("non-map mappings", func(t *testing.T) {
-		src, e := (&SourceStrategy{}).Create(&config.Partial{"mappings": 123})
+		src, e := (&SourceStrategy{}).Create(config.Partial{"mappings": 123})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -70,7 +70,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 	})
 
 	t.Run("non-string key map mappings", func(t *testing.T) {
-		src, e := (&SourceStrategy{}).Create(&config.Partial{"mappings": config.Partial{1: "value"}})
+		src, e := (&SourceStrategy{}).Create(config.Partial{"mappings": config.Partial{1: "value"}})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -82,7 +82,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 	})
 
 	t.Run("non-string value map mappings", func(t *testing.T) {
-		src, e := (&SourceStrategy{}).Create(&config.Partial{"mappings": config.Partial{"key": 1}})
+		src, e := (&SourceStrategy{}).Create(config.Partial{"mappings": config.Partial{"key": 1}})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -102,7 +102,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		path := "root"
 		expected := config.Partial{path: value}
 
-		src, e := (&SourceStrategy{}).Create(&config.Partial{"mappings": config.Partial{env: path}})
+		src, e := (&SourceStrategy{}).Create(config.Partial{"mappings": config.Partial{env: path}})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -123,7 +123,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 	t.Run("no mappings on config", func(t *testing.T) {
 		expected := config.Partial{}
 
-		src, e := (&SourceStrategy{}).Create(&config.Partial{})
+		src, e := (&SourceStrategy{}).Create(config.Partial{})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)

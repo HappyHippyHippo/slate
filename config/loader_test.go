@@ -52,7 +52,7 @@ func Test_Loader_Load(t *testing.T) {
 		LoaderSourcePath = "partial/sources.yaml"
 		LoaderSourceFormat = "format"
 	}()
-	baseSourcePartial := &Partial{"type": "file", "path": "base_source_path", "format": "format"}
+	baseSourcePartial := Partial{"type": "file", "path": "base_source_path", "format": "format"}
 
 	t.Run("error getting the base source", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
@@ -105,7 +105,7 @@ func Test_Loader_Load(t *testing.T) {
 		sourceCreator.EXPECT().Create(baseSourcePartial).Return(source, nil).Times(1)
 		configurer := NewMockConfigurer(ctrl)
 		configurer.EXPECT().AddSource("base_source_id", 0, source).Return(nil).Times(1)
-		configurer.EXPECT().Partial("slate.config.sources").Return(&Partial{}, nil).Times(1)
+		configurer.EXPECT().Partial("slate.config.sources").Return(Partial{}, nil).Times(1)
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
 		sut.configurer = configurer
@@ -120,7 +120,7 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partial := &Partial{"sources": "string"}
+		partial := Partial{"sources": "string"}
 		source := NewMockSource(ctrl)
 		sourceCreator := NewMockSourceCreator(ctrl)
 		sourceCreator.EXPECT().Create(baseSourcePartial).Return(source, nil).Times(1)
@@ -141,7 +141,7 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partial := &Partial{"sources": Partial{"priority": "string"}}
+		partial := Partial{"sources": Partial{"priority": "string"}}
 		source := NewMockSource(ctrl)
 		sourceCreator := NewMockSourceCreator(ctrl)
 		sourceCreator.EXPECT().Create(baseSourcePartial).Return(source, nil).Times(1)
@@ -166,12 +166,12 @@ func Test_Loader_Load(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		sourcePartial := Partial{"type": "my type"}
-		partial := &Partial{"source": sourcePartial}
+		partial := Partial{"source": sourcePartial}
 		source := NewMockSource(ctrl)
 		sourceCreator := NewMockSourceCreator(ctrl)
 		gomock.InOrder(
 			sourceCreator.EXPECT().Create(baseSourcePartial).Return(source, nil),
-			sourceCreator.EXPECT().Create(&sourcePartial).Return(nil, expected),
+			sourceCreator.EXPECT().Create(sourcePartial).Return(nil, expected),
 		)
 		configurer := NewMockConfigurer(ctrl)
 		configurer.EXPECT().AddSource("base_source_id", 0, source).Return(nil).Times(1)
@@ -194,13 +194,13 @@ func Test_Loader_Load(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		sourcePartial := Partial{"type": "my type", "priority": 101}
-		partial := &Partial{"source": sourcePartial}
+		partial := Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
 		source2 := NewMockSource(ctrl)
 		sourceCreator := NewMockSourceCreator(ctrl)
 		gomock.InOrder(
 			sourceCreator.EXPECT().Create(baseSourcePartial).Return(source1, nil),
-			sourceCreator.EXPECT().Create(&sourcePartial).Return(source2, nil),
+			sourceCreator.EXPECT().Create(sourcePartial).Return(source2, nil),
 		)
 		configurer := NewMockConfigurer(ctrl)
 		gomock.InOrder(
@@ -225,13 +225,13 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		sourcePartial := Partial{"type": "my type", "priority": 101}
-		partial := &Partial{"source": sourcePartial}
+		partial := Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
 		source2 := NewMockSource(ctrl)
 		sourceCreator := NewMockSourceCreator(ctrl)
 		gomock.InOrder(
 			sourceCreator.EXPECT().Create(baseSourcePartial).Return(source1, nil),
-			sourceCreator.EXPECT().Create(&sourcePartial).Return(source2, nil),
+			sourceCreator.EXPECT().Create(sourcePartial).Return(source2, nil),
 		)
 		configurer := NewMockConfigurer(ctrl)
 		gomock.InOrder(
@@ -257,15 +257,15 @@ func Test_Loader_Load(t *testing.T) {
 		LoaderSourcePath = "config.yaml"
 		defer func() { LoaderSourcePath = prev }()
 
-		basePartial := &Partial{"type": "file", "path": "config.yaml", "format": "format"}
+		basePartial := Partial{"type": "file", "path": "config.yaml", "format": "format"}
 		sourcePartial := Partial{"type": "my type", "priority": 101}
-		partial := &Partial{"source": sourcePartial}
+		partial := Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
 		source2 := NewMockSource(ctrl)
 		sourceCreator := NewMockSourceCreator(ctrl)
 		gomock.InOrder(
 			sourceCreator.EXPECT().Create(basePartial).Return(source1, nil),
-			sourceCreator.EXPECT().Create(&sourcePartial).Return(source2, nil),
+			sourceCreator.EXPECT().Create(sourcePartial).Return(source2, nil),
 		)
 		configurer := NewMockConfigurer(ctrl)
 		gomock.InOrder(
@@ -291,15 +291,15 @@ func Test_Loader_Load(t *testing.T) {
 		LoaderSourceFormat = "json"
 		defer func() { LoaderSourceFormat = prev }()
 
-		basePartial := &Partial{"type": "file", "path": "base_source_path", "format": "json"}
+		basePartial := Partial{"type": "file", "path": "base_source_path", "format": "json"}
 		sourcePartial := Partial{"type": "my type", "priority": 101}
-		partial := &Partial{"source": sourcePartial}
+		partial := Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
 		source2 := NewMockSource(ctrl)
 		sourceCreator := NewMockSourceCreator(ctrl)
 		gomock.InOrder(
 			sourceCreator.EXPECT().Create(basePartial).Return(source1, nil),
-			sourceCreator.EXPECT().Create(&sourcePartial).Return(source2, nil),
+			sourceCreator.EXPECT().Create(sourcePartial).Return(source2, nil),
 		)
 		configurer := NewMockConfigurer(ctrl)
 		gomock.InOrder(
@@ -325,15 +325,15 @@ func Test_Loader_Load(t *testing.T) {
 		LoaderSourceListPath = "config_list"
 		defer func() { LoaderSourceListPath = prev }()
 
-		basePartial := &Partial{"type": "file", "path": "base_source_path", "format": "format"}
+		basePartial := Partial{"type": "file", "path": "base_source_path", "format": "format"}
 		sourcePartial := Partial{"type": "my type", "priority": 101}
-		partial := &Partial{"source": sourcePartial}
+		partial := Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
 		source2 := NewMockSource(ctrl)
 		sourceCreator := NewMockSourceCreator(ctrl)
 		gomock.InOrder(
 			sourceCreator.EXPECT().Create(basePartial).Return(source1, nil),
-			sourceCreator.EXPECT().Create(&sourcePartial).Return(source2, nil),
+			sourceCreator.EXPECT().Create(sourcePartial).Return(source2, nil),
 		)
 		configurer := NewMockConfigurer(ctrl)
 		gomock.InOrder(
@@ -356,13 +356,13 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		sourcePartial := Partial{"type": "my type"}
-		partial := &Partial{"source": sourcePartial}
+		partial := Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
 		source2 := NewMockSource(ctrl)
 		sourceCreator := NewMockSourceCreator(ctrl)
 		gomock.InOrder(
 			sourceCreator.EXPECT().Create(baseSourcePartial).Return(source1, nil),
-			sourceCreator.EXPECT().Create(&sourcePartial).Return(source2, nil),
+			sourceCreator.EXPECT().Create(sourcePartial).Return(source2, nil),
 		)
 		configurer := NewMockConfigurer(ctrl)
 		gomock.InOrder(

@@ -79,7 +79,7 @@ func Test_ObsSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if sut.Accept(&config.Partial{}) {
+		if sut.Accept(config.Partial{}) {
 			t.Error("returned true")
 		}
 	})
@@ -90,7 +90,7 @@ func Test_ObsSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if sut.Accept(&config.Partial{"type": 123}) {
+		if sut.Accept(config.Partial{"type": 123}) {
 			t.Error("returned true")
 		}
 	})
@@ -101,7 +101,7 @@ func Test_ObsSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if sut.Accept(&config.Partial{"type": config.UnknownSource}) {
+		if sut.Accept(config.Partial{"type": config.UnknownSource}) {
 			t.Error("returned true")
 		}
 	})
@@ -112,7 +112,7 @@ func Test_ObsSourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if !sut.Accept(&config.Partial{"type": ObsType}) {
+		if !sut.Accept(config.Partial{"type": ObsType}) {
 			t.Error("returned false")
 		}
 	})
@@ -142,7 +142,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Partial{"format": "format"})
+		src, e := sut.Create(config.Partial{"format": "format"})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -159,7 +159,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Partial{"path": 123, "format": "format"})
+		src, e := sut.Create(config.Partial{"path": 123, "format": "format"})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -176,7 +176,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Partial{"path": "path", "format": 123})
+		src, e := sut.Create(config.Partial{"path": "path", "format": 123})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -212,7 +212,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(fs, decoderFactory)
 
-		src, e := sut.Create(&config.Partial{"path": path, "format": "format"})
+		src, e := sut.Create(config.Partial{"path": path, "format": "format"})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -256,7 +256,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(fs, decoderFactory)
 
-		src, e := sut.Create(&config.Partial{"path": path})
+		src, e := sut.Create(config.Partial{"path": path})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)

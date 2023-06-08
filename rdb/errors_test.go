@@ -101,9 +101,9 @@ func Test_errConfigNotFound(t *testing.T) {
 }
 
 func Test_errUnknownDialect(t *testing.T) {
-	arg := &config.Partial{"field": "value"}
+	arg := config.Partial{"field": "value"}
 	context := map[string]interface{}{"field": "value"}
-	message := "&map[field:value] : unknown database dialect"
+	message := "map[field:value] : unknown database dialect"
 
 	t.Run("creation without context", func(t *testing.T) {
 		if e := errUnknownDialect(arg); !errors.Is(e, ErrUnknownDialect) {

@@ -351,7 +351,7 @@ func Test_Provider_Boot(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partial := &Partial{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}
+		partial := Partial{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat}
 		container := slate.NewContainer()
 		source := NewMockSource(ctrl)
 		source.EXPECT().Get("").Return(Partial{}, nil).Times(1)

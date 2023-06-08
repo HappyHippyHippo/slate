@@ -35,7 +35,7 @@ func (m *MockDialectStrategy) EXPECT() *MockDialectStrategyRecorder {
 }
 
 // Accept mocks base method.
-func (m *MockDialectStrategy) Accept(cfg *config.Partial) bool {
+func (m *MockDialectStrategy) Accept(cfg config.Partial) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Accept", cfg)
 	ret0, _ := ret[0].(bool)
@@ -49,7 +49,7 @@ func (mr *MockDialectStrategyRecorder) Accept(cfg interface{}) *gomock.Call {
 }
 
 // Create mocks base method.
-func (m *MockDialectStrategy) Create(cfg *config.Partial) (gorm.Dialector, error) {
+func (m *MockDialectStrategy) Create(cfg config.Partial) (gorm.Dialector, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", cfg)
 	ret0, _ := ret[0].(gorm.Dialector)

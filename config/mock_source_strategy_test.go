@@ -32,7 +32,7 @@ func (m *MockSourceStrategy) EXPECT() *MockSourceStrategyRecorder {
 }
 
 // Accept mocks base method
-func (m *MockSourceStrategy) Accept(partial *Partial) bool {
+func (m *MockSourceStrategy) Accept(partial Partial) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Accept", partial)
 	ret0, _ := ret[0].(bool)
@@ -46,7 +46,7 @@ func (mr *MockSourceStrategyRecorder) Accept(cfg interface{}) *gomock.Call {
 }
 
 // Create mocks base method
-func (m *MockSourceStrategy) Create(partial *Partial) (Source, error) {
+func (m *MockSourceStrategy) Create(partial Partial) (Source, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", partial)
 	ret0, _ := ret[0].(Source)

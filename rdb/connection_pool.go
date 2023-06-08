@@ -9,12 +9,12 @@ import (
 
 type configurer interface {
 	Has(path string) bool
-	Partial(path string, def ...config.Partial) (*config.Partial, error)
+	Partial(path string, def ...config.Partial) (config.Partial, error)
 	AddObserver(path string, callback config.Observer) error
 }
 
 type connectionCreator interface {
-	Create(cfg *config.Partial, gormCfg *gorm.Config) (*gorm.DB, error)
+	Create(cfg config.Partial, gormCfg *gorm.Config) (*gorm.DB, error)
 }
 
 // ConnectionPool is a database connection pool and generator.

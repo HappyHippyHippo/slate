@@ -14,6 +14,6 @@ const (
 // DialectStrategy defines the interface to a gorm rdb
 // dialect instantiation strategy, based on a configuration.
 type DialectStrategy interface {
-	Accept(*config.Partial) bool
-	Create(*config.Partial) (gorm.Dialector, error)
+	Accept(config.Partial) bool
+	Create(config.Partial) (gorm.Dialector, error)
 }

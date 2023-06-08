@@ -42,7 +42,7 @@ func NewObsSourceStrategy(
 // a source where the data to check comes from a configuration
 // instance.
 func (s ObsSourceStrategy) Accept(
-	cfg *config.Partial,
+	cfg config.Partial,
 ) bool {
 	// check the config argument reference
 	if cfg == nil {
@@ -60,7 +60,7 @@ func (s ObsSourceStrategy) Accept(
 // Create will instantiate the desired rest source instance where
 // the initialization data comes from a configuration instance.
 func (s ObsSourceStrategy) Create(
-	cfg *config.Partial,
+	cfg config.Partial,
 ) (config.Source, error) {
 	// check the config argument reference
 	if cfg == nil {

@@ -53,7 +53,7 @@ func Test_DialectFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := &config.Partial{"dialect": "unsupported"}
+		cfg := config.Partial{"dialect": "unsupported"}
 		strategy := NewMockDialectStrategy(ctrl)
 		strategy.EXPECT().Accept(cfg).Return(false).Times(1)
 
@@ -76,7 +76,7 @@ func Test_DialectFactory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		cfg := &config.Partial{"dialect": "unsupported"}
+		cfg := config.Partial{"dialect": "unsupported"}
 		strategy := NewMockDialectStrategy(ctrl)
 		strategy.EXPECT().Accept(cfg).Return(true).Times(1)
 		strategy.EXPECT().Create(cfg).Return(nil, expected).Times(1)
@@ -95,7 +95,7 @@ func Test_DialectFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := &config.Partial{"dialect": "unsupported"}
+		cfg := config.Partial{"dialect": "unsupported"}
 		dialect := NewMockDialect(ctrl)
 		strategy := NewMockDialectStrategy(ctrl)
 		strategy.EXPECT().Accept(cfg).Return(true).Times(1)

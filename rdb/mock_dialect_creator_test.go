@@ -34,7 +34,7 @@ func (m *MockDialectCreator) EXPECT() *MockDialectCreatorRecorder {
 }
 
 // Create mocks base method.
-func (m *MockDialectCreator) Create(cfg *config.Partial) (gorm.Dialector, error) {
+func (m *MockDialectCreator) Create(cfg config.Partial) (gorm.Dialector, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", cfg)
 	ret0, _ := ret[0].(gorm.Dialector)

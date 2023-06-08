@@ -15,7 +15,7 @@ func errNilPointer(
 }
 
 func errInvalidSource(
-	partial *config.Partial,
+	partial config.Partial,
 	ctx ...map[string]interface{},
 ) error {
 	return slate.NewErrorFrom(config.ErrInvalidSource, fmt.Sprintf("%v", partial), ctx...)

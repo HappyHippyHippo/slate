@@ -34,7 +34,7 @@ func (f *DialectFactory) Register(
 // configuration parameters stored in the configuration partial marked by
 // the given name.
 func (f *DialectFactory) Create(
-	cfg *config.Partial,
+	cfg config.Partial,
 ) (gorm.Dialector, error) {
 	// check the config argument reference
 	if cfg == nil {

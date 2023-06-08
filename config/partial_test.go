@@ -476,7 +476,7 @@ func Test_Partial_Float(t *testing.T) {
 		}
 	})
 
-	t.Run("return conversion e if not storing an float", func(t *testing.T) {
+	t.Run("return conversion error if not storing an float", func(t *testing.T) {
 		path := "node"
 		value := "123.456"
 		sut := Partial{path: value}
@@ -533,7 +533,7 @@ func Test_Partial_String(t *testing.T) {
 		}
 	})
 
-	t.Run("return conversion e if not storing an string", func(t *testing.T) {
+	t.Run("return conversion error if not storing an string", func(t *testing.T) {
 		path := "node"
 		value := 123
 		sut := Partial{path: value}
@@ -590,7 +590,7 @@ func Test_Partial_List(t *testing.T) {
 		}
 	})
 
-	t.Run("return conversion e if not storing an list", func(t *testing.T) {
+	t.Run("return conversion error if not storing an list", func(t *testing.T) {
 		path := "node"
 		value := 123
 		sut := Partial{path: value}
@@ -635,19 +635,27 @@ func Test_Partial_List(t *testing.T) {
 }
 
 func Test_Partial_Partial(t *testing.T) {
-	t.Run("return valid stored value", func(t *testing.T) {
+	t.Run("return valid copied stored value", func(t *testing.T) {
 		path := "node"
 		value := Partial{"id": "value"}
 		sut := Partial{path: value}
 
-		if check, e := sut.Partial(path, Partial{"id": "simple value"}); e != nil {
+		check, e := sut.Partial(path, Partial{"id": "simple value"})
+		switch {
+		case e != nil:
 			t.Errorf("returned the unexpected e : %v", e)
-		} else if !reflect.DeepEqual(*check, value) {
+		case !reflect.DeepEqual(check, value):
 			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
+		default:
+			check["id"] = "other value"
+			changeCheck, _ := sut.Partial(path, Partial{"id": "simple value"})
+			if !reflect.DeepEqual(changeCheck, value) {
+				t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
+			}
 		}
 	})
 
-	t.Run("return conversion e if not storing an Partial", func(t *testing.T) {
+	t.Run("return conversion error if not storing an Partial", func(t *testing.T) {
 		path := "node"
 		value := 123
 		sut := Partial{path: value}
@@ -677,7 +685,7 @@ func Test_Partial_Partial(t *testing.T) {
 		}
 	})
 
-	t.Run("return simple value if the path don't exists", func(t *testing.T) {
+	t.Run("return default value if the path don't exists", func(t *testing.T) {
 		value := Partial{"id": "simple value"}
 		sut := Partial{}
 
@@ -685,7 +693,7 @@ func Test_Partial_Partial(t *testing.T) {
 		switch {
 		case e != nil:
 			t.Errorf("returned the unexpected e : %v", e)
-		case !reflect.DeepEqual(*check, value):
+		case !reflect.DeepEqual(check, value):
 			t.Errorf("returned the unexpected value (%v) when expecting : %v", check, value)
 		}
 	})

@@ -131,7 +131,7 @@ func Test_Factory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		service := "test"
-		watchdogCfg := &config.Partial{"formatter": 123}
+		watchdogCfg := config.Partial{"formatter": 123}
 		configurer := NewMockConfigurer(ctrl)
 		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
 
@@ -154,7 +154,7 @@ func Test_Factory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		service := "test"
-		watchdogCfg := &config.Partial{"level": config.Partial{"start": "invalid"}}
+		watchdogCfg := config.Partial{"level": config.Partial{"start": "invalid"}}
 		configurer := NewMockConfigurer(ctrl)
 		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
 
@@ -177,7 +177,7 @@ func Test_Factory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		service := "test"
-		watchdogCfg := &config.Partial{"level": config.Partial{"error": "invalid"}}
+		watchdogCfg := config.Partial{"level": config.Partial{"error": "invalid"}}
 		configurer := NewMockConfigurer(ctrl)
 		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
 
@@ -200,7 +200,7 @@ func Test_Factory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		service := "test"
-		watchdogCfg := &config.Partial{"level": config.Partial{"done": "invalid"}}
+		watchdogCfg := config.Partial{"level": config.Partial{"done": "invalid"}}
 		configurer := NewMockConfigurer(ctrl)
 		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
 
@@ -224,7 +224,7 @@ func Test_Factory_Create(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		service := "test"
-		watchdogCfg := &config.Partial{"formatter": "my formatter"}
+		watchdogCfg := config.Partial{"formatter": "my formatter"}
 		configurer := NewMockConfigurer(ctrl)
 		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
 		logFormatterCreator := NewMockLogFormatterCreator(ctrl)
@@ -250,7 +250,7 @@ func Test_Factory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		service := "test"
-		watchdogCfg := &config.Partial{"name": service}
+		watchdogCfg := config.Partial{"name": service}
 		configurer := NewMockConfigurer(ctrl)
 		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
 		formatter := NewMockLogFormatter(ctrl)

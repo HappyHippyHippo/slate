@@ -81,7 +81,7 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if sut.Accept(&config.Partial{}) {
+		if sut.Accept(config.Partial{}) {
 			t.Error("returned true")
 		}
 	})
@@ -92,7 +92,7 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if sut.Accept(&config.Partial{"type": 123}) {
+		if sut.Accept(config.Partial{"type": 123}) {
 			t.Error("returned true")
 		}
 	})
@@ -103,7 +103,7 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if sut.Accept(&config.Partial{"type": config.UnknownSource}) {
+		if sut.Accept(config.Partial{"type": config.UnknownSource}) {
 			t.Error("returned true")
 		}
 	})
@@ -114,7 +114,7 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		if !sut.Accept(&config.Partial{"type": Type}) {
+		if !sut.Accept(config.Partial{"type": Type}) {
 			t.Error("returned false")
 		}
 	})
@@ -144,7 +144,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Partial{"format": "format", "recursive": true})
+		src, e := sut.Create(config.Partial{"format": "format", "recursive": true})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -161,7 +161,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Partial{"path": 123, "format": "format", "recursive": true})
+		src, e := sut.Create(config.Partial{"path": 123, "format": "format", "recursive": true})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -178,7 +178,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Partial{"path": "path", "format": 123, "recursive": true})
+		src, e := sut.Create(config.Partial{"path": "path", "format": 123, "recursive": true})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -195,7 +195,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Partial{"path": "path", "format": 123, "recursive": "true"})
+		src, e := sut.Create(config.Partial{"path": "path", "format": 123, "recursive": "true"})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -212,7 +212,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(&config.Partial{"path": "path", "format": "format", "recursive": "true"})
+		src, e := sut.Create(config.Partial{"path": "path", "format": "format", "recursive": "true"})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
@@ -251,7 +251,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(fs, decoderFactory)
 
-		src, e := sut.Create(&config.Partial{"path": path, "format": "format", "recursive": true})
+		src, e := sut.Create(config.Partial{"path": path, "format": "format", "recursive": true})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -297,7 +297,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(fs, decoderFactory)
 
-		src, e := sut.Create(&config.Partial{"path": path, "recursive": true})
+		src, e := sut.Create(config.Partial{"path": path, "recursive": true})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)

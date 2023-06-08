@@ -6,7 +6,7 @@ import (
 )
 
 type dialectCreator interface {
-	Create(cfg *config.Partial) (gorm.Dialector, error)
+	Create(cfg config.Partial) (gorm.Dialector, error)
 }
 
 // ConnectionFactory is a database connection generator.
@@ -35,7 +35,7 @@ func NewConnectionFactory(
 // base configuration defined by the given name of the connection,
 // and apply the extra connection config also given as arguments.
 func (f *ConnectionFactory) Create(
-	cfg *config.Partial,
+	cfg config.Partial,
 	gormCfg *gorm.Config,
 ) (*gorm.DB, error) {
 	// get a dialect instance for the connection

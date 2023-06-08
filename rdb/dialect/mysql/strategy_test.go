@@ -20,19 +20,19 @@ func Test_DialectStrategy_Accept(t *testing.T) {
 	})
 
 	t.Run("refuse on config parsing", func(t *testing.T) {
-		if (&DialectStrategy{}).Accept(&config.Partial{"dialect": 123}) == true {
+		if (&DialectStrategy{}).Accept(config.Partial{"dialect": 123}) == true {
 			t.Error("returned true")
 		}
 	})
 
 	t.Run("refuse if the dialect name is not mysql", func(t *testing.T) {
-		if (&DialectStrategy{}).Accept(&config.Partial{"dialect": "sqlite"}) == true {
+		if (&DialectStrategy{}).Accept(config.Partial{"dialect": "sqlite"}) == true {
 			t.Error("returned true")
 		}
 	})
 
 	t.Run("accept if the dialect name is mysql", func(t *testing.T) {
-		if (&DialectStrategy{}).Accept(&config.Partial{"dialect": "mYsQl"}) == false {
+		if (&DialectStrategy{}).Accept(config.Partial{"dialect": "mYsQl"}) == false {
 			t.Error("returned false")
 		}
 	})
@@ -52,7 +52,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 	})
 
 	t.Run("invalid username value on connection configuration", func(t *testing.T) {
-		cfg := &config.Partial{
+		cfg := config.Partial{
 			"dialect":  "mysql",
 			"username": 123,
 		}
@@ -69,7 +69,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 	})
 
 	t.Run("invalid password value on connection configuration", func(t *testing.T) {
-		cfg := &config.Partial{
+		cfg := config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": 123,
@@ -87,7 +87,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 	})
 
 	t.Run("invalid protocol value on connection configuration", func(t *testing.T) {
-		cfg := &config.Partial{
+		cfg := config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
@@ -106,7 +106,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 	})
 
 	t.Run("invalid host value on connection configuration", func(t *testing.T) {
-		cfg := &config.Partial{
+		cfg := config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
@@ -126,7 +126,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 	})
 
 	t.Run("invalid port value on connection configuration", func(t *testing.T) {
-		cfg := &config.Partial{
+		cfg := config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
@@ -147,7 +147,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 	})
 
 	t.Run("invalid schema value on connection configuration", func(t *testing.T) {
-		cfg := &config.Partial{
+		cfg := config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
@@ -169,7 +169,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 	})
 
 	t.Run("invalid params value on connection configuration", func(t *testing.T) {
-		cfg := &config.Partial{
+		cfg := config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
@@ -193,7 +193,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 
 	t.Run("valid connection", func(t *testing.T) {
 		expected := "user:password@protocol(localhost:123)/rdb"
-		cfg := &config.Partial{
+		cfg := config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
@@ -218,7 +218,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 
 	t.Run("valid connection with simple protocol and port", func(t *testing.T) {
 		expected := "user:password@tcp(localhost:3306)/rdb"
-		cfg := &config.Partial{
+		cfg := config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",
@@ -246,7 +246,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 
 	t.Run("valid connection with extra params", func(t *testing.T) {
 		expectedPrefix := "user:password@tcp(localhost:3306)/rdb?"
-		cfg := &config.Partial{
+		cfg := config.Partial{
 			"dialect":  "mysql",
 			"username": "user",
 			"password": "password",

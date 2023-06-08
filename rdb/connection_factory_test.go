@@ -39,7 +39,7 @@ func Test_ConnectionFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := &config.Partial{"dialect": "invalid"}
+		cfg := config.Partial{"dialect": "invalid"}
 
 		sut, _ := NewConnectionFactory(NewDialectFactory())
 		conn, e := sut.Create(cfg, &gorm.Config{})
@@ -58,7 +58,7 @@ func Test_ConnectionFactory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		cfg := &config.Partial{"dialect": "invalid", "host": ":memory:"}
+		cfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
 		dialect := NewMockDialect(ctrl)
 		dialect.EXPECT().Initialize(gomock.Any()).Return(expected).Times(1)
 		dialectCreator := NewMockDialectCreator(ctrl)
@@ -82,7 +82,7 @@ func Test_ConnectionFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := &config.Partial{"dialect": "invalid", "host": ":memory:"}
+		cfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
 		dialect := NewMockDialect(ctrl)
 		dialect.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
 		dialectCreator := NewMockDialectCreator(ctrl)

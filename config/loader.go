@@ -1,14 +1,14 @@
 package config
 
 type configurer interface {
-	Partial(path string, def ...Partial) (*Partial, error)
+	Partial(path string, def ...Partial) (Partial, error)
 	AddSource(id string, priority int, src Source) error
 }
 
 var _ configurer = &Config{}
 
 type sourceCreator interface {
-	Create(cfg *Partial) (Source, error)
+	Create(cfg Partial) (Source, error)
 }
 
 var _ sourceCreator = &SourceFactory{}
@@ -44,7 +44,7 @@ func NewLoader(
 // path and format.
 func (l Loader) Load() error {
 	// retrieve the loader entry file partial content
-	src, e := l.sourceCreator.Create(&Partial{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat})
+	src, e := l.sourceCreator.Create(Partial{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat})
 	if e != nil {
 		return e
 	}
@@ -72,7 +72,7 @@ func (l Loader) Load() error {
 
 func (l Loader) loadSource(
 	id string,
-	cfg *Partial,
+	cfg Partial,
 ) error {
 	// parse the configuration
 	sc := struct{ Priority int }{}

@@ -33,7 +33,7 @@ func (m *MockStreamCreator) EXPECT() *MockStreamCreatorRecorder {
 }
 
 // Create mocks base method.
-func (m *MockStreamCreator) Create(cfg *config.Partial) (Stream, error) {
+func (m *MockStreamCreator) Create(cfg config.Partial) (Stream, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", cfg)
 	ret0, _ := ret[0].(Stream)

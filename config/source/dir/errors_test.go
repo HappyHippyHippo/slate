@@ -40,9 +40,9 @@ func Test_errNilPointer(t *testing.T) {
 }
 
 func Test_errInvalidSource(t *testing.T) {
-	arg := &config.Partial{"field": "value"}
+	arg := config.Partial{"field": "value"}
 	context := map[string]interface{}{"field": "value"}
-	message := "&map[field:value] : invalid config source"
+	message := "map[field:value] : invalid config source"
 
 	t.Run("creation without context", func(t *testing.T) {
 		if e := errInvalidSource(arg); !errors.Is(e, config.ErrInvalidSource) {

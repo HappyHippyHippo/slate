@@ -56,16 +56,8 @@ func Test_NewConnectionPool(t *testing.T) {
 		cfg1 := config.Partial{"dialect": "sqlite", "host": ":memory1:"}
 		cfg2 := config.Partial{"dialect": "sqlite", "host": ":memory2:"}
 		gormCfg := &gorm.Config{Logger: logger.Discard, DisableAutomaticPing: true}
-		config1 := config.Partial{
-			"slate": config.Partial{
-				"rdb": config.Partial{
-					"connections": config.Partial{
-						name: cfg1}}}}
-		config2 := config.Partial{
-			"slate": config.Partial{
-				"rdb": config.Partial{
-					"connections": config.Partial{
-						name + "salt": cfg2}}}}
+		config1 := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{name: cfg1}}}}
+		config2 := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{name + "salt": cfg2}}}}
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(config1, nil).MinTimes(1)
 		source2 := NewMockConfigSource(ctrl)
@@ -75,7 +67,7 @@ func Test_NewConnectionPool(t *testing.T) {
 
 		conn, _ := gorm.Open(sqlite.Open(":memory:"), nil)
 		connectionCreator := NewMockConnectionCreator(ctrl)
-		connectionCreator.EXPECT().Create(&cfg1, gormCfg).Return(conn, nil).Times(1)
+		connectionCreator.EXPECT().Create(cfg1, gormCfg).Return(conn, nil).Times(1)
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(cfg, cf)
@@ -149,7 +141,7 @@ func Test_ConnectionPool_Get(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		partial := &config.Partial{"data": "string"}
+		partial := config.Partial{"data": "string"}
 		gormCfg := &gorm.Config{Logger: logger.Discard}
 		configurer := NewMockConfigurer(ctrl)
 		configurer.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)
@@ -177,7 +169,7 @@ func Test_ConnectionPool_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partial := &config.Partial{"data": "string"}
+		partial := config.Partial{"data": "string"}
 		gormCfg := &gorm.Config{Logger: logger.Discard}
 		configurer := NewMockConfigurer(ctrl)
 		configurer.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)
@@ -201,7 +193,7 @@ func Test_ConnectionPool_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partial := &config.Partial{"data": "string"}
+		partial := config.Partial{"data": "string"}
 		gormCfg := &gorm.Config{Logger: logger.Discard}
 		configurer := NewMockConfigurer(ctrl)
 		configurer.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)

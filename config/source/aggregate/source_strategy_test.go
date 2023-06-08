@@ -20,7 +20,7 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 	t.Run("don't accept if type is missing", func(t *testing.T) {
 		if (&SourceStrategy{
 			sources: []config.Source{},
-		}).Accept(&config.Partial{}) {
+		}).Accept(config.Partial{}) {
 			t.Error("returned true")
 		}
 	})
@@ -28,7 +28,7 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 	t.Run("don't accept if type is not a string", func(t *testing.T) {
 		if (&SourceStrategy{
 			sources: []config.Source{},
-		}).Accept(&config.Partial{"type": 123}) {
+		}).Accept(config.Partial{"type": 123}) {
 			t.Error("returned true")
 		}
 	})
@@ -36,7 +36,7 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 	t.Run("don't accept if type is not env", func(t *testing.T) {
 		if (&SourceStrategy{
 			sources: []config.Source{},
-		}).Accept(&config.Partial{"type": config.UnknownSource}) {
+		}).Accept(config.Partial{"type": config.UnknownSource}) {
 			t.Error("returned true")
 		}
 	})
@@ -45,7 +45,7 @@ func Test_SourceStrategy_Accept(t *testing.T) {
 func Test_SourceStrategy_Create(t *testing.T) {
 	t.Run("accept nil config pointer", func(t *testing.T) {
 		sut := &SourceStrategy{sources: []config.Source{}}
-		src, e := sut.Create(&config.Partial{})
+		src, e := sut.Create(config.Partial{})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -69,7 +69,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		source.EXPECT().Get("", config.Partial{}).Return(value, nil).Times(1)
 		sut := &SourceStrategy{sources: []config.Source{source}}
 
-		src, e := sut.Create(&config.Partial{})
+		src, e := sut.Create(config.Partial{})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
@@ -101,7 +101,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		source2.EXPECT().Get("", config.Partial{}).Return(value2, nil).Times(1)
 		sut := &SourceStrategy{sources: []config.Source{source1, source2}}
 
-		src, e := sut.Create(&config.Partial{})
+		src, e := sut.Create(config.Partial{})
 		switch {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)

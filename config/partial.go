@@ -212,7 +212,7 @@ func (p *Partial) List(
 func (p *Partial) Partial(
 	path string,
 	def ...Partial,
-) (*Partial, error) {
+) (Partial, error) {
 	var val interface{}
 	var e error
 
@@ -228,7 +228,7 @@ func (p *Partial) Partial(
 	}
 	// result conversion
 	if v, ok := val.(Partial); ok {
-		return &v, nil
+		return v, nil
 	}
 	return nil, errConversion(val, "config.Partial")
 }
@@ -327,8 +327,6 @@ func (p *Partial) populate(
 	}
 	// source type action
 	switch sourceType {
-	case reflect.TypeOf(&Partial{}):
-		return p.populate(*source.(*Partial), target, icase)
 	case reflect.TypeOf(Partial{}):
 		// iterate through all the target fields to be assigned
 		for i := 0; i < target.NumField(); i++ {

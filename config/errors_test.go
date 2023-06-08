@@ -130,9 +130,9 @@ func Test_errInvalidFormat(t *testing.T) {
 }
 
 func Test_errInvalidSource(t *testing.T) {
-	arg := &Partial{"field": "value"}
+	arg := Partial{"field": "value"}
 	context := map[string]interface{}{"field": "value"}
-	message := "&map[field:value] : invalid config source"
+	message := "map[field:value] : invalid config source"
 
 	t.Run("creation without context", func(t *testing.T) {
 		if e := errInvalidSource(arg); !errors.Is(e, ErrInvalidSource) {

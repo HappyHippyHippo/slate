@@ -5,7 +5,7 @@ import (
 )
 
 type configurer interface {
-	Partial(path string, def ...config.Partial) (*config.Partial, error)
+	Partial(path string, def ...config.Partial) (config.Partial, error)
 	AddObserver(path string, callback config.Observer) error
 }
 
@@ -15,7 +15,7 @@ type logger interface {
 }
 
 type streamCreator interface {
-	Create(cfg *config.Partial) (Stream, error)
+	Create(cfg config.Partial) (Stream, error)
 }
 
 // Loader defines the logger instantiation and initialization of a new
@@ -34,7 +34,7 @@ func NewLoader(
 ) (*Loader, error) {
 	// check the config argument reference
 	if configurer == nil {
-		return nil, errNilPointer("configurer")
+		return nil, errNilPointer("config")
 	}
 	// check the logger argument reference
 	if logger == nil {
@@ -78,7 +78,7 @@ func (l Loader) Load() error {
 				// remove all the current registered streams
 				l.logger.RemoveAllStreams()
 				// load the new stream entries
-				_ = l.load(&cfg)
+				_ = l.load(cfg)
 			},
 		)
 	}
@@ -86,7 +86,7 @@ func (l Loader) Load() error {
 }
 
 func (l Loader) load(
-	cfg *config.Partial,
+	cfg config.Partial,
 ) error {
 	// iterate through the given logger config stream list
 	for _, id := range cfg.Entries() {

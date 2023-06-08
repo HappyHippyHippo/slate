@@ -56,7 +56,7 @@ func errInvalidFormat(
 }
 
 func errInvalidSource(
-	cfg *Partial,
+	cfg Partial,
 	ctx ...map[string]interface{},
 ) error {
 	return slate.NewErrorFrom(ErrInvalidSource, fmt.Sprintf("%v", cfg), ctx...)

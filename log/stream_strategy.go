@@ -14,6 +14,6 @@ const (
 // factory strategy that can validate creation requests and instantiation
 // of particular type of stream.
 type StreamStrategy interface {
-	Accept(cfg *config.Partial) bool
-	Create(cfg *config.Partial) (Stream, error)
+	Accept(cfg config.Partial) bool
+	Create(cfg config.Partial) (Stream, error)
 }

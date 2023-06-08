@@ -32,7 +32,7 @@ func (m *MockSourceCreator) EXPECT() *MockSourceCreatorRecorder {
 }
 
 // Create mocks base method.
-func (m *MockSourceCreator) Create(partial *Partial) (Source, error) {
+func (m *MockSourceCreator) Create(partial Partial) (Source, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", partial)
 	ret0, _ := ret[0].(Source)

@@ -33,7 +33,7 @@ func (m *MockStreamStrategy) EXPECT() *MockStreamStrategyRecorder {
 }
 
 // Accept mocks base method
-func (m *MockStreamStrategy) Accept(cfg *config.Partial) bool {
+func (m *MockStreamStrategy) Accept(cfg config.Partial) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Accept", cfg)
 	ret0, _ := ret[0].(bool)
@@ -47,7 +47,7 @@ func (mr *MockStreamStrategyRecorder) Accept(cfg interface{}) *gomock.Call {
 }
 
 // Create mocks base method
-func (m *MockStreamStrategy) Create(cfg *config.Partial) (Stream, error) {
+func (m *MockStreamStrategy) Create(cfg config.Partial) (Stream, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", cfg)
 	ret0, _ := ret[0].(Stream)

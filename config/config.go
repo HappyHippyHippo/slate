@@ -206,7 +206,7 @@ func (c *Config) List(
 func (c *Config) Partial(
 	path string,
 	def ...Partial,
-) (*Partial, error) {
+) (Partial, error) {
 	// lock the config for handling
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
