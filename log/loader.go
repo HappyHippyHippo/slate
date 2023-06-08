@@ -21,23 +21,23 @@ type streamCreator interface {
 // Loader defines the logger instantiation and initialization of a new
 // logger proxy.
 type Loader struct {
-	cfg           configurer
-	log           logger
+	configurer    configurer
+	logger        logger
 	streamCreator streamCreator
 }
 
 // NewLoader generates a new logger initialization instance.
 func NewLoader(
-	cfg *config.Config,
-	log *Log,
+	configurer *config.Config,
+	logger *Log,
 	streamCreator *StreamFactory,
 ) (*Loader, error) {
 	// check the config argument reference
-	if cfg == nil {
-		return nil, errNilPointer("cfg")
+	if configurer == nil {
+		return nil, errNilPointer("configurer")
 	}
 	// check the logger argument reference
-	if log == nil {
+	if logger == nil {
 		return nil, errNilPointer("logger")
 	}
 	// check the stream factory argument reference
@@ -46,8 +46,8 @@ func NewLoader(
 	}
 	// instantiate the loader
 	return &Loader{
-		cfg:           cfg,
-		log:           log,
+		configurer:    configurer,
+		logger:        logger,
 		streamCreator: streamCreator,
 	}, nil
 }
@@ -56,7 +56,7 @@ func NewLoader(
 // depending the data on the configuration.
 func (l Loader) Load() error {
 	// retrieve the logger entries from the config instance
-	entries, e := l.cfg.Partial(LoaderConfigPath, config.Partial{})
+	entries, e := l.configurer.Partial(LoaderConfigPath, config.Partial{})
 	if e != nil {
 		return e
 	}
@@ -67,7 +67,7 @@ func (l Loader) Load() error {
 	// check if the logger streams list should be observed for updates
 	if LoaderObserveConfig {
 		// add the observer to the given config
-		_ = l.cfg.AddObserver(
+		_ = l.configurer.AddObserver(
 			LoaderConfigPath,
 			func(_ interface{}, newConfig interface{}) {
 				// type check the new logger config with the logging streams
@@ -76,7 +76,7 @@ func (l Loader) Load() error {
 					return
 				}
 				// remove all the current registered streams
-				l.log.RemoveAllStreams()
+				l.logger.RemoveAllStreams()
 				// load the new stream entries
 				_ = l.load(&cfg)
 			},
@@ -101,7 +101,7 @@ func (l Loader) load(
 			return e
 		}
 		// add the stream to the logger stream pool
-		if e := l.log.AddStream(id, stream); e != nil {
+		if e := l.logger.AddStream(id, stream); e != nil {
 			return e
 		}
 	}

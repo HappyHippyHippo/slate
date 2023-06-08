@@ -1,14 +1,15 @@
 package migration
 
 import (
+	"reflect"
+
 	"github.com/golang/mock/gomock"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
-	"reflect"
 )
 
-// MockDialector is a mock an instance of gorm.Dialector interface.
+// MockDialector is a mock instance of gorm.Dialector interface.
 type MockDialector struct {
 	ctrl     *gomock.Controller
 	recorder *MockDialectorRecorder

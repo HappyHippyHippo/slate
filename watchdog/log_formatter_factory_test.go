@@ -2,12 +2,12 @@ package watchdog
 
 import (
 	"errors"
-	"github.com/happyhippyhippo/slate/config"
 	"reflect"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
+	"github.com/happyhippyhippo/slate/config"
 )
 
 func Test_LogFormatterFactory_Register(t *testing.T) {
@@ -19,7 +19,7 @@ func Test_LogFormatterFactory_Register(t *testing.T) {
 		}
 	})
 
-	t.Run("register the stream factory strategy", func(t *testing.T) {
+	t.Run("register the log formatter creator strategy", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -47,7 +47,7 @@ func Test_LogFormatterFactory_Create(t *testing.T) {
 		}
 	})
 
-	t.Run("unrecognized stream type", func(t *testing.T) {
+	t.Run("unrecognized format type", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -58,10 +58,10 @@ func Test_LogFormatterFactory_Create(t *testing.T) {
 		sut := &LogFormatterFactory{}
 		_ = sut.Register(strategy)
 
-		stream, e := sut.Create(cfg)
+		formatter, e := sut.Create(cfg)
 		switch {
-		case stream != nil:
-			t.Error("returned a config stream")
+		case formatter != nil:
+			t.Error("returned a log formatter")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrInvalidWatchdog):
@@ -69,22 +69,22 @@ func Test_LogFormatterFactory_Create(t *testing.T) {
 		}
 	})
 
-	t.Run("create the config stream", func(t *testing.T) {
+	t.Run("create the log formatter", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		cfg := &config.Partial{}
-		stream := NewMockLogFormatter(ctrl)
+		formatter := NewMockLogFormatter(ctrl)
 		strategy := NewMockLogFormatterStrategy(ctrl)
 		strategy.EXPECT().Accept(cfg).Return(true).Times(1)
-		strategy.EXPECT().Create(cfg).Return(stream, nil).Times(1)
+		strategy.EXPECT().Create(cfg).Return(formatter, nil).Times(1)
 
 		sut := &LogFormatterFactory{}
 		_ = sut.Register(strategy)
 
-		if s, e := sut.Create(cfg); e != nil {
+		if f, e := sut.Create(cfg); e != nil {
 			t.Errorf("returned the (%v) error", e)
-		} else if !reflect.DeepEqual(s, stream) {
+		} else if !reflect.DeepEqual(f, formatter) {
 			t.Error("didn't returned the created stream")
 		}
 	})

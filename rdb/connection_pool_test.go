@@ -3,13 +3,14 @@ package rdb
 import (
 	"errors"
 	"fmt"
+	"testing"
+
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"testing"
 )
 
 func Test_NewConnectionPool(t *testing.T) {
@@ -73,12 +74,12 @@ func Test_NewConnectionPool(t *testing.T) {
 		_ = cfg.AddSource("id", 0, source1)
 
 		conn, _ := gorm.Open(sqlite.Open(":memory:"), nil)
-		connectionFactory := NewMockConnectionFactory(ctrl)
-		connectionFactory.EXPECT().Create(&cfg1, gormCfg).Return(conn, nil).Times(1)
+		connectionCreator := NewMockConnectionCreator(ctrl)
+		connectionCreator.EXPECT().Create(&cfg1, gormCfg).Return(conn, nil).Times(1)
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(cfg, cf)
-		sut.connectionCreator = connectionFactory
+		sut.connectionCreator = connectionCreator
 
 		_, _ = sut.Get(name, gormCfg)
 		if len(sut.instances) != 1 {
@@ -97,14 +98,14 @@ func Test_ConnectionPool_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Has("slate.rdb.connections.primary").Return(false).Times(1)
-		connectionFactory := NewMockConnectionFactory(ctrl)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Has("slate.rdb.connections.primary").Return(false).Times(1)
+		connectionCreator := NewMockConnectionCreator(ctrl)
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(config.NewConfig(), cf)
-		sut.connectionCreator = connectionFactory
-		sut.cfg = cfg
+		sut.connectionCreator = connectionCreator
+		sut.configurer = configurer
 
 		conn, e := sut.Get("primary", &gorm.Config{})
 		switch {
@@ -122,15 +123,15 @@ func Test_ConnectionPool_Get(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)
-		cfg.EXPECT().Partial("slate.rdb.connections.name").Return(nil, expected).Times(1)
-		connectionFactory := NewMockConnectionFactory(ctrl)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)
+		configurer.EXPECT().Partial("slate.rdb.connections.name").Return(nil, expected).Times(1)
+		connectionCreator := NewMockConnectionCreator(ctrl)
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(config.NewConfig(), cf)
-		sut.connectionCreator = connectionFactory
-		sut.cfg = cfg
+		sut.connectionCreator = connectionCreator
+		sut.configurer = configurer
 
 		conn, e := sut.Get("name", &gorm.Config{})
 		switch {
@@ -150,16 +151,16 @@ func Test_ConnectionPool_Get(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		partial := &config.Partial{"data": "string"}
 		gormCfg := &gorm.Config{Logger: logger.Discard}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)
-		cfg.EXPECT().Partial("slate.rdb.connections.name").Return(partial, nil).Times(1)
-		connectionFactory := NewMockConnectionFactory(ctrl)
-		connectionFactory.EXPECT().Create(partial, gormCfg).Return(nil, expected).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)
+		configurer.EXPECT().Partial("slate.rdb.connections.name").Return(partial, nil).Times(1)
+		connectionCreator := NewMockConnectionCreator(ctrl)
+		connectionCreator.EXPECT().Create(partial, gormCfg).Return(nil, expected).Times(1)
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(config.NewConfig(), cf)
-		sut.connectionCreator = connectionFactory
-		sut.cfg = cfg
+		sut.connectionCreator = connectionCreator
+		sut.configurer = configurer
 
 		conn, e := sut.Get("name", gormCfg)
 		switch {
@@ -178,16 +179,16 @@ func Test_ConnectionPool_Get(t *testing.T) {
 
 		partial := &config.Partial{"data": "string"}
 		gormCfg := &gorm.Config{Logger: logger.Discard}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)
-		cfg.EXPECT().Partial("slate.rdb.connections.name").Return(partial, nil).Times(1)
-		connectionFactory := NewMockConnectionFactory(ctrl)
-		connectionFactory.EXPECT().Create(partial, gormCfg).Return(&gorm.DB{}, nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)
+		configurer.EXPECT().Partial("slate.rdb.connections.name").Return(partial, nil).Times(1)
+		connectionCreator := NewMockConnectionCreator(ctrl)
+		connectionCreator.EXPECT().Create(partial, gormCfg).Return(&gorm.DB{}, nil).Times(1)
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(config.NewConfig(), cf)
-		sut.connectionCreator = connectionFactory
-		sut.cfg = cfg
+		sut.connectionCreator = connectionCreator
+		sut.configurer = configurer
 
 		if check, e := sut.Get("name", gormCfg); check == nil {
 			t.Error("didn't return the expected connection instance")
@@ -202,16 +203,16 @@ func Test_ConnectionPool_Get(t *testing.T) {
 
 		partial := &config.Partial{"data": "string"}
 		gormCfg := &gorm.Config{Logger: logger.Discard}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)
-		cfg.EXPECT().Partial("slate.rdb.connections.name").Return(partial, nil).Times(1)
-		connectionFactory := NewMockConnectionFactory(ctrl)
-		connectionFactory.EXPECT().Create(partial, gormCfg).Return(&gorm.DB{}, nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)
+		configurer.EXPECT().Partial("slate.rdb.connections.name").Return(partial, nil).Times(1)
+		connectionCreator := NewMockConnectionCreator(ctrl)
+		connectionCreator.EXPECT().Create(partial, gormCfg).Return(&gorm.DB{}, nil).Times(1)
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(config.NewConfig(), cf)
-		sut.connectionCreator = connectionFactory
-		sut.cfg = cfg
+		sut.connectionCreator = connectionCreator
+		sut.configurer = configurer
 
 		conn, _ := sut.Get("name", gormCfg)
 		check, e := sut.Get("name", gormCfg)

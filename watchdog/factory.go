@@ -15,37 +15,37 @@ type logFormatterCreator interface {
 	Create(cfg *config.Partial) (LogFormatter, error)
 }
 
-// Factory defines an instance of a watchdog factory, used
+// Factory defines an instance of a watchdog creator, used
 // to create watchdogs related to a configuration entry.
 type Factory struct {
-	config           configurer
-	log              *log.Log
-	formatterCreator logFormatterCreator
+	configurer          configurer
+	log                 *log.Log
+	logFormatterCreator logFormatterCreator
 }
 
-// NewFactory will generate a new watchdog factory instance.
+// NewFactory will generate a new watchdog creator instance.
 func NewFactory(
-	cfg *config.Config,
+	configurer *config.Config,
 	logger *log.Log,
-	formatterCreator *LogFormatterFactory,
+	logFormatterCreator *LogFormatterFactory,
 ) (*Factory, error) {
 	// check config argument reference
-	if cfg == nil {
-		return nil, errNilPointer("cfg")
+	if configurer == nil {
+		return nil, errNilPointer("config")
 	}
 	// check log argument reference
 	if logger == nil {
 		return nil, errNilPointer("logger")
 	}
-	// check formatter factory reference
-	if formatterCreator == nil {
-		return nil, errNilPointer("formatterCreator")
+	// check formatter creator reference
+	if logFormatterCreator == nil {
+		return nil, errNilPointer("logFormatterCreator")
 	}
-	// return the created watchdog factory instance
+	// return the created watchdog creator instance
 	return &Factory{
-		config:           cfg,
-		log:              logger,
-		formatterCreator: formatterCreator,
+		configurer:          configurer,
+		log:                 logger,
+		logFormatterCreator: logFormatterCreator,
 	}, nil
 }
 
@@ -55,7 +55,7 @@ func (f *Factory) Create(
 	service string,
 ) (*Watchdog, error) {
 	// get service watchdog configuration
-	cfg, e := f.config.Partial(fmt.Sprintf("%s.%s", ConfigPathPrefix, service), config.Partial{})
+	cfg, e := f.configurer.Partial(fmt.Sprintf("%s.%s", ConfigPathPrefix, service), config.Partial{})
 	if e != nil {
 		return nil, e
 	}
@@ -99,7 +99,7 @@ func (f *Factory) Create(
 		return nil, errConversion(wc.Level.Done, "log.Level")
 	}
 	// obtain the formatter for the watchdog log adapter
-	formatter, e := f.formatterCreator.Create(&config.Partial{"type": wc.Formatter})
+	formatter, e := f.logFormatterCreator.Create(&config.Partial{"type": wc.Formatter})
 	if e != nil {
 		return nil, e
 	}

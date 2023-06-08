@@ -9,26 +9,26 @@ type kennelReg struct {
 	watchdog *Watchdog
 }
 
-type factory interface {
+type creator interface {
 	Create(service string) (*Watchdog, error)
 }
 
 // Kennel define an instance that will manage a group of watchdog
 // instances, and is used to run them in parallel.
 type Kennel struct {
-	factory factory
+	creator creator
 	regs    map[string]kennelReg
 }
 
 // NewKennel will generate a new kennel instance.
 func NewKennel(factory *Factory) (*Kennel, error) {
-	// check factory argument reference
+	// check creator argument reference
 	if factory == nil {
-		return nil, errNilPointer("factory")
+		return nil, errNilPointer("creator")
 	}
-	// return the created factory instance
+	// return the created creator instance
 	return &Kennel{
-		factory: factory,
+		creator: factory,
 		regs:    map[string]kennelReg{},
 	}, nil
 }
@@ -41,7 +41,7 @@ func (k *Kennel) Add(process Processor) error {
 		return errDuplicateService(process.Service())
 	}
 	// create the watchdog for the requested process
-	wd, e := k.factory.Create(process.Service())
+	wd, e := k.creator.Create(process.Service())
 	if e != nil {
 		return e
 	}

@@ -1,9 +1,10 @@
 package file
 
 import (
+	"reflect"
+
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate/log"
-	"reflect"
 )
 
 // MockFormatterStrategy is a mock instance of FormatterStrategy interface

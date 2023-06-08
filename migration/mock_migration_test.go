@@ -1,8 +1,9 @@
 package migration
 
 import (
-	"github.com/golang/mock/gomock"
 	"reflect"
+
+	"github.com/golang/mock/gomock"
 )
 
 // MockMigration is a mocked instance of Migration interface.

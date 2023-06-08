@@ -59,13 +59,13 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(baseSourcePartial).Return(nil, expected).Times(1)
-		cfg := NewMockConfigurer(ctrl)
+		sourceCreator := NewMockSourceCreator(ctrl)
+		sourceCreator.EXPECT().Create(baseSourcePartial).Return(nil, expected).Times(1)
+		configurer := NewMockConfigurer(ctrl)
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
-		sut.config = cfg
-		sut.sourceCreator = sourceFactory
+		sut.configurer = configurer
+		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
@@ -80,14 +80,14 @@ func Test_Loader_Load(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		source := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(baseSourcePartial).Return(source, nil).Times(1)
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().AddSource("base_source_id", 0, source).Return(expected).Times(1)
+		sourceCreator := NewMockSourceCreator(ctrl)
+		sourceCreator.EXPECT().Create(baseSourcePartial).Return(source, nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().AddSource("base_source_id", 0, source).Return(expected).Times(1)
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
-		sut.config = cfg
-		sut.sourceCreator = sourceFactory
+		sut.configurer = configurer
+		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
@@ -101,15 +101,15 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		source := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(baseSourcePartial).Return(source, nil).Times(1)
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().AddSource("base_source_id", 0, source).Return(nil).Times(1)
-		cfg.EXPECT().Partial("slate.config.sources").Return(&Partial{}, nil).Times(1)
+		sourceCreator := NewMockSourceCreator(ctrl)
+		sourceCreator.EXPECT().Create(baseSourcePartial).Return(source, nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().AddSource("base_source_id", 0, source).Return(nil).Times(1)
+		configurer.EXPECT().Partial("slate.config.sources").Return(&Partial{}, nil).Times(1)
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
-		sut.config = cfg
-		sut.sourceCreator = sourceFactory
+		sut.configurer = configurer
+		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -122,15 +122,15 @@ func Test_Loader_Load(t *testing.T) {
 
 		partial := &Partial{"sources": "string"}
 		source := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(baseSourcePartial).Return(source, nil).Times(1)
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().AddSource("base_source_id", 0, source).Return(nil).Times(1)
-		cfg.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
+		sourceCreator := NewMockSourceCreator(ctrl)
+		sourceCreator.EXPECT().Create(baseSourcePartial).Return(source, nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().AddSource("base_source_id", 0, source).Return(nil).Times(1)
+		configurer.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
-		sut.config = cfg
-		sut.sourceCreator = sourceFactory
+		sut.configurer = configurer
+		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the unexpected error : %v", e)
@@ -143,15 +143,15 @@ func Test_Loader_Load(t *testing.T) {
 
 		partial := &Partial{"sources": Partial{"priority": "string"}}
 		source := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
-		sourceFactory.EXPECT().Create(baseSourcePartial).Return(source, nil).Times(1)
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().AddSource("base_source_id", 0, source).Return(nil).Times(1)
-		cfg.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
+		sourceCreator := NewMockSourceCreator(ctrl)
+		sourceCreator.EXPECT().Create(baseSourcePartial).Return(source, nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().AddSource("base_source_id", 0, source).Return(nil).Times(1)
+		configurer.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
-		sut.config = cfg
-		sut.sourceCreator = sourceFactory
+		sut.configurer = configurer
+		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
@@ -168,18 +168,18 @@ func Test_Loader_Load(t *testing.T) {
 		sourcePartial := Partial{"type": "my type"}
 		partial := &Partial{"source": sourcePartial}
 		source := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
+		sourceCreator := NewMockSourceCreator(ctrl)
 		gomock.InOrder(
-			sourceFactory.EXPECT().Create(baseSourcePartial).Return(source, nil),
-			sourceFactory.EXPECT().Create(&sourcePartial).Return(nil, expected),
+			sourceCreator.EXPECT().Create(baseSourcePartial).Return(source, nil),
+			sourceCreator.EXPECT().Create(&sourcePartial).Return(nil, expected),
 		)
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().AddSource("base_source_id", 0, source).Return(nil).Times(1)
-		cfg.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().AddSource("base_source_id", 0, source).Return(nil).Times(1)
+		configurer.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
-		sut.config = cfg
-		sut.sourceCreator = sourceFactory
+		sut.configurer = configurer
+		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
@@ -197,21 +197,21 @@ func Test_Loader_Load(t *testing.T) {
 		partial := &Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
 		source2 := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
+		sourceCreator := NewMockSourceCreator(ctrl)
 		gomock.InOrder(
-			sourceFactory.EXPECT().Create(baseSourcePartial).Return(source1, nil),
-			sourceFactory.EXPECT().Create(&sourcePartial).Return(source2, nil),
+			sourceCreator.EXPECT().Create(baseSourcePartial).Return(source1, nil),
+			sourceCreator.EXPECT().Create(&sourcePartial).Return(source2, nil),
 		)
-		cfg := NewMockConfigurer(ctrl)
+		configurer := NewMockConfigurer(ctrl)
 		gomock.InOrder(
-			cfg.EXPECT().AddSource("base_source_id", 0, source1).Return(nil),
-			cfg.EXPECT().AddSource("source", 101, source2).Return(expected),
+			configurer.EXPECT().AddSource("base_source_id", 0, source1).Return(nil),
+			configurer.EXPECT().AddSource("source", 101, source2).Return(expected),
 		)
-		cfg.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
+		configurer.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
-		sut.config = cfg
-		sut.sourceCreator = sourceFactory
+		sut.configurer = configurer
+		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
@@ -228,21 +228,21 @@ func Test_Loader_Load(t *testing.T) {
 		partial := &Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
 		source2 := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
+		sourceCreator := NewMockSourceCreator(ctrl)
 		gomock.InOrder(
-			sourceFactory.EXPECT().Create(baseSourcePartial).Return(source1, nil),
-			sourceFactory.EXPECT().Create(&sourcePartial).Return(source2, nil),
+			sourceCreator.EXPECT().Create(baseSourcePartial).Return(source1, nil),
+			sourceCreator.EXPECT().Create(&sourcePartial).Return(source2, nil),
 		)
-		cfg := NewMockConfigurer(ctrl)
+		configurer := NewMockConfigurer(ctrl)
 		gomock.InOrder(
-			cfg.EXPECT().AddSource("base_source_id", 0, source1).Return(nil),
-			cfg.EXPECT().AddSource("source", 101, source2).Return(nil),
+			configurer.EXPECT().AddSource("base_source_id", 0, source1).Return(nil),
+			configurer.EXPECT().AddSource("source", 101, source2).Return(nil),
 		)
-		cfg.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
+		configurer.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
-		sut.config = cfg
-		sut.sourceCreator = sourceFactory
+		sut.configurer = configurer
+		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -262,21 +262,21 @@ func Test_Loader_Load(t *testing.T) {
 		partial := &Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
 		source2 := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
+		sourceCreator := NewMockSourceCreator(ctrl)
 		gomock.InOrder(
-			sourceFactory.EXPECT().Create(basePartial).Return(source1, nil),
-			sourceFactory.EXPECT().Create(&sourcePartial).Return(source2, nil),
+			sourceCreator.EXPECT().Create(basePartial).Return(source1, nil),
+			sourceCreator.EXPECT().Create(&sourcePartial).Return(source2, nil),
 		)
-		cfg := NewMockConfigurer(ctrl)
+		configurer := NewMockConfigurer(ctrl)
 		gomock.InOrder(
-			cfg.EXPECT().AddSource("base_source_id", 0, source1).Return(nil),
-			cfg.EXPECT().AddSource("source", 101, source2).Return(nil),
+			configurer.EXPECT().AddSource("base_source_id", 0, source1).Return(nil),
+			configurer.EXPECT().AddSource("source", 101, source2).Return(nil),
 		)
-		cfg.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
+		configurer.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
-		sut.config = cfg
-		sut.sourceCreator = sourceFactory
+		sut.configurer = configurer
+		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -296,21 +296,21 @@ func Test_Loader_Load(t *testing.T) {
 		partial := &Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
 		source2 := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
+		sourceCreator := NewMockSourceCreator(ctrl)
 		gomock.InOrder(
-			sourceFactory.EXPECT().Create(basePartial).Return(source1, nil),
-			sourceFactory.EXPECT().Create(&sourcePartial).Return(source2, nil),
+			sourceCreator.EXPECT().Create(basePartial).Return(source1, nil),
+			sourceCreator.EXPECT().Create(&sourcePartial).Return(source2, nil),
 		)
-		cfg := NewMockConfigurer(ctrl)
+		configurer := NewMockConfigurer(ctrl)
 		gomock.InOrder(
-			cfg.EXPECT().AddSource("base_source_id", 0, source1).Return(nil),
-			cfg.EXPECT().AddSource("source", 101, source2).Return(nil),
+			configurer.EXPECT().AddSource("base_source_id", 0, source1).Return(nil),
+			configurer.EXPECT().AddSource("source", 101, source2).Return(nil),
 		)
-		cfg.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
+		configurer.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
-		sut.config = cfg
-		sut.sourceCreator = sourceFactory
+		sut.configurer = configurer
+		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -330,21 +330,21 @@ func Test_Loader_Load(t *testing.T) {
 		partial := &Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
 		source2 := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
+		sourceCreator := NewMockSourceCreator(ctrl)
 		gomock.InOrder(
-			sourceFactory.EXPECT().Create(basePartial).Return(source1, nil),
-			sourceFactory.EXPECT().Create(&sourcePartial).Return(source2, nil),
+			sourceCreator.EXPECT().Create(basePartial).Return(source1, nil),
+			sourceCreator.EXPECT().Create(&sourcePartial).Return(source2, nil),
 		)
-		cfg := NewMockConfigurer(ctrl)
+		configurer := NewMockConfigurer(ctrl)
 		gomock.InOrder(
-			cfg.EXPECT().AddSource("base_source_id", 0, source1).Return(nil),
-			cfg.EXPECT().AddSource("source", 101, source2).Return(nil),
+			configurer.EXPECT().AddSource("base_source_id", 0, source1).Return(nil),
+			configurer.EXPECT().AddSource("source", 101, source2).Return(nil),
 		)
-		cfg.EXPECT().Partial("config_list").Return(partial, nil).Times(1)
+		configurer.EXPECT().Partial("config_list").Return(partial, nil).Times(1)
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
-		sut.config = cfg
-		sut.sourceCreator = sourceFactory
+		sut.configurer = configurer
+		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -359,21 +359,21 @@ func Test_Loader_Load(t *testing.T) {
 		partial := &Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
 		source2 := NewMockSource(ctrl)
-		sourceFactory := NewMockSourceFactory(ctrl)
+		sourceCreator := NewMockSourceCreator(ctrl)
 		gomock.InOrder(
-			sourceFactory.EXPECT().Create(baseSourcePartial).Return(source1, nil),
-			sourceFactory.EXPECT().Create(&sourcePartial).Return(source2, nil),
+			sourceCreator.EXPECT().Create(baseSourcePartial).Return(source1, nil),
+			sourceCreator.EXPECT().Create(&sourcePartial).Return(source2, nil),
 		)
-		cfg := NewMockConfigurer(ctrl)
+		configurer := NewMockConfigurer(ctrl)
 		gomock.InOrder(
-			cfg.EXPECT().AddSource("base_source_id", 0, source1).Return(nil),
-			cfg.EXPECT().AddSource("source", 0, source2).Return(nil),
+			configurer.EXPECT().AddSource("base_source_id", 0, source1).Return(nil),
+			configurer.EXPECT().AddSource("source", 0, source2).Return(nil),
 		)
-		cfg.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
+		configurer.EXPECT().Partial("slate.config.sources").Return(partial, nil).Times(1)
 
 		sut, _ := NewLoader(NewConfig(), NewSourceFactory())
-		sut.config = cfg
-		sut.sourceCreator = sourceFactory
+		sut.configurer = configurer
+		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)

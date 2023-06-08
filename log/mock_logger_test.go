@@ -1,15 +1,18 @@
 package log
 
 import (
-	"github.com/golang/mock/gomock"
 	"reflect"
+
+	"github.com/golang/mock/gomock"
 )
 
-// MockLogger is a mock of logger interface.
+// MockLogger is a mock instance of logger interface.
 type MockLogger struct {
 	ctrl     *gomock.Controller
 	recorder *MockLoggerRecorder
 }
+
+var _ logger = &MockLogger{}
 
 // MockLoggerRecorder is the mock recorder for MockLogger.
 type MockLoggerRecorder struct {

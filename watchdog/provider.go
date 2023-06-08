@@ -6,7 +6,7 @@ import (
 
 const (
 	// ID defines the id to be used as the container
-	// registration id of a watchdog factory instance, and as a
+	// registration id of a watchdog creator instance, and as a
 	// base id of all other watchdog package instances registered
 	// in the application container.
 	ID = slate.ID + ".watchdog"
@@ -16,12 +16,12 @@ const (
 	LogFormatterStrategyTag = ID + ".formatter.strategy"
 
 	// LogFormatterFactoryID defines the id to be used as the container
-	// registration id of the log formatter factory.
-	LogFormatterFactoryID = ID + ".formatter.factory"
+	// registration id of the log formatter creator.
+	LogFormatterFactoryID = ID + ".formatter.creator"
 
 	// WatchdogFactoryID defines the id to be used as the container
-	// registration id of the watchdog factory.
-	WatchdogFactoryID = ID + ".factory"
+	// registration id of the watchdog creator.
+	WatchdogFactoryID = ID + ".creator"
 
 	// ProcessTag defines the simple tag to be used
 	// to identify a watchdog process entry in the container.
@@ -43,9 +43,9 @@ func (p Provider) Register(
 	if container == nil {
 		return errNilPointer("container")
 	}
-	// add log formatter strategies and factory
+	// add log formatter strategies and creator
 	_ = container.Service(LogFormatterFactoryID, NewLogFormatterFactory)
-	// add the watchdog factory and kennel
+	// add the watchdog creator and kennel
 	_ = container.Service(WatchdogFactoryID, NewFactory)
 	_ = container.Service(ID, NewKennel)
 	return nil
@@ -69,7 +69,7 @@ func (p Provider) Boot(
 		}
 	}()
 
-	// populate the container log formatter factory with
+	// populate the container log formatter creator with
 	// all registered log formatter strategies
 	formatterFactory := p.getLogFormatterFactory(container)
 	for _, strategy := range p.getLogFormatterStrategies(container) {
@@ -89,7 +89,7 @@ func (p Provider) Boot(
 func (Provider) getLogFormatterFactory(
 	container *slate.Container,
 ) *LogFormatterFactory {
-	// retrieve the factory entry
+	// retrieve the creator entry
 	entry, e := container.Get(LogFormatterFactoryID)
 	if e != nil {
 		panic(e)

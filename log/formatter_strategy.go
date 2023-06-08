@@ -1,7 +1,7 @@
 package log
 
 const (
-	// UnknownFormatter defines the value to be used to declare a
+	// UnknownFormatter defines the value to be used to declare an
 	// unknown Log Formatter format.
 	UnknownFormatter = "unknown"
 )

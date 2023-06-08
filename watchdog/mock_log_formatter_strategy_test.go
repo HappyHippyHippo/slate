@@ -1,12 +1,13 @@
 package watchdog
 
 import (
+	"reflect"
+
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate/config"
-	"reflect"
 )
 
-// MockLogFormatterStrategy is a mock an instance of LogFormatterStrategy interface.
+// MockLogFormatterStrategy is a mock instance of LogFormatterStrategy interface.
 type MockLogFormatterStrategy struct {
 	ctrl     *gomock.Controller
 	recorder *MockLogFormatterStrategyRecorder

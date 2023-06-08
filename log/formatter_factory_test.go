@@ -2,10 +2,11 @@ package log
 
 import (
 	"errors"
-	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate"
 	"reflect"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/happyhippyhippo/slate"
 )
 
 func Test_NewFormatterFactory(t *testing.T) {

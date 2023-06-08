@@ -3,14 +3,15 @@ package file
 import (
 	"errors"
 	"fmt"
-	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate"
-	"github.com/happyhippyhippo/slate/config"
-	"github.com/happyhippyhippo/slate/log"
 	"io"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/golang/mock/gomock"
+	"github.com/happyhippyhippo/slate"
+	"github.com/happyhippyhippo/slate/config"
+	"github.com/happyhippyhippo/slate/log"
 )
 
 func Test_NewRotatingFileStreamStrategy(t *testing.T) {

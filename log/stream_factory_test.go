@@ -2,11 +2,12 @@ package log
 
 import (
 	"errors"
+	"reflect"
+	"testing"
+
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
-	"reflect"
-	"testing"
 )
 
 func Test_NewStreamFactory(t *testing.T) {

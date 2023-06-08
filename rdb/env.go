@@ -18,8 +18,8 @@ var (
 	// relational database connection configurations.
 	ConnectionsConfigPath = env.String(EnvID+"_CONNECTIONS_CONFIG_PATH", "slate.rdb.connections")
 
-	// ObserveConfig defines the connection factory cfg observing flag
-	// used to register in the cfg object an observer of the connection
-	// cfg entries list, so it can reset the connections pool.
+	// ObserveConfig defines the connection factory config observing flag
+	// used to register in the config object an observer of the connection
+	// config entries list, so it can reset the connections pool.
 	ObserveConfig = env.Bool(EnvID+"_OBSERVE_CONFIG", true)
 )

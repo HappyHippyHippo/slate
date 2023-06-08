@@ -1,14 +1,15 @@
 package migration
 
 import (
+	"reflect"
+
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/rdb"
 	"gorm.io/gorm"
-	"reflect"
 )
 
-// MockDialectStrategy is a mock an instance of IDialectStrategy interface.
+// MockDialectStrategy is a mock instance of IDialectStrategy interface.
 type MockDialectStrategy struct {
 	ctrl     *gomock.Controller
 	recorder *MockDialectStrategyRecorder

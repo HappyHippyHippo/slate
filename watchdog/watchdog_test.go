@@ -3,14 +3,14 @@ package watchdog
 import (
 	"errors"
 	"fmt"
-	"github.com/golang/mock/gomock"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
 )
 
 func Test_Watchdog(t *testing.T) {
-	t.Run("nil log", func(t *testing.T) {
+	t.Run("nil logAdapter", func(t *testing.T) {
 		sut, e := NewWatchdog(nil)
 		switch {
 		case sut != nil:
@@ -31,8 +31,8 @@ func Test_Watchdog(t *testing.T) {
 			t.Errorf("returned the (%v) error", e)
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
-		case sut.log != logAdapter:
-			t.Errorf("didn't store the given log instance")
+		case sut.logAdapter != logAdapter:
+			t.Errorf("didn't store the given logAdapter instance")
 		}
 	})
 }
@@ -48,7 +48,7 @@ func Test_Watchdog_Run(t *testing.T) {
 		logAdapter.EXPECT().Error(gomock.Any()).Return(nil).Times(0)
 		logAdapter.EXPECT().Done().Return(nil).Times(1)
 		sut, _ := NewWatchdog(&LogAdapter{})
-		sut.log = logAdapter
+		sut.logAdapter = logAdapter
 
 		count := 0
 		p, _ := NewProcess(service, func() error {
@@ -75,7 +75,7 @@ func Test_Watchdog_Run(t *testing.T) {
 		logAdapter.EXPECT().Error(gomock.Any()).Return(nil).Times(0)
 		logAdapter.EXPECT().Done().Return(nil).Times(1)
 		sut, _ := NewWatchdog(&LogAdapter{})
-		sut.log = logAdapter
+		sut.logAdapter = logAdapter
 
 		e := fmt.Errorf("error message")
 		count := 0
@@ -107,7 +107,7 @@ func Test_Watchdog_Run(t *testing.T) {
 		logAdapter.EXPECT().Error(e).Return(nil).Times(1)
 		logAdapter.EXPECT().Done().Return(nil).Times(1)
 		sut, _ := NewWatchdog(&LogAdapter{})
-		sut.log = logAdapter
+		sut.logAdapter = logAdapter
 
 		count := 0
 		p, _ := NewProcess(service, func() error {
@@ -139,7 +139,7 @@ func Test_Watchdog_Run(t *testing.T) {
 		logAdapter.EXPECT().Error(e).Return(nil).Times(1)
 		logAdapter.EXPECT().Done().Return(nil).Times(1)
 		sut, _ := NewWatchdog(&LogAdapter{})
-		sut.log = logAdapter
+		sut.logAdapter = logAdapter
 
 		count := 0
 		p, _ := NewProcess(service, func() error {

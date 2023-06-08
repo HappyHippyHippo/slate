@@ -44,7 +44,7 @@ func Test_Factory(t *testing.T) {
 		}
 	})
 
-	t.Run("nil formatter factory", func(t *testing.T) {
+	t.Run("nil formatter creator", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -82,11 +82,11 @@ func Test_Factory_Create(t *testing.T) {
 
 		service := "test"
 		expected := fmt.Errorf("error message")
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(nil, expected).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(nil, expected).Times(1)
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
-		sut.config = cfg
+		sut.configurer = configurer
 
 		chk, e := sut.Create(service)
 		switch {
@@ -109,11 +109,11 @@ func Test_Factory_Create(t *testing.T) {
 
 		service := "test"
 		expected := fmt.Errorf("error message")
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("path.test", config.Partial{}).Return(nil, expected).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("path.test", config.Partial{}).Return(nil, expected).Times(1)
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
-		sut.config = cfg
+		sut.configurer = configurer
 
 		chk, e := sut.Create(service)
 		switch {
@@ -126,17 +126,17 @@ func Test_Factory_Create(t *testing.T) {
 		}
 	})
 
-	t.Run("error populating the watchdog config", func(t *testing.T) {
+	t.Run("error populating the watchdog configurer", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		service := "test"
 		watchdogCfg := &config.Partial{"formatter": 123}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
-		sut.config = cfg
+		sut.configurer = configurer
 
 		chk, e := sut.Create(service)
 		switch {
@@ -155,11 +155,11 @@ func Test_Factory_Create(t *testing.T) {
 
 		service := "test"
 		watchdogCfg := &config.Partial{"level": config.Partial{"start": "invalid"}}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
-		sut.config = cfg
+		sut.configurer = configurer
 
 		chk, e := sut.Create(service)
 		switch {
@@ -178,11 +178,11 @@ func Test_Factory_Create(t *testing.T) {
 
 		service := "test"
 		watchdogCfg := &config.Partial{"level": config.Partial{"error": "invalid"}}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
-		sut.config = cfg
+		sut.configurer = configurer
 
 		chk, e := sut.Create(service)
 		switch {
@@ -201,11 +201,11 @@ func Test_Factory_Create(t *testing.T) {
 
 		service := "test"
 		watchdogCfg := &config.Partial{"level": config.Partial{"done": "invalid"}}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
-		sut.config = cfg
+		sut.configurer = configurer
 
 		chk, e := sut.Create(service)
 		switch {
@@ -225,14 +225,14 @@ func Test_Factory_Create(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		service := "test"
 		watchdogCfg := &config.Partial{"formatter": "my formatter"}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
-		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(&config.Partial{"type": "my formatter"}).Return(nil, expected).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+		logFormatterCreator := NewMockLogFormatterCreator(ctrl)
+		logFormatterCreator.EXPECT().Create(&config.Partial{"type": "my formatter"}).Return(nil, expected).Times(1)
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
-		sut.config = cfg
-		sut.formatterCreator = formatterFactory
+		sut.configurer = configurer
+		sut.logFormatterCreator = logFormatterCreator
 
 		chk, e := sut.Create(service)
 		switch {
@@ -251,16 +251,16 @@ func Test_Factory_Create(t *testing.T) {
 
 		service := "test"
 		watchdogCfg := &config.Partial{"name": service}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
 		formatter := NewMockLogFormatter(ctrl)
-		formatterFactory := NewMockLogFormatterFactory(ctrl)
-		formatterFactory.EXPECT().Create(&config.Partial{"type": "simple"}).Return(formatter, nil).Times(1)
+		logFormatterCreator := NewMockLogFormatterCreator(ctrl)
+		logFormatterCreator.EXPECT().Create(&config.Partial{"type": "simple"}).Return(formatter, nil).Times(1)
 		logger := log.NewLog()
 
 		sut, _ := NewFactory(config.NewConfig(), logger, NewLogFormatterFactory())
-		sut.config = cfg
-		sut.formatterCreator = formatterFactory
+		sut.configurer = configurer
+		sut.logFormatterCreator = logFormatterCreator
 
 		wd, e := sut.Create(service)
 		switch {
@@ -268,19 +268,19 @@ func Test_Factory_Create(t *testing.T) {
 			t.Errorf("returned the unexpected error : %v", e)
 		case wd == nil:
 			t.Errorf("didn't returned the expected watchdog reference")
-		case wd.log.(*LogAdapter).name != service:
+		case wd.logAdapter.(*LogAdapter).name != service:
 			t.Errorf("didn't stored the expected service name")
-		case wd.log.(*LogAdapter).channel != LogChannel:
+		case wd.logAdapter.(*LogAdapter).channel != LogChannel:
 			t.Errorf("didn't stored the expected channel name")
-		case wd.log.(*LogAdapter).startLevel != log.LevelMap[LogStartLevel]:
+		case wd.logAdapter.(*LogAdapter).startLevel != log.LevelMap[LogStartLevel]:
 			t.Errorf("didn't stored the expected start log message level")
-		case wd.log.(*LogAdapter).errorLevel != log.LevelMap[LogErrorLevel]:
+		case wd.logAdapter.(*LogAdapter).errorLevel != log.LevelMap[LogErrorLevel]:
 			t.Errorf("didn't stored the expected error log message level")
-		case wd.log.(*LogAdapter).doneLevel != log.LevelMap[LogDoneLevel]:
+		case wd.logAdapter.(*LogAdapter).doneLevel != log.LevelMap[LogDoneLevel]:
 			t.Errorf("didn't stored the expected done log message level")
-		case wd.log.(*LogAdapter).logger != logger:
+		case wd.logAdapter.(*LogAdapter).logger != logger:
 			t.Errorf("didn't stored the expected logger")
-		case wd.log.(*LogAdapter).formatter != formatter:
+		case wd.logAdapter.(*LogAdapter).formatter != formatter:
 			t.Errorf("didn't stored the expected formatter")
 		}
 	})

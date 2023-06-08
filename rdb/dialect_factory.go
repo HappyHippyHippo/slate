@@ -38,7 +38,7 @@ func (f *DialectFactory) Create(
 ) (gorm.Dialector, error) {
 	// check the config argument reference
 	if cfg == nil {
-		return nil, errNilPointer("cfg")
+		return nil, errNilPointer("config")
 	}
 	// search for a strategy that can create a dialect instance for the
 	// dialect name retrieved from the configuration

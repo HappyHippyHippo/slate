@@ -9,12 +9,12 @@ import (
 type LogFormatterFactory []LogFormatterStrategy
 
 // NewLogFormatterFactory will instantiate a new logging formatter
-// factory instance.
+// creator instance.
 func NewLogFormatterFactory() *LogFormatterFactory {
 	return &LogFormatterFactory{}
 }
 
-// Register will register a new watchdog log formatter factory
+// Register will register a new watchdog log formatter creator
 // strategy to be used on creation request.
 func (f *LogFormatterFactory) Register(
 	strategy LogFormatterStrategy,
@@ -23,7 +23,7 @@ func (f *LogFormatterFactory) Register(
 	if strategy == nil {
 		return errNilPointer("strategy")
 	}
-	// add the strategy to the factory strategy pool
+	// add the strategy to the creator strategy pool
 	*f = append(*f, strategy)
 	return nil
 }

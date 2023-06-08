@@ -35,7 +35,7 @@ func Test_DialectFactory_Register(t *testing.T) {
 }
 
 func Test_DialectFactory_Create(t *testing.T) {
-	t.Run("missing cfg", func(t *testing.T) {
+	t.Run("missing config", func(t *testing.T) {
 		sut := &DialectFactory{}
 
 		dialect, e := sut.Create(nil)

@@ -1,15 +1,15 @@
 package migration
 
 import (
-	reflect "reflect"
+	"reflect"
 
-	gomock "github.com/golang/mock/gomock"
-	gorm "gorm.io/gorm"
-	clause "gorm.io/gorm/clause"
-	schema "gorm.io/gorm/schema"
+	"github.com/golang/mock/gomock"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"gorm.io/gorm/schema"
 )
 
-// MockMigrator is a mock of Migrator interface.
+// MockMigrator is a mock instance of Migrator interface.
 type MockMigrator struct {
 	ctrl     *gomock.Controller
 	recorder *MockMigratorRecorder
@@ -65,7 +65,7 @@ func (mr *MockMigratorRecorder) AlterColumn(arg0, arg1 interface{}) *gomock.Call
 // AutoMigrate mocks base method.
 func (m *MockMigrator) AutoMigrate(arg0 ...interface{}) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
+	var varargs []interface{}
 	for _, a := range arg0 {
 		varargs = append(varargs, a)
 	}
@@ -126,7 +126,7 @@ func (mr *MockMigratorRecorder) CreateIndex(arg0, arg1 interface{}) *gomock.Call
 // CreateTable mocks base method.
 func (m *MockMigrator) CreateTable(arg0 ...interface{}) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
+	var varargs []interface{}
 	for _, a := range arg0 {
 		varargs = append(varargs, a)
 	}
@@ -214,7 +214,7 @@ func (mr *MockMigratorRecorder) DropIndex(arg0, arg1 interface{}) *gomock.Call {
 // DropTable mocks base method.
 func (m *MockMigrator) DropTable(arg0 ...interface{}) error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
+	var varargs []interface{}
 	for _, a := range arg0 {
 		varargs = append(varargs, a)
 	}

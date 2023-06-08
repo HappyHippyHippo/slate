@@ -4,7 +4,7 @@ import (
 	"sort"
 )
 
-type dao interface {
+type storer interface {
 	Last() (Record, error)
 	Up(version uint64) (Record, error)
 	Down(last Record) error
@@ -12,21 +12,21 @@ type dao interface {
 
 // Migrator defines a new migration manager instance.
 type Migrator struct {
-	dao        dao
+	storer     storer
 	migrations []Migration
 }
 
 // NewMigrator will instantiate a new Migrator instance.
 func NewMigrator(
-	dao *Dao,
+	storer *Dao,
 ) (*Migrator, error) {
 	// check DAO argument reference
-	if dao == nil {
-		return nil, errNilPointer("dao")
+	if storer == nil {
+		return nil, errNilPointer("storer")
 	}
 	// instantiate the migration manager
 	return &Migrator{
-		dao:        dao,
+		storer:     storer,
 		migrations: []Migration{},
 	}, nil
 }
@@ -51,7 +51,7 @@ func (m *Migrator) AddMigration(
 // Current returns the version of the last executed migration.
 func (m *Migrator) Current() (uint64, error) {
 	// get the current/last applied migration
-	current, e := m.dao.Last()
+	current, e := m.storer.Last()
 	if e != nil {
 		return 0, e
 	}
@@ -65,7 +65,7 @@ func (m *Migrator) Migrate() error {
 		return nil
 	}
 	// get the current/last applied migration
-	current, e := m.dao.Last()
+	current, e := m.storer.Last()
 	if e != nil {
 		return e
 	}
@@ -79,7 +79,7 @@ func (m *Migrator) Migrate() error {
 				return e
 			}
 			// register the executed migration
-			if current, e = m.dao.Up(migrationVersion); e != nil {
+			if current, e = m.storer.Up(migrationVersion); e != nil {
 				return e
 			}
 		}
@@ -94,7 +94,7 @@ func (m *Migrator) Up() error {
 		return nil
 	}
 	// get the current/last applied migration
-	current, e := m.dao.Last()
+	current, e := m.storer.Last()
 	if e != nil {
 		return e
 	}
@@ -108,7 +108,7 @@ func (m *Migrator) Up() error {
 				return e
 			}
 			// register the executed migration
-			_, e = m.dao.Up(migrationVersion)
+			_, e = m.storer.Up(migrationVersion)
 			return e
 		}
 	}
@@ -122,7 +122,7 @@ func (m *Migrator) Down() error {
 		return nil
 	}
 	// get the current/last applied migration
-	current, e := m.dao.Last()
+	current, e := m.storer.Last()
 	if e != nil {
 		return e
 	}
@@ -135,7 +135,7 @@ func (m *Migrator) Down() error {
 				return e
 			}
 			// remove the record of the execution of the migration
-			return m.dao.Down(current)
+			return m.storer.Down(current)
 		}
 	}
 	return nil

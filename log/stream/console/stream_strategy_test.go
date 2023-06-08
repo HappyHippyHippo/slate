@@ -2,13 +2,13 @@ package console
 
 import (
 	"errors"
-	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/config"
-	"github.com/happyhippyhippo/slate/log/formatter/json"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
+	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/log"
+	"github.com/happyhippyhippo/slate/log/formatter/json"
 )
 
 func Test_NewStreamStrategy(t *testing.T) {

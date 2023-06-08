@@ -1,9 +1,10 @@
 package simple
 
 import (
+	"testing"
+
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate/config"
-	"testing"
 )
 
 func Test_FormatterStrategy_Accept(t *testing.T) {

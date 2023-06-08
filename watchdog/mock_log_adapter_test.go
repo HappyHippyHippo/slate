@@ -1,15 +1,18 @@
 package watchdog
 
 import (
-	"github.com/golang/mock/gomock"
 	"reflect"
+
+	"github.com/golang/mock/gomock"
 )
 
-// MockLogAdapter is a mock an instance of LogAdapter interface.
+// MockLogAdapter is a mock instance of LogAdapter interface.
 type MockLogAdapter struct {
 	ctrl     *gomock.Controller
 	recorder *MockLogAdapterRecorder
 }
+
+var _ logAdapter = &MockLogAdapter{}
 
 // MockLogAdapterRecorder is the mock recorder for MockLogAdapter.
 type MockLogAdapterRecorder struct {

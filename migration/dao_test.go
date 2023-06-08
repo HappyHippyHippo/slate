@@ -4,12 +4,12 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"github.com/happyhippyhippo/slate"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/happyhippyhippo/slate"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

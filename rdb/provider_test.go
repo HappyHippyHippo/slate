@@ -3,12 +3,13 @@ package rdb
 import (
 	"errors"
 	"fmt"
+	"testing"
+
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/fs"
 	"gorm.io/gorm"
-	"testing"
 )
 
 func Test_Provider_Register(t *testing.T) {

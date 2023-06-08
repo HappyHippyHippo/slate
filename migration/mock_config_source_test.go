@@ -1,10 +1,10 @@
 package migration
 
 import (
-	"github.com/happyhippyhippo/slate/config"
 	"reflect"
 
 	"github.com/golang/mock/gomock"
+	"github.com/happyhippyhippo/slate/config"
 )
 
 // MockConfigSource is a mock instance of config.Source interface
@@ -68,7 +68,7 @@ func (m *MockConfigSource) Get(path string, def ...interface{}) (interface{}, er
 	for _, a := range def {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "Create", varargs...)
+	ret := m.ctrl.Call(m, "Get", varargs...)
 	ret0, _ := ret[0].(interface{})
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -82,5 +82,5 @@ func (mr *MockConfigSourceRecorder) Get(path interface{}, def ...interface{}) *g
 	for _, a := range def {
 		varargs = append(varargs, a)
 	}
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockConfigSource)(nil).Get), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockConfigSource)(nil).Get), varargs...)
 }

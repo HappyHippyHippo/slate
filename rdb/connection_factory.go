@@ -33,7 +33,7 @@ func NewConnectionFactory(
 
 // Create execute the process of the connection creation based on the
 // base configuration defined by the given name of the connection,
-// and apply the extra connection cfg also given as arguments.
+// and apply the extra connection config also given as arguments.
 func (f *ConnectionFactory) Create(
 	cfg *config.Partial,
 	gormCfg *gorm.Config,

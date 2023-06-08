@@ -1,8 +1,9 @@
 package log
 
 import (
-	"github.com/golang/mock/gomock"
 	"reflect"
+
+	"github.com/golang/mock/gomock"
 )
 
 // MockFormatter is a mock instance of Formatter interface

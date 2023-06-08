@@ -1,14 +1,15 @@
 package rdb
 
 import (
+	"reflect"
+
 	"github.com/golang/mock/gomock"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
-	"reflect"
 )
 
-// MockDialect is a mock an instance of Dialect interface.
+// MockDialect is a mock instance of Dialect interface.
 type MockDialect struct {
 	ctrl     *gomock.Controller
 	recorder *MockDialectRecorder

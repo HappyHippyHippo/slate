@@ -16,18 +16,18 @@ var _ sourceCreator = &SourceFactory{}
 // Loader defines an object responsible to initialize a
 // configuration manager.
 type Loader struct {
-	config        configurer
+	configurer    configurer
 	sourceCreator sourceCreator
 }
 
 // NewLoader instantiate a new configuration loader instance.
 func NewLoader(
-	cfg *Config,
+	configurer *Config,
 	sourceCreator *SourceFactory,
 ) (*Loader, error) {
 	// check manager argument reference
-	if cfg == nil {
-		return nil, errNilPointer("cfg")
+	if configurer == nil {
+		return nil, errNilPointer("configurer")
 	}
 	// check source factory argument reference
 	if sourceCreator == nil {
@@ -35,7 +35,7 @@ func NewLoader(
 	}
 	// instantiate the loader
 	return &Loader{
-		config:        cfg,
+		configurer:    configurer,
 		sourceCreator: sourceCreator,
 	}, nil
 }
@@ -49,11 +49,11 @@ func (l Loader) Load() error {
 		return e
 	}
 	// add the loaded entry file content into the manager
-	if e := l.config.AddSource(LoaderSourceID, 0, src); e != nil {
+	if e := l.configurer.AddSource(LoaderSourceID, 0, src); e != nil {
 		return e
 	}
 	// retrieve from the loaded info the partial entries list
-	sources, e := l.config.Partial(LoaderSourceListPath)
+	sources, e := l.configurer.Partial(LoaderSourceListPath)
 	if e != nil {
 		return nil
 	}
@@ -85,5 +85,5 @@ func (l Loader) loadSource(
 		return e
 	}
 	// add the loaded source to the manager
-	return l.config.AddSource(id, sc.Priority, src)
+	return l.configurer.AddSource(id, sc.Priority, src)
 }

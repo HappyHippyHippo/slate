@@ -1,12 +1,13 @@
 package log
 
 import (
+	"reflect"
+
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate/config"
-	"reflect"
 )
 
-// MockStreamStrategy is a mock an instance of StreamStrategy interface
+// MockStreamStrategy is a mock instance of StreamStrategy interface
 type MockStreamStrategy struct {
 	ctrl     *gomock.Controller
 	recorder *MockStreamStrategyRecorder

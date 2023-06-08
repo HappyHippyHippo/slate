@@ -3,10 +3,11 @@ package log
 import (
 	"errors"
 	"fmt"
+	"testing"
+
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
-	"testing"
 )
 
 func Test_NewLoader(t *testing.T) {
@@ -70,11 +71,11 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(nil, expected).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(nil, expected).Times(1)
 
 		sut, _ := NewLoader(config.NewConfig(), NewLog(), NewStreamFactory())
-		sut.cfg = cfg
+		sut.configurer = configurer
 
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
@@ -88,12 +89,12 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		partial := &config.Partial{}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
-		cfg.EXPECT().AddObserver("slate.logger.streams", gomock.Any()).Return(nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
+		configurer.EXPECT().AddObserver("slate.logger.streams", gomock.Any()).Return(nil).Times(1)
 
 		sut, _ := NewLoader(config.NewConfig(), NewLog(), NewStreamFactory())
-		sut.cfg = cfg
+		sut.configurer = configurer
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%s) error", e)
@@ -109,12 +110,12 @@ func Test_Loader_Load(t *testing.T) {
 		defer func() { LoaderConfigPath = prev }()
 
 		partial := &config.Partial{}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("path", config.Partial{}).Return(partial, nil).Times(1)
-		cfg.EXPECT().AddObserver("path", gomock.Any()).Return(nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("path", config.Partial{}).Return(partial, nil).Times(1)
+		configurer.EXPECT().AddObserver("path", gomock.Any()).Return(nil).Times(1)
 
 		sut, _ := NewLoader(config.NewConfig(), NewLog(), NewStreamFactory())
-		sut.cfg = cfg
+		sut.configurer = configurer
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%s) error", e)
@@ -126,11 +127,11 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		partial := &config.Partial{"id": 1}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
 
 		sut, _ := NewLoader(config.NewConfig(), NewLog(), NewStreamFactory())
-		sut.cfg = cfg
+		sut.configurer = configurer
 
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
@@ -145,14 +146,14 @@ func Test_Loader_Load(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		partial := &config.Partial{"id": config.Partial{}}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
-		streamFactory := NewMockStreamFactory(ctrl)
-		streamFactory.EXPECT().Create(&config.Partial{}).Return(nil, expected).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
+		streamCreator := NewMockStreamCreator(ctrl)
+		streamCreator.EXPECT().Create(&config.Partial{}).Return(nil, expected).Times(1)
 
 		sut, _ := NewLoader(config.NewConfig(), NewLog(), NewStreamFactory())
-		sut.cfg = cfg
-		sut.streamCreator = streamFactory
+		sut.configurer = configurer
+		sut.streamCreator = streamCreator
 
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
@@ -167,18 +168,18 @@ func Test_Loader_Load(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		partial := &config.Partial{"id": config.Partial{}}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
 		stream := NewMockStream(ctrl)
-		streamFactory := NewMockStreamFactory(ctrl)
-		streamFactory.EXPECT().Create(&config.Partial{}).Return(stream, nil).Times(1)
-		log := NewMockLogger(ctrl)
-		log.EXPECT().AddStream("id", stream).Return(expected).Times(1)
+		streamCreator := NewMockStreamCreator(ctrl)
+		streamCreator.EXPECT().Create(&config.Partial{}).Return(stream, nil).Times(1)
+		logger := NewMockLogger(ctrl)
+		logger.EXPECT().AddStream("id", stream).Return(expected).Times(1)
 
 		sut, _ := NewLoader(config.NewConfig(), NewLog(), NewStreamFactory())
-		sut.cfg = cfg
-		sut.log = log
-		sut.streamCreator = streamFactory
+		sut.configurer = configurer
+		sut.logger = logger
+		sut.streamCreator = streamCreator
 
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
@@ -192,19 +193,19 @@ func Test_Loader_Load(t *testing.T) {
 		defer ctrl.Finish()
 
 		partial := &config.Partial{"id": config.Partial{}}
-		cfg := NewMockConfigurer(ctrl)
-		cfg.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
-		cfg.EXPECT().AddObserver("slate.logger.streams", gomock.Any()).Return(nil).Times(1)
+		configurer := NewMockConfigurer(ctrl)
+		configurer.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
+		configurer.EXPECT().AddObserver("slate.logger.streams", gomock.Any()).Return(nil).Times(1)
 		stream := NewMockStream(ctrl)
-		streamFactory := NewMockStreamFactory(ctrl)
-		streamFactory.EXPECT().Create(&config.Partial{}).Return(stream, nil).Times(1)
-		log := NewMockLogger(ctrl)
-		log.EXPECT().AddStream("id", stream).Return(nil).Times(1)
+		streamCreator := NewMockStreamCreator(ctrl)
+		streamCreator.EXPECT().Create(&config.Partial{}).Return(stream, nil).Times(1)
+		logger := NewMockLogger(ctrl)
+		logger.EXPECT().AddStream("id", stream).Return(nil).Times(1)
 
 		sut, _ := NewLoader(config.NewConfig(), NewLog(), NewStreamFactory())
-		sut.cfg = cfg
-		sut.log = log
-		sut.streamCreator = streamFactory
+		sut.configurer = configurer
+		sut.logger = logger
+		sut.streamCreator = streamCreator
 
 		if e := sut.Load(); e != nil {
 			t.Errorf("returned the (%v) error", e)
@@ -222,20 +223,20 @@ func Test_Loader_Load(t *testing.T) {
 		source1.EXPECT().Get("").Return(partial1, nil).Times(2)
 		source2 := NewMockConfigSource(ctrl)
 		source2.EXPECT().Get("").Return(partial2, nil).Times(1)
-		cfg := config.NewConfig()
-		_ = cfg.AddSource("id", 1, source1)
+		configurer := config.NewConfig()
+		_ = configurer.AddSource("id", 1, source1)
 		stream := NewMockStream(ctrl)
-		streamFactory := NewMockStreamFactory(ctrl)
-		streamFactory.EXPECT().Create(&config1).Return(stream, nil).Times(1)
-		log := NewMockLogger(ctrl)
-		log.EXPECT().AddStream("id", stream).Return(nil).Times(1)
+		streamCreator := NewMockStreamCreator(ctrl)
+		streamCreator.EXPECT().Create(&config1).Return(stream, nil).Times(1)
+		logger := NewMockLogger(ctrl)
+		logger.EXPECT().AddStream("id", stream).Return(nil).Times(1)
 
-		sut, _ := NewLoader(cfg, NewLog(), NewStreamFactory())
-		sut.streamCreator = streamFactory
-		sut.log = log
+		sut, _ := NewLoader(configurer, NewLog(), NewStreamFactory())
+		sut.streamCreator = streamCreator
+		sut.logger = logger
 		_ = sut.Load()
 
-		_ = cfg.AddSource("id2", 100, source2)
+		_ = configurer.AddSource("id2", 100, source2)
 	})
 
 	t.Run("reconfigured logger streams", func(t *testing.T) {
@@ -250,29 +251,23 @@ func Test_Loader_Load(t *testing.T) {
 		source1.EXPECT().Get("").Return(partial1, nil).Times(2)
 		source2 := NewMockConfigSource(ctrl)
 		source2.EXPECT().Get("").Return(partial2, nil).Times(1)
-		cfg := config.NewConfig()
-		_ = cfg.AddSource("id1", 1, source1)
+		configurer := config.NewConfig()
+		_ = configurer.AddSource("id1", 1, source1)
 		stream1 := NewMockStream(ctrl)
 		stream2 := NewMockStream(ctrl)
-		streamFactory := NewMockStreamFactory(ctrl)
-		gomock.InOrder(
-			streamFactory.EXPECT().Create(&config1).Return(stream1, nil),
-			streamFactory.EXPECT().Create(&config1).Return(stream1, nil),
-			streamFactory.EXPECT().Create(&config1).Return(stream2, nil),
-		)
-		log := NewMockLogger(ctrl)
-		log.EXPECT().RemoveAllStreams().Times(1)
-		gomock.InOrder(
-			log.EXPECT().AddStream("id1", stream1).Return(nil),
-			log.EXPECT().AddStream("id1", stream1).Return(nil),
-			log.EXPECT().AddStream("id2", stream2).Return(nil),
-		)
+		streamCreator := NewMockStreamCreator(ctrl)
+		streamCreator.EXPECT().Create(&config1).Return(stream1, nil).Times(2)
+		streamCreator.EXPECT().Create(&config1).Return(stream2, nil).Times(1)
+		logger := NewMockLogger(ctrl)
+		logger.EXPECT().RemoveAllStreams().Times(1)
+		logger.EXPECT().AddStream("id1", stream1).Return(nil).Times(2)
+		logger.EXPECT().AddStream("id2", stream2).Return(nil).Times(1)
 
-		sut, _ := NewLoader(cfg, NewLog(), NewStreamFactory())
-		sut.streamCreator = streamFactory
-		sut.log = log
+		sut, _ := NewLoader(configurer, NewLog(), NewStreamFactory())
+		sut.streamCreator = streamCreator
+		sut.logger = logger
 		_ = sut.Load()
 
-		_ = cfg.AddSource("id2", 100, source2)
+		_ = configurer.AddSource("id2", 100, source2)
 	})
 }

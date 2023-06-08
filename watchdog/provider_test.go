@@ -29,15 +29,15 @@ func Test_Provider_Register(t *testing.T) {
 		case e != nil:
 			t.Errorf("returned the (%v) error", e)
 		case !container.Has(LogFormatterFactoryID):
-			t.Errorf("didn't registered the log formatter factory : %v", sut)
+			t.Errorf("didn't registered the log formatter creator : %v", sut)
 		case !container.Has(WatchdogFactoryID):
-			t.Errorf("didn't registered the watchdog factory : %v", sut)
+			t.Errorf("didn't registered the watchdog creator : %v", sut)
 		case !container.Has(ID):
 			t.Errorf("didn't registered the kannel : %v", sut)
 		}
 	})
 
-	t.Run("retrieving log formatter factory", func(t *testing.T) {
+	t.Run("retrieving log formatter creator", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -50,17 +50,17 @@ func Test_Provider_Register(t *testing.T) {
 		case e != nil:
 			t.Errorf("returned the unexpected error (%v)", e)
 		case sut == nil:
-			t.Error("didn't returned a reference to the log formatter factory")
+			t.Error("didn't returned a reference to the log formatter creator")
 		default:
 			switch sut.(type) {
 			case *LogFormatterFactory:
 			default:
-				t.Error("didn't returned the log formatter factory")
+				t.Error("didn't returned the log formatter creator")
 			}
 		}
 	})
 
-	t.Run("retrieving watchdog factory", func(t *testing.T) {
+	t.Run("retrieving watchdog creator", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -74,12 +74,12 @@ func Test_Provider_Register(t *testing.T) {
 		case e != nil:
 			t.Errorf("returned the unexpected error (%v)", e)
 		case sut == nil:
-			t.Error("didn't returned a reference to the watchdog factory")
+			t.Error("didn't returned a reference to the watchdog creator")
 		default:
 			switch sut.(type) {
 			case *Factory:
 			default:
-				t.Error("didn't returned the watchdog factory")
+				t.Error("didn't returned the watchdog creator")
 			}
 		}
 	})
@@ -118,7 +118,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("error retrieving the log formatter factory", func(t *testing.T) {
+	t.Run("error retrieving the log formatter creator", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -134,7 +134,7 @@ func Test_Provider_Boot(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid log formatter factory", func(t *testing.T) {
+	t.Run("invalid log formatter creator", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 

@@ -3,13 +3,13 @@ package file
 import (
 	"errors"
 	"fmt"
-	"github.com/happyhippyhippo/slate/config"
 	"io"
 	"os"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate"
+	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/log"
 )
 

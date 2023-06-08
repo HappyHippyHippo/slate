@@ -1,16 +1,19 @@
 package watchdog
 
 import (
+	"reflect"
+
 	"github.com/golang/mock/gomock"
 	"github.com/happyhippyhippo/slate/config"
-	"reflect"
 )
 
-// MockConfigurer is a mock of configurer interface.
+// MockConfigurer is a mock instance of configurer interface.
 type MockConfigurer struct {
 	ctrl     *gomock.Controller
 	recorder *MockConfigurerRecorder
 }
+
+var _ configurer = &MockConfigurer{}
 
 // MockConfigurerRecorder is the mock recorder for MockConfigurer.
 type MockConfigurerRecorder struct {

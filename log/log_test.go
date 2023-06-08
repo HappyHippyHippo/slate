@@ -3,11 +3,12 @@ package log
 import (
 	"errors"
 	"fmt"
-	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate"
 	"reflect"
 	"sort"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/happyhippyhippo/slate"
 )
 
 func Test_NewLog(t *testing.T) {

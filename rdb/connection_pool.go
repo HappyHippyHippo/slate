@@ -19,7 +19,7 @@ type connectionCreator interface {
 
 // ConnectionPool is a database connection pool and generator.
 type ConnectionPool struct {
-	cfg               configurer
+	configurer        configurer
 	connectionCreator connectionCreator
 	instances         map[string]*gorm.DB
 }
@@ -27,11 +27,11 @@ type ConnectionPool struct {
 // NewConnectionPool will instantiate a new relational
 // database connection pool instance.
 func NewConnectionPool(
-	cfg *config.Config,
+	configurer *config.Config,
 	connectionCreator *ConnectionFactory,
 ) (*ConnectionPool, error) {
 	// check config argument reference
-	if cfg == nil {
+	if configurer == nil {
 		return nil, errNilPointer("config")
 	}
 	// check ConnectionFactory argument reference
@@ -40,14 +40,14 @@ func NewConnectionPool(
 	}
 	// instantiate the connection pool instance
 	pool := &ConnectionPool{
-		cfg:               cfg,
+		configurer:        configurer,
 		connectionCreator: connectionCreator,
 		instances:         map[string]*gorm.DB{},
 	}
 	// check if is to observe connection configuration changes
 	if ObserveConfig {
 		// add an observer to the connections config
-		_ = cfg.AddObserver(ConnectionsConfigPath, func(_ interface{}, _ interface{}) {
+		_ = configurer.AddObserver(ConnectionsConfigPath, func(_ interface{}, _ interface{}) {
 			// close all the currently opened connections
 			for _, conn := range pool.instances {
 				if db, _ := conn.DB(); db != nil {
@@ -63,7 +63,7 @@ func NewConnectionPool(
 
 // Get execute the process of the connection creation based on the
 // base configuration defined by the given name of the connection,
-// and apply the extra connection cfg also given as arguments.
+// and apply the extra connection config also given as arguments.
 func (f *ConnectionPool) Get(
 	name string,
 	gormCfg *gorm.Config,
@@ -75,11 +75,11 @@ func (f *ConnectionPool) Get(
 	// generate the configuration path of the requested connection
 	path := fmt.Sprintf("%s.%s", ConnectionsConfigPath, name)
 	// check if there is a configuration for the requested connection
-	if !f.cfg.Has(path) {
+	if !f.configurer.Has(path) {
 		return nil, errConfigNotFound(path)
 	}
 	// obtain the connection configuration
-	cfg, e := f.cfg.Partial(path)
+	cfg, e := f.configurer.Partial(path)
 	if e != nil {
 		return nil, e
 	}

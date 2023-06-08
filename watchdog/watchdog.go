@@ -8,20 +8,20 @@ type logAdapter interface {
 
 // Watchdog defines the instance used to overlook a process execution.
 type Watchdog struct {
-	log logAdapter
+	logAdapter logAdapter
 }
 
 // NewWatchdog generates a new watchdog instance.
 func NewWatchdog(
-	log *LogAdapter,
+	logAdapter *LogAdapter,
 ) (*Watchdog, error) {
-	// check log argument reference
-	if log == nil {
-		return nil, errNilPointer("log")
+	// check logAdapter argument reference
+	if logAdapter == nil {
+		return nil, errNilPointer("logAdapter")
 	}
 	// return the created watchdog instance
 	return &Watchdog{
-		log: log,
+		logAdapter: logAdapter,
 	}, nil
 }
 
@@ -47,7 +47,7 @@ func (w *Watchdog) Run(process Processor) (e error) {
 		closed <- struct{}{}
 	}
 	// log the starting of the watchdog process
-	_ = w.log.Start()
+	_ = w.logAdapter.Start()
 	for {
 		// run the method
 		go runner()
@@ -55,11 +55,11 @@ func (w *Watchdog) Run(process Processor) (e error) {
 		select {
 		case <-errored:
 			// log the error
-			_ = w.log.Error(e)
+			_ = w.logAdapter.Error(e)
 		case <-closed:
 			// log the execution termination and
 			// terminate the watchdog
-			_ = w.log.Done()
+			_ = w.logAdapter.Done()
 			return e
 		}
 	}

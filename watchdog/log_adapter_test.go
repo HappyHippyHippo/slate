@@ -28,7 +28,7 @@ func Test_NewLogAdapter(t *testing.T) {
 		}
 	})
 
-	t.Run("nil log", func(t *testing.T) {
+	t.Run("nil formatter", func(t *testing.T) {
 		sut, e := NewLogAdapter("service", "channel", log.FATAL, log.FATAL, log.FATAL, log.NewLog(), nil)
 		switch {
 		case sut != nil:
