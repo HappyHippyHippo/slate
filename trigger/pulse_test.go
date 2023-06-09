@@ -13,7 +13,7 @@ func Test_NewPulse(t *testing.T) {
 		if _, e := NewPulse(20*time.Millisecond, nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -21,7 +21,7 @@ func Test_NewPulse(t *testing.T) {
 		if _, e := NewPulse(20*time.Millisecond, func() error {
 			return nil
 		}); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }

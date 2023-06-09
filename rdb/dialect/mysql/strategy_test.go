@@ -47,7 +47,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -64,7 +64,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -82,7 +82,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -101,7 +101,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -121,7 +121,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -142,7 +142,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -164,7 +164,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -187,7 +187,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -211,7 +211,7 @@ func Test_DialectStrategy_Create(t *testing.T) {
 			t.Error("didn't return the expected valid dialect instance")
 		default:
 			if check := dialect.(*mysql.Dialector).Config.DSN; check != expected {
-				t.Errorf("dialect composed with the DSN (%v) when expected to be (%v)", check, expected)
+				t.Errorf("(%v) when expecting (%v)", check, expected)
 			}
 		}
 	})
@@ -236,10 +236,10 @@ func Test_DialectStrategy_Create(t *testing.T) {
 			switch d := dialect.(type) {
 			case *mysql.Dialector:
 				if check := d.Config.DSN; check != expected {
-					t.Errorf("dialect composed with the DSN (%v) when expected to be (%v)", check, expected)
+					t.Errorf("(%v) when expecting (%v)", check, expected)
 				}
 			default:
-				t.Error("didn't return the expected mysql dialect instance")
+				t.Error("didn't return the expected mysql dialect")
 			}
 		}
 	})
@@ -270,14 +270,14 @@ func Test_DialectStrategy_Create(t *testing.T) {
 				dsn := d.Config.DSN
 				switch {
 				case !strings.HasPrefix(dsn, expectedPrefix):
-					t.Errorf("dialect composed with the DSN prefix of (%v) when expected to be (%v)", dsn, expectedPrefix)
+					t.Errorf("(%v) when expecting (%v)", dsn, expectedPrefix)
 				case !strings.Contains(dsn, "&param1=value1"):
-					t.Errorf("missing dialect composed with the DSN params (%v)", "&param1=value1")
+					t.Errorf("missing params (%v)", "&param1=value1")
 				case !strings.Contains(dsn, "&param2=value2"):
-					t.Errorf("missing dialect composed with the DSN params (%v)", "&param2=value2")
+					t.Errorf("missing params (%v)", "&param2=value2")
 				}
 			default:
-				t.Error("didn't return the expected mysql dialect instance")
+				t.Error("didn't return the expected mysql dialect")
 			}
 		}
 	})

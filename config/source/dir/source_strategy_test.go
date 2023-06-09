@@ -23,7 +23,7 @@ func Test_NewSourceStrategy(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -38,7 +38,7 @@ func Test_NewSourceStrategy(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -52,7 +52,7 @@ func Test_NewSourceStrategy(t *testing.T) {
 		sut, e := NewSourceStrategy(fs, decoderFactory)
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
 		case sut.fileSystem != fs:
@@ -134,7 +134,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -144,14 +144,17 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"format": "format", "recursive": true})
+		src, e := sut.Create(config.Partial{
+			"format":    "format",
+			"recursive": true,
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, config.ErrInvalidSource):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, config.ErrInvalidSource)
+			t.Errorf("(%v) when expecting (%v)", e, config.ErrInvalidSource)
 		}
 	})
 
@@ -161,14 +164,18 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"path": 123, "format": "format", "recursive": true})
+		src, e := sut.Create(config.Partial{
+			"path":      123,
+			"format":    "format",
+			"recursive": true,
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -178,14 +185,18 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"path": "path", "format": 123, "recursive": true})
+		src, e := sut.Create(config.Partial{
+			"path":      "path",
+			"format":    123,
+			"recursive": true,
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -195,14 +206,18 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"path": "path", "format": 123, "recursive": "true"})
+		src, e := sut.Create(config.Partial{
+			"path":      "path",
+			"format":    123,
+			"recursive": "true",
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -212,14 +227,18 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(NewMockFs(ctrl), config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"path": "path", "format": "format", "recursive": "true"})
+		src, e := sut.Create(config.Partial{
+			"path":      "path",
+			"format":    "format",
+			"recursive": "true",
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -239,7 +258,10 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		file := NewMockFile(ctrl)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
-		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fs.
+			EXPECT().
+			OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).
+			Return(file, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
@@ -251,10 +273,14 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(fs, decoderFactory)
 
-		src, e := sut.Create(config.Partial{"path": path, "format": "format", "recursive": true})
+		src, e := sut.Create(config.Partial{
+			"path":      path,
+			"format":    "format",
+			"recursive": true,
+		})
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case src == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -285,7 +311,10 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		file := NewMockFile(ctrl)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
-		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fs.
+			EXPECT().
+			OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).
+			Return(file, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&expected, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
@@ -297,10 +326,13 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(fs, decoderFactory)
 
-		src, e := sut.Create(config.Partial{"path": path, "recursive": true})
+		src, e := sut.Create(config.Partial{
+			"path":      path,
+			"recursive": true,
+		})
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case src == nil:
 			t.Error("didn't returned a valid reference")
 		default:

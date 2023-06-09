@@ -101,7 +101,7 @@ func (Provider) getFormatterFactory(
 	if instance, ok := entry.(*FormatterFactory); ok {
 		return instance
 	}
-	panic(errConversion(entry, "*logger.FormatterFactory"))
+	panic(errConversion(entry, "*log.FormatterFactory"))
 }
 
 func (Provider) getFormatterStrategies(
@@ -117,7 +117,7 @@ func (Provider) getFormatterStrategies(
 	for _, entry := range entries {
 		s, ok := entry.(FormatterStrategy)
 		if !ok {
-			panic(errConversion(entry, "logger.FormatterStrategy"))
+			panic(errConversion(entry, "log.FormatterStrategy"))
 		}
 		strategies = append(strategies, s)
 	}
@@ -136,7 +136,7 @@ func (Provider) getStreamFactory(
 	if instance, ok := entry.(*StreamFactory); ok {
 		return instance
 	}
-	panic(errConversion(entry, "*logger.StreamFactory"))
+	panic(errConversion(entry, "*log.StreamFactory"))
 }
 
 func (Provider) getStreamStrategies(
@@ -152,7 +152,7 @@ func (Provider) getStreamStrategies(
 	for _, entry := range entries {
 		s, ok := entry.(StreamStrategy)
 		if !ok {
-			panic(errConversion(entry, "logger.StreamStrategy"))
+			panic(errConversion(entry, "log.StreamStrategy"))
 		}
 		strategies = append(strategies, s)
 	}
@@ -171,5 +171,5 @@ func (Provider) getLoader(
 	if instance, ok := entry.(*Loader); ok {
 		return instance
 	}
-	panic(errConversion(entry, "*logger.Loader"))
+	panic(errConversion(entry, "*log.Loader"))
 }

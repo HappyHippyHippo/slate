@@ -18,7 +18,7 @@ func Test_NewLoader(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -30,7 +30,7 @@ func Test_NewLoader(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -38,7 +38,7 @@ func Test_NewLoader(t *testing.T) {
 		if sut, e := NewLoader(NewConfig(), NewSourceFactory()); sut == nil {
 			t.Error("didn't returned a valid reference")
 		} else if e != nil {
-			t.Errorf("return the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }
@@ -52,7 +52,11 @@ func Test_Loader_Load(t *testing.T) {
 		LoaderSourcePath = "partial/sources.yaml"
 		LoaderSourceFormat = "format"
 	}()
-	baseSourcePartial := Partial{"type": "file", "path": "base_source_path", "format": "format"}
+	baseSourcePartial := Partial{
+		"type":   "file",
+		"path":   "base_source_path",
+		"format": "format",
+	}
 
 	t.Run("error getting the base source", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
@@ -70,7 +74,7 @@ func Test_Loader_Load(t *testing.T) {
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -92,7 +96,7 @@ func Test_Loader_Load(t *testing.T) {
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -112,7 +116,7 @@ func Test_Loader_Load(t *testing.T) {
 		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -133,7 +137,7 @@ func Test_Loader_Load(t *testing.T) {
 		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -156,7 +160,7 @@ func Test_Loader_Load(t *testing.T) {
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrConversion) {
-			t.Errorf("returned (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -184,7 +188,7 @@ func Test_Loader_Load(t *testing.T) {
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -216,7 +220,7 @@ func Test_Loader_Load(t *testing.T) {
 		if e := sut.Load(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -245,7 +249,7 @@ func Test_Loader_Load(t *testing.T) {
 		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -257,7 +261,11 @@ func Test_Loader_Load(t *testing.T) {
 		LoaderSourcePath = "config.yaml"
 		defer func() { LoaderSourcePath = prev }()
 
-		basePartial := Partial{"type": "file", "path": "config.yaml", "format": "format"}
+		basePartial := Partial{
+			"type":   "file",
+			"path":   "config.yaml",
+			"format": "format",
+		}
 		sourcePartial := Partial{"type": "my type", "priority": 101}
 		partial := Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
@@ -279,7 +287,7 @@ func Test_Loader_Load(t *testing.T) {
 		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -291,7 +299,11 @@ func Test_Loader_Load(t *testing.T) {
 		LoaderSourceFormat = "json"
 		defer func() { LoaderSourceFormat = prev }()
 
-		basePartial := Partial{"type": "file", "path": "base_source_path", "format": "json"}
+		basePartial := Partial{
+			"type":   "file",
+			"path":   "base_source_path",
+			"format": "json",
+		}
 		sourcePartial := Partial{"type": "my type", "priority": 101}
 		partial := Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
@@ -313,7 +325,7 @@ func Test_Loader_Load(t *testing.T) {
 		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -325,7 +337,11 @@ func Test_Loader_Load(t *testing.T) {
 		LoaderSourceListPath = "config_list"
 		defer func() { LoaderSourceListPath = prev }()
 
-		basePartial := Partial{"type": "file", "path": "base_source_path", "format": "format"}
+		basePartial := Partial{
+			"type":   "file",
+			"path":   "base_source_path",
+			"format": "format",
+		}
 		sourcePartial := Partial{"type": "my type", "priority": 101}
 		partial := Partial{"source": sourcePartial}
 		source1 := NewMockSource(ctrl)
@@ -347,7 +363,7 @@ func Test_Loader_Load(t *testing.T) {
 		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -376,7 +392,7 @@ func Test_Loader_Load(t *testing.T) {
 		sut.sourceCreator = sourceCreator
 
 		if e := sut.Load(); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }

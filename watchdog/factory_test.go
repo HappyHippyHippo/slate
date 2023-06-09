@@ -24,7 +24,7 @@ func Test_Factory(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -40,7 +40,7 @@ func Test_Factory(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -56,7 +56,7 @@ func Test_Factory(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -68,7 +68,7 @@ func Test_Factory(t *testing.T) {
 
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
 		}
@@ -83,7 +83,11 @@ func Test_Factory_Create(t *testing.T) {
 		service := "test"
 		expected := fmt.Errorf("error message")
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(nil, expected).Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.watchdog.services.test", config.Partial{}).
+			Return(nil, expected).
+			Times(1)
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
 		sut.configurer = configurer
@@ -95,7 +99,7 @@ func Test_Factory_Create(t *testing.T) {
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -110,7 +114,11 @@ func Test_Factory_Create(t *testing.T) {
 		service := "test"
 		expected := fmt.Errorf("error message")
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Partial("path.test", config.Partial{}).Return(nil, expected).Times(1)
+		configurer.
+			EXPECT().
+			Partial("path.test", config.Partial{}).
+			Return(nil, expected).
+			Times(1)
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
 		sut.configurer = configurer
@@ -122,7 +130,7 @@ func Test_Factory_Create(t *testing.T) {
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -133,7 +141,11 @@ func Test_Factory_Create(t *testing.T) {
 		service := "test"
 		watchdogCfg := config.Partial{"formatter": 123}
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.watchdog.services.test", config.Partial{}).
+			Return(watchdogCfg, nil).
+			Times(1)
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
 		sut.configurer = configurer
@@ -145,7 +157,7 @@ func Test_Factory_Create(t *testing.T) {
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -156,7 +168,11 @@ func Test_Factory_Create(t *testing.T) {
 		service := "test"
 		watchdogCfg := config.Partial{"level": config.Partial{"start": "invalid"}}
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.watchdog.services.test", config.Partial{}).
+			Return(watchdogCfg, nil).
+			Times(1)
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
 		sut.configurer = configurer
@@ -168,7 +184,7 @@ func Test_Factory_Create(t *testing.T) {
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -179,7 +195,11 @@ func Test_Factory_Create(t *testing.T) {
 		service := "test"
 		watchdogCfg := config.Partial{"level": config.Partial{"error": "invalid"}}
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.watchdog.services.test", config.Partial{}).
+			Return(watchdogCfg, nil).
+			Times(1)
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
 		sut.configurer = configurer
@@ -191,7 +211,7 @@ func Test_Factory_Create(t *testing.T) {
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -202,7 +222,11 @@ func Test_Factory_Create(t *testing.T) {
 		service := "test"
 		watchdogCfg := config.Partial{"level": config.Partial{"done": "invalid"}}
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.watchdog.services.test", config.Partial{}).
+			Return(watchdogCfg, nil).
+			Times(1)
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
 		sut.configurer = configurer
@@ -214,7 +238,7 @@ func Test_Factory_Create(t *testing.T) {
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -226,9 +250,17 @@ func Test_Factory_Create(t *testing.T) {
 		service := "test"
 		watchdogCfg := config.Partial{"formatter": "my formatter"}
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.watchdog.services.test", config.Partial{}).
+			Return(watchdogCfg, nil).
+			Times(1)
 		logFormatterCreator := NewMockLogFormatterCreator(ctrl)
-		logFormatterCreator.EXPECT().Create(&config.Partial{"type": "my formatter"}).Return(nil, expected).Times(1)
+		logFormatterCreator.
+			EXPECT().
+			Create(&config.Partial{"type": "my formatter"}).
+			Return(nil, expected).
+			Times(1)
 
 		sut, _ := NewFactory(config.NewConfig(), log.NewLog(), NewLogFormatterFactory())
 		sut.configurer = configurer
@@ -241,7 +273,7 @@ func Test_Factory_Create(t *testing.T) {
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -252,10 +284,17 @@ func Test_Factory_Create(t *testing.T) {
 		service := "test"
 		watchdogCfg := config.Partial{"name": service}
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Partial("slate.watchdog.services.test", config.Partial{}).Return(watchdogCfg, nil).Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.watchdog.services.test", config.Partial{}).
+			Return(watchdogCfg, nil).
+			Times(1)
 		formatter := NewMockLogFormatter(ctrl)
 		logFormatterCreator := NewMockLogFormatterCreator(ctrl)
-		logFormatterCreator.EXPECT().Create(&config.Partial{"type": "simple"}).Return(formatter, nil).Times(1)
+		logFormatterCreator.
+			EXPECT().
+			Create(&config.Partial{"type": "simple"}).
+			Return(formatter, nil).Times(1)
 		logger := log.NewLog()
 
 		sut, _ := NewFactory(config.NewConfig(), logger, NewLogFormatterFactory())
@@ -265,7 +304,7 @@ func Test_Factory_Create(t *testing.T) {
 		wd, e := sut.Create(service)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		case wd == nil:
 			t.Errorf("didn't returned the expected watchdog reference")
 		case wd.logAdapter.(*LogAdapter).name != service:

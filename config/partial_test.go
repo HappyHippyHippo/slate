@@ -16,7 +16,7 @@ func Test_Partial_Clone(t *testing.T) {
 		sut["extra"] = "value"
 
 		if c == nil {
-			t.Error("clone call didn't returned a valid reference")
+			t.Error("didn't returned a valid reference")
 		} else if len(c) != 0 {
 			t.Errorf("cloned partial is not empty : %v", c)
 		}
@@ -29,9 +29,9 @@ func Test_Partial_Clone(t *testing.T) {
 		sut["extra"] = "value"
 
 		if c == nil {
-			t.Error("clone call didn't returned a valid reference")
+			t.Error("didn't returned a valid reference")
 		} else if !reflect.DeepEqual(c, expected) {
-			t.Errorf("cloned partial (%v) is not the expected : %v", c, expected)
+			t.Errorf("cloned (%v) is not the expected : %v", c, expected)
 		}
 	})
 
@@ -43,9 +43,9 @@ func Test_Partial_Clone(t *testing.T) {
 		sut["field"].(Partial)["extra"] = "value"
 
 		if c == nil {
-			t.Error("clone call didn't returned a valid reference")
+			t.Error("didn't returned a valid reference")
 		} else if !reflect.DeepEqual(c, expected) {
-			t.Errorf("cloned partial (%v) is not the expected : %v", c, expected)
+			t.Errorf("cloned (%v) is not the expected : %v", c, expected)
 		}
 	})
 
@@ -57,9 +57,9 @@ func Test_Partial_Clone(t *testing.T) {
 		sut["field"].([]interface{})[0].(Partial)["extra"] = "value"
 
 		if c == nil {
-			t.Error("clone call didn't returned a valid reference")
+			t.Error("didn't returned a valid reference")
 		} else if !reflect.DeepEqual(c, expected) {
-			t.Errorf("cloned partial (%v) is not the expected : %v", c, expected)
+			t.Errorf("cloned (%v) is not the expected : %v", c, expected)
 		}
 	})
 
@@ -71,9 +71,9 @@ func Test_Partial_Clone(t *testing.T) {
 		sut["field"].([]interface{})[0].([]interface{})[0].(Partial)["extra"] = "value"
 
 		if c == nil {
-			t.Error("clone call didn't returned a valid reference")
+			t.Error("didn't returned a valid reference")
 		} else if !reflect.DeepEqual(c, expected) {
-			t.Errorf("cloned partial (%v) is not the expected : %v", c, expected)
+			t.Errorf("cloned (%v) is not the expected : %v", c, expected)
 		}
 	})
 }
@@ -150,9 +150,9 @@ func Test_Partial_Has(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
-			if check := scenario.partial.Has(scenario.search); !check {
-				t.Errorf("didn't found the (%s) path in (%v)", scenario.search, scenario.partial)
+		for _, s := range scenarios {
+			if check := s.partial.Has(s.search); !check {
+				t.Errorf("didn't found the (%s) path in (%v)", s.search, s.partial)
 			}
 		}
 	})
@@ -184,9 +184,83 @@ func Test_Partial_Has(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
-			if check := scenario.partial.Has(scenario.search); check {
-				t.Errorf("founded the (%s) path in (%v)", scenario.search, scenario.partial)
+		for _, s := range scenarios {
+			if check := s.partial.Has(s.search); check {
+				t.Errorf("founded the (%s) path in (%v)", s.search, s.partial)
+			}
+		}
+	})
+}
+
+func Test_Partial_Set(t *testing.T) {
+	t.Run("error on empty path", func(t *testing.T) {
+		if chk, e := (&Partial{}).Set("", 123); chk != nil {
+			t.Error("unexpected valid partial reference")
+		} else if !errors.Is(e, ErrInvalidEmptyPath) {
+			t.Errorf("returned (%v) when expecting (%e)", e, ErrInvalidEmptyPath)
+		}
+	})
+
+	t.Run("set", func(t *testing.T) {
+		scenarios := []struct {
+			partial  Partial
+			path     string
+			value    interface{}
+			expected Partial
+		}{
+			{ // set to existing root partial
+				partial:  Partial{"test": 456},
+				path:     "test",
+				value:    123,
+				expected: Partial{"test": 123},
+			},
+			{ // set to non-existing root partial
+				partial:  Partial{},
+				path:     "test",
+				value:    123,
+				expected: Partial{"test": 123},
+			},
+			{ // set to existing sub partial and existing value
+				partial:  Partial{"test": Partial{"node": 456}},
+				path:     "test.node",
+				value:    123,
+				expected: Partial{"test": Partial{"node": 123}},
+			},
+			{ // set to existing sub partial and non-existing value
+				partial:  Partial{"test": Partial{}},
+				path:     "test.node",
+				value:    123,
+				expected: Partial{"test": Partial{"node": 123}},
+			},
+			{ // set to non existing sub partial
+				partial:  Partial{},
+				path:     "test.node",
+				value:    123,
+				expected: Partial{"test": Partial{"node": 123}},
+			},
+			{ // set to existing value on path
+				partial:  Partial{"test": 123},
+				path:     "test.node",
+				value:    123,
+				expected: Partial{"test": Partial{"node": 123}},
+			},
+			{ // set to non existing sub partial with nil path part
+				partial:  Partial{},
+				path:     "test...node",
+				value:    123,
+				expected: Partial{"test": Partial{"node": 123}},
+			},
+		}
+
+		for _, s := range scenarios {
+			check, e := s.partial.Set(s.path, s.value)
+			switch {
+			case e != nil:
+				t.Errorf("(%v) error when assigning (%v) to (%v) path", e, s.value, s.path)
+			case check != &s.partial:
+				t.Error("didn't returned the reference ot the assigned partial")
+			case !reflect.DeepEqual(s.partial, s.expected):
+				t.Errorf("didn't updated (%v) partial, expected (%v)", s.partial, s.expected)
 			}
 		}
 	})
@@ -246,11 +320,11 @@ func Test_Partial_Get(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
-			if check, e := scenario.partial.Get(scenario.search); e != nil {
-				t.Errorf("returned the unexpected error (%v) when retrieving (%v)", e, scenario.search)
-			} else if !reflect.DeepEqual(check, scenario.expected) {
-				t.Errorf("returned (%v) when retrieving (%v), expected (%v)", check, scenario.search, scenario.expected)
+		for _, s := range scenarios {
+			if check, e := s.partial.Get(s.search); e != nil {
+				t.Errorf("(%v) error when retrieving (%v)", e, s.search)
+			} else if !reflect.DeepEqual(check, s.expected) {
+				t.Errorf("returned (%v) when retrieving (%v), expected (%v)", check, s.search, s.expected)
 			}
 		}
 	})
@@ -286,15 +360,15 @@ func Test_Partial_Get(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
-			check, e := scenario.partial.Get(scenario.search)
+		for _, s := range scenarios {
+			check, e := s.partial.Get(s.search)
 			switch {
 			case e == nil:
 				t.Error("didn't returned the expected error")
 			case !errors.Is(e, ErrPathNotFound):
-				t.Errorf("returned error was not a partial path not found error : %v", e)
+				t.Errorf("not a partial path not found error : %v", e)
 			case check != nil:
-				t.Error("unexpectedly returned a valid reference to a stored partial value")
+				t.Error("valid reference to a stored partial value")
 			}
 		}
 	})
@@ -303,9 +377,9 @@ func Test_Partial_Get(t *testing.T) {
 		sut := Partial{"node1": nil, "node2": "value2"}
 
 		if check, e := sut.Get("node1", "default_value"); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if check != nil {
-			t.Errorf("returned the (%v) check", check)
+			t.Errorf("(%v) returned", check)
 		}
 	})
 
@@ -341,11 +415,11 @@ func Test_Partial_Get(t *testing.T) {
 		}
 
 		def := "default_value"
-		for _, scenario := range scenarios {
-			if check, e := scenario.partial.Get(scenario.search, def); e != nil {
-				t.Errorf("returned the unexpected error : %v", e)
+		for _, s := range scenarios {
+			if check, e := s.partial.Get(s.search, def); e != nil {
+				t.Errorf("unexpected (%v) error", e)
 			} else if check != def {
-				t.Errorf("returned (%v) when retrieving (%v)", check, scenario.search)
+				t.Errorf("returned (%v) when retrieving (%v)", check, s.search)
 			}
 		}
 	})
@@ -357,9 +431,9 @@ func Test_Partial_Bool(t *testing.T) {
 		sut := Partial{path: true}
 
 		if check, e := sut.Bool(path, false); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if !check {
-			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, true)
+			t.Errorf("(%v) when expecting : %v", check, true)
 		}
 	})
 
@@ -371,11 +445,11 @@ func Test_Partial_Bool(t *testing.T) {
 		check, e := sut.Bool(path, true)
 		switch {
 		case check:
-			t.Errorf("returned the unexpected value : %v", check)
+			t.Errorf("unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("the returned error is the expected error convertion error : %v", e)
+			t.Errorf("not convertion error : %v", e)
 		}
 	})
 
@@ -385,11 +459,11 @@ func Test_Partial_Bool(t *testing.T) {
 		check, e := sut.Bool("node")
 		switch {
 		case check:
-			t.Errorf("returned the unexpected value : %v", check)
+			t.Errorf("unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrPathNotFound):
-			t.Errorf("the returned error is the expected error convertion error : %v", e)
+			t.Errorf("not path not found error : %v", e)
 		}
 	})
 
@@ -399,9 +473,9 @@ func Test_Partial_Bool(t *testing.T) {
 		check, e := sut.Bool("node", true)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		case !check:
-			t.Errorf("returned the unexpected value (%v) when expecting : %v", check, true)
+			t.Errorf("(%v) value when expecting : %v", check, true)
 		}
 	})
 }
@@ -413,9 +487,9 @@ func Test_Partial_Int(t *testing.T) {
 		sut := Partial{path: value}
 
 		if check, e := sut.Int(path, 456); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if check != value {
-			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
+			t.Errorf("(%v) value when expecting : %v", check, value)
 		}
 	})
 
@@ -427,11 +501,11 @@ func Test_Partial_Int(t *testing.T) {
 		check, e := sut.Int(path, 456)
 		switch {
 		case check != 0:
-			t.Errorf("returned the unexpected value : %v", check)
+			t.Errorf("unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("the returned error is the expected error convertion error : %v", e)
+			t.Errorf("not convertion error : %v", e)
 		}
 	})
 
@@ -441,11 +515,11 @@ func Test_Partial_Int(t *testing.T) {
 		check, e := sut.Int("node")
 		switch {
 		case check != 0:
-			t.Errorf("returned the unexpected value : %v", check)
+			t.Errorf("unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrPathNotFound):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
+			t.Errorf("not path not found error : %v", e)
 		}
 	})
 
@@ -456,9 +530,9 @@ func Test_Partial_Int(t *testing.T) {
 		check, e := sut.Int("node", value)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		case check != value:
-			t.Errorf("returned the unexpected value (%v) when expecting : %v", check, value)
+			t.Errorf("(%v) value when expecting : %v", check, value)
 		}
 	})
 }
@@ -470,9 +544,9 @@ func Test_Partial_Float(t *testing.T) {
 		sut := Partial{path: value}
 
 		if check, e := sut.Float(path, 456.789); e != nil {
-			t.Errorf("returned the unexpected e : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if check != value {
-			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
+			t.Errorf("(%v) value when expecting : %v", check, value)
 		}
 	})
 
@@ -484,11 +558,11 @@ func Test_Partial_Float(t *testing.T) {
 		check, e := sut.Float(path, 456)
 		switch {
 		case check != 0:
-			t.Errorf("returned the unexpected value : %v", check)
+			t.Errorf("unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
+			t.Errorf("not convertion error : %v", e)
 		}
 	})
 
@@ -498,11 +572,11 @@ func Test_Partial_Float(t *testing.T) {
 		check, e := sut.Float("node")
 		switch {
 		case check != 0:
-			t.Errorf("returned the unexpected value : %v", check)
+			t.Errorf("unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrPathNotFound):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
+			t.Errorf("not path not found error : %v", e)
 		}
 	})
 
@@ -513,9 +587,9 @@ func Test_Partial_Float(t *testing.T) {
 		check, e := sut.Float("node", value)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		case check != value:
-			t.Errorf("returned the unexpected value (%v) when expecting : %v", check, value)
+			t.Errorf("(%v) value when expecting : %v", check, value)
 		}
 	})
 }
@@ -527,9 +601,9 @@ func Test_Partial_String(t *testing.T) {
 		sut := Partial{path: value}
 
 		if check, e := sut.String(path, "simple value"); e != nil {
-			t.Errorf("returned the unexpected e : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if check != value {
-			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
+			t.Errorf("(%v) value when expecting : %v", check, value)
 		}
 	})
 
@@ -541,11 +615,11 @@ func Test_Partial_String(t *testing.T) {
 		check, e := sut.String(path, "simple value")
 		switch {
 		case check != "":
-			t.Errorf("returned the unexpected value : %v", check)
+			t.Errorf("unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
+			t.Errorf("not convertion error : %v", e)
 		}
 	})
 
@@ -555,11 +629,11 @@ func Test_Partial_String(t *testing.T) {
 		check, e := sut.String("node")
 		switch {
 		case check != "":
-			t.Errorf("returned the unexpected value : %v", check)
+			t.Errorf("unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrPathNotFound):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
+			t.Errorf("not path not found error : %v", e)
 		}
 	})
 
@@ -570,9 +644,9 @@ func Test_Partial_String(t *testing.T) {
 		check, e := sut.String("node", value)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		case check != value:
-			t.Errorf("returned the unexpected value (%v) when expecting : %v", check, value)
+			t.Errorf("(%v) value when expecting : %v", check, value)
 		}
 	})
 }
@@ -584,9 +658,9 @@ func Test_Partial_List(t *testing.T) {
 		sut := Partial{path: value}
 
 		if check, e := sut.List(path, []interface{}{"simple value"}); e != nil {
-			t.Errorf("returned the unexpected e : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if !reflect.DeepEqual(check, value) {
-			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
+			t.Errorf("(%v) value when expecting : %v", check, value)
 		}
 	})
 
@@ -598,11 +672,11 @@ func Test_Partial_List(t *testing.T) {
 		check, e := sut.List(path, []interface{}{"simple value"})
 		switch {
 		case check != nil:
-			t.Errorf("returned the unexpected value : %v", check)
+			t.Errorf("unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
+			t.Errorf("not convertion error : %v", e)
 		}
 	})
 
@@ -612,11 +686,11 @@ func Test_Partial_List(t *testing.T) {
 		check, e := sut.List("node")
 		switch {
 		case check != nil:
-			t.Errorf("returned the unexpected value : %v", check)
+			t.Errorf("unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrPathNotFound):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
+			t.Errorf("not path not found error : %v", e)
 		}
 	})
 
@@ -627,9 +701,9 @@ func Test_Partial_List(t *testing.T) {
 		check, e := sut.List("node", value)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		case !reflect.DeepEqual(check, value):
-			t.Errorf("returned the unexpected value (%v) when expecting : %v", check, value)
+			t.Errorf("(%v) value when expecting : %v", check, value)
 		}
 	})
 }
@@ -643,14 +717,14 @@ func Test_Partial_Partial(t *testing.T) {
 		check, e := sut.Partial(path, Partial{"id": "simple value"})
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		case !reflect.DeepEqual(check, value):
-			t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
+			t.Errorf("(%v) value when expecting : %v", check, value)
 		default:
 			check["id"] = "other value"
 			changeCheck, _ := sut.Partial(path, Partial{"id": "simple value"})
 			if !reflect.DeepEqual(changeCheck, value) {
-				t.Errorf("returned the unexpected value of (%v) when expecting : %v", check, value)
+				t.Errorf("(%v) value when expecting : %v", check, value)
 			}
 		}
 	})
@@ -663,11 +737,11 @@ func Test_Partial_Partial(t *testing.T) {
 		check, e := sut.Partial(path, Partial{"id": "simple value"})
 		switch {
 		case check != nil:
-			t.Errorf("returned the unexpected value : %v", check)
+			t.Errorf("unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
+			t.Errorf("not convertion error : %v", e)
 		}
 	})
 
@@ -677,11 +751,11 @@ func Test_Partial_Partial(t *testing.T) {
 		check, e := sut.Partial("node")
 		switch {
 		case check != nil:
-			t.Errorf("returned the unexpected value : %v", check)
+			t.Errorf("unexpected value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrPathNotFound):
-			t.Errorf("the returned e is the expected e convertion e : %v", e)
+			t.Errorf("not path not found error : %v", e)
 		}
 	})
 
@@ -692,9 +766,9 @@ func Test_Partial_Partial(t *testing.T) {
 		check, e := sut.Partial("node", value)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		case !reflect.DeepEqual(check, value):
-			t.Errorf("returned the unexpected value (%v) when expecting : %v", check, value)
+			t.Errorf("(%v) value when expecting : %v", check, value)
 		}
 	})
 }
@@ -758,12 +832,12 @@ func Test_Partial_Merge(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
-			check := scenario.partial1
-			check.Merge(scenario.partial2)
+		for _, s := range scenarios {
+			check := s.partial1
+			check.Merge(s.partial2)
 
-			if !reflect.DeepEqual(check, scenario.expected) {
-				t.Errorf("resulted in (%s) when merging (%v) and (%v), expecting (%v)", check, scenario.partial1, scenario.partial2, scenario.expected)
+			if !reflect.DeepEqual(check, s.expected) {
+				t.Errorf("(%s) when merging (%v) and (%v), expecting (%v)", check, s.partial1, s.partial2, s.expected)
 			}
 		}
 	})
@@ -778,7 +852,7 @@ func Test_Partial_Merge(t *testing.T) {
 		check.Merge(data2)
 
 		if !reflect.DeepEqual(check, expected) {
-			t.Errorf("resulted in (%s) when merging (%v) and (%v), expecting (%v)", check, data1, data2, expected)
+			t.Errorf("(%s) when merging (%v) and (%v), expecting (%v)", check, data1, data2, expected)
 		}
 	})
 }
@@ -792,11 +866,11 @@ func Test_Partial_Populate(t *testing.T) {
 		v, e := data.Populate(path, target)
 		switch {
 		case v != nil:
-			t.Error("returned an unexpected valid reference to a data")
+			t.Error("valid reference to a data")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrPathNotFound):
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -808,11 +882,11 @@ func Test_Partial_Populate(t *testing.T) {
 		v, e := data.Populate(path, target)
 		switch {
 		case v != nil:
-			t.Error("returned an unexpected valid reference to a data")
+			t.Error("valid reference to a data")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -824,11 +898,11 @@ func Test_Partial_Populate(t *testing.T) {
 		v, e := data.Populate(path, target)
 		switch {
 		case v != nil:
-			t.Error("returned an unexpected valid reference to a data")
+			t.Error("valid reference to a data")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -840,11 +914,11 @@ func Test_Partial_Populate(t *testing.T) {
 		v, e := data.Populate(path, target)
 		switch {
 		case v != nil:
-			t.Error("returned an unexpected valid reference to a data")
+			t.Error("valid reference to a data")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -857,9 +931,9 @@ func Test_Partial_Populate(t *testing.T) {
 		v, e := data.Populate(path, target)
 		switch {
 		case !reflect.DeepEqual(v, expValue):
-			t.Errorf("didn't returned the (%v) expected value : %v", expValue, v)
+			t.Errorf("(%v) value when expecting : %v", v, expValue)
 		case e != nil:
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -878,9 +952,9 @@ func Test_Partial_Populate(t *testing.T) {
 		v, e := data.Populate(path, target)
 		switch {
 		case !reflect.DeepEqual(v, expValue):
-			t.Errorf("didn't returned the (%v) expected value : %v", expValue, v)
+			t.Errorf("(%v) value when expecting : %v", v, expValue)
 		case e != nil:
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -911,13 +985,13 @@ func Test_Partial_Populate(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
-			v, e := scenario.data.Populate(scenario.path, scenario.target)
+		for _, s := range scenarios {
+			v, e := s.data.Populate(s.path, s.target)
 			switch {
-			case !reflect.DeepEqual(v, scenario.expValue):
-				t.Errorf("didn't returned the (%v) expected value : %v", scenario.expValue, v)
+			case !reflect.DeepEqual(v, s.expValue):
+				t.Errorf("(%v) value when expecting : %v", v, s.expValue)
 			case e != nil:
-				t.Errorf("returned the unexpected (%v) error", e)
+				t.Errorf("unexpected (%v) error", e)
 			}
 		}
 	})
@@ -967,13 +1041,13 @@ func Test_Partial_Populate(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
-			v, e := scenario.data.Populate(scenario.path, scenario.target)
+		for _, s := range scenarios {
+			v, e := s.data.Populate(s.path, s.target)
 			switch {
-			case !reflect.DeepEqual(v, scenario.expValue):
-				t.Errorf("didn't returned the (%v) expected value : %v", v, scenario.expValue)
+			case !reflect.DeepEqual(v, s.expValue):
+				t.Errorf("(%v) value when expecting : %v", v, s.expValue)
 			case e != nil:
-				t.Errorf("returned the unexpected (%v) error", e)
+				t.Errorf("unexpected (%v) error", e)
 			}
 		}
 	})
@@ -1029,13 +1103,13 @@ func Test_Partial_Populate(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
-			v, e := scenario.data.Populate(scenario.path, scenario.target)
+		for _, s := range scenarios {
+			v, e := s.data.Populate(s.path, s.target)
 			switch {
-			case !reflect.DeepEqual(v, scenario.expValue):
-				t.Errorf("didn't returned the (%v) expected value : %v", scenario.expValue, v)
+			case !reflect.DeepEqual(v, s.expValue):
+				t.Errorf("(%v) value when expecting : %v", v, s.expValue)
 			case e != nil:
-				t.Errorf("returned the unexpected (%v) error", e)
+				t.Errorf("unexpected (%v) error", e)
 			}
 		}
 	})

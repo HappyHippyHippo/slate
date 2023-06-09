@@ -19,7 +19,7 @@ func Test_NewMigrator(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -31,7 +31,7 @@ func Test_NewMigrator(t *testing.T) {
 		sut, e := NewMigrator(dao)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("unexpected error (%v)", e)
 		case sut == nil:
 			t.Error("didn't return the expected migrator instance")
 		case !reflect.DeepEqual(sut.storer, dao):
@@ -52,7 +52,7 @@ func Test_Migrator_AddMigration(t *testing.T) {
 		if e := sut.AddMigration(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -66,7 +66,7 @@ func Test_Migrator_AddMigration(t *testing.T) {
 		sut.storer = storer
 
 		if e := sut.AddMigration(migration); e != nil {
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if !reflect.DeepEqual(sut.migrations, []Migration{migration}) {
 			t.Error("didn't stored the registering migration")
 		}
@@ -86,7 +86,7 @@ func Test_Migrator_Current(t *testing.T) {
 		if _, e := sut.Current(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -102,9 +102,9 @@ func Test_Migrator_Current(t *testing.T) {
 		sut.storer = storer
 
 		if current, e := sut.Current(); e != nil {
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if current != version {
-			t.Errorf("unexpectedly returned the %v version when expecting %v", current, version)
+			t.Errorf("(%v) when expecting (%v)", current, version)
 		}
 	})
 }
@@ -119,7 +119,7 @@ func Test_Migrator_Migrate(t *testing.T) {
 		sut.storer = storer
 
 		if e := sut.Migrate(); e != nil {
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -139,7 +139,7 @@ func Test_Migrator_Migrate(t *testing.T) {
 		if e := sut.Migrate(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -156,7 +156,7 @@ func Test_Migrator_Migrate(t *testing.T) {
 		_ = sut.AddMigration(migration)
 
 		if e := sut.Migrate(); e != nil {
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -177,7 +177,7 @@ func Test_Migrator_Migrate(t *testing.T) {
 		if e := sut.Migrate(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -199,7 +199,7 @@ func Test_Migrator_Migrate(t *testing.T) {
 		if e := sut.Migrate(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -229,7 +229,7 @@ func Test_Migrator_Migrate(t *testing.T) {
 		_ = sut.AddMigration(migration2)
 
 		if e := sut.Migrate(); e != nil {
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }
@@ -244,7 +244,7 @@ func Test_Migrator_Up(t *testing.T) {
 		sut.storer = storer
 
 		if e := sut.Up(); e != nil {
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -264,7 +264,7 @@ func Test_Migrator_Up(t *testing.T) {
 		if e := sut.Up(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -281,7 +281,7 @@ func Test_Migrator_Up(t *testing.T) {
 		_ = sut.AddMigration(migration)
 
 		if e := sut.Up(); e != nil {
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -302,7 +302,7 @@ func Test_Migrator_Up(t *testing.T) {
 		if e := sut.Up(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -324,7 +324,7 @@ func Test_Migrator_Up(t *testing.T) {
 		if e := sut.Up(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -349,7 +349,7 @@ func Test_Migrator_Up(t *testing.T) {
 		_ = sut.AddMigration(migration2)
 
 		if e := sut.Up(); e != nil {
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }
@@ -364,7 +364,7 @@ func Test_Migrator_Down(t *testing.T) {
 		sut.storer = storer
 
 		if e := sut.Down(); e != nil {
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -384,7 +384,7 @@ func Test_Migrator_Down(t *testing.T) {
 		if e := sut.Down(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -406,7 +406,7 @@ func Test_Migrator_Down(t *testing.T) {
 		if e := sut.Down(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -430,7 +430,7 @@ func Test_Migrator_Down(t *testing.T) {
 		if e := sut.Down(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -447,7 +447,7 @@ func Test_Migrator_Down(t *testing.T) {
 		_ = sut.AddMigration(migration1)
 
 		if e := sut.Down(); e != nil {
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -472,7 +472,7 @@ func Test_Migrator_Down(t *testing.T) {
 		_ = sut.AddMigration(migration2)
 
 		if e := sut.Down(); e != nil {
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }

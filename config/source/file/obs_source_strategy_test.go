@@ -21,7 +21,7 @@ func Test_NewObsSourceStrategy(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -36,7 +36,7 @@ func Test_NewObsSourceStrategy(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -50,7 +50,7 @@ func Test_NewObsSourceStrategy(t *testing.T) {
 		sut, e := NewObsSourceStrategy(fs, decoderFactory)
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
 		case sut.fileSystem != fs:
@@ -132,7 +132,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -149,7 +149,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, config.ErrInvalidSource):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, config.ErrInvalidSource)
+			t.Errorf("(%v) when expecting (%v)", e, config.ErrInvalidSource)
 		}
 	})
 
@@ -166,7 +166,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -183,7 +183,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -215,7 +215,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		src, e := sut.Create(config.Partial{"path": path, "format": "format"})
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case src == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -259,7 +259,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		src, e := sut.Create(config.Partial{"path": path})
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case src == nil:
 			t.Error("didn't returned a valid reference")
 		default:

@@ -17,12 +17,12 @@ func Test_Bool(t *testing.T) {
 
 		t.Run("should return the simple value (true)", func(t *testing.T) {
 			if check := Bool(env, false); check != false {
-				t.Error("didn't returned the simple value of false")
+				t.Error("returned true")
 			}
 		})
 		t.Run("should return the simple value (false)", func(t *testing.T) {
 			if check := Bool(env, true); check != true {
-				t.Error("didn't returned the simple value of true")
+				t.Error("returned false")
 			}
 		})
 	})
@@ -34,7 +34,7 @@ func Test_Bool(t *testing.T) {
 		defer func() { _ = os.Setenv(env, cur) }()
 
 		if check := Bool(env, false); check != true {
-			t.Error("didn't returned the defined environment value of true")
+			t.Error("returned false")
 		}
 	})
 
@@ -45,7 +45,7 @@ func Test_Bool(t *testing.T) {
 		defer func() { _ = os.Setenv(env, cur) }()
 
 		if check := Bool(env, false); check != true {
-			t.Error("didn't returned the defined environment value of true")
+			t.Error("returned false")
 		}
 	})
 
@@ -56,7 +56,7 @@ func Test_Bool(t *testing.T) {
 		defer func() { _ = os.Setenv(env, cur) }()
 
 		if check := Bool(env, false); check != true {
-			t.Error("didn't returned the defined environment value of true")
+			t.Error("returned false")
 		}
 	})
 }
@@ -72,7 +72,7 @@ func Test_Int(t *testing.T) {
 		defer func() { _ = os.Setenv(env, cur) }()
 
 		if check := Int(env, def); check != def {
-			t.Errorf("returned the (%v) string value, instead of the expected (%v) simple value", check, def)
+			t.Errorf("(%v) when expecting (%v)", check, def)
 		}
 	})
 
@@ -83,7 +83,7 @@ func Test_Int(t *testing.T) {
 		defer func() { _ = os.Setenv(env, cur) }()
 
 		if check := Int(env, def); check != def {
-			t.Errorf("returned the (%v) string value, instead of the expected (%v)", check, def)
+			t.Errorf("(%v) when expecting (%v)", check, def)
 		}
 	})
 
@@ -94,7 +94,7 @@ func Test_Int(t *testing.T) {
 		defer func() { _ = os.Setenv(env, cur) }()
 
 		if check := Int(env, def); check != 456 {
-			t.Errorf("returned the (%v) string value, instead of the expected (%v) simple value", check, value)
+			t.Errorf("(%v) when expecting (%v)", check, 456)
 		}
 	})
 }
@@ -110,7 +110,7 @@ func Test_String(t *testing.T) {
 		defer func() { _ = os.Setenv(env, cur) }()
 
 		if check := String(env, def); check != def {
-			t.Errorf("returned the (%v) string value, instead of the expected (%v) simple value", check, def)
+			t.Errorf("(%v) when expecting (%v)", check, def)
 		}
 	})
 
@@ -121,7 +121,7 @@ func Test_String(t *testing.T) {
 		defer func() { _ = os.Setenv(env, cur) }()
 
 		if check := String(env, def); check != value {
-			t.Errorf("returned the (%v) string value, instead of the expected (%v) simple value", check, value)
+			t.Errorf("(%v) when expecting (%v)", check, value)
 		}
 	})
 }
@@ -137,7 +137,7 @@ func Test_List(t *testing.T) {
 		defer func() { _ = os.Setenv(env, cur) }()
 
 		if check := List(env, def); !reflect.DeepEqual(check, def) {
-			t.Errorf("returned the (%v) string value, instead of the expected (%v) simple value", check, def)
+			t.Errorf("(%v) when expecting (%v)", check, def)
 		}
 	})
 
@@ -148,7 +148,7 @@ func Test_List(t *testing.T) {
 		defer func() { _ = os.Setenv(env, cur) }()
 
 		if check := List(env, def); !reflect.DeepEqual(check, []string{value}) {
-			t.Errorf("returned the (%v) string value, instead of the expected (%v) simple value", check, value)
+			t.Errorf("(%v) when expecting (%v)", check, value)
 		}
 	})
 
@@ -161,7 +161,7 @@ func Test_List(t *testing.T) {
 		defer func() { _ = os.Setenv(env, cur) }()
 
 		if check := List(env, def); !reflect.DeepEqual(check, expected) {
-			t.Errorf("returned the (%v) string value, instead of the expected (%v) simple value", check, expected)
+			t.Errorf("(%v) when expecting (%v)", check, expected)
 		}
 	})
 }

@@ -54,7 +54,7 @@ func Test_Application_Provide(t *testing.T) {
 		if e := NewApplication().Provide(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, ErrNilPointer)
 		}
 	})
 
@@ -72,7 +72,7 @@ func Test_Application_Provide(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		case len(sut.providers) != 0:
 			t.Error("stored the failing provider")
 		}
@@ -87,7 +87,7 @@ func Test_Application_Provide(t *testing.T) {
 		provider.EXPECT().Register(&sut.Container).Return(nil).Times(1)
 
 		if e := sut.Provide(provider); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if len(sut.providers) != 1 || sut.providers[0] != provider {
 			t.Error("didn't stored the added provider")
 		}
@@ -103,13 +103,17 @@ func Test_Application_Boot(t *testing.T) {
 		sut := NewApplication()
 		provider := NewMockProvider(ctrl)
 		provider.EXPECT().Register(&sut.Container).Return(nil).Times(1)
-		provider.EXPECT().Boot(&sut.Container).DoAndReturn(func(*Container) error { panic(expected) }).Times(1)
+		provider.
+			EXPECT().
+			Boot(&sut.Container).
+			DoAndReturn(func(*Container) error { panic(expected) }).
+			Times(1)
 		_ = sut.Provide(provider)
 
 		if e := sut.Boot(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -121,7 +125,11 @@ func Test_Application_Boot(t *testing.T) {
 		sut := NewApplication()
 		provider := NewMockProvider(ctrl)
 		provider.EXPECT().Register(&sut.Container).Return(nil).Times(1)
-		provider.EXPECT().Boot(&sut.Container).DoAndReturn(func(*Container) error { panic(expected) }).Times(1)
+		provider.
+			EXPECT().
+			Boot(&sut.Container).
+			DoAndReturn(func(*Container) error { panic(expected) }).
+			Times(1)
 		_ = sut.Provide(provider)
 
 		defer assertPanic(t, expected)
@@ -136,13 +144,17 @@ func Test_Application_Boot(t *testing.T) {
 		sut := NewApplication()
 		provider := NewMockProvider(ctrl)
 		provider.EXPECT().Register(&sut.Container).Return(nil).Times(1)
-		provider.EXPECT().Boot(&sut.Container).Return(fmt.Errorf("%s", expected)).Times(1)
+		provider.
+			EXPECT().
+			Boot(&sut.Container).
+			Return(fmt.Errorf("%s", expected)).
+			Times(1)
 		_ = sut.Provide(provider)
 
 		if e := sut.Boot(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 

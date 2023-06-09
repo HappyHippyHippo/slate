@@ -22,7 +22,7 @@ func Test_SourceFactory_Register(t *testing.T) {
 		if e := (&SourceFactory{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -34,7 +34,7 @@ func Test_SourceFactory_Register(t *testing.T) {
 		sut := &SourceFactory{}
 
 		if e := sut.Register(strategy); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if (*sut)[0] != strategy {
 			t.Error("didn't stored the strategy")
 		}
@@ -51,7 +51,7 @@ func Test_SourceFactory_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -62,7 +62,11 @@ func Test_SourceFactory_Create(t *testing.T) {
 		sourceType := "type"
 		path := "path"
 		format := "format"
-		partial := Partial{"type": sourceType, "path": path, "format": format}
+		partial := Partial{
+			"type":   sourceType,
+			"path":   path,
+			"format": format,
+		}
 		strategy := NewMockSourceStrategy(ctrl)
 		strategy.EXPECT().Accept(partial).Return(false).Times(1)
 		sut := &SourceFactory{}
@@ -75,7 +79,7 @@ func Test_SourceFactory_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrInvalidSource):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrInvalidSource)
+			t.Errorf("(%v) when expecting (%v)", e, ErrInvalidSource)
 		}
 	})
 
@@ -86,7 +90,11 @@ func Test_SourceFactory_Create(t *testing.T) {
 		sourceType := "type"
 		path := "path"
 		format := "format"
-		partial := Partial{"type": sourceType, "path": path, "format": format}
+		partial := Partial{
+			"type":   sourceType,
+			"path":   path,
+			"format": format,
+		}
 		src := NewMockSource(ctrl)
 		strategy := NewMockSourceStrategy(ctrl)
 		strategy.EXPECT().Accept(partial).Return(true).Times(1)
@@ -95,7 +103,7 @@ func Test_SourceFactory_Create(t *testing.T) {
 		_ = sut.Register(strategy)
 
 		if check, e := sut.Create(partial); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if !reflect.DeepEqual(check, src) {
 			t.Error("didn't returned the created source")
 		}

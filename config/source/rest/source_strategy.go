@@ -80,10 +80,14 @@ func (s SourceStrategy) Create(
 	}
 	// validate configuration
 	if sc.URI == "" {
-		return nil, errInvalidSource(cfg, map[string]interface{}{"description": "missing URI"})
+		return nil, errInvalidSource(cfg, map[string]interface{}{
+			"description": "missing URI",
+		})
 	}
 	if sc.Path.Config == "" {
-		return nil, errInvalidSource(cfg, map[string]interface{}{"description": "missing response config path"})
+		return nil, errInvalidSource(cfg, map[string]interface{}{
+			"description": "missing response config path",
+		})
 	}
 	// return acceptance for the read config type
 	return NewSource(

@@ -21,7 +21,7 @@ func Test_NewRotatingFileWriter(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -33,7 +33,11 @@ func Test_NewRotatingFileWriter(t *testing.T) {
 		path := "path-%s"
 		expectedPath := fmt.Sprintf(path, time.Now().Format("2006-01-02"))
 		fileSystem := NewMockFs(ctrl)
-		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
+		fileSystem.
+			EXPECT().
+			OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).
+			Return(nil, expected).
+			Times(1)
 
 		sut, e := NewRotatingWriter(fileSystem, path)
 		switch {
@@ -42,7 +46,7 @@ func Test_NewRotatingFileWriter(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -54,10 +58,14 @@ func Test_NewRotatingFileWriter(t *testing.T) {
 		expectedPath := fmt.Sprintf(path, time.Now().Format("2006-01-02"))
 		file := NewMockFile(ctrl)
 		fileSystem := NewMockFs(ctrl)
-		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fileSystem.
+			EXPECT().
+			OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).
+			Return(file, nil).
+			Times(1)
 
 		if sut, e := NewRotatingWriter(fileSystem, path); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if sut == nil {
 			t.Error("didn't returned the expected writer reference")
 		}
@@ -76,14 +84,18 @@ func Test_RotatingFileWriter_Write(t *testing.T) {
 		file := NewMockFile(ctrl)
 		file.EXPECT().Write(output).Return(0, expected).Times(1)
 		fileSystem := NewMockFs(ctrl)
-		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fileSystem.
+			EXPECT().
+			OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).
+			Return(file, nil).
+			Times(1)
 
 		sut, _ := NewRotatingWriter(fileSystem, path)
 
 		if _, e := sut.Write(output); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -98,14 +110,18 @@ func Test_RotatingFileWriter_Write(t *testing.T) {
 		file := NewMockFile(ctrl)
 		file.EXPECT().Write(output).Return(count, nil).Times(1)
 		fileSystem := NewMockFs(ctrl)
-		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fileSystem.
+			EXPECT().
+			OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).
+			Return(file, nil).
+			Times(1)
 
 		sut, _ := NewRotatingWriter(fileSystem, path)
 
 		if written, e := sut.Write(output); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if written != count {
-			t.Errorf("returned the unexpected number of written elements of (%v) when expecting (%v)", written, count)
+			t.Errorf("unexpected number of written elements of (%v) when expecting (%v)", written, count)
 		}
 	})
 
@@ -120,7 +136,11 @@ func Test_RotatingFileWriter_Write(t *testing.T) {
 		file := NewMockFile(ctrl)
 		file.EXPECT().Close().Return(expected)
 		fileSystem := NewMockFs(ctrl)
-		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fileSystem.
+			EXPECT().
+			OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).
+			Return(file, nil).
+			Times(1)
 
 		sut, _ := NewRotatingWriter(fileSystem, path)
 		sut.(*RotatingWriter).day++
@@ -128,7 +148,7 @@ func Test_RotatingFileWriter_Write(t *testing.T) {
 		if _, e := sut.Write(output); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -144,8 +164,14 @@ func Test_RotatingFileWriter_Write(t *testing.T) {
 		file.EXPECT().Close().Return(nil)
 		fileSystem := NewMockFs(ctrl)
 		gomock.InOrder(
-			fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil),
-			fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(nil, expected),
+			fileSystem.
+				EXPECT().
+				OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).
+				Return(file, nil),
+			fileSystem.
+				EXPECT().
+				OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).
+				Return(nil, expected),
 		)
 
 		sut, _ := NewRotatingWriter(fileSystem, path)
@@ -154,7 +180,7 @@ func Test_RotatingFileWriter_Write(t *testing.T) {
 		if _, e := sut.Write(output); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -172,17 +198,23 @@ func Test_RotatingFileWriter_Write(t *testing.T) {
 		file2.EXPECT().Write(output).Return(count, nil).Times(1)
 		fileSystem := NewMockFs(ctrl)
 		gomock.InOrder(
-			fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file1, nil),
-			fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file2, nil),
+			fileSystem.
+				EXPECT().
+				OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).
+				Return(file1, nil),
+			fileSystem.
+				EXPECT().
+				OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).
+				Return(file2, nil),
 		)
 
 		sut, _ := NewRotatingWriter(fileSystem, path)
 		sut.(*RotatingWriter).day++
 
 		if written, e := sut.Write(output); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if written != count {
-			t.Errorf("returned the unexpected number of written elements of (%v) when expecting (%v)", written, count)
+			t.Errorf("unexpected number of written elements of (%v) when expecting (%v)", written, count)
 		}
 	})
 }
@@ -198,14 +230,18 @@ func Test_RotatingFileWriter_Close(t *testing.T) {
 		file := NewMockFile(ctrl)
 		file.EXPECT().Close().Return(expected)
 		fileSystem := NewMockFs(ctrl)
-		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fileSystem.
+			EXPECT().
+			OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).
+			Return(file, nil).
+			Times(1)
 
 		sut, _ := NewRotatingWriter(fileSystem, path)
 
 		if e := sut.(io.Closer).Close(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 }

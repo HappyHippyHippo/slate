@@ -28,7 +28,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -45,7 +45,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -64,7 +64,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -84,7 +84,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -108,7 +108,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, config.ErrInvalidFormat):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, config.ErrInvalidFormat)
+			t.Errorf("(%v) when expecting (%v)", e, config.ErrInvalidFormat)
 		}
 	})
 
@@ -137,7 +137,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -165,7 +165,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrConfigNotFound):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrConfigNotFound)
+			t.Errorf("(%v) when expecting (%v)", e, ErrConfigNotFound)
 		}
 	})
 
@@ -193,7 +193,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrConfigNotFound):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrConfigNotFound)
+			t.Errorf("(%v) when expecting (%v)", e, ErrConfigNotFound)
 		}
 	})
 
@@ -221,7 +221,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -246,7 +246,7 @@ func Test_NewSource(t *testing.T) {
 		sut, e := NewSource(client, "uri", "format", decoderFactory, "path")
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
 		case !reflect.DeepEqual(sut.Partial, expected):
@@ -264,7 +264,11 @@ func Test_NewSource(t *testing.T) {
 		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		decoder := NewMockDecoder(ctrl)
-		decoder.EXPECT().Decode().Return(&config.Partial{"node": config.Partial{"inner_node": expected}}, nil).Times(1)
+		decoder.EXPECT().Decode().Return(&config.Partial{
+			"node": config.Partial{
+				"inner_node": expected,
+			},
+		}, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
 		decoderStrategy := NewMockDecoderStrategy(ctrl)
 		decoderStrategy.EXPECT().Accept("format").Return(true).Times(1)
@@ -275,7 +279,7 @@ func Test_NewSource(t *testing.T) {
 		sut, e := NewSource(client, "uri", "format", decoderFactory, "node..inner_node")
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
 		case !reflect.DeepEqual(sut.Partial, expected):

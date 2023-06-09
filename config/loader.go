@@ -44,7 +44,11 @@ func NewLoader(
 // path and format.
 func (l Loader) Load() error {
 	// retrieve the loader entry file partial content
-	src, e := l.sourceCreator.Create(Partial{"type": "file", "path": LoaderSourcePath, "format": LoaderSourceFormat})
+	src, e := l.sourceCreator.Create(Partial{
+		"type":   "file",
+		"path":   LoaderSourcePath,
+		"format": LoaderSourceFormat,
+	})
 	if e != nil {
 		return e
 	}

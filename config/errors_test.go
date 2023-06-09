@@ -69,6 +69,36 @@ func Test_errConversion(t *testing.T) {
 	})
 }
 
+func Test_errInvalidEmptyPath(t *testing.T) {
+	arg := "dummy argument"
+	context := map[string]interface{}{"field": "value"}
+	message := "dummy argument : invalid empty config path"
+
+	t.Run("creation without context", func(t *testing.T) {
+		if e := errInvalidEmptyPath(arg); !errors.Is(e, ErrInvalidEmptyPath) {
+			t.Errorf("error not a instance of ErrInvalidEmptyPath")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(*slate.Error); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if te.Context() != nil {
+			t.Errorf("didn't stored a nil value context")
+		}
+	})
+
+	t.Run("creation with context", func(t *testing.T) {
+		if e := errInvalidEmptyPath(arg, context); !errors.Is(e, ErrInvalidEmptyPath) {
+			t.Errorf("error not a instance of ErrInvalidEmptyPath")
+		} else if e.Error() != message {
+			t.Errorf("error message (%v) not same as expected (%v)", e, message)
+		} else if te, ok := e.(*slate.Error); !ok {
+			t.Errorf("didn't returned a slate error instance")
+		} else if check := te.Context(); !reflect.DeepEqual(check, context) {
+			t.Errorf("context (%v) not same as expected (%v)", check, context)
+		}
+	})
+}
+
 func Test_errPathNotFound(t *testing.T) {
 	arg := "dummy argument"
 	context := map[string]interface{}{"field": "value"}

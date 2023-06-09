@@ -73,13 +73,13 @@ func (m *Migrator) Migrate() error {
 	for _, migration := range m.migrations {
 		// check if the iterated migration has a higher version from
 		// the last applied one
-		if migrationVersion := migration.Version(); current.Version < migrationVersion {
+		if v := migration.Version(); current.Version < v {
 			// execute the migration
 			if e := migration.Up(); e != nil {
 				return e
 			}
 			// register the executed migration
-			if current, e = m.storer.Up(migrationVersion); e != nil {
+			if current, e = m.storer.Up(v); e != nil {
 				return e
 			}
 		}
@@ -102,13 +102,13 @@ func (m *Migrator) Up() error {
 	for _, migration := range m.migrations {
 		// check if the iterated migration has a higher version from
 		// the last applied one
-		if migrationVersion := migration.Version(); current.Version < migrationVersion {
+		if v := migration.Version(); current.Version < v {
 			// execute the migration
 			if e := migration.Up(); e != nil {
 				return e
 			}
 			// register the executed migration
-			_, e = m.storer.Up(migrationVersion)
+			_, e = m.storer.Up(v)
 			return e
 		}
 	}
@@ -129,7 +129,7 @@ func (m *Migrator) Down() error {
 	// iterate through all registered migrations
 	for _, migration := range m.migrations {
 		// check if the iterated migration is the currently applied migration
-		if migrationVersion := migration.Version(); current.Version == migrationVersion {
+		if v := migration.Version(); current.Version == v {
 			// execute the undo action of the migration
 			if e := migration.Down(); e != nil {
 				return e

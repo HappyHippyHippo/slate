@@ -20,7 +20,7 @@ func Test_NewStreamStrategy(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -28,7 +28,7 @@ func Test_NewStreamStrategy(t *testing.T) {
 		if sut, e := NewStreamStrategy(log.NewFormatterFactory()); sut == nil {
 			t.Errorf("didn't returned a valid reference")
 		} else if e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }
@@ -81,12 +81,15 @@ func Test_StreamStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
 	t.Run("non-string format", func(t *testing.T) {
-		partial := config.Partial{"type": Type, "format": 123}
+		partial := config.Partial{
+			"type":   Type,
+			"format": 123,
+		}
 		sut, _ := NewStreamStrategy(log.NewFormatterFactory())
 
 		stream, e := sut.Create(partial)
@@ -96,12 +99,16 @@ func Test_StreamStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
 	t.Run("non-log level name level", func(t *testing.T) {
-		partial := config.Partial{"type": Type, "format": json.Format, "level": "invalid"}
+		partial := config.Partial{
+			"type":   Type,
+			"format": json.Format,
+			"level":  "invalid",
+		}
 		sut, _ := NewStreamStrategy(log.NewFormatterFactory())
 
 		stream, e := sut.Create(partial)
@@ -111,12 +118,16 @@ func Test_StreamStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, log.ErrInvalidLevel):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, log.ErrInvalidLevel)
+			t.Errorf("(%v) when expecting (%v)", e, log.ErrInvalidLevel)
 		}
 	})
 
 	t.Run("error creating the formatter", func(t *testing.T) {
-		partial := config.Partial{"type": Type, "format": json.Format, "level": "fatal"}
+		partial := config.Partial{
+			"type":   Type,
+			"format": json.Format,
+			"level":  "fatal",
+		}
 		sut, _ := NewStreamStrategy(log.NewFormatterFactory())
 
 		stream, e := sut.Create(partial)
@@ -126,7 +137,7 @@ func Test_StreamStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, log.ErrInvalidFormat):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, log.ErrInvalidFormat)
+			t.Errorf("(%v) when expecting (%v)", e, log.ErrInvalidFormat)
 		}
 	})
 
@@ -150,7 +161,7 @@ func Test_StreamStrategy_Create(t *testing.T) {
 		stream, e := sut.Create(partial)
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case stream == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -158,9 +169,9 @@ func Test_StreamStrategy_Create(t *testing.T) {
 			case *Stream:
 				switch {
 				case s.Level != log.FATAL:
-					t.Error("didn't created a stream with the correct level")
+					t.Errorf("invalid level (%s)", log.LevelMapName[s.Level])
 				case len(s.Channels) != 2:
-					t.Error("didn't created a stream with the correct channel list")
+					t.Errorf("invalid channel list (%v)", s.Channels)
 				}
 			default:
 				t.Error("didn't returned a new console stream")

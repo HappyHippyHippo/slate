@@ -30,9 +30,9 @@ func Test_FormatterStrategy_Accept(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
-			if check := (&FormatterStrategy{}).Accept(scenario.format); check != scenario.expected {
-				t.Errorf("returned (%v) for the (%s) format", check, scenario.format)
+		for _, s := range scenarios {
+			if check := (&FormatterStrategy{}).Accept(s.format); check != s.expected {
+				t.Errorf("(%v) for the (%s) format", check, s.format)
 			}
 		}
 	})
@@ -43,7 +43,7 @@ func Test_FormatterStrategy_Create(t *testing.T) {
 		sut, e := (&FormatterStrategy{}).Create()
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
 		default:

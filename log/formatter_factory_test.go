@@ -23,7 +23,7 @@ func Test_FormatterFactory_Register(t *testing.T) {
 		if e := (&FormatterFactory{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -35,7 +35,7 @@ func Test_FormatterFactory_Register(t *testing.T) {
 		sut := &FormatterFactory{}
 
 		if e := sut.Register(strategy); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if (*sut)[0] != strategy {
 			t.Errorf("didn't stored the s")
 		}
@@ -61,7 +61,7 @@ func Test_FormatterFactory_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrInvalidFormat):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrInvalidFormat)
+			t.Errorf("(%v) when expecting (%v)", e, ErrInvalidFormat)
 		}
 	})
 
@@ -79,7 +79,7 @@ func Test_FormatterFactory_Create(t *testing.T) {
 		_ = sut.Register(strategy)
 
 		if res, e := sut.Create(format); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if !reflect.DeepEqual(res, formatter) {
 			t.Errorf("didn't returned the Formatter")
 		}

@@ -48,7 +48,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		src, e := sut.Create(config.Partial{})
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case src == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -72,7 +72,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		src, e := sut.Create(config.Partial{})
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case src == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -104,7 +104,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		src, e := sut.Create(config.Partial{})
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case src == nil:
 			t.Error("didn't returned a valid reference")
 		default:

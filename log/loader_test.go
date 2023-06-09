@@ -19,7 +19,7 @@ func Test_NewLoader(t *testing.T) {
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -34,7 +34,7 @@ func Test_NewLoader(t *testing.T) {
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -49,7 +49,7 @@ func Test_NewLoader(t *testing.T) {
 		case e == nil:
 			t.Errorf("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -60,7 +60,7 @@ func Test_NewLoader(t *testing.T) {
 		if sut, e := NewLoader(config.NewConfig(), NewLog(), NewStreamFactory()); sut == nil {
 			t.Errorf("didn't returned a valid reference")
 		} else if e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }
@@ -72,7 +72,11 @@ func Test_Loader_Load(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(nil, expected).Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.logger.streams", config.Partial{}).
+			Return(nil, expected).
+			Times(1)
 
 		sut, _ := NewLoader(config.NewConfig(), NewLog(), NewStreamFactory())
 		sut.configurer = configurer
@@ -80,7 +84,7 @@ func Test_Loader_Load(t *testing.T) {
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -90,8 +94,16 @@ func Test_Loader_Load(t *testing.T) {
 
 		partial := config.Partial{}
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
-		configurer.EXPECT().AddObserver("slate.logger.streams", gomock.Any()).Return(nil).Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.logger.streams", config.Partial{}).
+			Return(partial, nil).
+			Times(1)
+		configurer.
+			EXPECT().
+			AddObserver("slate.logger.streams", gomock.Any()).
+			Return(nil).
+			Times(1)
 
 		sut, _ := NewLoader(config.NewConfig(), NewLog(), NewStreamFactory())
 		sut.configurer = configurer
@@ -128,7 +140,11 @@ func Test_Loader_Load(t *testing.T) {
 
 		partial := config.Partial{"id": 1}
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.logger.streams", config.Partial{}).
+			Return(partial, nil).
+			Times(1)
 
 		sut, _ := NewLoader(config.NewConfig(), NewLog(), NewStreamFactory())
 		sut.configurer = configurer
@@ -136,7 +152,7 @@ func Test_Loader_Load(t *testing.T) {
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -147,7 +163,11 @@ func Test_Loader_Load(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		partial := config.Partial{"id": config.Partial{}}
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.logger.streams", config.Partial{}).
+			Return(partial, nil).
+			Times(1)
 		streamCreator := NewMockStreamCreator(ctrl)
 		streamCreator.EXPECT().Create(config.Partial{}).Return(nil, expected).Times(1)
 
@@ -158,7 +178,7 @@ func Test_Loader_Load(t *testing.T) {
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -169,7 +189,11 @@ func Test_Loader_Load(t *testing.T) {
 		expected := fmt.Errorf("error message")
 		partial := config.Partial{"id": config.Partial{}}
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.logger.streams", config.Partial{}).
+			Return(partial, nil).
+			Times(1)
 		stream := NewMockStream(ctrl)
 		streamCreator := NewMockStreamCreator(ctrl)
 		streamCreator.EXPECT().Create(config.Partial{}).Return(stream, nil).Times(1)
@@ -184,7 +208,7 @@ func Test_Loader_Load(t *testing.T) {
 		if e := sut.Load(); e == nil {
 			t.Errorf("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -194,8 +218,16 @@ func Test_Loader_Load(t *testing.T) {
 
 		partial := config.Partial{"id": config.Partial{}}
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Partial("slate.logger.streams", config.Partial{}).Return(partial, nil).Times(1)
-		configurer.EXPECT().AddObserver("slate.logger.streams", gomock.Any()).Return(nil).Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.logger.streams", config.Partial{}).
+			Return(partial, nil).
+			Times(1)
+		configurer.
+			EXPECT().
+			AddObserver("slate.logger.streams", gomock.Any()).
+			Return(nil).
+			Times(1)
 		stream := NewMockStream(ctrl)
 		streamCreator := NewMockStreamCreator(ctrl)
 		streamCreator.EXPECT().Create(config.Partial{}).Return(stream, nil).Times(1)
@@ -208,7 +240,7 @@ func Test_Loader_Load(t *testing.T) {
 		sut.streamCreator = streamCreator
 
 		if e := sut.Load(); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -216,9 +248,16 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		config1 := config.Partial{"type": "console", "format": "json", "channels": []interface{}{}, "Level": "fatal"}
-		partial1 := config.Partial{"slate": config.Partial{"logger": config.Partial{"streams": config.Partial{"id": config1}}}}
-		partial2 := config.Partial{"slate": config.Partial{"logger": config.Partial{"streams": "string"}}}
+		config1 := config.Partial{
+			"type":     "console",
+			"format":   "json",
+			"channels": []interface{}{},
+			"Level":    "fatal",
+		}
+		partial1 := config.Partial{}
+		_, _ = partial1.Set("slate.logger.streams.id", config1)
+		partial2 := config.Partial{}
+		_, _ = partial2.Set("slate.logger.streams", "string")
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).Times(2)
 		source2 := NewMockConfigSource(ctrl)
@@ -243,10 +282,22 @@ func Test_Loader_Load(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		config1 := config.Partial{"type": "console", "format": "json", "Channels": []interface{}{}, "Level": "fatal"}
-		config2 := config.Partial{"type": "console", "format": "json", "Channels": []interface{}{}, "Level": "fatal"}
-		partial1 := config.Partial{"slate": config.Partial{"logger": config.Partial{"streams": config.Partial{"id1": config1}}}}
-		partial2 := config.Partial{"slate": config.Partial{"logger": config.Partial{"streams": config.Partial{"id2": config2}}}}
+		config1 := config.Partial{
+			"type":     "console",
+			"format":   "json",
+			"Channels": []interface{}{},
+			"Level":    "fatal",
+		}
+		config2 := config.Partial{
+			"type":     "console",
+			"format":   "json",
+			"Channels": []interface{}{},
+			"Level":    "fatal",
+		}
+		partial1 := config.Partial{}
+		_, _ = partial1.Set("slate.logger.streams.id1", config1)
+		partial2 := config.Partial{}
+		_, _ = partial2.Set("slate.logger.streams.id2", config2)
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(partial1, nil).Times(2)
 		source2 := NewMockConfigSource(ctrl)

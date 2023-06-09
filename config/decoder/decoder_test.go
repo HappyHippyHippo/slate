@@ -22,7 +22,7 @@ func Test_BaseDecoder_Close(t *testing.T) {
 		if e := sut.Close(); e == nil {
 			t.Errorf("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -50,9 +50,12 @@ func Test_BaseDecoder_Decode(t *testing.T) {
 		sut := Decoder{Reader: reader}
 		defer func() { _ = sut.Close() }()
 		baseDecoder := NewMockUnderlyingDecoder(ctrl)
-		baseDecoder.EXPECT().Decode(&map[string]interface{}{}).DoAndReturn(func(p *map[string]interface{}) error {
-			return expected
-		}).Times(1)
+		baseDecoder.
+			EXPECT().
+			Decode(&map[string]interface{}{}).
+			DoAndReturn(func(p *map[string]interface{}) error {
+				return expected
+			}).Times(1)
 		sut.UnderlyingDecoder = baseDecoder
 
 		check, e := sut.Decode()
@@ -62,7 +65,7 @@ func Test_BaseDecoder_Decode(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -76,10 +79,13 @@ func Test_BaseDecoder_Decode(t *testing.T) {
 		sut := Decoder{Reader: reader}
 		defer func() { _ = sut.Close() }()
 		baseDecoder := NewMockUnderlyingDecoder(ctrl)
-		baseDecoder.EXPECT().Decode(&map[string]interface{}{}).DoAndReturn(func(p *map[string]interface{}) error {
-			(*p)["node"] = data["node"]
-			return nil
-		}).Times(1)
+		baseDecoder.
+			EXPECT().
+			Decode(&map[string]interface{}{}).
+			DoAndReturn(func(p *map[string]interface{}) error {
+				(*p)["node"] = data["node"]
+				return nil
+			}).Times(1)
 		sut.UnderlyingDecoder = baseDecoder
 
 		check, e := sut.Decode()
@@ -89,7 +95,7 @@ func Test_BaseDecoder_Decode(t *testing.T) {
 		case !reflect.DeepEqual(*check, data):
 			t.Errorf("returned (%v)", check)
 		case e != nil:
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }

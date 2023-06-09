@@ -67,7 +67,7 @@ func Test_Log_Signal(t *testing.T) {
 		_ = sut.AddStream(id2, stream2)
 
 		if e := sut.Signal(channel, level, message, ctx); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -96,7 +96,7 @@ func Test_Log_Signal(t *testing.T) {
 		if e := sut.Signal(channel, level, message, ctx); e == nil {
 			t.Error("didn't returned the expected  error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 }
@@ -123,7 +123,7 @@ func Test_Log_Broadcast(t *testing.T) {
 		_ = sut.AddStream(id2, stream2)
 
 		if e := sut.Broadcast(level, message, ctx); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -151,7 +151,7 @@ func Test_Log_Broadcast(t *testing.T) {
 		if e := sut.Broadcast(level, message, ctx); e == nil {
 			t.Error("didn't returned the expected  error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 }
@@ -214,17 +214,17 @@ func Test_Log_ListStreams(t *testing.T) {
 		if sort.Search(len(streams), func(i int) bool {
 			return streams[i] >= "id1"
 		}) >= len(streams) {
-			t.Errorf("returned the {%v} id's list instead of the expected: {%v}", streams, expected)
+			t.Errorf("{%v} when expecting {%v}", streams, expected)
 		}
 		if sort.Search(len(streams), func(i int) bool {
 			return streams[i] >= "id2"
 		}) >= len(streams) {
-			t.Errorf("returned the {%v} id's list instead of the expected: {%v}", streams, expected)
+			t.Errorf("{%v} when expecting {%v}", streams, expected)
 		}
 		if sort.Search(len(streams), func(i int) bool {
 			return streams[i] >= "id3"
 		}) >= len(streams) {
-			t.Errorf("returned the {%v} id's list instead of the expected: {%v}", streams, expected)
+			t.Errorf("{%v} when expecting {%v}", streams, expected)
 		}
 	})
 }
@@ -237,7 +237,7 @@ func Test_Log_AddStream(t *testing.T) {
 		if e := sut.AddStream("id", nil); e == nil {
 			t.Errorf("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -256,7 +256,7 @@ func Test_Log_AddStream(t *testing.T) {
 		if e := sut.AddStream(id, stream2); e == nil {
 			t.Errorf("didn't returned the expected error")
 		} else if !errors.Is(e, ErrDuplicateStream) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrDuplicateStream)
+			t.Errorf("(%v) when expecting (%v)", e, ErrDuplicateStream)
 		}
 	})
 
@@ -275,7 +275,7 @@ func Test_Log_AddStream(t *testing.T) {
 		} else if check, e := sut.Stream(id); !reflect.DeepEqual(check, stream1) {
 			t.Errorf("didn't stored the stream")
 		} else if e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }
@@ -321,7 +321,7 @@ func Test_Log_RemoveAllStreams(t *testing.T) {
 		sut.RemoveAllStreams()
 
 		if check := sut.ListStreams(); len(check) != 0 {
-			t.Errorf("returned the {%v} id's list instead of an empty list", check)
+			t.Errorf("{%v} id's list instead of an empty list", check)
 		}
 	})
 }
@@ -338,7 +338,7 @@ func Test_Log_Stream(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrStreamNotFound):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrStreamNotFound)
+			t.Errorf("(%v) when expecting (%v)", e, ErrStreamNotFound)
 		}
 	})
 
@@ -356,7 +356,7 @@ func Test_Log_Stream(t *testing.T) {
 		if check, e := sut.Stream(id); !reflect.DeepEqual(check, stream1) {
 			t.Errorf("didn0t retrieved the stored stream")
 		} else if e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }

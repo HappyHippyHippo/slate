@@ -33,10 +33,10 @@ func Test_DecoderStrategy_Accept(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
+		for _, s := range scenarios {
 			test := func() {
-				if check := (DecoderStrategy{}).Accept(scenario.format); check != scenario.expected {
-					t.Errorf("returned (%v) when checking (%v) format", check, scenario.format)
+				if check := (DecoderStrategy{}).Accept(s.format); check != s.expected {
+					t.Errorf("returned (%v) when checking (%v)", check, s.format)
 				}
 			}
 			test()
@@ -49,7 +49,7 @@ func Test_DecoderStrategy_Create(t *testing.T) {
 		if decoder, e := (DecoderStrategy{}).Create(); decoder != nil {
 			t.Error("returned an unexpected valid decoder instance")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expecting : %v", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -57,7 +57,7 @@ func Test_DecoderStrategy_Create(t *testing.T) {
 		if decoder, e := (DecoderStrategy{}).Create("string"); decoder != nil {
 			t.Error("returned an unexpected valid decoder instance")
 		} else if !errors.Is(e, slate.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting : %v", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -68,7 +68,7 @@ func Test_DecoderStrategy_Create(t *testing.T) {
 		decoder, e := (DecoderStrategy{}).Create(NewMockReader(ctrl))
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case decoder == nil:
 			t.Error("didn't returned a valid reference")
 		default:

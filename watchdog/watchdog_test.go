@@ -18,7 +18,7 @@ func Test_Watchdog(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -28,7 +28,7 @@ func Test_Watchdog(t *testing.T) {
 		sut, e := NewWatchdog(logAdapter)
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
 		case sut.logAdapter != logAdapter:
@@ -61,7 +61,7 @@ func Test_Watchdog_Run(t *testing.T) {
 		case count != 1:
 			t.Errorf("didn't executed the process method")
 		case chk != nil:
-			t.Errorf("returned the unexpected error : %v", chk)
+			t.Errorf("unexpected (%v) error", chk)
 		}
 	})
 
@@ -91,7 +91,7 @@ func Test_Watchdog_Run(t *testing.T) {
 		case chk == nil:
 			t.Error("didn't returned the expected error")
 		case chk.Error() != e.Error():
-			t.Errorf("returned the unexpected error (%v) when expecting : %v", chk, e)
+			t.Errorf("(%v) when expecting (%v)", chk, e)
 		}
 	})
 
@@ -123,7 +123,7 @@ func Test_Watchdog_Run(t *testing.T) {
 		case count != 2:
 			t.Errorf("didn't executed the process method two times")
 		case chk != nil:
-			t.Errorf("returned the unexpected error : %v", chk)
+			t.Errorf("unexpected (%v) error", chk)
 		}
 	})
 
@@ -157,7 +157,7 @@ func Test_Watchdog_Run(t *testing.T) {
 		case chk == nil:
 			t.Error("didn't returned the expected error")
 		case chk.Error() != e.Error():
-			t.Errorf("returned the unexpected error (%v) when expecting : %v", chk, e)
+			t.Errorf("(%v) when expecting (%v)", chk, e)
 		}
 	})
 }

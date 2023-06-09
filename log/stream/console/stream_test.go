@@ -26,7 +26,7 @@ func Test_NewStream(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -36,7 +36,7 @@ func Test_NewStream(t *testing.T) {
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case sut.Writer != os.Stdout:
 			t.Error("didn't stored the stdout as the defined writer")
 		}
@@ -120,21 +120,25 @@ func Test_Stream_Signal(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
+		for _, s := range scenarios {
 			test := func() {
 				ctrl := gomock.NewController(t)
 				defer func() { ctrl.Finish() }()
 
 				writer := NewMockWriter(ctrl)
-				writer.EXPECT().Write([]byte(scenario.expected + "\n")).Times(scenario.callTimes)
+				writer.EXPECT().Write([]byte(s.expected + "\n")).Times(s.callTimes)
 				formatter := NewMockFormatter(ctrl)
-				formatter.EXPECT().Format(scenario.call.level, scenario.call.message).Return(scenario.expected).Times(scenario.callTimes)
+				formatter.
+					EXPECT().
+					Format(s.call.level, s.call.message).
+					Return(s.expected).
+					Times(s.callTimes)
 
-				sut, _ := NewStream(formatter, scenario.state.channels, scenario.state.level)
+				sut, _ := NewStream(formatter, s.state.channels, s.state.level)
 				sut.Writer = writer
 
-				if e := sut.Signal(scenario.call.channel, scenario.call.level, scenario.call.message); e != nil {
-					t.Errorf("returned the (%v) error", e)
+				if e := sut.Signal(s.call.channel, s.call.level, s.call.message); e != nil {
+					t.Errorf("unexpected (%v) error", e)
 				}
 			}
 			test()
@@ -224,21 +228,25 @@ func Test_Stream_Signal(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
+		for _, s := range scenarios {
 			test := func() {
 				ctrl := gomock.NewController(t)
 				defer func() { ctrl.Finish() }()
 
 				writer := NewMockWriter(ctrl)
-				writer.EXPECT().Write([]byte(scenario.expected + "\n")).Times(scenario.callTimes)
+				writer.EXPECT().Write([]byte(s.expected + "\n")).Times(s.callTimes)
 				formatter := NewMockFormatter(ctrl)
-				formatter.EXPECT().Format(scenario.call.level, scenario.call.message, scenario.call.ctx).Return(scenario.expected).Times(scenario.callTimes)
+				formatter.
+					EXPECT().
+					Format(s.call.level, s.call.message, s.call.ctx).
+					Return(s.expected).
+					Times(s.callTimes)
 
-				sut, _ := NewStream(formatter, scenario.state.channels, scenario.state.level)
+				sut, _ := NewStream(formatter, s.state.channels, s.state.level)
 				sut.Writer = writer
 
-				if e := sut.Signal(scenario.call.channel, scenario.call.level, scenario.call.message, scenario.call.ctx); e != nil {
-					t.Errorf("returned the (%v) error", e)
+				if e := sut.Signal(s.call.channel, s.call.level, s.call.message, s.call.ctx); e != nil {
+					t.Errorf("unexpected (%v) error", e)
 				}
 			}
 			test()
@@ -298,21 +306,25 @@ func Test_Stream_Broadcast(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
+		for _, s := range scenarios {
 			test := func() {
 				ctrl := gomock.NewController(t)
 				defer func() { ctrl.Finish() }()
 
 				writer := NewMockWriter(ctrl)
-				writer.EXPECT().Write([]byte(scenario.expected + "\n")).Times(scenario.callTimes)
+				writer.EXPECT().Write([]byte(s.expected + "\n")).Times(s.callTimes)
 				formatter := NewMockFormatter(ctrl)
-				formatter.EXPECT().Format(scenario.call.level, scenario.call.message).Return(scenario.expected).Times(scenario.callTimes)
+				formatter.
+					EXPECT().
+					Format(s.call.level, s.call.message).
+					Return(s.expected).
+					Times(s.callTimes)
 
-				sut, _ := NewStream(formatter, scenario.state.channels, scenario.state.level)
+				sut, _ := NewStream(formatter, s.state.channels, s.state.level)
 				sut.Writer = writer
 
-				if e := sut.Broadcast(scenario.call.level, scenario.call.message); e != nil {
-					t.Errorf("returned the (%v) error", e)
+				if e := sut.Broadcast(s.call.level, s.call.message); e != nil {
+					t.Errorf("unexpected (%v) error", e)
 				}
 			}
 			test()
@@ -375,21 +387,25 @@ func Test_Stream_Broadcast(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
+		for _, s := range scenarios {
 			test := func() {
 				ctrl := gomock.NewController(t)
 				defer func() { ctrl.Finish() }()
 
 				writer := NewMockWriter(ctrl)
-				writer.EXPECT().Write([]byte(scenario.expected + "\n")).Times(scenario.callTimes)
+				writer.EXPECT().Write([]byte(s.expected + "\n")).Times(s.callTimes)
 				formatter := NewMockFormatter(ctrl)
-				formatter.EXPECT().Format(scenario.call.level, scenario.call.message, scenario.call.ctx).Return(scenario.expected).Times(scenario.callTimes)
+				formatter.
+					EXPECT().
+					Format(s.call.level, s.call.message, s.call.ctx).
+					Return(s.expected).
+					Times(s.callTimes)
 
-				sut, _ := NewStream(formatter, scenario.state.channels, scenario.state.level)
+				sut, _ := NewStream(formatter, s.state.channels, s.state.level)
 				sut.Writer = writer
 
-				if e := sut.Broadcast(scenario.call.level, scenario.call.message, scenario.call.ctx); e != nil {
-					t.Errorf("returned the (%v) error", e)
+				if e := sut.Broadcast(s.call.level, s.call.message, s.call.ctx); e != nil {
+					t.Errorf("unexpected (%v) error", e)
 				}
 			}
 			test()

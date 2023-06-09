@@ -17,7 +17,7 @@ func Test_NewProcess(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -30,11 +30,11 @@ func Test_NewProcess(t *testing.T) {
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case sut.service != service:
-			t.Errorf("didn't stored the given (%v) service name : %v", service, sut.service)
+			t.Errorf("(%v) service when expecting (%v)", sut.service, service)
 		case fmt.Sprintf("%p", sut.runner) != fmt.Sprintf("%p", runner):
-			t.Errorf("didn't stored the given (%p) runner : %p", runner, sut.runner)
+			t.Errorf("(%p) runner when expecting (%p)", sut.runner, runner)
 		}
 	})
 }
@@ -46,7 +46,7 @@ func Test_Process_Service(t *testing.T) {
 		sut, _ := NewProcess(service, runner)
 
 		if chk := sut.Service(); chk != service {
-			t.Errorf("didn't returned the expected (%v) service name : %v", service, sut.service)
+			t.Errorf("(%v) service when expecting (%v)", sut.service, service)
 		}
 	})
 }
@@ -58,7 +58,7 @@ func Test_Process_Runner(t *testing.T) {
 		sut, _ := NewProcess(service, runner)
 
 		if chk := sut.Runner(); fmt.Sprintf("%p", chk) != fmt.Sprintf("%p", runner) {
-			t.Errorf("didn't returned the expected (%p) runner : %p", runner, sut.runner)
+			t.Errorf("(%p) runner when expecting (%p)", sut.runner, runner)
 		}
 	})
 }

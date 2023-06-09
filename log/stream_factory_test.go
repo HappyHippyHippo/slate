@@ -24,7 +24,7 @@ func Test_StreamFactory_Register(t *testing.T) {
 		if e := (&StreamFactory{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -36,7 +36,7 @@ func Test_StreamFactory_Register(t *testing.T) {
 		sut := &StreamFactory{}
 
 		if e := sut.Register(strategy); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if (*sut)[0] != strategy {
 			t.Error("didn't stored the strategy")
 		}
@@ -52,7 +52,7 @@ func Test_StreamFactory_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -74,7 +74,7 @@ func Test_StreamFactory_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrInvalidStream):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrInvalidStream)
+			t.Errorf("(%v) when expecting (%v)", e, ErrInvalidStream)
 		}
 	})
 
@@ -92,7 +92,7 @@ func Test_StreamFactory_Create(t *testing.T) {
 		_ = sut.Register(strategy)
 
 		if s, e := sut.Create(cfg); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if !reflect.DeepEqual(s, stream) {
 			t.Error("didn't returned the created stream")
 		}

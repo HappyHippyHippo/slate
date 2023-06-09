@@ -90,7 +90,11 @@ func (w *RotatingWriter) rotate() error {
 	w.day = now.Day()
 	w.current = fmt.Sprintf(w.file, now.Format("2006-01-02"))
 	// open the new target file
-	if w.fp, e = w.fs.OpenFile(w.current, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644); e != nil {
+	if w.fp, e = w.fs.OpenFile(
+		w.current,
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		0o644,
+	); e != nil {
 		return e
 	}
 	return nil

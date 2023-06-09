@@ -18,7 +18,7 @@ func Test_Provider_Register(t *testing.T) {
 		if e := sut.Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -29,9 +29,9 @@ func Test_Provider_Register(t *testing.T) {
 		e := sut.Register(container)
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case !container.Has(ID):
-			t.Errorf("didn't registered the strategy : %v", sut)
+			t.Errorf("no strategy : %v", sut)
 		}
 	})
 
@@ -45,12 +45,14 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&Provider{}).Register(container)
 
 		source1 := NewMockSource(ctrl)
-		_ = container.Service("cfg1", func() *MockSource { return source1 }, SourceTag)
+		_ = container.Service("cfg1", func() *MockSource {
+			return source1
+		}, SourceTag)
 
 		strategy, e := container.Get(ID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("unexpected error (%v)", e)
 		case strategy == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -68,7 +70,7 @@ func Test_Provider_Boot(t *testing.T) {
 		if e := (&Provider{}).Boot(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -78,7 +80,7 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = sut.Register(container)
 
 		if e := sut.Boot(container); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }

@@ -55,7 +55,10 @@ func (f *Factory) Create(
 	service string,
 ) (*Watchdog, error) {
 	// get service watchdog configuration
-	cfg, e := f.configurer.Partial(fmt.Sprintf("%s.%s", ConfigPathPrefix, service), config.Partial{})
+	cfg, e := f.configurer.Partial(
+		fmt.Sprintf("%s.%s", ConfigPathPrefix, service),
+		config.Partial{},
+	)
 	if e != nil {
 		return nil, e
 	}

@@ -18,11 +18,11 @@ func Test_NewConnectionPool(t *testing.T) {
 		sut, e := NewConnectionPool(nil, &ConnectionFactory{})
 		switch {
 		case sut != nil:
-			t.Error("return an unexpected valid connection factory instance")
+			t.Error("return an unexpected valid connection factory")
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -30,11 +30,11 @@ func Test_NewConnectionPool(t *testing.T) {
 		sut, e := NewConnectionPool(config.NewConfig(), nil)
 		switch {
 		case sut != nil:
-			t.Error("return an unexpected valid connection factory instance")
+			t.Error("return an unexpected valid connection factory")
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -42,7 +42,7 @@ func Test_NewConnectionPool(t *testing.T) {
 		connectionsFactory, _ := NewConnectionFactory(NewDialectFactory())
 
 		if sut, e := NewConnectionPool(config.NewConfig(), connectionsFactory); sut == nil {
-			t.Error("didn't returned the expected valid connection factory instance")
+			t.Error("didn't returned the expected valid connection factory ")
 		} else if e != nil {
 			t.Errorf("return the unexpected error : %v", e)
 		}
@@ -56,8 +56,10 @@ func Test_NewConnectionPool(t *testing.T) {
 		cfg1 := config.Partial{"dialect": "sqlite", "host": ":memory1:"}
 		cfg2 := config.Partial{"dialect": "sqlite", "host": ":memory2:"}
 		gormCfg := &gorm.Config{Logger: logger.Discard, DisableAutomaticPing: true}
-		config1 := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{name: cfg1}}}}
-		config2 := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{name + "salt": cfg2}}}}
+		config1 := config.Partial{}
+		_, _ = config1.Set("slate.rdb.connections", config.Partial{name: cfg1})
+		config2 := config.Partial{}
+		_, _ = config2.Set("slate.rdb.connections", config.Partial{name + "salt": cfg2})
 		source1 := NewMockConfigSource(ctrl)
 		source1.EXPECT().Get("").Return(config1, nil).MinTimes(1)
 		source2 := NewMockConfigSource(ctrl)
@@ -91,7 +93,11 @@ func Test_ConnectionPool_Get(t *testing.T) {
 		defer ctrl.Finish()
 
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Has("slate.rdb.connections.primary").Return(false).Times(1)
+		configurer.
+			EXPECT().
+			Has("slate.rdb.connections.primary").
+			Return(false).
+			Times(1)
 		connectionCreator := NewMockConnectionCreator(ctrl)
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
@@ -106,7 +112,7 @@ func Test_ConnectionPool_Get(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, ErrConfigNotFound):
-			t.Errorf("returned the (%v) error when expected (%v)", e, ErrConfigNotFound)
+			t.Errorf("(%v) when expected (%v)", e, ErrConfigNotFound)
 		}
 	})
 
@@ -116,8 +122,16 @@ func Test_ConnectionPool_Get(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)
-		configurer.EXPECT().Partial("slate.rdb.connections.name").Return(nil, expected).Times(1)
+		configurer.
+			EXPECT().
+			Has("slate.rdb.connections.name").
+			Return(true).
+			Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.rdb.connections.name").
+			Return(nil, expected).
+			Times(1)
 		connectionCreator := NewMockConnectionCreator(ctrl)
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
@@ -132,7 +146,7 @@ func Test_ConnectionPool_Get(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
+			t.Errorf("(%v) when expected (%v)", e, expected)
 		}
 	})
 
@@ -144,10 +158,22 @@ func Test_ConnectionPool_Get(t *testing.T) {
 		partial := config.Partial{"data": "string"}
 		gormCfg := &gorm.Config{Logger: logger.Discard}
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)
-		configurer.EXPECT().Partial("slate.rdb.connections.name").Return(partial, nil).Times(1)
+		configurer.
+			EXPECT().
+			Has("slate.rdb.connections.name").
+			Return(true).
+			Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.rdb.connections.name").
+			Return(partial, nil).
+			Times(1)
 		connectionCreator := NewMockConnectionCreator(ctrl)
-		connectionCreator.EXPECT().Create(partial, gormCfg).Return(nil, expected).Times(1)
+		connectionCreator.
+			EXPECT().
+			Create(partial, gormCfg).
+			Return(nil, expected).
+			Times(1)
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(config.NewConfig(), cf)
@@ -161,7 +187,7 @@ func Test_ConnectionPool_Get(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
+			t.Errorf("(%v) when expected (%v)", e, expected)
 		}
 	})
 
@@ -172,10 +198,22 @@ func Test_ConnectionPool_Get(t *testing.T) {
 		partial := config.Partial{"data": "string"}
 		gormCfg := &gorm.Config{Logger: logger.Discard}
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)
-		configurer.EXPECT().Partial("slate.rdb.connections.name").Return(partial, nil).Times(1)
+		configurer.
+			EXPECT().
+			Has("slate.rdb.connections.name").
+			Return(true).
+			Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.rdb.connections.name").
+			Return(partial, nil).
+			Times(1)
 		connectionCreator := NewMockConnectionCreator(ctrl)
-		connectionCreator.EXPECT().Create(partial, gormCfg).Return(&gorm.DB{}, nil).Times(1)
+		connectionCreator.
+			EXPECT().
+			Create(partial, gormCfg).
+			Return(&gorm.DB{}, nil).
+			Times(1)
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(config.NewConfig(), cf)
@@ -196,10 +234,22 @@ func Test_ConnectionPool_Get(t *testing.T) {
 		partial := config.Partial{"data": "string"}
 		gormCfg := &gorm.Config{Logger: logger.Discard}
 		configurer := NewMockConfigurer(ctrl)
-		configurer.EXPECT().Has("slate.rdb.connections.name").Return(true).Times(1)
-		configurer.EXPECT().Partial("slate.rdb.connections.name").Return(partial, nil).Times(1)
+		configurer.
+			EXPECT().
+			Has("slate.rdb.connections.name").
+			Return(true).
+			Times(1)
+		configurer.
+			EXPECT().
+			Partial("slate.rdb.connections.name").
+			Return(partial, nil).
+			Times(1)
 		connectionCreator := NewMockConnectionCreator(ctrl)
-		connectionCreator.EXPECT().Create(partial, gormCfg).Return(&gorm.DB{}, nil).Times(1)
+		connectionCreator.
+			EXPECT().
+			Create(partial, gormCfg).
+			Return(&gorm.DB{}, nil).
+			Times(1)
 
 		cf, _ := NewConnectionFactory(NewDialectFactory())
 		sut, _ := NewConnectionPool(config.NewConfig(), cf)

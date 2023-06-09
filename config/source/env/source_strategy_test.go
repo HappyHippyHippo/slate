@@ -53,43 +53,51 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
 	t.Run("non-map mappings", func(t *testing.T) {
-		src, e := (&SourceStrategy{}).Create(config.Partial{"mappings": 123})
+		src, e := (&SourceStrategy{}).Create(config.Partial{
+			"mappings": 123,
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
 	t.Run("non-string key map mappings", func(t *testing.T) {
-		src, e := (&SourceStrategy{}).Create(config.Partial{"mappings": config.Partial{1: "value"}})
+		src, e := (&SourceStrategy{}).Create(config.Partial{
+			"mappings": config.Partial{
+				1: "value",
+			}})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
 	t.Run("non-string value map mappings", func(t *testing.T) {
-		src, e := (&SourceStrategy{}).Create(config.Partial{"mappings": config.Partial{"key": 1}})
+		src, e := (&SourceStrategy{}).Create(config.Partial{
+			"mappings": config.Partial{
+				"key": 1,
+			}})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -102,10 +110,12 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		path := "root"
 		expected := config.Partial{path: value}
 
-		src, e := (&SourceStrategy{}).Create(config.Partial{"mappings": config.Partial{env: path}})
+		src, e := (&SourceStrategy{}).Create(config.Partial{
+			"mappings": config.Partial{env: path},
+		})
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case src == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -126,7 +136,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		src, e := (&SourceStrategy{}).Create(config.Partial{})
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case src == nil:
 			t.Error("didn't returned a valid reference")
 		default:

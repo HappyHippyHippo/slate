@@ -24,7 +24,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -39,7 +39,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -60,7 +60,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -84,7 +84,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -105,7 +105,7 @@ func Test_NewSource(t *testing.T) {
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		default:
 			switch {
 			case sut.Mutex == nil:
@@ -137,7 +137,11 @@ func Test_NewSource(t *testing.T) {
 		dir.EXPECT().Close().Return(nil).Times(1)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
-		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
+		fs.
+			EXPECT().
+			OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).
+			Return(nil, expected).
+			Times(1)
 		decoderFactory := config.NewDecoderFactory()
 
 		sut, e := NewSource(path, config.UnknownDecoder, true, fs, decoderFactory)
@@ -147,7 +151,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -167,7 +171,11 @@ func Test_NewSource(t *testing.T) {
 		file.EXPECT().Close().Return(nil).Times(1)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
-		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fs.
+			EXPECT().
+			OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).
+			Return(file, nil).
+			Times(1)
 		decoderStrategy := NewMockDecoderStrategy(ctrl)
 		decoderStrategy.EXPECT().Accept(config.UnknownDecoder).Return(false).Times(1)
 		decoderFactory := config.NewDecoderFactory()
@@ -180,7 +188,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case errors.Is(e, config.ErrInvalidSource):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, config.ErrInvalidSource)
+			t.Errorf("(%v) when expecting (%v)", e, config.ErrInvalidSource)
 		}
 	})
 
@@ -201,7 +209,11 @@ func Test_NewSource(t *testing.T) {
 		file := NewMockFile(ctrl)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
-		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fs.
+			EXPECT().
+			OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).
+			Return(file, nil).
+			Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(nil, expected).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
@@ -218,7 +230,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -238,7 +250,11 @@ func Test_NewSource(t *testing.T) {
 		file := NewMockFile(ctrl)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
-		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fs.
+			EXPECT().
+			OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).
+			Return(file, nil).
+			Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(partial, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
@@ -253,7 +269,7 @@ func Test_NewSource(t *testing.T) {
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		default:
 			switch {
 			case sut.Mutex == nil:
@@ -267,7 +283,7 @@ func Test_NewSource(t *testing.T) {
 			case sut.decoderCreator != decoderFactory:
 				t.Error("didn't stored the decoder factory reference")
 			case !reflect.DeepEqual(sut.Partial, *partial):
-				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, *partial)
+				t.Errorf("(%v) when expecting (%v)", sut.Partial, *partial)
 			}
 		}
 	})
@@ -291,7 +307,11 @@ func Test_NewSource(t *testing.T) {
 		file := NewMockFile(ctrl)
 		fs := NewMockFs(ctrl)
 		fs.EXPECT().Open(path).Return(dir, nil).Times(1)
-		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fs.
+			EXPECT().
+			OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).
+			Return(file, nil).
+			Times(1)
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(partial, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
@@ -306,7 +326,7 @@ func Test_NewSource(t *testing.T) {
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		default:
 			switch {
 			case sut.Mutex == nil:
@@ -320,7 +340,7 @@ func Test_NewSource(t *testing.T) {
 			case sut.decoderCreator != decoderFactory:
 				t.Error("didn't stored the decoder factory reference")
 			case !reflect.DeepEqual(sut.Partial, *partial):
-				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, *partial)
+				t.Errorf("(%v) when expecting (%v)", sut.Partial, *partial)
 			}
 		}
 	})
@@ -347,8 +367,13 @@ func Test_NewSource(t *testing.T) {
 		fs := NewMockFs(ctrl)
 		gomock.InOrder(
 			fs.EXPECT().Open(path).Return(dir, nil).Times(1),
-			fs.EXPECT().Open(path+"/"+subDirInfoName).Return(nil, expected).Times(1))
-		fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(file1, nil).Times(1)
+			fs.EXPECT().Open(path+"/"+subDirInfoName).Return(nil, expected).Times(1),
+		)
+		fs.
+			EXPECT().
+			OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).
+			Return(file1, nil).
+			Times(1)
 		decoder1 := NewMockDecoder(ctrl)
 		decoder1.EXPECT().Decode().Return(partial1, nil).Times(1)
 		decoder1.EXPECT().Close().Return(nil).Times(1)
@@ -365,7 +390,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -399,11 +424,19 @@ func Test_NewSource(t *testing.T) {
 		file2 := NewMockFile(ctrl)
 		fs := NewMockFs(ctrl)
 		gomock.InOrder(
-			fs.EXPECT().Open(path).Return(dir, nil).Times(1),
-			fs.EXPECT().Open(path+"/"+subDirInfoName).Return(subDir, nil).Times(1))
+			fs.EXPECT().Open(path).Return(dir, nil),
+			fs.EXPECT().Open(path+"/"+subDirInfoName).Return(subDir, nil),
+		)
 		gomock.InOrder(
-			fs.EXPECT().OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(file1, nil).Times(1),
-			fs.EXPECT().OpenFile(path+"/"+subDirInfoName+"/"+subFileInfoName, os.O_RDONLY, os.FileMode(0o644)).Return(file2, nil).Times(1))
+			fs.
+				EXPECT().
+				OpenFile(path+"/"+fileInfoName, os.O_RDONLY, os.FileMode(0o644)).
+				Return(file1, nil),
+			fs.
+				EXPECT().
+				OpenFile(path+"/"+subDirInfoName+"/"+subFileInfoName, os.O_RDONLY, os.FileMode(0o644)).
+				Return(file2, nil),
+		)
 		decoder1 := NewMockDecoder(ctrl)
 		decoder1.EXPECT().Decode().Return(partial1, nil).Times(1)
 		decoder1.EXPECT().Close().Return(nil).Times(1)
@@ -427,7 +460,7 @@ func Test_NewSource(t *testing.T) {
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		default:
 			switch {
 			case sut.Mutex == nil:
@@ -441,7 +474,7 @@ func Test_NewSource(t *testing.T) {
 			case sut.decoderCreator != decoderFactory:
 				t.Error("didn't stored the decoder factory reference")
 			case !reflect.DeepEqual(sut.Partial, expected):
-				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, expected)
+				t.Errorf("(%v) when expecting (%v)", sut.Partial, expected)
 			}
 		}
 	})

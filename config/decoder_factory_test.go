@@ -23,7 +23,7 @@ func Test_DecoderFactory_Register(t *testing.T) {
 		if e := (&DecoderFactory{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -35,7 +35,7 @@ func Test_DecoderFactory_Register(t *testing.T) {
 		sut := DecoderFactory{}
 
 		if e := sut.Register(strategy); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if sut[0] != strategy {
 			t.Error("didn't stored the strategy")
 		}
@@ -61,7 +61,7 @@ func Test_DecoderFactory_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrInvalidFormat):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrInvalidFormat)
+			t.Errorf("(%v) when expecting (%v)", e, ErrInvalidFormat)
 		}
 	})
 
@@ -79,7 +79,7 @@ func Test_DecoderFactory_Create(t *testing.T) {
 		_ = sut.Register(strategy)
 
 		if check, e := sut.Create(format, reader); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if !reflect.DeepEqual(check, decoder) {
 			t.Error("didn't returned the created strategy")
 		}

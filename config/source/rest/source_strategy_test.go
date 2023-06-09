@@ -25,7 +25,7 @@ func Test_NewSourceStrategy(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -38,7 +38,7 @@ func Test_NewSourceStrategy(t *testing.T) {
 		sut, e := NewSourceStrategy(decoderFactory)
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
 		case sut.decoderFactory != decoderFactory:
@@ -48,7 +48,7 @@ func Test_NewSourceStrategy(t *testing.T) {
 			switch client.(type) {
 			case *http.Client:
 			default:
-				t.Error("didn't stored a valid http client decoderCreator")
+				t.Error("didn't stored a valid http client")
 			}
 		}
 	})
@@ -125,7 +125,7 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -135,14 +135,17 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"format": "format", "configPath": "path"})
+		src, e := sut.Create(config.Partial{
+			"format":     "format",
+			"configPath": "path",
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, config.ErrInvalidSource):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, config.ErrInvalidSource)
+			t.Errorf("(%v) when expecting (%v)", e, config.ErrInvalidSource)
 		}
 	})
 
@@ -152,14 +155,17 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"uri": "path", "format": "format"})
+		src, e := sut.Create(config.Partial{
+			"uri":    "path",
+			"format": "format",
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, config.ErrInvalidSource):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, config.ErrInvalidSource)
+			t.Errorf("(%v) when expecting (%v)", e, config.ErrInvalidSource)
 		}
 	})
 
@@ -169,14 +175,18 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"uri": 123, "format": "format", "configPath": "path"})
+		src, e := sut.Create(config.Partial{
+			"uri":        123,
+			"format":     "format",
+			"configPath": "path",
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -186,14 +196,18 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"uri": "uri", "format": 123, "configPath": "path"})
+		src, e := sut.Create(config.Partial{
+			"uri":        "uri",
+			"format":     123,
+			"configPath": "path",
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -203,14 +217,20 @@ func Test_SourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"uri": "uri", "format": "format", "path": config.Partial{"config": 123}})
+		src, e := sut.Create(config.Partial{
+			"uri":    "uri",
+			"format": "format",
+			"path": config.Partial{
+				"config": 123,
+			},
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -241,10 +261,16 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		sut.clientFactory = func() requester { return client }
 
-		src, e := sut.Create(config.Partial{"uri": uri, "format": format, "path": config.Partial{"config": path}})
+		src, e := sut.Create(config.Partial{
+			"uri":    uri,
+			"format": format,
+			"path": config.Partial{
+				"config": path,
+			},
+		})
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case src == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -285,10 +311,15 @@ func Test_SourceStrategy_Create(t *testing.T) {
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		sut.clientFactory = func() requester { return client }
 
-		src, e := sut.Create(config.Partial{"uri": uri, "path": config.Partial{"config": path}})
+		src, e := sut.Create(config.Partial{
+			"uri": uri,
+			"path": config.Partial{
+				"config": path,
+			},
+		})
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case src == nil:
 			t.Error("didn't returned a valid reference")
 		default:

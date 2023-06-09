@@ -83,7 +83,9 @@ func (s SourceStrategy) Create(
 	}
 	// validate configuration
 	if sc.Path == "" {
-		return nil, errInvalidSource(cfg, map[string]interface{}{"description": "missing path"})
+		return nil, errInvalidSource(cfg, map[string]interface{}{
+			"description": "missing path",
+		})
 	}
 	// return acceptance for the read config type
 	return NewSource(

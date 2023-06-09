@@ -15,7 +15,7 @@ func Test_LogFormatterFactory_Register(t *testing.T) {
 		if e := (&LogFormatterFactory{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -27,7 +27,7 @@ func Test_LogFormatterFactory_Register(t *testing.T) {
 		sut := &LogFormatterFactory{}
 
 		if e := sut.Register(strategy); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if (*sut)[0] != strategy {
 			t.Error("didn't stored the strategy")
 		}
@@ -43,7 +43,7 @@ func Test_LogFormatterFactory_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -65,7 +65,7 @@ func Test_LogFormatterFactory_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrInvalidWatchdog):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrInvalidWatchdog)
+			t.Errorf("(%v) when expecting (%v)", e, ErrInvalidWatchdog)
 		}
 	})
 
@@ -83,7 +83,7 @@ func Test_LogFormatterFactory_Create(t *testing.T) {
 		_ = sut.Register(strategy)
 
 		if f, e := sut.Create(cfg); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if !reflect.DeepEqual(f, formatter) {
 			t.Error("didn't returned the created stream")
 		}

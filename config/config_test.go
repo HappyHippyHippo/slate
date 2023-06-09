@@ -65,7 +65,7 @@ func Test_Config_Close(t *testing.T) {
 		if e := sut.Close(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 	t.Run("error while closing observer", func(t *testing.T) {
@@ -86,7 +86,7 @@ func Test_Config_Close(t *testing.T) {
 		if e := sut.Close(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -133,7 +133,7 @@ func Test_Config_Entries(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
+		for _, s := range scenarios {
 			test := func() {
 				ctrl := gomock.NewController(t)
 
@@ -141,17 +141,17 @@ func Test_Config_Entries(t *testing.T) {
 				sut := NewConfig()
 				src := NewMockSource(ctrl)
 				src.EXPECT().Close().Times(1)
-				src.EXPECT().Get("").Return(scenario.config, nil).Times(1)
+				src.EXPECT().Get("").Return(s.config, nil).Times(1)
 				_ = sut.AddSource("src", 0, src)
 
 				defer func() { _ = sut.Close(); ctrl.Finish() }()
 
 				check := sut.Entries()
 
-				sort.Strings(scenario.expected)
+				sort.Strings(s.expected)
 				sort.Strings(check)
-				if !reflect.DeepEqual(check, scenario.expected) {
-					t.Errorf("returned (%v) when expecting (%v)", check, scenario.expected)
+				if !reflect.DeepEqual(check, s.expected) {
+					t.Errorf("(%v) when expecting (%v)", check, s.expected)
 				}
 			}
 			test()
@@ -178,7 +178,7 @@ func Test_Config_Has(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
+		for _, s := range scenarios {
 			test := func() {
 				ctrl := gomock.NewController(t)
 
@@ -186,13 +186,13 @@ func Test_Config_Has(t *testing.T) {
 				sut := NewConfig()
 				src := NewMockSource(ctrl)
 				src.EXPECT().Close().Times(1)
-				src.EXPECT().Get("").Return(scenario.config, nil).Times(1)
+				src.EXPECT().Get("").Return(s.config, nil).Times(1)
 				_ = sut.AddSource("src", 0, src)
 
 				defer func() { _ = sut.Close(); ctrl.Finish() }()
 
-				if check := sut.Has(scenario.search); check != scenario.expected {
-					t.Errorf("returned (%v) when expecting (%v)", check, scenario.expected)
+				if check := sut.Has(s.search); check != s.expected {
+					t.Errorf("(%v) when expecting (%v)", check, s.expected)
 				}
 			}
 			test()
@@ -202,11 +202,12 @@ func Test_Config_Has(t *testing.T) {
 
 func Test_Config_Get(t *testing.T) {
 	t.Run("return path value", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
 		search := "node"
 		expected := "value"
 		config := Partial{search: expected}
-
-		ctrl := gomock.NewController(t)
 
 		ObserveFrequency = 60
 		sut := NewConfig()
@@ -218,9 +219,9 @@ func Test_Config_Get(t *testing.T) {
 		defer func() { _ = sut.Close(); ctrl.Finish() }()
 
 		if check, e := sut.Get(search); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if check != expected {
-			t.Errorf("returned (%v) when expecting (%v)", check, expected)
+			t.Errorf("(%v) when expecting (%v)", check, expected)
 		}
 	})
 
@@ -241,11 +242,11 @@ func Test_Config_Get(t *testing.T) {
 		check, e := sut.Get(path)
 		switch {
 		case check != nil:
-			t.Errorf("returned the unexpected valid value : %v", check)
+			t.Errorf("unexpected valid value : %v", check)
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrPathNotFound):
-			t.Errorf("returned (%v) error when expecting (%v)", e, ErrPathNotFound)
+			t.Errorf("(%v) when expecting (%v)", e, ErrPathNotFound)
 		}
 	})
 
@@ -265,9 +266,9 @@ func Test_Config_Get(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.Get(path, val); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if check != val {
-			t.Errorf("returned (%v) when expecting (%v)", check, val)
+			t.Errorf("(%v) when expecting (%v)", check, val)
 		}
 	})
 }
@@ -287,7 +288,7 @@ func Test_Config_Bool(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.Bool(path); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if !check {
 			t.Errorf("returned (%v)", check)
 		}
@@ -310,7 +311,7 @@ func Test_Config_Int(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.Int(path); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if check != value {
 			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
@@ -333,7 +334,7 @@ func Test_Config_Float(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.Float(path); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if check != value {
 			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
@@ -356,7 +357,7 @@ func Test_Config_String(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.String(path); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if check != value {
 			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
@@ -379,7 +380,7 @@ func Test_Config_List(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.List(path); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if !reflect.DeepEqual(check, value) {
 			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
@@ -402,7 +403,7 @@ func Test_Config_Partial(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.Partial(path); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if !reflect.DeepEqual(check, value) {
 			t.Errorf("returned (%v) when expecting : %v", check, value)
 		}
@@ -427,7 +428,7 @@ func Test_Config_Populate(t *testing.T) {
 		_ = sut.AddSource("src", 0, src)
 
 		if check, e := sut.Populate(path+"."+"field", target); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if !reflect.DeepEqual(check, expected) {
 			t.Errorf("returned (%v) when expecting : %v", check, expected)
 		}
@@ -479,7 +480,7 @@ func Test_Config_AddSource(t *testing.T) {
 		if e := sut.AddSource("src", 0, nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -495,7 +496,7 @@ func Test_Config_AddSource(t *testing.T) {
 		src.EXPECT().Get("").Return(Partial{}, nil).Times(1)
 
 		if e := sut.AddSource("src", 0, src); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if !sut.HasSource("src") {
 			t.Error("didn't stored the source")
 		}
@@ -516,7 +517,7 @@ func Test_Config_AddSource(t *testing.T) {
 		if e := sut.AddSource("src", 0, src); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, ErrDuplicateSource) {
-			t.Errorf("returned (%v) error when expecting (%v)", e, ErrDuplicateSource)
+			t.Errorf("(%v) when expecting (%v)", e, ErrDuplicateSource)
 		}
 	})
 
@@ -594,7 +595,7 @@ func Test_Config_RemoveSource(t *testing.T) {
 		defer func() { _ = sut.Close() }()
 
 		if e := sut.RemoveSource("src"); e != nil {
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("unexpected error (%v)", e)
 		}
 	})
 
@@ -614,7 +615,7 @@ func Test_Config_RemoveSource(t *testing.T) {
 		if e := sut.RemoveSource("src"); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -697,7 +698,7 @@ func Test_Config_RemoveAllSources(t *testing.T) {
 		if e := sut.RemoveAllSources(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -745,7 +746,7 @@ func Test_Config_Source(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrSourceNotFound):
-			t.Errorf("returned (%v) error when expecting (%v)", e, ErrSourceNotFound)
+			t.Errorf("(%v) when expecting (%v)", e, ErrSourceNotFound)
 		}
 	})
 
@@ -764,11 +765,11 @@ func Test_Config_Source(t *testing.T) {
 		check, e := sut.Source("src")
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case check == nil:
 			t.Error("returned nil")
 		case !reflect.DeepEqual(check, src):
-			t.Errorf("returned (%v) when expecting (%v)", check, src)
+			t.Errorf("(%v) when expecting (%v)", check, src)
 		}
 	})
 }
@@ -782,7 +783,7 @@ func Test_Config_SourcePriority(t *testing.T) {
 		if e := sut.SourcePriority("invalid id", 0); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, ErrSourceNotFound) {
-			t.Errorf("returned (%v) error when expecting (%v)", e, ErrSourceNotFound)
+			t.Errorf("(%v) when expecting (%v)", e, ErrSourceNotFound)
 		}
 	})
 
@@ -838,7 +839,7 @@ func Test_Config_HasObserver(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
+		for _, s := range scenarios {
 			test := func() {
 				ctrl := gomock.NewController(t)
 				defer ctrl.Finish()
@@ -848,15 +849,19 @@ func Test_Config_HasObserver(t *testing.T) {
 				defer func() { _ = sut.Close() }()
 				src := NewMockSource(ctrl)
 				src.EXPECT().Close().Times(1)
-				src.EXPECT().Get("").Return(Partial{"node1": "value1", "node2": "value2", "node3": "value3"}, nil).Times(1)
+				src.EXPECT().Get("").Return(Partial{
+					"node1": "value1",
+					"node2": "value2",
+					"node3": "value3",
+				}, nil).Times(1)
 				_ = sut.AddSource("config", 0, src)
 
-				for _, observer := range scenario.observers {
+				for _, observer := range s.observers {
 					_ = sut.AddObserver(observer, func(old, new interface{}) {})
 				}
 
-				if check := sut.HasObserver(scenario.search); check != scenario.exp {
-					t.Errorf("returned (%v) when expecting (%v)", check, scenario.exp)
+				if check := sut.HasObserver(s.search); check != s.exp {
+					t.Errorf("(%v) when expecting (%v)", check, s.exp)
 				}
 			}
 			test()
@@ -873,7 +878,7 @@ func Test_Config_AddObserver(t *testing.T) {
 		if e := sut.AddObserver("path", nil); e == nil {
 			t.Errorf("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -882,10 +887,11 @@ func Test_Config_AddObserver(t *testing.T) {
 		sut := NewConfig()
 		defer func() { _ = sut.Close() }()
 
-		if e := sut.AddObserver("path", func(interface{}, interface{}) {}); e == nil {
+		if e := sut.AddObserver("path", func(interface{}, interface{}) {
+		}); e == nil {
 			t.Errorf("didn't returned the expected error")
 		} else if !errors.Is(e, ErrPathNotFound) {
-			t.Errorf("returned (%v) error when expecting (%v)", e, ErrPathNotFound)
+			t.Errorf("(%v) when expecting (%v)", e, ErrPathNotFound)
 		}
 	})
 
@@ -894,15 +900,17 @@ func Test_Config_AddObserver(t *testing.T) {
 		defer ctrl.Finish()
 
 		ObserveFrequency = 60
+		partial := Partial{"path": "value"}
 		sut := NewConfig()
 		defer func() { _ = sut.Close() }()
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
-		src.EXPECT().Get("").Return(Partial{"path": "value"}, nil).Times(1)
+		src.EXPECT().Get("").Return(partial, nil).Times(1)
 		_ = sut.AddSource("config", 0, src)
 
-		if e := sut.AddObserver("path", func(interface{}, interface{}) {}); e != nil {
-			t.Errorf("returned the unexpected error, %v", e)
+		if e := sut.AddObserver("path", func(interface{}, interface{}) {
+		}); e != nil {
+			t.Errorf("unexpected error, %v", e)
 		} else if len(sut.observers) != 1 {
 			t.Error("didn't stored the requested observer")
 		}
@@ -918,9 +926,16 @@ func Test_Config_RemoveObserver(t *testing.T) {
 		sut := NewConfig()
 		defer func() { _ = sut.Close() }()
 
+		partial := Partial{
+			"node": Partial{
+				"1": "value1",
+				"2": "value2",
+				"3": "value3",
+			},
+		}
 		src := NewMockSource(ctrl)
 		src.EXPECT().Close().Times(1)
-		src.EXPECT().Get("").Return(Partial{"node": Partial{"1": "value1", "2": "value2", "3": "value3"}}, nil).Times(1)
+		src.EXPECT().Get("").Return(partial, nil).Times(1)
 		_ = sut.AddSource("config", 0, src)
 
 		_ = sut.AddObserver("node.1", func(old, new interface{}) {})
@@ -943,9 +958,10 @@ func Test_Config(t *testing.T) {
 		sut := NewConfig()
 		defer func() { _ = sut.Close() }()
 
+		partial := Partial{"node": "value"}
 		src := NewMockObsSource(ctrl)
 		src.EXPECT().Close().Times(1)
-		src.EXPECT().Get("").Return(Partial{"node": "value"}, nil).Times(1)
+		src.EXPECT().Get("").Return(partial, nil).Times(1)
 		src.EXPECT().Reload().Return(false, nil).MinTimes(1)
 		_ = sut.AddSource("src", 0, src)
 
@@ -959,8 +975,9 @@ func Test_Config(t *testing.T) {
 		ObserveFrequency = 20
 		sut := NewConfig()
 
+		partial := Partial{"node": "value"}
 		src := NewMockObsSource(ctrl)
-		src.EXPECT().Get("").Return(Partial{"node": "value"}, nil).MinTimes(2)
+		src.EXPECT().Get("").Return(partial, nil).MinTimes(2)
 		src.EXPECT().Reload().Return(true, nil).MinTimes(1)
 		_ = sut.AddSource("src", 0, src)
 
@@ -979,8 +996,9 @@ func Test_Config(t *testing.T) {
 		ObserveFrequency = 20
 		sut := NewConfig()
 
+		partial := Partial{"node": "value1"}
 		src1 := NewMockSource(ctrl)
-		src1.EXPECT().Get("").Return(Partial{"node": "value1"}, nil).AnyTimes()
+		src1.EXPECT().Get("").Return(partial, nil).AnyTimes()
 		_ = sut.AddSource("src1", 0, src1)
 
 		_ = sut.AddObserver("node", func(old, new interface{}) {
@@ -988,8 +1006,7 @@ func Test_Config(t *testing.T) {
 
 			if old != "value1" {
 				t.Errorf("callback called with (%v) as old value", old)
-			}
-			if new != "value2" {
+			} else if new != "value2" {
 				t.Errorf("callback called with (%v) as new value", new)
 			}
 		})
@@ -1001,7 +1018,7 @@ func Test_Config(t *testing.T) {
 		if !check {
 			t.Errorf("didn't actually called the callback")
 		} else if check := sut.observers[0].current; check != "value2" {
-			t.Errorf("stored the current value {%v} instead of the expected {%v}", check, "value2")
+			t.Errorf("stored {%v} instead of {%v}", check, "value2")
 		}
 	})
 
@@ -1024,8 +1041,7 @@ func Test_Config(t *testing.T) {
 
 			if old.([]interface{})[0].(Partial)["sub_node"] != initial[0].(Partial)["sub_node"] {
 				t.Errorf("callback called with (%v) as old value", old)
-			}
-			if new.([]interface{})[0].(Partial)["sub_node"] != expected[0].(Partial)["sub_node"] {
+			} else if new.([]interface{})[0].(Partial)["sub_node"] != expected[0].(Partial)["sub_node"] {
 				t.Errorf("callback called with (%v) as new value", new)
 			}
 		})
@@ -1037,7 +1053,7 @@ func Test_Config(t *testing.T) {
 		if !check {
 			t.Errorf("didn't actually called the callback")
 		} else if check := sut.observers[0].current; check.([]interface{})[0].(Partial)["sub_node"] != expected[0].(Partial)["sub_node"] {
-			t.Errorf("stored the current value {%v} instead of the expected {%v}", check, expected)
+			t.Errorf("stored {%v} instead of {%v}", check, expected)
 		}
 	})
 
@@ -1060,8 +1076,7 @@ func Test_Config(t *testing.T) {
 
 			if reflect.DeepEqual(old, initial) {
 				t.Errorf("callback called with (%v) as old value", old)
-			}
-			if reflect.DeepEqual(old, expected) {
+			} else if reflect.DeepEqual(old, expected) {
 				t.Errorf("callback called with (%v) as new value", new)
 			}
 		})
@@ -1073,7 +1088,7 @@ func Test_Config(t *testing.T) {
 		if !check {
 			t.Errorf("didn't actually called the callback")
 		} else if check := sut.observers[0].current; check.(Partial)["sub_node"] != expected["sub_node"] {
-			t.Errorf("stored the current value {%v} instead of the expected {%v}", check, expected)
+			t.Errorf("stored {%v} instead of {%v}", check, expected)
 		}
 	})
 }

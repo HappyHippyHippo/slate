@@ -41,7 +41,7 @@ func Test_FormatterStrategy_Create(t *testing.T) {
 		stream, e := (&FormatterStrategy{}).Create(&config.Partial{})
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case stream == nil:
 			t.Error("didn't returned a valid reference")
 		default:

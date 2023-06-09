@@ -41,7 +41,7 @@ func Test_Source_Get(t *testing.T) {
 		sut := &Source{Mutex: locker, Partial: data}
 
 		if value, e := sut.Get(search); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if value != expected {
 			t.Errorf("returned the (%v) value", value)
 		}

@@ -16,7 +16,7 @@ func Test_Provider_Register(t *testing.T) {
 		if e := (&Provider{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -27,13 +27,13 @@ func Test_Provider_Register(t *testing.T) {
 		e := sut.Register(container)
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case !container.Has(LogFormatterFactoryID):
-			t.Errorf("didn't registered the log formatter creator : %v", sut)
+			t.Errorf("no log formatter creator : %v", sut)
 		case !container.Has(WatchdogFactoryID):
-			t.Errorf("didn't registered the watchdog creator : %v", sut)
+			t.Errorf("no watchdog creator : %v", sut)
 		case !container.Has(ID):
-			t.Errorf("didn't registered the kannel : %v", sut)
+			t.Errorf("no kannel : %v", sut)
 		}
 	})
 
@@ -48,7 +48,7 @@ func Test_Provider_Register(t *testing.T) {
 		sut, e := container.Get(LogFormatterFactoryID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("unexpected error (%v)", e)
 		case sut == nil:
 			t.Error("didn't returned a reference to the log formatter creator")
 		default:
@@ -72,7 +72,7 @@ func Test_Provider_Register(t *testing.T) {
 		sut, e := container.Get(WatchdogFactoryID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("unexpected error (%v)", e)
 		case sut == nil:
 			t.Error("didn't returned a reference to the watchdog creator")
 		default:
@@ -96,7 +96,7 @@ func Test_Provider_Register(t *testing.T) {
 		sut, e := container.Get(ID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("unexpected error (%v)", e)
 		case sut == nil:
 			t.Error("didn't returned a reference to the kennel")
 		default:
@@ -114,7 +114,7 @@ func Test_Provider_Boot(t *testing.T) {
 		if e := (&Provider{}).Boot(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -125,12 +125,14 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(LogFormatterFactoryID, func() (*LogFormatterFactory, error) { return nil, fmt.Errorf("error message") })
+		_ = container.Service(LogFormatterFactoryID, func() (*LogFormatterFactory, error) {
+			return nil, fmt.Errorf("error message")
+		})
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -141,12 +143,14 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(LogFormatterFactoryID, func() string { return "string" })
+		_ = container.Service(LogFormatterFactoryID, func() string {
+			return "string"
+		})
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -157,16 +161,14 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(
-			"id",
-			func() (LogFormatterStrategy, error) { return nil, fmt.Errorf("error message") },
-			LogFormatterStrategyTag,
-		)
+		_ = container.Service("id", func() (LogFormatterStrategy, error) {
+			return nil, fmt.Errorf("error message")
+		}, LogFormatterStrategyTag)
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -177,12 +179,14 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service("id", func() (interface{}, error) { return "invalid", nil }, LogFormatterStrategyTag)
+		_ = container.Service("id", func() interface{} {
+			return "invalid"
+		}, LogFormatterStrategyTag)
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -195,12 +199,14 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = (&log.Provider{}).Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(ID, func() (*Kennel, error) { return nil, fmt.Errorf("error message") })
+		_ = container.Service(ID, func() (*Kennel, error) {
+			return nil, fmt.Errorf("error message")
+		})
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -213,12 +219,14 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = (&log.Provider{}).Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(ID, func() string { return "string" })
+		_ = container.Service(ID, func() string {
+			return "string"
+		})
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -231,16 +239,14 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = (&log.Provider{}).Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(
-			"id",
-			func() (Processor, error) { return nil, fmt.Errorf("error message") },
-			ProcessTag,
-		)
+		_ = container.Service("id", func() (Processor, error) {
+			return nil, fmt.Errorf("error message")
+		}, ProcessTag)
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -253,12 +259,14 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = (&log.Provider{}).Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service("id", func() (interface{}, error) { return "invalid", nil }, ProcessTag)
+		_ = container.Service("id", func() interface{} {
+			return "invalid"
+		}, ProcessTag)
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -278,28 +286,22 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = (&log.Provider{}).Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service("log.formatter", func() LogFormatterStrategy { return formatterStrategy }, LogFormatterStrategyTag)
-		_ = container.Service(
-			"id1",
-			func() (*Process1, error) {
-				p, e := NewProcess("service", func() error { return nil })
-				return &Process1{Process: *p}, e
-			},
-			ProcessTag,
-		)
-		_ = container.Service(
-			"id2",
-			func() (*Process2, error) {
-				p, e := NewProcess("service", func() error { return nil })
-				return &Process2{Process: *p}, e
-			},
-			ProcessTag,
-		)
+		_ = container.Service("log.formatter", func() LogFormatterStrategy {
+			return formatterStrategy
+		}, LogFormatterStrategyTag)
+		_ = container.Service("id1", func() (*Process1, error) {
+			p, e := NewProcess("service", func() error { return nil })
+			return &Process1{Process: *p}, e
+		}, ProcessTag)
+		_ = container.Service("id2", func() (*Process2, error) {
+			p, e := NewProcess("service", func() error { return nil })
+			return &Process2{Process: *p}, e
+		}, ProcessTag)
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, ErrDuplicateService) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrDuplicateService)
+			t.Errorf("(%v) when expecting (%v)", e, ErrDuplicateService)
 		}
 	})
 
@@ -316,15 +318,15 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = (&log.Provider{}).Register(container)
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service("log.formatter", func() LogFormatterStrategy { return formatterStrategy }, LogFormatterStrategyTag)
-		_ = container.Service(
-			"id",
-			func() (Processor, error) { return NewProcess("service", func() error { return nil }) },
-			ProcessTag,
-		)
+		_ = container.Service("log.formatter", func() LogFormatterStrategy {
+			return formatterStrategy
+		}, LogFormatterStrategyTag)
+		_ = container.Service("id", func() (Processor, error) {
+			return NewProcess("service", func() error { return nil })
+		}, ProcessTag)
 
 		if e := sut.Boot(container); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }

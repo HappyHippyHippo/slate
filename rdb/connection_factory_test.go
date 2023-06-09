@@ -17,17 +17,17 @@ func Test_NewConnectionFactory(t *testing.T) {
 		sut, e := NewConnectionFactory(nil)
 		switch {
 		case sut != nil:
-			t.Error("return an unexpected valid connection factory instance")
+			t.Error("return an unexpected valid connection factory")
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
 	t.Run("valid creation", func(t *testing.T) {
 		if sut, e := NewConnectionFactory(NewDialectFactory()); sut == nil {
-			t.Error("didn't returned the expected valid connection factory instance")
+			t.Error("didn't returned the expected valid connection factory")
 		} else if e != nil {
 			t.Errorf("return the unexpected error : %v", e)
 		}
@@ -49,7 +49,7 @@ func Test_ConnectionFactory_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, ErrUnknownDialect):
-			t.Errorf("returned the (%v) error when expected (%v)", e, ErrUnknownDialect)
+			t.Errorf("(%v) when expected (%v)", e, ErrUnknownDialect)
 		}
 	})
 
@@ -58,7 +58,10 @@ func Test_ConnectionFactory_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := fmt.Errorf("error message")
-		cfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
+		cfg := config.Partial{
+			"dialect": "invalid",
+			"host":    ":memory:",
+		}
 		dialect := NewMockDialect(ctrl)
 		dialect.EXPECT().Initialize(gomock.Any()).Return(expected).Times(1)
 		dialectCreator := NewMockDialectCreator(ctrl)
@@ -74,7 +77,7 @@ func Test_ConnectionFactory_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
+			t.Errorf("(%v) when expected (%v)", e, expected)
 		}
 	})
 
@@ -82,7 +85,10 @@ func Test_ConnectionFactory_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		cfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
+		cfg := config.Partial{
+			"dialect": "invalid",
+			"host":    ":memory:",
+		}
 		dialect := NewMockDialect(ctrl)
 		dialect.EXPECT().Initialize(gomock.Any()).Return(nil).Times(1)
 		dialectCreator := NewMockDialectCreator(ctrl)

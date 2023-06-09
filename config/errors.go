@@ -7,6 +7,10 @@ import (
 )
 
 var (
+	// ErrInvalidEmptyPath defines an invalid empty path in Partial
+	// assigning error.
+	ErrInvalidEmptyPath = fmt.Errorf("invalid empty config path")
+
 	// ErrPathNotFound defines a path in Partial not found error.
 	ErrPathNotFound = fmt.Errorf("config path not found")
 
@@ -39,6 +43,13 @@ func errConversion(
 	ctx ...map[string]interface{},
 ) error {
 	return slate.NewErrorFrom(slate.ErrConversion, fmt.Sprintf("%v to %s", val, t), ctx...)
+}
+
+func errInvalidEmptyPath(
+	path string,
+	ctx ...map[string]interface{},
+) error {
+	return slate.NewErrorFrom(ErrInvalidEmptyPath, path, ctx...)
 }
 
 func errPathNotFound(

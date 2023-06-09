@@ -32,14 +32,14 @@ func Test_NewDao(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
 	t.Run("error on auto migrate", func(t *testing.T) {
 		db, mockDB, e := sqlmock.New()
 		if e != nil {
-			t.Fatalf("anerror '%s' was not expected when opening a stub rdb connection", e)
+			t.Fatalf("unexpected (%s) error when opening connection", e)
 		}
 		defer func() { _ = db.Close() }()
 
@@ -53,23 +53,26 @@ func Test_NewDao(t *testing.T) {
 			ExpectExec("CREATE TABLE `__version`").
 			WillReturnError(expected)
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
+		gdb, e := gorm.Open(
+			mysql.New(mysql.Config{Conn: db}),
+			&gorm.Config{Logger: logger.Discard},
+		)
 
 		sut, e := NewDao(gdb)
 		switch {
 		case sut != nil:
-			t.Error("return an unexpected valid reference to the dao instance")
+			t.Error("unexpected valid reference")
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error insead of the expected (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
 	t.Run("construct", func(t *testing.T) {
 		db, mockDB, e := sqlmock.New()
 		if e != nil {
-			t.Fatalf("anerror '%s' was not expected when opening a stub rdb connection", e)
+			t.Fatalf("unexpected (%s) error when opening connection", e)
 		}
 		defer func() { _ = db.Close() }()
 
@@ -83,7 +86,10 @@ func Test_NewDao(t *testing.T) {
 			WillReturnResult(sqlmock.
 				NewResult(0, 0))
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
+		gdb, e := gorm.Open(
+			mysql.New(mysql.Config{Conn: db}),
+			&gorm.Config{Logger: logger.Discard},
+		)
 
 		if sut, e := NewDao(gdb); e != nil {
 			t.Errorf("return the unexpected error : (%v)", e)
@@ -97,7 +103,7 @@ func Test_Dao_Last(t *testing.T) {
 	t.Run("error retrieve last entry", func(t *testing.T) {
 		db, mockDB, e := sqlmock.New()
 		if e != nil {
-			t.Fatalf("anerror '%s' was not expected when opening a stub rdb connection", e)
+			t.Fatalf("unexpected (%s) error when opening connection", e)
 		}
 		defer func() { _ = db.Close() }()
 
@@ -115,20 +121,23 @@ func Test_Dao_Last(t *testing.T) {
 			ExpectQuery("SELECT \\* FROM `__version`").
 			WillReturnError(expected)
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
+		gdb, e := gorm.Open(
+			mysql.New(mysql.Config{Conn: db}),
+			&gorm.Config{Logger: logger.Discard},
+		)
 
 		sut, _ := NewDao(gdb)
 		if _, e := sut.Last(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
 	t.Run("retrieve empty model if no last entry", func(t *testing.T) {
 		db, mockDB, e := sqlmock.New()
 		if e != nil {
-			t.Fatalf("anerror '%s' was not expected when opening a stub rdb connection", e)
+			t.Fatalf("unexpected (%s) error when opening connection", e)
 		}
 		defer func() { _ = db.Close() }()
 
@@ -146,11 +155,14 @@ func Test_Dao_Last(t *testing.T) {
 			WillReturnRows(sqlmock.
 				NewRows(nil))
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
+		gdb, e := gorm.Open(
+			mysql.New(mysql.Config{Conn: db}),
+			&gorm.Config{Logger: logger.Discard},
+		)
 
 		sut, _ := NewDao(gdb)
 		if record, e := sut.Last(); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if record.ID != 0 {
 			t.Error("return an unexpected last record")
 		}
@@ -159,7 +171,7 @@ func Test_Dao_Last(t *testing.T) {
 	t.Run("retrieve last entry", func(t *testing.T) {
 		db, mockDB, e := sqlmock.New()
 		if e != nil {
-			t.Fatalf("anerror '%s' was not expected when opening a stub rdb connection", e)
+			t.Fatalf("unexpected (%s) error when opening connection", e)
 		}
 		defer func() { _ = db.Close() }()
 
@@ -179,11 +191,15 @@ func Test_Dao_Last(t *testing.T) {
 			WillReturnRows(sqlmock.
 				NewRows([]string{"id", "version", "created_at", "updated_at", "deleted_at"}).
 				AddRow(id, version, nil, nil, nil))
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
+
+		gdb, e := gorm.Open(
+			mysql.New(mysql.Config{Conn: db}),
+			&gorm.Config{Logger: logger.Discard},
+		)
 
 		sut, _ := NewDao(gdb)
 		if record, e := sut.Last(); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if record.ID != id || record.Version != version {
 			t.Error("return an invalid last record")
 		}
@@ -194,7 +210,7 @@ func Test_Dao_Up(t *testing.T) {
 	t.Run("error updating last entry", func(t *testing.T) {
 		db, mockDB, e := sqlmock.New()
 		if e != nil {
-			t.Fatalf("anerror '%s' was not expected when opening a stub rdb connection", e)
+			t.Fatalf("unexpected (%s) error when opening connection", e)
 		}
 		defer func() { _ = db.Close() }()
 
@@ -215,20 +231,23 @@ func Test_Dao_Up(t *testing.T) {
 			WillReturnError(fmt.Errorf("%s", errMsg))
 		mockDB.ExpectRollback()
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
+		gdb, e := gorm.Open(
+			mysql.New(mysql.Config{Conn: db}),
+			&gorm.Config{Logger: logger.Discard},
+		)
 
 		sut, _ := NewDao(gdb)
 		if _, e := sut.Up(version); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if check := e.Error(); check != errMsg {
-			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", check, errMsg)
+			t.Errorf("unexpected (%v) error instead of the expected (%v)", check, errMsg)
 		}
 	})
 
 	t.Run("updating last entry", func(t *testing.T) {
 		db, mockDB, e := sqlmock.New()
 		if e != nil {
-			t.Fatalf("anerror '%s' was not expected when opening a stub rdb connection", e)
+			t.Fatalf("unexpected (%s) error when opening connection", e)
 		}
 		defer func() { _ = db.Close() }()
 
@@ -249,13 +268,16 @@ func Test_Dao_Up(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mockDB.ExpectCommit()
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
+		gdb, e := gorm.Open(
+			mysql.New(mysql.Config{Conn: db}),
+			&gorm.Config{Logger: logger.Discard},
+		)
 
 		sut, _ := NewDao(gdb)
 		if record, e := sut.Up(version); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if reflect.DeepEqual(Record{Version: version}, record) {
-			t.Errorf("returned the unexpected model (%v) when expecting : %v", record, Record{Version: version})
+			t.Errorf("(%v) when expecting (%v)", record, Record{Version: version})
 		}
 	})
 }
@@ -264,7 +286,7 @@ func Test_Dao_Down(t *testing.T) {
 	t.Run("error removing last entry", func(t *testing.T) {
 		db, mockDB, e := sqlmock.New()
 		if e != nil {
-			t.Fatalf("anerror '%s' was not expected when opening a stub rdb connection", e)
+			t.Fatalf("unexpected (%s) error when opening connection", e)
 		}
 		defer func() { _ = db.Close() }()
 
@@ -287,20 +309,23 @@ func Test_Dao_Down(t *testing.T) {
 			WillReturnError(fmt.Errorf("%s", errMsg))
 		mockDB.ExpectRollback()
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
+		gdb, e := gorm.Open(
+			mysql.New(mysql.Config{Conn: db}),
+			&gorm.Config{Logger: logger.Discard},
+		)
 
 		sut, _ := NewDao(gdb)
 		if e := sut.Down(Record{ID: id, Version: version}); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if check := e.Error(); check != errMsg {
-			t.Errorf("returned the unexpected (%v) error instead of the expected (%v)", check, errMsg)
+			t.Errorf("(%v) when expecting (%v)", check, errMsg)
 		}
 	})
 
 	t.Run("removing last entry", func(t *testing.T) {
 		db, mockDB, e := sqlmock.New()
 		if e != nil {
-			t.Fatalf("anerror '%s' was not expected when opening a stub rdb connection", e)
+			t.Fatalf("unexpected (%s) error when opening connection", e)
 		}
 		defer func() { _ = db.Close() }()
 
@@ -322,11 +347,14 @@ func Test_Dao_Down(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		mockDB.ExpectCommit()
 
-		gdb, e := gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{Logger: logger.Discard})
+		gdb, e := gorm.Open(
+			mysql.New(mysql.Config{Conn: db}),
+			&gorm.Config{Logger: logger.Discard},
+		)
 
 		sut, _ := NewDao(gdb)
 		if e := sut.Down(Record{ID: id, Version: version}); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }

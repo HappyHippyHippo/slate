@@ -25,7 +25,7 @@ func Test_NewObsSourceStrategy(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -38,7 +38,7 @@ func Test_NewObsSourceStrategy(t *testing.T) {
 		sut, e := NewObsSourceStrategy(decoderFactory)
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case sut == nil:
 			t.Error("didn't returned a valid reference")
 		case sut.decoderFactory != decoderFactory:
@@ -125,7 +125,7 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -135,14 +135,18 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"format": "format", "timestampPath": "path", "configPath": "path"})
+		src, e := sut.Create(config.Partial{
+			"format":        "format",
+			"timestampPath": "path",
+			"configPath":    "path",
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, config.ErrInvalidSource):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, config.ErrInvalidSource)
+			t.Errorf("(%v) when expecting (%v)", e, config.ErrInvalidSource)
 		}
 	})
 
@@ -152,14 +156,20 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"uri": "uri", "format": "format", "path": config.Partial{"config": "path"}})
+		src, e := sut.Create(config.Partial{
+			"uri":    "uri",
+			"format": "format",
+			"path": config.Partial{
+				"config": "path",
+			},
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, config.ErrInvalidSource):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, config.ErrInvalidSource)
+			t.Errorf("(%v) when expecting (%v)", e, config.ErrInvalidSource)
 		}
 	})
 
@@ -169,14 +179,20 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"uri": "uri", "format": "format", "path": config.Partial{"timestamp": "path"}})
+		src, e := sut.Create(config.Partial{
+			"uri":    "uri",
+			"format": "format",
+			"path": config.Partial{
+				"timestamp": "path",
+			},
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, config.ErrInvalidSource):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, config.ErrInvalidSource)
+			t.Errorf("(%v) when expecting (%v)", e, config.ErrInvalidSource)
 		}
 	})
 
@@ -186,14 +202,21 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"uri": 123, "format": "format", "path": config.Partial{"config": "path", "timestamp": "path"}})
+		src, e := sut.Create(config.Partial{
+			"uri":    123,
+			"format": "format",
+			"path": config.Partial{
+				"config":    "path",
+				"timestamp": "path",
+			},
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -203,14 +226,21 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"uri": "uri", "format": 123, "path": config.Partial{"config": "path", "timestamp": "path"}})
+		src, e := sut.Create(config.Partial{
+			"uri":    "uri",
+			"format": 123,
+			"path": config.Partial{
+				"config":    "path",
+				"timestamp": "path",
+			},
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -220,14 +250,21 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"uri": "uri", "format": "format", "path": config.Partial{"config": "path", "timestamp": 123}})
+		src, e := sut.Create(config.Partial{
+			"uri":    "uri",
+			"format": "format",
+			"path": config.Partial{
+				"config":    "path",
+				"timestamp": 123,
+			},
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -237,14 +274,21 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(config.NewDecoderFactory())
 
-		src, e := sut.Create(config.Partial{"uri": "uri", "format": "format", "path": config.Partial{"config": 123, "timestamp": "path"}})
+		src, e := sut.Create(config.Partial{
+			"uri":    "uri",
+			"format": "format",
+			"path": config.Partial{
+				"config":    123,
+				"timestamp": "path",
+			},
+		})
 		switch {
 		case src != nil:
 			t.Error("returned a valid reference")
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -259,7 +303,10 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		field := "field"
 		value := "value"
 		expected := config.Partial{field: value}
-		respData := config.Partial{"path": config.Partial{"field": "value"}, "timestamp": "2000-01-01T00:00:00.000Z"}
+		respData := config.Partial{
+			"path":      config.Partial{"field": "value"},
+			"timestamp": "2000-01-01T00:00:00.000Z",
+		}
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
@@ -271,15 +318,24 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(decoderFactory)
 		response := http.Response{}
-		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}, "timestamp": "2021-12-15T21:07:48.239Z"}`))
+		response.Body = io.NopCloser(strings.NewReader(
+			`{"path": {"field": "value"}, "timestamp": "2021-12-15T21:07:48.239Z"}`,
+		))
 		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		sut.clientFactory = func() requester { return client }
 
-		src, e := sut.Create(config.Partial{"uri": uri, "format": format, "path": config.Partial{"config": configPath, "timestamp": timestampPath}})
+		src, e := sut.Create(config.Partial{
+			"uri":    uri,
+			"format": format,
+			"path": config.Partial{
+				"config":    configPath,
+				"timestamp": timestampPath,
+			},
+		})
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case src == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -304,7 +360,10 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 		field := "field"
 		value := "value"
 		expected := config.Partial{field: value}
-		respData := config.Partial{"path": config.Partial{"field": "value"}, "timestamp": "2000-01-01T00:00:00.000Z"}
+		respData := config.Partial{
+			"path":      config.Partial{"field": "value"},
+			"timestamp": "2000-01-01T00:00:00.000Z",
+		}
 		decoder := NewMockDecoder(ctrl)
 		decoder.EXPECT().Decode().Return(&respData, nil).Times(1)
 		decoder.EXPECT().Close().Return(nil).Times(1)
@@ -316,15 +375,23 @@ func Test_ObsSourceStrategy_Create(t *testing.T) {
 
 		sut, _ := NewObsSourceStrategy(decoderFactory)
 		response := http.Response{}
-		response.Body = io.NopCloser(strings.NewReader(`{"path": {"field": "value"}, "timestamp": "2021-12-15T21:07:48.239Z"}`))
+		response.Body = io.NopCloser(strings.NewReader(
+			`{"path": {"field": "value"}, "timestamp": "2021-12-15T21:07:48.239Z"}`,
+		))
 		client := NewMockRequester(ctrl)
 		client.EXPECT().Do(gomock.Any()).Return(&response, nil).Times(1)
 		sut.clientFactory = func() requester { return client }
 
-		src, e := sut.Create(config.Partial{"uri": uri, "path": config.Partial{"config": configPath, "timestamp": timestampPath}})
+		src, e := sut.Create(config.Partial{
+			"uri": uri,
+			"path": config.Partial{
+				"config":    configPath,
+				"timestamp": timestampPath,
+			},
+		})
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case src == nil:
 			t.Error("didn't returned a valid reference")
 		default:

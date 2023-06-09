@@ -20,7 +20,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -40,7 +40,7 @@ func Test_NewSource(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -55,11 +55,11 @@ func Test_NewSource(t *testing.T) {
 		sut, e := NewSource([]config.Source{source})
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		case sut == nil:
 			t.Error("didn't returned the expected valid reference")
 		case !reflect.DeepEqual(sut.Partial, expected):
-			t.Errorf("returned the (%v) config when expecting (%v)", sut.Partial, expected)
+			t.Errorf("(%v) when expecting (%v)", sut.Partial, expected)
 		}
 	})
 
@@ -68,19 +68,21 @@ func Test_NewSource(t *testing.T) {
 		defer ctrl.Finish()
 
 		expected := config.Partial{"id 1": "value 1", "id 2": "value 2"}
+		partial1 := config.Partial{"id 1": "value 1"}
 		source1 := NewMockSource(ctrl)
-		source1.EXPECT().Get("", config.Partial{}).Return(config.Partial{"id 1": "value 1"}, nil).Times(1)
+		source1.EXPECT().Get("", config.Partial{}).Return(partial1, nil).Times(1)
+		partial2 := config.Partial{"id 2": "value 2"}
 		source2 := NewMockSource(ctrl)
-		source2.EXPECT().Get("", config.Partial{}).Return(config.Partial{"id 2": "value 2"}, nil).Times(1)
+		source2.EXPECT().Get("", config.Partial{}).Return(partial2, nil).Times(1)
 
 		sut, e := NewSource([]config.Source{source1, source2})
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected e : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		case sut == nil:
 			t.Error("didn't returned the expected valid reference")
 		case !reflect.DeepEqual(sut.Partial, expected):
-			t.Errorf("returned the (%v) config when expecting (%v)", sut.Partial, expected)
+			t.Errorf("(%v) when expecting (%v)", sut.Partial, expected)
 		}
 	})
 }

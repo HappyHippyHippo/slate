@@ -17,7 +17,7 @@ func Test_Provider_Register(t *testing.T) {
 		if e := (&Provider{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -28,11 +28,11 @@ func Test_Provider_Register(t *testing.T) {
 		e := sut.Register(container)
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case !container.Has(ID):
-			t.Errorf("didn't registered the migrator : %v", sut)
+			t.Errorf("no migrator : %v", sut)
 		case !container.Has(DaoID):
-			t.Errorf("didn't registered the migrator DAO : %v", sut)
+			t.Errorf("no migrator DAO : %v", sut)
 		}
 	})
 
@@ -41,12 +41,14 @@ func Test_Provider_Register(t *testing.T) {
 		container := slate.NewContainer()
 		_ = (&rdb.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(rdb.ID, func() (*rdb.ConnectionPool, error) { return nil, expected })
+		_ = container.Service(rdb.ID, func() (*rdb.ConnectionPool, error) {
+			return nil, expected
+		})
 
 		if _, e := container.Get(DaoID); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -59,12 +61,14 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(rdb.ConfigID, func() (*gorm.Config, error) { return nil, expected })
+		_ = container.Service(rdb.ConfigID, func() (*gorm.Config, error) {
+			return nil, expected
+		})
 
 		if _, e := container.Get(DaoID); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -80,7 +84,7 @@ func Test_Provider_Register(t *testing.T) {
 		if _, e := container.Get(DaoID); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -94,7 +98,8 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&Provider{}).Register(container)
 
 		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{"primary": rdbCfg}}}}
+		partial := config.Partial{}
+		_, _ = partial.Set("slate.rdb.connections.primary", rdbCfg)
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
 		cfg := config.NewConfig()
@@ -108,14 +113,16 @@ func Test_Provider_Register(t *testing.T) {
 		dialectStrategy := NewMockDialectStrategy(ctrl)
 		dialectStrategy.EXPECT().Accept(rdbCfg).Return(true).Times(1)
 		dialectStrategy.EXPECT().Create(rdbCfg).Return(dialector, nil).Times(1)
-		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
+		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy {
+			return dialectStrategy
+		}, rdb.DialectStrategyTag)
 
 		_ = (&rdb.Provider{}).Boot(container)
 
 		sut, e := container.Get(DaoID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("unexpected error (%v)", e)
 		case sut == nil:
 			t.Error("didn't returned a reference to the migrator DAO")
 		default:
@@ -141,7 +148,8 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&Provider{}).Register(container)
 
 		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{"secondary": rdbCfg}}}}
+		partial := config.Partial{}
+		_, _ = partial.Set("slate.rdb.connections.secondary", rdbCfg)
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
 		cfg := config.NewConfig()
@@ -155,14 +163,16 @@ func Test_Provider_Register(t *testing.T) {
 		dialectStrategy := NewMockDialectStrategy(ctrl)
 		dialectStrategy.EXPECT().Accept(rdbCfg).Return(true).Times(1)
 		dialectStrategy.EXPECT().Create(rdbCfg).Return(dialector, nil).Times(1)
-		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
+		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy {
+			return dialectStrategy
+		}, rdb.DialectStrategyTag)
 
 		_ = (&rdb.Provider{}).Boot(container)
 
 		sut, e := container.Get(DaoID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("unexpected error (%v)", e)
 		case sut == nil:
 			t.Error("didn't returned a reference to the migrator DAO")
 		default:
@@ -183,12 +193,14 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(DaoID, func() (*Dao, error) { return nil, expected })
+		_ = container.Service(DaoID, func() (*Dao, error) {
+			return nil, expected
+		})
 
 		if _, e := container.Get(ID); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -201,12 +213,14 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&config.Provider{}).Register(container)
 		_ = (&rdb.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
-		_ = container.Service(DaoID, func() (*Dao, error) { return nil, expected })
+		_ = container.Service(DaoID, func() (*Dao, error) {
+			return nil, expected
+		})
 
 		if _, e := container.Get(ID); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -220,7 +234,8 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&Provider{}).Register(container)
 
 		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{"primary": rdbCfg}}}}
+		partial := config.Partial{}
+		_, _ = partial.Set("slate.rdb.connections.primary", rdbCfg)
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
 		cfg := config.NewConfig()
@@ -234,14 +249,16 @@ func Test_Provider_Register(t *testing.T) {
 		dialectStrategy := NewMockDialectStrategy(ctrl)
 		dialectStrategy.EXPECT().Accept(rdbCfg).Return(true).Times(1)
 		dialectStrategy.EXPECT().Create(rdbCfg).Return(dialector, nil).Times(1)
-		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
+		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy {
+			return dialectStrategy
+		}, rdb.DialectStrategyTag)
 
 		_ = (&rdb.Provider{}).Boot(container)
 
 		sut, e := container.Get(ID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("unexpected error (%v)", e)
 		case sut == nil:
 			t.Error("didn't returned a reference to the migrator")
 		default:
@@ -259,7 +276,7 @@ func Test_Provider_Boot(t *testing.T) {
 		if e := (&Provider{}).Boot(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -274,7 +291,7 @@ func Test_Provider_Boot(t *testing.T) {
 		sut := &Provider{}
 
 		if e := sut.Boot(container); e != nil {
-			t.Errorf("returned the unexpected serr, (%v)", e)
+			t.Errorf("unexpected serr, (%v)", e)
 		}
 	})
 
@@ -290,7 +307,7 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = sut.Register(container)
 
 		if e := sut.Boot(container); e != nil {
-			t.Errorf("returned the unexpected serr, (%v)", e)
+			t.Errorf("unexpected serr, (%v)", e)
 		}
 	})
 
@@ -299,24 +316,28 @@ func Test_Provider_Boot(t *testing.T) {
 		container := slate.NewContainer()
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(ID, func() (*Migrator, error) { return nil, expected })
+		_ = container.Service(ID, func() (*Migrator, error) {
+			return nil, expected
+		})
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 	t.Run("invalid retrieved migrator", func(t *testing.T) {
 		container := slate.NewContainer()
 		sut := &Provider{}
 		_ = sut.Register(container)
-		_ = container.Service(ID, func() (interface{}, error) { return "string", nil })
+		_ = container.Service(ID, func() interface{} {
+			return "string"
+		})
 
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -330,7 +351,8 @@ func Test_Provider_Boot(t *testing.T) {
 
 		expected := fmt.Errorf("error message")
 		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{"primary": rdbCfg}}}}
+		partial := config.Partial{}
+		_, _ = partial.Set("slate.rdb.connections.primary", rdbCfg)
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
 		cfg := config.NewConfig()
@@ -344,8 +366,12 @@ func Test_Provider_Boot(t *testing.T) {
 		dialectStrategy := NewMockDialectStrategy(ctrl)
 		dialectStrategy.EXPECT().Accept(rdbCfg).Return(true).Times(1)
 		dialectStrategy.EXPECT().Create(rdbCfg).Return(dialector, nil).Times(1)
-		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
-		_ = container.Service("id", func() (interface{}, error) { return nil, expected }, MigrationTag)
+		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy {
+			return dialectStrategy
+		}, rdb.DialectStrategyTag)
+		_ = container.Service("id", func() (interface{}, error) {
+			return nil, expected
+		}, MigrationTag)
 
 		_ = (&rdb.Provider{}).Boot(container)
 
@@ -355,7 +381,7 @@ func Test_Provider_Boot(t *testing.T) {
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrContainer) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrContainer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrContainer)
 		}
 	})
 
@@ -368,7 +394,8 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = (&rdb.Provider{}).Register(container)
 
 		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{"primary": rdbCfg}}}}
+		partial := config.Partial{}
+		_, _ = partial.Set("slate.rdb.connections.primary", rdbCfg)
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
 		cfg := config.NewConfig()
@@ -382,8 +409,12 @@ func Test_Provider_Boot(t *testing.T) {
 		dialectStrategy := NewMockDialectStrategy(ctrl)
 		dialectStrategy.EXPECT().Accept(rdbCfg).Return(true).Times(1)
 		dialectStrategy.EXPECT().Create(rdbCfg).Return(dialector, nil).Times(1)
-		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
-		_ = container.Service("id", func() (interface{}, error) { return "string", nil }, MigrationTag)
+		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy {
+			return dialectStrategy
+		}, rdb.DialectStrategyTag)
+		_ = container.Service("id", func() interface{} {
+			return "string"
+		}, MigrationTag)
 
 		_ = (&rdb.Provider{}).Boot(container)
 
@@ -393,7 +424,7 @@ func Test_Provider_Boot(t *testing.T) {
 		if e := sut.Boot(container); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrConversion) {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -406,7 +437,8 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = (&rdb.Provider{}).Register(container)
 
 		rdbCfg := config.Partial{"dialect": "invalid", "host": ":memory:"}
-		partial := config.Partial{"slate": config.Partial{"rdb": config.Partial{"connections": config.Partial{"primary": rdbCfg}}}}
+		partial := config.Partial{}
+		_, _ = partial.Set("slate.rdb.connections.primary", rdbCfg)
 		source := NewMockConfigSource(ctrl)
 		source.EXPECT().Get("").Return(partial, nil).Times(1)
 		cfg := config.NewConfig()
@@ -420,11 +452,15 @@ func Test_Provider_Boot(t *testing.T) {
 		dialectStrategy := NewMockDialectStrategy(ctrl)
 		dialectStrategy.EXPECT().Accept(rdbCfg).Return(true).Times(1)
 		dialectStrategy.EXPECT().Create(rdbCfg).Return(dialector, nil).Times(1)
-		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy { return dialectStrategy }, rdb.DialectStrategyTag)
+		_ = container.Service("dialect_strategy", func() rdb.DialectStrategy {
+			return dialectStrategy
+		}, rdb.DialectStrategyTag)
 		migration := NewMockMigration(ctrl)
 		migration.EXPECT().Version().Return(uint64(1)).Times(1)
 		migration.EXPECT().Up().Times(1)
-		_ = container.Service("id", func() (interface{}, error) { return migration, nil }, MigrationTag)
+		_ = container.Service("id", func() interface{} {
+			return migration
+		}, MigrationTag)
 
 		_ = (&rdb.Provider{}).Boot(container)
 
@@ -432,7 +468,7 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = sut.Register(container)
 
 		if e := sut.Boot(container); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }

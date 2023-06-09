@@ -13,7 +13,7 @@ func Test_Provider_Register(t *testing.T) {
 		if e := (Provider{}).Register(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -24,14 +24,14 @@ func Test_Provider_Register(t *testing.T) {
 		system, e := app.Get(ID)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("unexpected error (%v)", e)
 		case system == nil:
 			t.Error("didn't returned the expected instance")
 		default:
 			switch system.(type) {
 			case *afero.OsFs:
 			default:
-				t.Error("didn't returned the file system form the container")
+				t.Error("didn't returned the file system")
 			}
 		}
 	})
@@ -42,7 +42,7 @@ func Test_Provider_Boot(t *testing.T) {
 		if e := (Provider{}).Boot(nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -51,7 +51,7 @@ func Test_Provider_Boot(t *testing.T) {
 		_ = app.Provide(Provider{})
 
 		if e := app.Boot(); e != nil {
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }

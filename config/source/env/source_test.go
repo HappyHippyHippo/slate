@@ -15,7 +15,7 @@ func Test_NewSource(t *testing.T) {
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		default:
 			switch {
 			case sut.Mutex == nil:
@@ -36,13 +36,13 @@ func Test_NewSource(t *testing.T) {
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		default:
 			switch {
 			case sut.Mutex == nil:
 				t.Error("didn't created the access mutex")
 			case !reflect.DeepEqual(sut.Partial, expected):
-				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, expected)
+				t.Errorf("(%v) when expecting (%v)", sut.Partial, expected)
 			}
 		}
 	})
@@ -60,13 +60,13 @@ func Test_NewSource(t *testing.T) {
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		default:
 			switch {
 			case sut.Mutex == nil:
 				t.Error("didn't created the access mutex")
 			case !reflect.DeepEqual(sut.Partial, expected):
-				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, expected)
+				t.Errorf("(%v) when expecting (%v)", sut.Partial, expected)
 			}
 		}
 	})
@@ -77,20 +77,21 @@ func Test_NewSource(t *testing.T) {
 		_ = os.Setenv(env, value)
 		defer func() { _ = os.Setenv(env, "") }()
 
-		expected := config.Partial{"root": config.Partial{"node": value}}
+		expected := config.Partial{}
+		_, _ = expected.Set("root.node", value)
 
 		sut, e := NewSource(map[string]string{env: "root.node"})
 		switch {
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		default:
 			switch {
 			case sut.Mutex == nil:
 				t.Error("didn't created the access mutex")
 			case !reflect.DeepEqual(sut.Partial, expected):
-				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, expected)
+				t.Errorf("(%v) when expecting (%v)", sut.Partial, expected)
 			}
 		}
 	})
@@ -101,20 +102,21 @@ func Test_NewSource(t *testing.T) {
 			_ = os.Setenv("env1", "")
 		}()
 
-		expected := config.Partial{"root": config.Partial{"node": "value"}}
+		expected := config.Partial{}
+		_, _ = expected.Set("root.node", "value")
 
 		sut, e := NewSource(map[string]string{"env1": "root.node"})
 		switch {
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		default:
 			switch {
 			case sut.Mutex == nil:
 				t.Error("didn't created the access mutex")
 			case !reflect.DeepEqual(sut.Partial, expected):
-				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, expected)
+				t.Errorf("(%v) when expecting (%v)", sut.Partial, expected)
 			}
 		}
 	})
@@ -125,20 +127,21 @@ func Test_NewSource(t *testing.T) {
 			_ = os.Setenv("env1", "")
 		}()
 
-		expected := config.Partial{"root": config.Partial{"node1": config.Partial{"node2": "value"}}}
+		expected := config.Partial{}
+		_, _ = expected.Set("root.node1.node2", "value")
 
 		sut, e := NewSource(map[string]string{"env1": "root.node1.node2"})
 		switch {
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		default:
 			switch {
 			case sut.Mutex == nil:
 				t.Error("didn't created the access mutex")
 			case !reflect.DeepEqual(sut.Partial, expected):
-				t.Errorf("didn't loaded the content correctly having (%v) when expecting (%v)", sut.Partial, expected)
+				t.Errorf(" (%v) when expecting (%v)", sut.Partial, expected)
 			}
 		}
 	})

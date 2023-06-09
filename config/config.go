@@ -70,7 +70,8 @@ func NewConfig() *Config {
 	}
 	// check if there is a need to create the observable sources
 	// ticker trigger
-	if period := time.Duration(ObserveFrequency) * time.Millisecond; period != 0 {
+	period := time.Duration(ObserveFrequency) * time.Millisecond
+	if period != 0 {
 		// create the ticker trigger used to poll the
 		// observable sources
 		c.observer, _ = trigger.NewRecurring(period, func() error {
@@ -166,7 +167,8 @@ func (c *Config) Int(
 	return c.partial.Int(path, def...)
 }
 
-// Float will retrieve a floating point configuration value loaded from a source.
+// Float will retrieve a floating point configuration value loaded
+// from a source.
 func (c *Config) Float(
 	path string,
 	def ...float64,
@@ -300,8 +302,8 @@ func (c *Config) RemoveSource(
 }
 
 // RemoveAllSources remove all the registered sources from the registration
-// list of the configuration. This will also update the configuration content and
-// re-validate the observed paths.
+// list of the configuration. This will also update the configuration
+// content and re-validate the observed paths.
 func (c *Config) RemoveAllSources() error {
 	// lock the config for handling
 	c.mutex.Lock()

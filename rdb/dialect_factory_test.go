@@ -15,7 +15,7 @@ func Test_DialectFactory_Register(t *testing.T) {
 		if e := (&DialectFactory{}).Register(nil); e == nil {
 			t.Error("didn't return the expected error")
 		} else if !errors.Is(e, slate.ErrNilPointer) {
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -45,7 +45,7 @@ func Test_DialectFactory_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expected (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expected (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -67,7 +67,7 @@ func Test_DialectFactory_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't return the expected error")
 		case !errors.Is(e, ErrUnknownDialect):
-			t.Errorf("returned the (%v) error when expected (%v)", e, ErrUnknownDialect)
+			t.Errorf("(%v) when expected (%v)", e, ErrUnknownDialect)
 		}
 	})
 
@@ -87,7 +87,7 @@ func Test_DialectFactory_Create(t *testing.T) {
 		if _, e := sut.Create(cfg); e == nil {
 			t.Error("didn't return the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expected (%v)", e, expected)
+			t.Errorf("(%v) when expected (%v)", e, expected)
 		}
 	})
 

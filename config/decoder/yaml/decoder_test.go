@@ -21,7 +21,7 @@ func Test_NewDecoder(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -37,7 +37,7 @@ func Test_NewDecoder(t *testing.T) {
 		} else {
 			defer func() { _ = sut.Close() }()
 			if e != nil {
-				t.Errorf("returned the (%v) error", e)
+				t.Errorf("unexpected (%v) error", e)
 			} else if sut.Reader != reader {
 				t.Error("didn't store the reader reference")
 			}
@@ -58,7 +58,7 @@ func Test_Decoder_Close(t *testing.T) {
 		if e := sut.Close(); e == nil {
 			t.Errorf("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -86,7 +86,12 @@ func Test_Decoder_Decode(t *testing.T) {
 		sut, _ := NewDecoder(reader)
 		defer func() { _ = sut.Close() }()
 		underlyingDecoder := NewMockUnderlyingDecoder(ctrl)
-		underlyingDecoder.EXPECT().Decode(&config.Partial{}).DoAndReturn(func(p *config.Partial) error { return expected }).Times(1)
+		underlyingDecoder.
+			EXPECT().
+			Decode(&config.Partial{}).
+			DoAndReturn(func(p *config.Partial) error {
+				return expected
+			}).Times(1)
 		sut.UnderlyingDecoder = underlyingDecoder
 
 		check, e := sut.Decode()
@@ -96,7 +101,7 @@ func Test_Decoder_Decode(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -110,10 +115,13 @@ func Test_Decoder_Decode(t *testing.T) {
 		sut, _ := NewDecoder(reader)
 		defer func() { _ = sut.Close() }()
 		underlyingDecoder := NewMockUnderlyingDecoder(ctrl)
-		underlyingDecoder.EXPECT().Decode(&config.Partial{}).DoAndReturn(func(p *config.Partial) error {
-			(*p)["node"] = data["node"]
-			return nil
-		}).Times(1)
+		underlyingDecoder.
+			EXPECT().
+			Decode(&config.Partial{}).
+			DoAndReturn(func(p *config.Partial) error {
+				(*p)["node"] = data["node"]
+				return nil
+			}).Times(1)
 		sut.UnderlyingDecoder = underlyingDecoder
 
 		check, e := sut.Decode()
@@ -121,7 +129,7 @@ func Test_Decoder_Decode(t *testing.T) {
 		case check == nil:
 			t.Error("returned a nil data")
 		case e != nil:
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case !reflect.DeepEqual(*check, data):
 			t.Errorf("returned (%v)", check)
 		}
@@ -139,9 +147,9 @@ func Test_Decoder_Decode(t *testing.T) {
 		case check == nil:
 			t.Error("returned a nil data")
 		case e != nil:
-			t.Errorf("returned the unexpected (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case !reflect.DeepEqual(*check, expected):
-			t.Errorf("returned (%v) instead of the expected (%v)", *check, expected)
+			t.Errorf("(%v) when expecting (%v)", *check, expected)
 		}
 	})
 }

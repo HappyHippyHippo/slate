@@ -57,6 +57,61 @@ func (p *Partial) Has(
 	return e == nil
 }
 
+// Set will store a value in the requested partial path.
+func (p *Partial) Set(
+	path string,
+	value interface{},
+) (*Partial, error) {
+	// retrieve the path parts
+	if path == "" {
+		return nil, errInvalidEmptyPath(path)
+	}
+	parts := strings.Split(path, PathSeparator)
+
+	// iterate through the path
+	it := p
+	if len(parts) == 1 {
+		(*it)[path] = value
+		return p, nil
+	}
+
+	// path part partial generation
+	generate := func(part string) {
+		// check if the part exists and is a partial struct
+		generate := false
+		if next, ok := (*it)[part]; !ok {
+			generate = true
+		} else if _, ok := next.(Partial); !ok {
+			generate = true
+		}
+		// generate the part if not present
+		if generate == true {
+			(*it)[part] = Partial{}
+		}
+	}
+
+	// part walkthrough
+	for _, part := range parts[:len(parts)-1] {
+		// if the iterated path is empty
+		// (double occurrence of a separator), just continue
+		if part == "" {
+			continue
+		}
+
+		// generate the part and advance the iteration
+		generate(part)
+		next := (*it)[part].(Partial)
+		it = &next
+	}
+
+	// store the desired value
+	part := parts[len(parts)-1:][0]
+	generate(part)
+	(*it)[part] = value
+
+	return p, nil
+}
+
 // Get will retrieve the value stored in the requested path.
 // If the path does not exist, then the value nil will be returned. Or, if
 // a simple value was given as the optional extra argument, then it will

@@ -44,7 +44,7 @@ func Test_Container_Close(t *testing.T) {
 		if e := sut.Close(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -107,7 +107,7 @@ func Test_Container_Service(t *testing.T) {
 		if e := sut.Service(id, nil); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, ErrNilPointer) {
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, ErrNilPointer)
 		}
 	})
 
@@ -118,7 +118,7 @@ func Test_Container_Service(t *testing.T) {
 		if e := sut.Service(id, "string"); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, ErrNonFunctionFactory) {
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, ErrNonFunctionFactory)
+			t.Errorf("(%v) when expecting (%v)", e, ErrNonFunctionFactory)
 		}
 	})
 
@@ -129,7 +129,7 @@ func Test_Container_Service(t *testing.T) {
 		if e := sut.Service(id, func() {}); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if !errors.Is(e, ErrFactoryWithoutResult) {
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, ErrFactoryWithoutResult)
+			t.Errorf("(%v) when expecting (%v)", e, ErrFactoryWithoutResult)
 		}
 	})
 
@@ -169,7 +169,7 @@ func Test_Container_Service(t *testing.T) {
 		if e := sut.Service(id, func() interface{} { return entry2 }); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -212,7 +212,7 @@ func Test_Container_Get(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error instance")
 		case !errors.Is(e, ErrServiceNotFound):
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, ErrServiceNotFound)
+			t.Errorf("(%v) when expecting (%v)", e, ErrServiceNotFound)
 		}
 	})
 
@@ -229,7 +229,7 @@ func Test_Container_Get(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error instance")
 		case !errors.Is(e, ErrContainer):
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, ErrContainer)
+			t.Errorf("(%v) when expecting (%v)", e, ErrContainer)
 		}
 	})
 
@@ -245,7 +245,7 @@ func Test_Container_Get(t *testing.T) {
 		_ = sut.Service(id, func() interface{} { count++; return entry })
 
 		if check, e := sut.Get(id); e != nil {
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("unexpected error (%v)", e)
 		} else if check == nil {
 			t.Error("didn't returned a valid reference")
 		}
@@ -267,7 +267,7 @@ func Test_Container_Get(t *testing.T) {
 			check, e := sut.Get(id)
 			switch {
 			case e != nil:
-				t.Errorf("returned the unexpected error (%v)", e)
+				t.Errorf("unexpected error (%v)", e)
 			case check == nil:
 				t.Error("didn't returned a valid reference")
 			case count != 1:
@@ -295,7 +295,7 @@ func Test_Container_Tag(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error instance")
 		case !errors.Is(e, ErrContainer):
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, ErrContainer)
+			t.Errorf("(%v) when expecting (%v)", e, ErrContainer)
 		}
 	})
 
@@ -311,9 +311,9 @@ func Test_Container_Tag(t *testing.T) {
 		_ = sut.Service(id2, func() *B { return &B{} }, "tag1", "tag2")
 
 		if list, e := sut.Tag("tag3"); e != nil {
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("unexpected error (%v)", e)
 		} else if len(list) != 0 {
-			t.Errorf("returned the unexpected non-empty (%v) list", list)
+			t.Errorf("unexpected non-empty (%v) list", list)
 		}
 	})
 
@@ -329,9 +329,9 @@ func Test_Container_Tag(t *testing.T) {
 		_ = sut.Service(id2, func() *B { return &B{} }, "tag1", "tag2")
 
 		if list, e := sut.Tag("tag2"); e != nil {
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("unexpected error (%v)", e)
 		} else if len(list) != 1 {
-			t.Errorf("returned the unexpected (%v) list", list)
+			t.Errorf("unexpected (%v) list", list)
 		}
 	})
 
@@ -347,9 +347,9 @@ func Test_Container_Tag(t *testing.T) {
 		_ = sut.Service(id2, func() *B { return &B{} }, "tag1", "tag2")
 
 		if list, e := sut.Tag("tag1"); e != nil {
-			t.Errorf("returned the unexpected error (%v)", e)
+			t.Errorf("unexpected error (%v)", e)
 		} else if len(list) != 2 {
-			t.Errorf("returned the unexpected (%v) list", list)
+			t.Errorf("unexpected (%v) list", list)
 		}
 	})
 }
@@ -359,7 +359,7 @@ func Test_Container_Remove(t *testing.T) {
 		id := "id"
 		sut := NewContainer()
 		if e := sut.Remove(id); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -369,7 +369,7 @@ func Test_Container_Remove(t *testing.T) {
 		_ = sut.Service(id, func() string { return "value" })
 
 		if e := sut.Remove(id); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if sut.Has(id) {
 			t.Error("didn't removed the entry")
 		}
@@ -388,7 +388,7 @@ func Test_Container_Remove(t *testing.T) {
 		_, _ = sut.Get(id)
 
 		if e := sut.Remove(id); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if sut.Has(id) {
 			t.Error("didn't removed the entry")
 		}
@@ -408,7 +408,7 @@ func Test_Container_Clear(t *testing.T) {
 		_ = sut.Service(id, func() interface{} { return entry })
 
 		if e := sut.Clear(); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if sut.Has(id) {
 			t.Error("didn't removed the entry")
 		}
@@ -430,7 +430,7 @@ func Test_Container_Clear(t *testing.T) {
 		if e := sut.Clear(); e == nil {
 			t.Error("didn't returned the expected error")
 		} else if e.Error() != expected.Error() {
-			t.Errorf("returned the error (%v) when was expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -447,7 +447,7 @@ func Test_Container_Clear(t *testing.T) {
 		_, _ = sut.Get(id)
 
 		if e := sut.Clear(); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		} else if sut.Has(id) {
 			t.Error("didn't removed the entry")
 		}

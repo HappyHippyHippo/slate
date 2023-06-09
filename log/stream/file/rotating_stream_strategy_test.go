@@ -23,7 +23,7 @@ func Test_NewRotatingFileStreamStrategy(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -38,7 +38,7 @@ func Test_NewRotatingFileStreamStrategy(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -51,7 +51,7 @@ func Test_NewRotatingFileStreamStrategy(t *testing.T) {
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 }
@@ -119,7 +119,7 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -127,7 +127,10 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partial := config.Partial{"type": Type, "format": 123}
+		partial := config.Partial{
+			"type":   Type,
+			"format": 123,
+		}
 		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
 		src, e := sut.Create(partial)
@@ -137,7 +140,7 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrConversion):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrConversion)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrConversion)
 		}
 	})
 
@@ -145,7 +148,11 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partial := config.Partial{"type": Type, "format": "format", "level": "invalid"}
+		partial := config.Partial{
+			"type":   Type,
+			"format": "format",
+			"level":  "invalid",
+		}
 		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
 		stream, e := sut.Create(partial)
@@ -155,7 +162,7 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, log.ErrInvalidLevel):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, log.ErrInvalidLevel)
+			t.Errorf("(%v) when expecting (%v)", e, log.ErrInvalidLevel)
 		}
 	})
 
@@ -163,7 +170,11 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		partial := config.Partial{"type": Type, "format": "format", "level": "fatal"}
+		partial := config.Partial{
+			"type":   Type,
+			"format": "format",
+			"level":  "fatal",
+		}
 		sut, _ := NewRotatingStreamStrategy(NewMockFs(ctrl), log.NewFormatterFactory())
 
 		stream, e := sut.Create(partial)
@@ -174,7 +185,7 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, log.ErrInvalidFormat):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, log.ErrInvalidFormat)
+			t.Errorf("(%v) when expecting (%v)", e, log.ErrInvalidFormat)
 		}
 	})
 
@@ -192,7 +203,11 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 			"path":     path,
 			"channels": []interface{}{"channel1", "channel2"}}
 		fileSystem := NewMockFs(ctrl)
-		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(nil, expected).Times(1)
+		fileSystem.
+			EXPECT().
+			OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).
+			Return(nil, expected).
+			Times(1)
 		formatter := NewMockFormatter(ctrl)
 		formatterStrategy := NewMockFormatterStrategy(ctrl)
 		formatterStrategy.EXPECT().Accept("format").Return(true).Times(1)
@@ -210,7 +225,7 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -229,7 +244,11 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		file := NewMockFile(ctrl)
 		file.EXPECT().Close().Return(nil).Times(1)
 		fileSystem := NewMockFs(ctrl)
-		fileSystem.EXPECT().OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).Return(file, nil).Times(1)
+		fileSystem.
+			EXPECT().
+			OpenFile(expectedPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.FileMode(0o644)).
+			Return(file, nil).
+			Times(1)
 		formatter := NewMockFormatter(ctrl)
 		formatterStrategy := NewMockFormatterStrategy(ctrl)
 		formatterStrategy.EXPECT().Accept("format").Return(true).Times(1)
@@ -242,7 +261,7 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 		stream, e := sut.Create(partial)
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case stream == nil:
 			t.Error("didn't returned a valid reference")
 		default:
@@ -251,9 +270,9 @@ func Test_RotatingFileStreamStrategy_Create(t *testing.T) {
 			case *Stream:
 				switch {
 				case s.Level != log.FATAL:
-					t.Error("didn't created a stream with the correct level")
+					t.Errorf("invalid level (%s)", log.LevelMapName[s.Level])
 				case len(s.Channels) != 2:
-					t.Error("didn't created a stream with the correct channel list")
+					t.Errorf("invalid channel list (%v)", s.Channels)
 				}
 			default:
 				t.Error("didn't returned a new file stream")

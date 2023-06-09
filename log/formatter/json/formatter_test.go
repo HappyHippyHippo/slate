@@ -71,9 +71,9 @@ func Test_Formatter_Format(t *testing.T) {
 			},
 		}
 
-		for _, scenario := range scenarios {
-			check := Formatter{}.Format(scenario.level, scenario.message, scenario.ctx)
-			match, _ := regexp.Match(scenario.expected, []byte(check))
+		for _, s := range scenarios {
+			check := Formatter{}.Format(s.level, s.message, s.ctx)
+			match, _ := regexp.Match(s.expected, []byte(check))
 			if !match {
 				t.Errorf("didn't validated (%s) output", check)
 			}

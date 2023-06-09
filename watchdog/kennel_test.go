@@ -22,7 +22,7 @@ func Test_NewKennel(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, slate.ErrNilPointer):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, slate.ErrNilPointer)
+			t.Errorf("(%v) when expecting (%v)", e, slate.ErrNilPointer)
 		}
 	})
 
@@ -35,7 +35,7 @@ func Test_NewKennel(t *testing.T) {
 
 		switch {
 		case e != nil:
-			t.Errorf("returned the (%v) error", e)
+			t.Errorf("unexpected (%v) error", e)
 		case sut == nil:
 			t.Errorf("didn't returned a valid reference")
 		case sut.creator != factory:
@@ -63,7 +63,7 @@ func Test_Kennel_Add(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case !errors.Is(e, ErrDuplicateService):
-			t.Errorf("returned the (%v) error when expecting (%v)", e, ErrDuplicateService)
+			t.Errorf("(%v) when expecting (%v)", e, ErrDuplicateService)
 		}
 	})
 
@@ -84,7 +84,7 @@ func Test_Kennel_Add(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 
@@ -103,7 +103,7 @@ func Test_Kennel_Add(t *testing.T) {
 		e := sut.Add(process)
 		switch {
 		case e != nil:
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		case len(sut.regs) != 1:
 			t.Error("didn't stored the process registry")
 		case sut.regs[service].process != process:
@@ -122,7 +122,7 @@ func Test_Kennel_Run(t *testing.T) {
 		sut, _ := NewKennel(&Factory{})
 
 		if e := sut.Run(); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -143,7 +143,7 @@ func Test_Kennel_Run(t *testing.T) {
 		_ = sut.Add(process)
 
 		if e := sut.Run(); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -151,17 +151,19 @@ func Test_Kennel_Run(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		process1 := &Process{service: "service1", runner: func() error { return nil }}
+		runner := func() error { return nil }
+
+		process1 := &Process{service: "service1", runner: runner}
 		logAdapter1 := NewMockLogAdapter(ctrl)
 		logAdapter1.EXPECT().Start().Return(nil).Times(1)
 		logAdapter1.EXPECT().Done().Return(nil).Times(1)
 		wd1 := &Watchdog{logAdapter: logAdapter1}
-		process2 := &Process{service: "service2", runner: func() error { return nil }}
+		process2 := &Process{service: "service2", runner: runner}
 		logAdapter2 := NewMockLogAdapter(ctrl)
 		logAdapter2.EXPECT().Start().Return(nil).Times(1)
 		logAdapter2.EXPECT().Done().Return(nil).Times(1)
 		wd2 := &Watchdog{logAdapter: logAdapter2}
-		process3 := &Process{service: "service3", runner: func() error { return nil }}
+		process3 := &Process{service: "service3", runner: runner}
 		logAdapter3 := NewMockLogAdapter(ctrl)
 		logAdapter3.EXPECT().Start().Return(nil).Times(1)
 		logAdapter3.EXPECT().Done().Return(nil).Times(1)
@@ -179,7 +181,7 @@ func Test_Kennel_Run(t *testing.T) {
 		_ = sut.Add(process3)
 
 		if e := sut.Run(); e != nil {
-			t.Errorf("returned the unexpected error : %v", e)
+			t.Errorf("unexpected (%v) error", e)
 		}
 	})
 
@@ -187,9 +189,11 @@ func Test_Kennel_Run(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		runner := func() error { return nil }
+
 		expected := fmt.Errorf("error message")
 		panicError := fmt.Errorf("panic error")
-		process1 := &Process{service: "service1", runner: func() error { return nil }}
+		process1 := &Process{service: "service1", runner: runner}
 		logAdapter1 := NewMockLogAdapter(ctrl)
 		logAdapter1.EXPECT().Start().Return(nil).Times(1)
 		logAdapter1.EXPECT().Done().Return(nil).Times(1)
@@ -207,7 +211,7 @@ func Test_Kennel_Run(t *testing.T) {
 		logAdapter2.EXPECT().Error(panicError).Return(nil).Times(1)
 		logAdapter2.EXPECT().Done().Return(nil).Times(1)
 		wd2 := &Watchdog{logAdapter: logAdapter2}
-		process3 := &Process{service: "service3", runner: func() error { return nil }}
+		process3 := &Process{service: "service3", runner: runner}
 		logAdapter3 := NewMockLogAdapter(ctrl)
 		logAdapter3.EXPECT().Start().Return(nil).Times(1)
 		logAdapter3.EXPECT().Done().Return(nil).Times(1)
@@ -229,7 +233,7 @@ func Test_Kennel_Run(t *testing.T) {
 		case e == nil:
 			t.Error("didn't returned the expected error")
 		case e.Error() != expected.Error():
-			t.Errorf("returned the (%v) error when expecting (%v)", e, expected)
+			t.Errorf("(%v) when expecting (%v)", e, expected)
 		}
 	})
 }

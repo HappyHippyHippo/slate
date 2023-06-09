@@ -81,7 +81,9 @@ func (s ObsSourceStrategy) Create(
 	}
 	// validate configuration
 	if sc.Path == "" {
-		return nil, errInvalidSource(cfg, map[string]interface{}{"description": "missing path"})
+		return nil, errInvalidSource(cfg, map[string]interface{}{
+			"description": "missing path",
+		})
 	}
 	// return acceptance for the read config type
 	return NewObsSource(sc.Path, sc.Format, s.fileSystem, s.decoderFactory)

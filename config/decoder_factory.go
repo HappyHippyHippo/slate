@@ -37,6 +37,7 @@ func (f *DecoderFactory) Create(
 			return s.Create(args...)
 		}
 	}
-	// signal that no strategy was found that would accept the requested format
+	// signal that no strategy was found that would accept the
+	// requested format
 	return nil, errInvalidFormat(format)
 }
