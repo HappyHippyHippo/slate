@@ -4,9 +4,10 @@ import (
 	"reflect"
 
 	"github.com/golang/mock/gomock"
+	"gorm.io/gorm"
+
 	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/rdb"
-	"gorm.io/gorm"
 )
 
 // MockDialectStrategy is a mock instance of IDialectStrategy interface.

@@ -40,7 +40,7 @@ import (
 //                 group.
 
 type result interface {
-	// Extracts the values for this result from the provided value and
+	// Extract the values for this result from the provided value and
 	// stores them into the provided containerWriter.
 	//
 	// This MAY panic if the result does not consume a single value.

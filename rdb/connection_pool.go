@@ -3,8 +3,9 @@ package rdb
 import (
 	"fmt"
 
-	"github.com/happyhippyhippo/slate/config"
 	"gorm.io/gorm"
+
+	"github.com/happyhippyhippo/slate/config"
 )
 
 type configurer interface {

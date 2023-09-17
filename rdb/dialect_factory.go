@@ -1,8 +1,9 @@
 package rdb
 
 import (
-	"github.com/happyhippyhippo/slate/config"
 	"gorm.io/gorm"
+
+	"github.com/happyhippyhippo/slate/config"
 )
 
 // DialectFactory defines an object that will generate a database

@@ -4,8 +4,9 @@ import (
 	"reflect"
 
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/config"
 	"gorm.io/gorm"
+
+	"github.com/happyhippyhippo/slate/config"
 )
 
 // MockConnectionCreator is a mock instance of connectionCreator interface.

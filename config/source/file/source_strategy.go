@@ -1,8 +1,9 @@
 package file
 
 import (
-	"github.com/happyhippyhippo/slate/config"
 	"github.com/spf13/afero"
+
+	"github.com/happyhippyhippo/slate/config"
 )
 
 const (

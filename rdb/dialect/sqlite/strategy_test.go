@@ -7,9 +7,10 @@ import (
 	"strings"
 	"testing"
 
+	"gorm.io/driver/sqlite"
+
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
-	"gorm.io/driver/sqlite"
 )
 
 func Test_DialectStrategy_Accept(t *testing.T) {

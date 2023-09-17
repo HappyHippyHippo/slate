@@ -1,9 +1,10 @@
 package stream
 
 import (
-	"github.com/golang/mock/gomock"
 	"io"
 	"reflect"
+
+	"github.com/golang/mock/gomock"
 )
 
 // MockWriter is a mock instance of Writer interface

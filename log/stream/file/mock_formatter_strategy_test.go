@@ -4,6 +4,7 @@ import (
 	"reflect"
 
 	"github.com/golang/mock/gomock"
+
 	"github.com/happyhippyhippo/slate/log"
 )
 

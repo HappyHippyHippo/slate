@@ -9,10 +9,11 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/happyhippyhippo/slate"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	"github.com/happyhippyhippo/slate"
 )
 
 type AnyTime struct{}

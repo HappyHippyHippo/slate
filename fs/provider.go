@@ -1,8 +1,9 @@
 package fs
 
 import (
-	"github.com/happyhippyhippo/slate"
 	"github.com/spf13/afero"
+
+	"github.com/happyhippyhippo/slate"
 )
 
 const (

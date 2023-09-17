@@ -4,9 +4,10 @@ import (
 	"os"
 	"sync"
 
+	"github.com/spf13/afero"
+
 	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/config/source"
-	"github.com/spf13/afero"
 )
 
 type decoderCreator interface {

@@ -1,9 +1,10 @@
 package rdb
 
 import (
-	"github.com/happyhippyhippo/slate"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	"github.com/happyhippyhippo/slate"
 )
 
 const (

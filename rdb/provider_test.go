@@ -6,10 +6,11 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"gorm.io/gorm"
+
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/fs"
-	"gorm.io/gorm"
 )
 
 func Test_Provider_Register(t *testing.T) {

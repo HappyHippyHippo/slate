@@ -353,7 +353,7 @@ type provider interface {
 	// constructor.
 	ResultList() resultList
 
-	// Calls the underlying constructor, reading values from the
+	// Call the underlying constructor, reading values from the
 	// containerStore as needed.
 	//
 	// The values produced by this provider should be submitted into the
@@ -479,7 +479,7 @@ func (s *Scope) provide(ctor interface{}, opts provideOptions) (err error) {
 	if err != nil {
 		return err
 	}
-	for k, _ := range keys {
+	for k := range keys {
 		n.resultKeys = append(n.resultKeys, k)
 	}
 

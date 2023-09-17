@@ -3,9 +3,10 @@ package yaml
 import (
 	"io"
 
+	goyaml "gopkg.in/yaml.v3"
+
 	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/config/decoder"
-	goyaml "gopkg.in/yaml.v3"
 )
 
 // Decoder defines a config source YAML content decoder instance.

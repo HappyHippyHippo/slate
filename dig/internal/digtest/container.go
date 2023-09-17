@@ -23,8 +23,9 @@ package digtest
 import (
 	"testing"
 
-	"github.com/happyhippyhippo/slate/dig"
 	"github.com/stretchr/testify/require"
+
+	"github.com/happyhippyhippo/slate/dig"
 )
 
 // Container wraps dig.Container to provide methods for easier testing.

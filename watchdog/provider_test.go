@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/log"
@@ -30,7 +31,7 @@ func Test_Provider_Register(t *testing.T) {
 			t.Errorf("unexpected (%v) error", e)
 		case !container.Has(LogFormatterFactoryID):
 			t.Errorf("no log formatter creator : %v", sut)
-		case !container.Has(WatchdogFactoryID):
+		case !container.Has(FactoryID):
 			t.Errorf("no watchdog creator : %v", sut)
 		case !container.Has(ID):
 			t.Errorf("no kannel : %v", sut)
@@ -69,7 +70,7 @@ func Test_Provider_Register(t *testing.T) {
 		_ = (&log.Provider{}).Register(container)
 		_ = (&Provider{}).Register(container)
 
-		sut, e := container.Get(WatchdogFactoryID)
+		sut, e := container.Get(FactoryID)
 		switch {
 		case e != nil:
 			t.Errorf("unexpected error (%v)", e)

@@ -4,9 +4,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/spf13/afero"
+
 	"github.com/happyhippyhippo/slate/config"
 	"github.com/happyhippyhippo/slate/log"
-	"github.com/spf13/afero"
 )
 
 const (

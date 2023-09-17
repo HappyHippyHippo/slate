@@ -4,8 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/happyhippyhippo/slate"
 	"github.com/spf13/afero"
+
+	"github.com/happyhippyhippo/slate"
 )
 
 func Test_Provider_Register(t *testing.T) {

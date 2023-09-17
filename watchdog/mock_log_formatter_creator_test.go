@@ -1,9 +1,11 @@
 package watchdog
 
 import (
-	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate/config"
 	"reflect"
+
+	"github.com/golang/mock/gomock"
+
+	"github.com/happyhippyhippo/slate/config"
 )
 
 // MockLogFormatterCreator is a mocked instance of ILogFormatterFactory interface.

@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/happyhippyhippo/slate/config"
-	"github.com/happyhippyhippo/slate/rdb"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+
+	"github.com/happyhippyhippo/slate/config"
+	"github.com/happyhippyhippo/slate/rdb"
 )
 
 const (

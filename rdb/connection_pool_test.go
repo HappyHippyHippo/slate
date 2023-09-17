@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/happyhippyhippo/slate"
-	"github.com/happyhippyhippo/slate/config"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	"github.com/happyhippyhippo/slate"
+	"github.com/happyhippyhippo/slate/config"
 )
 
 func Test_NewConnectionPool(t *testing.T) {

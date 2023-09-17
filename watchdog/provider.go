@@ -19,9 +19,9 @@ const (
 	// registration id of the log formatter creator.
 	LogFormatterFactoryID = ID + ".formatter.creator"
 
-	// WatchdogFactoryID defines the id to be used as the container
+	// FactoryID defines the id to be used as the container
 	// registration id of the watchdog creator.
-	WatchdogFactoryID = ID + ".creator"
+	FactoryID = ID + ".factory"
 
 	// ProcessTag defines the simple tag to be used
 	// to identify a watchdog process entry in the container.
@@ -46,7 +46,7 @@ func (p Provider) Register(
 	// add log formatter strategies and creator
 	_ = container.Service(LogFormatterFactoryID, NewLogFormatterFactory)
 	// add the watchdog creator and kennel
-	_ = container.Service(WatchdogFactoryID, NewFactory)
+	_ = container.Service(FactoryID, NewFactory)
 	_ = container.Service(ID, NewKennel)
 	return nil
 }

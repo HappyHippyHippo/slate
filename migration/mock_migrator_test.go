@@ -9,13 +9,11 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-// MockMigrator is a mock instance of Migrator interface.
+// MockMigrator is a mock of Migrator interface.
 type MockMigrator struct {
 	ctrl     *gomock.Controller
 	recorder *MockMigratorRecorder
 }
-
-var _ gorm.Migrator = &MockMigrator{}
 
 // MockMigratorRecorder is the mock recorder for MockMigrator.
 type MockMigratorRecorder struct {
@@ -411,4 +409,19 @@ func (m *MockMigrator) RenameTable(arg0, arg1 interface{}) error {
 func (mr *MockMigratorRecorder) RenameTable(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenameTable", reflect.TypeOf((*MockMigrator)(nil).RenameTable), arg0, arg1)
+}
+
+// TableType mocks base method.
+func (m *MockMigrator) TableType(arg0 interface{}) (gorm.TableType, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TableType", arg0)
+	ret0, _ := ret[0].(gorm.TableType)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TableType indicates an expected call of TableType.
+func (mr *MockMigratorRecorder) TableType(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TableType", reflect.TypeOf((*MockMigrator)(nil).TableType), arg0)
 }

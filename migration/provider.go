@@ -1,9 +1,10 @@
 package migration
 
 import (
+	"gorm.io/gorm"
+
 	"github.com/happyhippyhippo/slate"
 	"github.com/happyhippyhippo/slate/rdb"
-	"gorm.io/gorm"
 )
 
 const (
