@@ -437,7 +437,7 @@ func (s *Scope) Provide(constructor interface{}, opts ...ProvideOption) error {
 
 func (s *Scope) provide(ctor interface{}, opts provideOptions) (err error) {
 	// If Export option is provided to the constructor, this should be injected to the
-	// root-level Scope (Container) to allow it to propagate to all other Scopes.
+	// root-level Scope (Provider) to allow it to propagate to all other Scopes.
 	origScope := s
 	if opts.Exported {
 		s = s.rootScope()

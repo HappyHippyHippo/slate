@@ -24,7 +24,7 @@
 //
 // STABLE. No breaking changes will be made in this major version.
 //
-// # Container
+// # Provider
 //
 // Dig exposes type Container as an object capable of resolving a directed
 // acyclic dependency graph. Use the New function to create one.

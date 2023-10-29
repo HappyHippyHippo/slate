@@ -3,13 +3,6 @@
 ## Opinionated golang application scaffolding
 
 - [x] slate
-  - [x] cache
-    - [ ] store
-      - [ ] inmemory
-      - [ ] memcached
-      - [ ] bmemcached
-      - [ ] redis
-  - [x] envelope
   - [x] config
     - [x] decoder
       - [x] json
@@ -29,21 +22,11 @@
       - [x] console
       - [x] file
   - [x] migration
-  - [x] rest
-    - [x] envelopemw
-    - [x] logmw
-      - [x] request
-        - [x] json
-        - [x] xml
-      - [x] response
-        - [x] json
-        - [x] xml
   - [x] rdb
     - [x] dialect
       - [x] sqlite
       - [x] mysql
   - [x] trigger
-  - [x] validation
   - [x] watchdog
     - [x] formatter
-      - [x] simple
+      - [x] default

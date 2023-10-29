@@ -1,6 +1,7 @@
 package slate
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -10,23 +11,54 @@ var (
 
 	// ErrConversion defines a type conversion error.
 	ErrConversion = NewError("invalid type conversion")
-
-	// ErrContainer defines a container error.
-	ErrContainer = NewError("service container error")
-
-	// ErrNonFunctionFactory defines a service container registration error
-	// that signals that the registration request was made with a
-	// non-function service factory.
-	ErrNonFunctionFactory = NewError("non-function service factory")
-
-	// ErrFactoryWithoutResult defines a service container registration error
-	// that signals that the registration request was made with a
-	// function service factory that don't return a service.
-	ErrFactoryWithoutResult = NewError("service factory without result")
-
-	// ErrServiceNotFound defines a service not found on the container.
-	ErrServiceNotFound = NewError("service not found")
 )
+
+// Error defines a contextualized error
+type Error struct {
+	err     error
+	context map[string]interface{}
+}
+
+var _ error = &Error{}
+
+// NewError will instantiate a new error instance
+func NewError(
+	msg string,
+	ctx ...map[string]interface{},
+) error {
+	e := &Error{err: errors.New(msg)}
+	if len(ctx) != 0 {
+		e.context = ctx[0]
+	}
+	return e
+}
+
+// NewErrorFrom create a new contextualized error instance
+// from an existing error
+func NewErrorFrom(
+	err error,
+	msg string,
+	ctx ...map[string]interface{},
+) error {
+	e := NewError(msg, ctx...)
+	e.(*Error).err = fmt.Errorf("%s : %w", e.Error(), err)
+	return e
+}
+
+// Error retrieve the error information from the error instance
+func (e *Error) Error() string {
+	return e.err.Error()
+}
+
+// Unwrap will try to unwrap the error information
+func (e *Error) Unwrap() error {
+	return errors.Unwrap(e.err)
+}
+
+// Context will retrieve the error context information
+func (e *Error) Context() map[string]interface{} {
+	return e.context
+}
 
 func errNilPointer(
 	arg string,
@@ -35,30 +67,10 @@ func errNilPointer(
 	return NewErrorFrom(ErrNilPointer, arg, ctx...)
 }
 
-func errContainer(
-	e error,
+func errConversion(
+	val interface{},
+	t string,
 	ctx ...map[string]interface{},
 ) error {
-	return NewErrorFrom(ErrContainer, fmt.Errorf("%w", e).Error(), ctx...)
-}
-
-func errNonFunctionFactory(
-	arg string,
-	ctx ...map[string]interface{},
-) error {
-	return NewErrorFrom(ErrNonFunctionFactory, arg, ctx...)
-}
-
-func errFactoryWithoutResult(
-	arg string,
-	ctx ...map[string]interface{},
-) error {
-	return NewErrorFrom(ErrFactoryWithoutResult, arg, ctx...)
-}
-
-func errServiceNotFound(
-	arg string,
-	ctx ...map[string]interface{},
-) error {
-	return NewErrorFrom(ErrServiceNotFound, arg, ctx...)
+	return NewErrorFrom(ErrConversion, fmt.Sprintf("%v to %s", val, t), ctx...)
 }

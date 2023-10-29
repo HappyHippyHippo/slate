@@ -121,7 +121,7 @@ func (g *Group) removeResult(r *Result) {
 	g.Results = pruned
 }
 
-// Graph is the DOT-format graph in a Container.
+// Graph is the DOT-format graph in a Provider.
 type Graph struct {
 	Ctors   []*Ctor
 	ctorMap map[CtorID]*Ctor
