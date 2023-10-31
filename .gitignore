@@ -2,3 +2,5 @@
 .vscode
 _bin
 _test
+
+.DS_Store
