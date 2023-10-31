@@ -345,7 +345,7 @@ func (ServiceRegister) Provide(
 	container *ServiceContainer,
 ) error {
 	if container == nil {
-		return errNilPointer("Provider")
+		return errNilPointer("container")
 	}
 	return nil
 }
@@ -355,7 +355,7 @@ func (ServiceRegister) Boot(
 	container *ServiceContainer,
 ) error {
 	if container == nil {
-		return errNilPointer("Provider")
+		return errNilPointer("container")
 	}
 	return nil
 }

@@ -1382,7 +1382,7 @@ func (sr LogServiceRegister) Provide(
 ) error {
 	// check container argument reference
 	if container == nil {
-		return errNilPointer("Provider")
+		return errNilPointer("container")
 	}
 	// register the services
 	_ = container.Add(LogJSONEncoderCreatorContainerID, NewLogJSONEncoderCreator, LogFormatterCreatorTag)
@@ -1405,7 +1405,7 @@ func (sr LogServiceRegister) Boot(
 ) (e error) {
 	// check container argument reference
 	if container == nil {
-		return errNilPointer("Provider")
+		return errNilPointer("container")
 	}
 	// check if the logger loader is active
 	if !LogLoaderActive {

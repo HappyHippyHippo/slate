@@ -127,7 +127,7 @@ func (sr RdbMySqlServiceRegister) Provide(
 ) error {
 	// check container argument reference
 	if container == nil {
-		return errNilPointer("Provider")
+		return errNilPointer("container")
 	}
 	// register the services
 	_ = container.Add(RdbMySqlDialectCreatorContainerID, NewRdbMySqlDialectCreator, RdbDialectCreatorTag)

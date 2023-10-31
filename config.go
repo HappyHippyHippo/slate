@@ -2888,7 +2888,7 @@ func (sr ConfigServiceRegister) Provide(
 ) error {
 	// check container argument reference
 	if container == nil {
-		return errNilPointer("Provider")
+		return errNilPointer("container")
 	}
 	// register the services
 	_ = container.Add(ConfigYAMLDecoderCreatorContainerID, NewConfigYAMLDecoderCreator, ConfigParserCreatorTag)
@@ -2917,7 +2917,7 @@ func (sr ConfigServiceRegister) Boot(
 ) (e error) {
 	// check container argument reference
 	if container == nil {
-		return errNilPointer("Provider")
+		return errNilPointer("container")
 	}
 	// check if the config loader is active
 	if !ConfigLoaderActive {

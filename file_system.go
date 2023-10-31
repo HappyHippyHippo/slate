@@ -42,7 +42,7 @@ func (FileSystemServiceRegister) Provide(
 	container *ServiceContainer,
 ) error {
 	if container == nil {
-		return errNilPointer("Provider")
+		return errNilPointer("container")
 	}
 	return container.Add(FileSystemContainerID, afero.NewOsFs)
 }

@@ -109,7 +109,7 @@ func (sr RdbSqliteServiceRegister) Provide(
 ) error {
 	// check container argument reference
 	if container == nil {
-		return errNilPointer("Provider")
+		return errNilPointer("container")
 	}
 	// register the services
 	_ = container.Add(RdbSqliteDialectCreatorContainerID, NewRdbSqliteDialectCreator, RdbDialectCreatorTag)

@@ -311,7 +311,7 @@ func (sr MigratorServiceRegister) Provide(
 ) error {
 	// check container argument reference
 	if container == nil {
-		return errNilPointer("Provider")
+		return errNilPointer("container")
 	}
 	// register the services
 	_ = container.Add(MigratorDAOContainerID, sr.getDAO())
@@ -329,7 +329,7 @@ func (sr MigratorServiceRegister) Boot(
 ) (e error) {
 	// check container argument reference
 	if container == nil {
-		return errNilPointer("Provider")
+		return errNilPointer("container")
 	}
 	// check the application auto migration flag
 	if !MigratorAutoMigrate {
