@@ -125,7 +125,7 @@ func NewRdbMySqlServiceRegister(
 func (sr RdbMySqlServiceRegister) Provide(
 	container *ServiceContainer,
 ) error {
-	// check Provider argument reference
+	// check container argument reference
 	if container == nil {
 		return errNilPointer("Provider")
 	}

@@ -291,7 +291,7 @@ func NewRdbServiceRegister(
 func (sr RdbServiceRegister) Provide(
 	container *ServiceContainer,
 ) error {
-	// check Provider argument reference
+	// check container argument reference
 	if container == nil {
 		return errNilPointer("Provider")
 	}

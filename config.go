@@ -2886,7 +2886,7 @@ func NewConfigServiceRegister(
 func (sr ConfigServiceRegister) Provide(
 	container *ServiceContainer,
 ) error {
-	// check Provider argument reference
+	// check container argument reference
 	if container == nil {
 		return errNilPointer("Provider")
 	}
@@ -2915,7 +2915,7 @@ func (sr ConfigServiceRegister) Provide(
 func (sr ConfigServiceRegister) Boot(
 	container *ServiceContainer,
 ) (e error) {
-	// check Provider argument reference
+	// check container argument reference
 	if container == nil {
 		return errNilPointer("Provider")
 	}

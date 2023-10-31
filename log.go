@@ -1380,7 +1380,7 @@ func NewLogServiceRegister(
 func (sr LogServiceRegister) Provide(
 	container *ServiceContainer,
 ) error {
-	// check Provider argument reference
+	// check container argument reference
 	if container == nil {
 		return errNilPointer("Provider")
 	}
@@ -1403,7 +1403,7 @@ func (sr LogServiceRegister) Provide(
 func (sr LogServiceRegister) Boot(
 	container *ServiceContainer,
 ) (e error) {
-	// check Provider argument reference
+	// check container argument reference
 	if container == nil {
 		return errNilPointer("Provider")
 	}

@@ -309,7 +309,7 @@ func NewMigratorServiceRegister(
 func (sr MigratorServiceRegister) Provide(
 	container *ServiceContainer,
 ) error {
-	// check Provider argument reference
+	// check container argument reference
 	if container == nil {
 		return errNilPointer("Provider")
 	}
@@ -327,7 +327,7 @@ func (sr MigratorServiceRegister) Provide(
 func (sr MigratorServiceRegister) Boot(
 	container *ServiceContainer,
 ) (e error) {
-	// check Provider argument reference
+	// check container argument reference
 	if container == nil {
 		return errNilPointer("Provider")
 	}
