@@ -593,12 +593,18 @@ func Test_RdbServiceRegister(t *testing.T) {
 			container := NewServiceContainer()
 			_ = NewRdbServiceRegister().Provide(container)
 
-			service, e := container.Get(RdbDialectFactoryContainerID)
+			factory, e := container.Get(RdbDialectFactoryContainerID)
 			switch {
 			case e != nil:
 				t.Errorf("unexpected error (%v)", e)
-			case service == nil:
+			case factory == nil:
 				t.Error("didn't returned a valid reference")
+			default:
+				switch factory.(type) {
+				case *RdbDialectFactory:
+				default:
+					t.Error("didn't return a dialect factory instance")
+				}
 			}
 		})
 
@@ -659,6 +665,12 @@ func Test_RdbServiceRegister(t *testing.T) {
 				t.Errorf("unexpected error (%v)", e)
 			case factory == nil:
 				t.Error("didn't return a valid reference")
+			default:
+				switch factory.(type) {
+				case *RdbConnectionFactory:
+				default:
+					t.Error("didn't return a dialect factory instance")
+				}
 			}
 		})
 
@@ -724,10 +736,18 @@ func Test_RdbServiceRegister(t *testing.T) {
 				return config
 			})
 
-			if check, e := container.Get(RdbPrimaryConnectionContainerID); e != nil {
+			check, e := container.Get(RdbPrimaryConnectionContainerID)
+			switch {
+			case e != nil:
 				t.Errorf("unexpected error (%v)", e)
-			} else if check == nil {
+			case check == nil:
 				t.Error("didn't return a valid reference")
+			default:
+				switch check.(type) {
+				case *gorm.DB:
+				default:
+					t.Error("didn't return a dialect factory instance")
+				}
 			}
 		})
 
@@ -763,10 +783,18 @@ func Test_RdbServiceRegister(t *testing.T) {
 				return config
 			})
 
-			if check, e := container.Get(RdbPrimaryConnectionContainerID); e != nil {
+			check, e := container.Get(RdbPrimaryConnectionContainerID)
+			switch {
+			case e != nil:
 				t.Errorf("unexpected error (%v)", e)
-			} else if check == nil {
+			case check == nil:
 				t.Error("didn't return a valid reference")
+			default:
+				switch check.(type) {
+				case *gorm.DB:
+				default:
+					t.Error("didn't return a dialect factory instance")
+				}
 			}
 		})
 	})

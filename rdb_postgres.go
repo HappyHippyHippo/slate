@@ -69,7 +69,7 @@ func (RdbPostgresDialectCreator) Create(
 		Schema   string
 		Params   ConfigPartial
 	}{
-		Port: 3306,
+		Port: 5432,
 	}
 	if _, e := config.Populate("", &sConfig); e != nil {
 		return nil, e
@@ -85,9 +85,9 @@ func (RdbPostgresDialectCreator) Create(
 	)
 	// add the extra parameters to the generated DSN string
 	if len(sConfig.Params) > 0 {
-		dsn += "?"
+		dsn += " "
 		for key, value := range sConfig.Params {
-			dsn += fmt.Sprintf("&%s=%v", key, value)
+			dsn += fmt.Sprintf(" %s=%v", key, value)
 		}
 	}
 	// create the connection dialect instance

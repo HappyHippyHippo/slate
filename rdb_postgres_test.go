@@ -131,7 +131,7 @@ func Test_RdbPostgresDialectCreator(t *testing.T) {
 				"username": "user",
 				"password": "password",
 				"host":     "localhost",
-				"port":     3306,
+				"port":     5432,
 				"schema":   123,
 			}
 
@@ -152,7 +152,7 @@ func Test_RdbPostgresDialectCreator(t *testing.T) {
 				"username": "user",
 				"password": "password",
 				"host":     "localhost",
-				"port":     3306,
+				"port":     5432,
 				"schema":   "mysql",
 				"params":   123,
 			}
@@ -193,7 +193,7 @@ func Test_RdbPostgresDialectCreator(t *testing.T) {
 		})
 
 		t.Run("valid connection with simple port", func(t *testing.T) {
-			expected := "user=user password=password host=localhost port=3306 dbname=rdb"
+			expected := "user=user password=password host=localhost port=5432 dbname=rdb"
 			config := ConfigPartial{
 				"dialect":  "postgres",
 				"username": "user",
@@ -221,7 +221,7 @@ func Test_RdbPostgresDialectCreator(t *testing.T) {
 		})
 
 		t.Run("valid connection with extra params", func(t *testing.T) {
-			expectedPrefix := "user=user password=password host=localhost port=3306 dbname=rdb"
+			expectedPrefix := "user=user password=password host=localhost port=5432 dbname=rdb"
 			config := ConfigPartial{
 				"dialect":  "postgres",
 				"username": "user",
